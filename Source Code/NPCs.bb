@@ -3430,7 +3430,7 @@ Function UpdateNPCs()
 										For i = 0 To MaxItemAmount-1
 											If Inventory(i)<>Null
 												Local docname$ = Inventory(i)\itemtemplate\namespec
-												If docname = "log" ;TODO
+												If Left(docname, 3) = "log"
 													;860,850,830,800
 													docamount% = docamount% + 1
 													docchance = docchance + 10*docamount%

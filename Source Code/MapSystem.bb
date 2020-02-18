@@ -1359,8 +1359,7 @@ Function PlaceForest_MapCreator(fr.Forest,x#,y#,z#,r.Rooms)
 					Local it.Items = Null
 					If (ty Mod 3)=2 And itemPlaced[Floor(ty/3)]=False Then
 						itemPlaced[Floor(ty/3)]=True
-						;it.Items = CreateItem(GetLocalStringR("Items", "log", Int(Floor(ty/3)+1)), "paper", 0,0.5,0) ;TODO
-						it.Items = CreateItem("paper", 0,0.5,0)
+						it.Items = CreateItem("paper", 0,0.5,0, "log" + Int(Floor(ty/3)+1))
 						EntityType(it\collider, HIT_ITEM)
 						EntityParent(it\collider, tile_entity)
 					EndIf
