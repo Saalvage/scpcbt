@@ -1,0 +1,3 @@
+Delete options.ini
+Clear Saves
+Clear Error logs
