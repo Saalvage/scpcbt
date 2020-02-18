@@ -15,7 +15,6 @@
 - Added Apollyon difficulty; can be unlocked by beating the game on Keter. (Inspired by Ultimate Edition).
 - Added inventory size as a difficulty factor.
 - Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A and the radio.
-TODO 148, NVG
 - Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the render size will be the screen size.
 - Added button to restore all settings to standard values.
 - Added a sound when clicking on disabled checkboxes in the menu.
@@ -28,6 +27,8 @@ TODO 148, NVG
 	- Added ability to downgrade Keycards.
 	- Added refinements for SCP-427.
 	- Added refinements for the Strange Bottle.
+	- Added extremely low chance to get SCP-1499 by refining a gas mask.
+	- Added consistency.
 	- Fixed SCP-148's refinements.
 	- And some other minor stuff.
 - Geometry the player can't interact with no longer has collision, should result in a performance boost. (Idea by Third Subdivision Studio/Vane Brain and ENDSHN)

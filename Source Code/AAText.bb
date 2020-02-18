@@ -10,7 +10,7 @@ Type AAFont
 	Field texture%
 	Field backup% ;images don't get erased by clearworld
 	
-	Field x%[256] ;not going to bother with unicode
+	Field x%[256] ;not going to bother with unicode; but at least the higher ascii range :) ~Salvage
 	Field y%[256]
 	Field w%[256]
 	Field h%[256]

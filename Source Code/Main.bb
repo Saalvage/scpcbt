@@ -2446,7 +2446,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 				Msg = GetLocalString("Messages", "scannerdenied")
 				MsgTimer = 70 * 10
 			EndIf
-			Return			
+			Return
 		EndIf
 	Else
 		If d\locked Then
@@ -9740,6 +9740,82 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					EndIf
 					RemoveItem(item)
 			End Select
+		Case "scp420j"
+			Select setting
+				Case "rough"		
+					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
+				Case "1:1"
+					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
+				Case "fine", "very fine"
+					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
+			End Select
+			RemoveItem(item)
+		Case "cigarette"
+			Select setting
+				Case "rough", "coarse"	
+					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					PositionEntity(item\collider, x + 1.5, y + 0.5, z + 1.0)
+					ResetEntity(item\collider)
+				Case "fine"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
+					Else
+						it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
+					EndIf
+				Case "very fine"
+					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
+			End Select
+		Case "420s"
+			If item\itemtemplate\namespec = "joint" Then
+				Select setting
+					Case "rough"
+						d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
+						d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+					Case "coarse"
+						it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
+					Case "1:1"
+						If Rand(3) = 1 Then
+							it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
+						Else
+							PositionEntity(item\collider, x + 1.5, y + 0.5, z + 1.0)
+							ResetEntity(item\collider)
+						EndIf
+					Case "fine", "very fine"
+						it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
+				End Select
+			Else ;smellyjoint
+				Select setting
+					Case "rough"
+						it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
+					Case "coarse"
+						If Rand(3) = 1 Then
+							it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
+						Else
+							it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
+						EndIf
+					Case "1:1", "fine", "very fine"
+						PositionEntity(item\collider, x + 1.5, y + 0.5, z + 1.0)
+						ResetEntity(item\collider)
+				End Select
+			EndIf
+		Case "scp427"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+					RemoveItem(item)
+				Case "coarse"
+					it2 = CreateItem("scp500", x, y, z)
+					RemoveItem(item)
+				Case "1:1", "fine", "very fine"
+					PositionEntity(item\collider, x, y, z)
+					ResetEntity(item\collider)
+			End Select
 		Case "badgasmask"
 			Select setting
 				Case "rough", "coarse"
@@ -9747,8 +9823,13 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					If Rand(50) = 1 Then
+						it2 = CreateItem("bad1499", x, y, z)
+						RemoveItem(item)
+					Else
+						PositionEntity(item\collider, x, y, z)
+						ResetEntity(item\collider)
+					EndIf
 				Case "fine"
 					it2 = CreateItem("gasmask", x, y, z)
 					RemoveItem(item)
@@ -9766,8 +9847,13 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("badgasmask", x, y, z)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					If Rand(100) = 1 Then
+						it2 = CreateItem("scp1499", x, y, z)
+						RemoveItem(item)
+					Else
+						PositionEntity(item\collider, x, y, z)
+						ResetEntity(item\collider)
+					EndIf
 				Case "fine", "very fine"
 					it2 = CreateItem("supergasmask", x, y, z)
 					RemoveItem(item)
@@ -9781,8 +9867,18 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("gasmask", x, y, z)
 					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					If Rand(200) = 1 Then
+						If Rand(3) = 1 Then
+							it2 = CreateItem("super1499", x, y, z)
+							RemoveItem(item)
+						Else
+							it2 = CreateItem("fine1499", x, y, z)
+							RemoveItem(item)
+						EndIf
+					Else
+						PositionEntity(item\collider, x, y, z)
+						ResetEntity(item\collider)
+					EndIf
 				Case "fine", "very fine"
 					it2 = CreateItem("supergasmask", x, y, z)
 					RemoveItem(item)
@@ -9849,19 +9945,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					ResetEntity(item\collider)
 				Case "very fine"
 					item\invSlots = Max(item\state2,20)
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
-			End Select
-		Case "scp427"
-			Select setting
-				Case "rough"
-					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
-				Case "coarse"
-					it2 = CreateItem("scp500", x, y, z)
-					RemoveItem(item)
-				Case "1:1", "fine", "very fine"
 					PositionEntity(item\collider, x, y, z)
 					ResetEntity(item\collider)
 			End Select
@@ -10018,20 +10101,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "1:1", "fine", "very fine"
 					it2 = CreateItem("scp513", x, y, z)
 					
-			End Select
-			
-			RemoveItem(item)
-		Case "scp420j", "cigarette"
-			Select setting
-				Case "rough", "coarse"			
-					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
-				Case "fine"
-					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
-				Case "very fine"
-					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
 			End Select
 			
 			RemoveItem(item)
