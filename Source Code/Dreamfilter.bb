@@ -44,7 +44,3 @@ Function UpdateBlur(power#)
 	CopyRect 0, 0, GraphicWidth, GraphicHeight, 1024.0 - GraphicWidth/2, 1024.0 - GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
 	
 End Function
-
-;~IDEal Editor Parameters:
-;~F#3#26
-;~C#Blitz3D

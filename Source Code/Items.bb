@@ -832,14 +832,3 @@ Function Update294()
 	
 	CatchErrors("Update294")
 End Function
-
-
-
-
-
-
-
-
-;~IDEal Editor Parameters:
-;~F#B#1E
-;~C#Blitz3D

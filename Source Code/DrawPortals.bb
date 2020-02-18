@@ -104,6 +104,3 @@ Function UpdateDrawPortal(ndp.DrawPortal);,passive%=True)
 	SetBuffer(BackBuffer())
 	;ClsColor 0,0,0
 End Function
-;~IDEal Editor Parameters:
-;~F#0#E#40#4C
-;~C#Blitz3D

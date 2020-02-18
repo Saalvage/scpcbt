@@ -13,5 +13,3 @@ Const AllChannel=	-3
 Const FreeChannel = -1
 
 FSOUND_Init(Freq, Channels, Flags)
-;~IDEal Editor Parameters:
-;~C#Blitz3D

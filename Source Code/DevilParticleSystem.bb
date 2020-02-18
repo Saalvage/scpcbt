@@ -411,12 +411,3 @@ For p.Particle = Each Particle
 	EndIf
 Next
 End Function
-
-
-
-
-
-;~IDEal Editor Parameters:
-;~F#2F#35#42#55#5E#63#68#6D#72#78#7D#83#8C#96#A0#A6#AC#B1#B9#BF
-;~F#C4#C9#D3#D8#DE#E4#EE#106#117#11D
-;~C#Blitz3D
