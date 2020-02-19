@@ -68,7 +68,7 @@ Function UpdateMainMenu()
 	
 	DrawImage(MenuBack, 0, 0)
 	
-	If (MilliSecs2() Mod MenuBlinkTimer(0)) >= Rand(MenuBlinkDuration(0)) Then
+	If (MilliSecs() Mod MenuBlinkTimer(0)) >= Rand(MenuBlinkDuration(0)) Then
 		DrawImage(Menu173, GraphicWidth - ImageWidth(Menu173), GraphicHeight - ImageHeight(Menu173))
 	EndIf
 	
@@ -1720,7 +1720,7 @@ Function InputBox$(x%, y%, width%, height%, Txt$, ID% = 0, MaxChr% = 0)
 	If SelectedInputBox = ID Then
 		Txt = rInput(Txt)
 		If MaxChr > 0 Then Txt = Left(Txt, MaxChr)
-		If (MilliSecs2() Mod 800) < 400 Then Rect (x + width / 2 + AAStringWidth(Txt) / 2 + 2, y + height / 2 - 5, 2, 12)
+		If (MilliSecs() Mod 800) < 400 Then Rect (x + width / 2 + AAStringWidth(Txt) / 2 + 2, y + height / 2 - 5, 2, 12)
 	EndIf	
 	
 	AAText(x + width / 2, y + height / 2, Txt, True, True)

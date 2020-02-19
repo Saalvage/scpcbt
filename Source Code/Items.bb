@@ -320,7 +320,7 @@ Type Items
 End Type 
 
 Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#=1.0,invSlots%=0)
-	CatchErrors("Uncaught (CreateItem)")
+	;CatchErrors("Uncaught (CreateItem)")
 	
 	Local i.Items = New Items
 	Local it.ItemTemplates
@@ -391,12 +391,12 @@ Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#
 	i\ID=LastItemID+1
 	LastItemID=i\ID
 	
-	CatchErrors("CreateItem")
+	;CatchErrors("CreateItem")
 	Return i
 End Function
 
 Function RemoveItem(i.Items)
-	CatchErrors("Uncaught (RemoveItem)")
+	;CatchErrors("Uncaught (RemoveItem)")
 	Local n
 	FreeEntity(i\model) : FreeEntity(i\collider) : i\collider = 0
 	
@@ -434,12 +434,12 @@ Function RemoveItem(i.Items)
 	EndIf
 	Delete i
 	
-	CatchErrors("RemoveItem")
+	;CatchErrors("RemoveItem")
 End Function
 
 
 Function UpdateItems()
-	CatchErrors("Uncaught (UpdateItems)")
+	;CatchErrors("Uncaught (UpdateItems)")
 	Local n, i.Items, i2.Items
 	Local xtemp#, ytemp#, ztemp#
 	Local temp%, np.NPCs
@@ -453,9 +453,9 @@ Function UpdateItems()
 		i\Dropped = 0
 		
 		If (Not i\Picked) Then
-			If i\disttimer < MilliSecs2() Then
+			If i\disttimer < MilliSecs() Then
 				i\dist = EntityDistance(Camera, i\collider)
-				i\disttimer = MilliSecs2() + 700
+				i\disttimer = MilliSecs() + 700
 				If i\dist < HideDist Then ShowEntity i\collider
 			EndIf
 			
@@ -540,7 +540,7 @@ Function UpdateItems()
 		EndIf
 		
 		If Not deletedItem Then
-			CatchErrors(Chr(34)+i\itemtemplate\localname+Chr(34)+" item")
+			;CatchErrors(Chr(34)+i\itemtemplate\localname+Chr(34)+" item")
 		EndIf
 		deletedItem = False
 	Next
@@ -571,7 +571,7 @@ Function PickItem(item.Items)
 		Return
 	EndIf
 	
-	CatchErrors("Uncaught (PickItem)")
+	;CatchErrors("Uncaught (PickItem)")
 	If (Not fullINV) Then
 		For n% = 0 To MaxItemAmount - 1
 			If Inventory(n) = Null Then
@@ -694,7 +694,7 @@ Function PickItem(item.Items)
 		Msg = GetLocalString("Messages", "cantcarrymore")
 		MsgTimer = 70 * 5
 	EndIf
-	CatchErrors("PickItem")
+	;CatchErrors("PickItem")
 End Function
 
 Function DropItem(item.Items,playdropsound%=True)
@@ -704,7 +704,7 @@ Function DropItem(item.Items,playdropsound%=True)
 		Return
 	EndIf
 	
-	CatchErrors("Uncaught (DropItem)")
+	;CatchErrors("Uncaught (DropItem)")
 	If playdropsound Then
 		If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
 	EndIf
@@ -745,13 +745,13 @@ Function DropItem(item.Items,playdropsound%=True)
 			I_427\Using = 0
 	End Select
 	
-	CatchErrors("DropItem")
+	;CatchErrors("DropItem")
 	
 End Function
 
 ;Update any ailments inflicted by SCP-294 drinks.
 Function Update294()
-	CatchErrors("Uncaught (Update294)")
+	;CatchErrors("Uncaught (Update294)")
 	
 	If CameraShakeTimer > 0 Then
 		CameraShakeTimer = CameraShakeTimer - (FPSfactor/70)
@@ -762,24 +762,24 @@ Function Update294()
 		DebugLog VomitTimer
 		VomitTimer = VomitTimer - (FPSfactor/70)
 		
-		If (MilliSecs2() Mod 1600) < Rand(200, 400) Then
+		If (MilliSecs() Mod 1600) < Rand(200, 400) Then
 			If BlurTimer = 0 Then BlurTimer = Rnd(10, 20)*70
 			CameraShake = Rnd(0, 2)
 		EndIf
 		
-;		If (MilliSecs2() Mod 1000) < Rand(1200) Then 
+;		If (MilliSecs() Mod 1000) < Rand(1200) Then 
 		
-		If Rand(50) = 50 And (MilliSecs2() Mod 4000) < 200 Then PlaySound_Strict(CoughSFX(Rand(0,2)))
+		If Rand(50) = 50 And (MilliSecs() Mod 4000) < 200 Then PlaySound_Strict(CoughSFX(Rand(0,2)))
 		
 		;Regurgitate when timer is below 10 seconds. (ew)
 		If VomitTimer < 10 And Rnd(0, 500 * VomitTimer) < 2 Then
 			If (Not ChannelPlaying(VomitCHN)) And (Not Regurgitate) Then
 				VomitCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\294\Retch" + Rand(1, 2) + ".ogg"))
-				Regurgitate = MilliSecs2() + 50
+				Regurgitate = MilliSecs() + 50
 			EndIf
 		EndIf
 		
-		If Regurgitate > MilliSecs2() And Regurgitate <> 0 Then
+		If Regurgitate > MilliSecs() And Regurgitate <> 0 Then
 			mouse_y_speed_1 = mouse_y_speed_1 + 1.0
 		Else
 			Regurgitate = 0
@@ -789,7 +789,7 @@ Function Update294()
 		VomitTimer = VomitTimer - (FPSfactor/70)
 		
 		If VomitTimer > -5 Then
-			If (MilliSecs2() Mod 400) < 50 Then CameraShake = 4 
+			If (MilliSecs() Mod 400) < 50 Then CameraShake = 4 
 			mouse_x_speed_1 = 0.0
 			Playable = False
 		Else
@@ -832,5 +832,5 @@ Function Update294()
 		EndIf
 	EndIf
 	
-	CatchErrors("Update294")
+	;CatchErrors("Update294")
 End Function

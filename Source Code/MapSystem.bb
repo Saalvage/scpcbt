@@ -7,7 +7,7 @@ Type Materials
 End Type
 
 Function LoadMaterials(file$)
-	CatchErrors("Uncaught (LoadMaterials)")
+	;CatchErrors("Uncaught (LoadMaterials)")
 	;If Not BumpEnabled Then Return
 	
 	Local TemporaryString$
@@ -46,7 +46,7 @@ Function LoadMaterials(file$)
 	
 	CloseFile f
 	
-	CatchErrors("LoadMaterials")
+	;CatchErrors("LoadMaterials")
 End Function
 
 
@@ -130,7 +130,7 @@ Function FreeTextureCache()
 End Function
 
 Function LoadRMesh(file$,rt.RoomTemplates)
-	CatchErrors("Uncaught (LoadRMesh)")
+	;CatchErrors("Uncaught (LoadRMesh)")
 	;generate a texture made of white
 	Local blankTexture%
 	blankTexture=CreateTexture(4,4,1,1)
@@ -695,7 +695,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 	
 	CloseFile f
 	
-	CatchErrors("LoadRMesh")
+	;CatchErrors("LoadRMesh")
 	Return obj%
 	
 End Function
@@ -823,7 +823,7 @@ Function turn_if_deviating%(max_deviation_distance_%,pathx%,center_%,dir%,retval
 End Function
 
 Function GenForestGrid(fr.Forest)
-	CatchErrors("Uncaught (GenForestGrid)")
+	;CatchErrors("Uncaught (GenForestGrid)")
 	fr\ID=LastForestID+1
 	LastForestID=LastForestID+1
 	
@@ -987,11 +987,11 @@ Function GenForestGrid(fr.Forest)
 		Next
 	Next
 	
-	CatchErrors("GenForestGrid")
+	;CatchErrors("GenForestGrid")
 End Function
 
 Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
-	CatchErrors("Uncaught (PlaceForest)")
+	;CatchErrors("Uncaught (PlaceForest)")
 	;local variables
 	Local tx%,ty%
 	Local tile_size#=12.0
@@ -1256,11 +1256,11 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 		Next		
 	Next
 	
-	CatchErrors("PlaceForest")
+	;CatchErrors("PlaceForest")
 End Function
 
 Function PlaceForest_MapCreator(fr.Forest,x#,y#,z#,r.Rooms)
-	CatchErrors("Uncaught (PlaceForest_MapCreator)")
+	;CatchErrors("Uncaught (PlaceForest_MapCreator)")
 	;local variables
 	Local tx%,ty%
 	Local tile_size#=12.0
@@ -1482,11 +1482,11 @@ Function PlaceForest_MapCreator(fr.Forest,x#,y#,z#,r.Rooms)
 	
 	DebugLog "ForestINIT END"
 	
-	CatchErrors("PlaceForest_MapCreator")
+	;CatchErrors("PlaceForest_MapCreator")
 End Function
 
 Function DestroyForest(fr.Forest)
-	CatchErrors("Uncaught (DestroyForest)")
+	;CatchErrors("Uncaught (DestroyForest)")
 	Local tx%,ty%
 	For tx% = 0 To gridsize-1
 		For ty% = 0 To gridsize-1
@@ -1513,13 +1513,13 @@ Function DestroyForest(fr.Forest)
 		If fr\TileTexture[i]<>0 Then FreeEntity fr\TileTexture[i] : fr\TileTexture[i]=0
 	Next
 	
-	CatchErrors("DestroyForest")
+	;CatchErrors("DestroyForest")
 	;Delete fr
 End Function
 
 
 Function UpdateForest(fr.Forest,ent%)
-	CatchErrors("Uncaught (UpdateForest)")
+	;CatchErrors("Uncaught (UpdateForest)")
 	;local variables
 	Local tx%,ty%
 	If Abs(EntityY(ent,True)-EntityY(fr\Forest_Pivot,True))<12.0 Then
@@ -1539,7 +1539,7 @@ Function UpdateForest(fr.Forest,ent%)
 			Next
 		Next
 	EndIf
-	CatchErrors("UpdateForest")
+	;CatchErrors("UpdateForest")
 End Function
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1602,7 +1602,7 @@ End Function
 Function LoadRoomTemplates(file$)
 	Local I_Loc.Loc = First Loc
 	
-	CatchErrors("Uncaught (LoadRoomTemplates)")
+	;CatchErrors("Uncaught (LoadRoomTemplates)")
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file)=1 Then
 		file = I_Loc\LangPath + file
 	EndIf
@@ -1660,7 +1660,7 @@ Function LoadRoomTemplates(file$)
 	
 	CloseFile f
 	
-	CatchErrors("LoadRoomTemplates")
+	;CatchErrors("LoadRoomTemplates")
 End Function
 
 
@@ -1980,7 +1980,7 @@ Function PlaceGrid_MapCreator(r.Rooms)
 End Function
 
 Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
-	CatchErrors("Uncaught (CreateRoom)")
+	;CatchErrors("Uncaught (CreateRoom)")
 	Local r.Rooms = New Rooms
 	Local rt.RoomTemplates
 	
@@ -2055,11 +2055,11 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 		Next
 	Next
 	
-	CatchErrors("CreateRoom")
+	;CatchErrors("CreateRoom")
 End Function
 
 Function FillRoom(r.Rooms)
-	CatchErrors("Uncaught (FillRoom)")
+	;CatchErrors("Uncaught (FillRoom)")
 	Local d.Doors, d2.Doors, sc.SecurityCams, de.Decals, r2.Rooms, sc2.SecurityCams
 	Local it.Items, i%
 	Local xtemp%, ytemp%, ztemp%
@@ -5458,11 +5458,11 @@ Function FillRoom(r.Rooms)
 		EndIf
 	Next
 	
-	CatchErrors("FillRoom ("+r\RoomTemplate\Name+")")
+	;CatchErrors("FillRoom ("+r\RoomTemplate\Name+")")
 End Function
 
 Function UpdateRooms()
-	CatchErrors("Uncaught (UpdateRooms)")
+	;CatchErrors("Uncaught (UpdateRooms)")
 	Local dist#, i%, j%, r.Rooms
 	
 	Local x#,z#,hide%=True
@@ -5608,7 +5608,7 @@ Function UpdateRooms()
 		Next
 	EndIf
 	
-	CatchErrors("UpdateErrors")
+	;CatchErrors("UpdateErrors")
 End Function
 
 Function IsRoomAdjacent(this.Rooms,that.Rooms)
@@ -5880,7 +5880,7 @@ Function InitWayPoints(loadingstart=45)
 		Next
 	Next
 	
-	DebugLog "InitWaypoints() - "+(MilliSecs2()-temper)
+	DebugLog "InitWaypoints() - "+(MilliSecs()-temper)
 	
 End Function
 
@@ -6262,7 +6262,7 @@ Function CreateSecurityCam.SecurityCams(x#, y#, z#, r.Rooms, screen% = False)
 End Function
 
 Function UpdateSecurityCams()
-	CatchErrors("Uncaught (UpdateSecurityCams)")
+	;CatchErrors("Uncaught (UpdateSecurityCams)")
 	Local sc.SecurityCams
 	
 	;coffineffect = 0, not affected by 895
@@ -6474,7 +6474,7 @@ Function UpdateSecurityCams()
 							EntityTexture(sc\ScrOverlay, OldAiPics(0))
 						EndIf
 						
-						If (MilliSecs2() Mod sc\PlayerState) >= Rand(600) Then
+						If (MilliSecs() Mod sc\PlayerState) >= Rand(600) Then
 							EntityTexture(sc\ScrOverlay, MonitorTexture)
 						Else
 							If sc\soundCHN = 0 Then
@@ -6498,12 +6498,12 @@ Function UpdateSecurityCams()
 			
 			If sc<>Null Then
 				If sc\room<>Null Then
-					CatchErrors("UpdateSecurityCameras ("+sc\room\RoomTemplate\Name+")")
+					;CatchErrors("UpdateSecurityCameras ("+sc\room\RoomTemplate\Name+")")
 				Else
-					CatchErrors("UpdateSecurityCameras (screen has no room)")
+					;CatchErrors("UpdateSecurityCameras (screen has no room)")
 				EndIf
 			Else
-				CatchErrors("UpdateSecurityCameras (screen doesn't exist anymore)")
+				;CatchErrors("UpdateSecurityCameras (screen doesn't exist anymore)")
 			EndIf
 		EndIf
 	Next
@@ -8028,7 +8028,7 @@ Function SetChunkDataValues()
 		Next
 	Next
 	
-	SeedRnd MilliSecs2()
+	SeedRnd MilliSecs()
 	
 End Function
 
@@ -8084,7 +8084,7 @@ Function CreateChunkParts(r.Rooms)
 		EndIf
 	Next
 	
-	SeedRnd MilliSecs2()
+	SeedRnd MilliSecs()
 	
 End Function
 

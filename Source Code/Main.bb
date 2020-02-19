@@ -2756,13 +2756,6 @@ Function InitEvents()
 	CreateEvent("room966","room966", 0)
 	
 	CreateEvent("room1123", "room1123", 0, 0)
-	;CreateEvent("room2test1074","room2test1074",0)
-	;CreateEvent("room038","room038",0,0)
-	;CreateEvent("room009","room009",0,0)
-	;CreateEvent("medibay", "medibay", 0)
-	;CreateEvent("room409", "room409", 0)
-	;CreateEvent("room178", "room178", 0)
-	;CreateEvent("room020", "room020", 0)
 	CreateEvent("room2tesla", "room2tesla_lcz", 0, 0.9)
 	CreateEvent("room2tesla", "room2tesla_hcz", 0, 0.9)
 	
@@ -2816,12 +2809,6 @@ Collisions HIT_APACHE, HIT_APACHE, 1, 2
 Collisions HIT_178, HIT_MAP, 2, 2
 Collisions HIT_178, HIT_178, 1, 3
 Collisions HIT_DEAD, HIT_MAP, 2, 2
-
-Function MilliSecs2()
-	Local retVal% = MilliSecs()
-	If retVal < 0 Then retVal = retVal + 2147483648
-	Return retVal
-End Function
 
 DrawLoading(90, True)
 
@@ -2925,7 +2912,7 @@ Repeat
 	
 	Cls
 	
-	CurTime = MilliSecs2()
+	CurTime = MilliSecs()
 	ElapsedTime = (CurTime - PrevTime) / 1000.0
 	PrevTime = CurTime
 	PrevFPSFactor = FPSfactor
@@ -2936,17 +2923,17 @@ Repeat
 	
 	If Framelimit > 0 Then
 	    ;Framelimit
-		Local WaitingTime% = (1000.0 / Framelimit) - (MilliSecs2() - LoopDelay)
+		Local WaitingTime% = (1000.0 / Framelimit) - (MilliSecs() - LoopDelay)
 		Delay WaitingTime%
 		
-		LoopDelay = MilliSecs2()
+		LoopDelay = MilliSecs()
 	EndIf
 	
 	;Counting the fps
-	If CheckFPS < MilliSecs2() Then
+	If CheckFPS < MilliSecs() Then
 		FPS = ElapsedLoops
 		ElapsedLoops = 0
-		CheckFPS = MilliSecs2()+1000
+		CheckFPS = MilliSecs()+1000
 	EndIf
 	ElapsedLoops = ElapsedLoops + 1
 	
@@ -2954,8 +2941,8 @@ Repeat
 		DoubleClick = False
 		MouseHit1 = MouseHit(1)
 		If MouseHit1 Then
-			If MilliSecs2() - LastMouseHit1 < 800 Then DoubleClick = True
-			LastMouseHit1 = MilliSecs2()
+			If MilliSecs() - LastMouseHit1 < 800 Then DoubleClick = True
+			LastMouseHit1 = MilliSecs()
 		EndIf
 		
 		Local prevmousedown1 = MouseDown1
@@ -3463,7 +3450,7 @@ Repeat
 	EntityBlend fresize_image,1
 	EntityAlpha fresize_image,1.0
 	
-	CatchErrors("Main loop / uncaught")
+	;CatchErrors("Main loop / uncaught")
 	
 	If Vsync = 0 Then
 		Flip 0
@@ -3477,7 +3464,7 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function QuickLoadEvents()
-	CatchErrors("Uncaught (QuickLoadEvents)")
+	;CatchErrors("Uncaught (QuickLoadEvents)")
 	
 	Local e.Events = QuickLoad_CurrEvent
 	
@@ -3750,7 +3737,7 @@ Function QuickLoadEvents()
 
 	End Select
 	
-	CatchErrors("QuickLoadEvents "+e\EventName)
+	;CatchErrors("QuickLoadEvents "+e\EventName)
 	
 End Function
 
@@ -4082,7 +4069,7 @@ End Function
 ;--------------------------------------- player controls -------------------------------------------
 
 Function MovePlayer()
-	CatchErrors("Uncaught (MovePlayer)")
+	;CatchErrors("Uncaught (MovePlayer)")
 	Local Sprint# = 1.0, Speed# = 0.018, i%, angle#
 	Local I_Cheats.Cheats = First Cheats	
 	
@@ -4367,7 +4354,7 @@ Function MovePlayer()
 	
 	If Injuries > 1.0 Then
 		temp2 = Bloodloss
-		BlurTimer = Max(Max(Sin(MilliSecs2()/100.0)*Bloodloss*30.0,Bloodloss*2*(2.0-CrouchState)),BlurTimer)
+		BlurTimer = Max(Max(Sin(MilliSecs()/100.0)*Bloodloss*30.0,Bloodloss*2*(2.0-CrouchState)),BlurTimer)
 		Local I_427.SCP427 = First SCP427
 		If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 			Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
@@ -4396,7 +4383,7 @@ Function MovePlayer()
 			FreeEntity pvt
 		EndIf
 		
-		CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs2())/20.0)+1.0)*Bloodloss*0.2)
+		CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0)*Bloodloss*0.2)
 		
 		If Bloodloss > 60 Then Crouch = True
 		If Bloodloss => 100 Then 
@@ -4437,7 +4424,7 @@ Function MovePlayer()
 		HeartBeatVolume = Max(HeartBeatVolume - FPSfactor*0.05, 0)
 	EndIf
 	
-	CatchErrors("MovePlayer")
+	;CatchErrors("MovePlayer")
 End Function
 
 Function MouseLook()
@@ -4507,7 +4494,7 @@ Function MouseLook()
 		
 		If PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
 			If EntityY(Collider)<2000*RoomScale Or EntityY(Collider)>2608*RoomScale Then
-				RotateEntity Camera, WrapAngle(EntityPitch(Camera)),WrapAngle(EntityYaw(Camera)), roll+WrapAngle(Sin(MilliSecs2()/150.0)*30.0) ; Pitch the user;s camera up And down.
+				RotateEntity Camera, WrapAngle(EntityPitch(Camera)),WrapAngle(EntityYaw(Camera)), roll+WrapAngle(Sin(MilliSecs()/150.0)*30.0) ; Pitch the user;s camera up And down.
 			EndIf
 		EndIf
 		
@@ -4697,7 +4684,7 @@ End Function
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
 
 Function DrawGUI()
-	CatchErrors("Uncaught (DrawGUI)")
+	;CatchErrors("Uncaught (DrawGUI)")
 	
 	Local temp%, x%, y%, z%, i%, yawvalue#, pitchvalue#
 	Local x2#,y2#,z2#
@@ -4938,8 +4925,8 @@ Function DrawGUI()
 			Else
 				AAText x + 350, 50, "Current Room Position: ("+PlayerRoom\x+", "+PlayerRoom\y+", "+PlayerRoom\z+")"
 			EndIf
-			GlobalMemoryStatus m.MEMORYSTATUS
-			AAText x + 350, 90, (m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
+			;GlobalMemoryStatus m.MEMORYSTATUS TODO
+			;AAText x + 350, 90, (m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
 			AAText x + 350, 110, "Triangles rendered: "+CurrTrisAmount
 			AAText x + 350, 130, "Active textures: "+ActiveTextures()
 			AAText x + 350, 150, "SCP-427 state (secs): "+Int(I_427\Timer/70.0)
@@ -6505,7 +6492,7 @@ Function DrawGUI()
 							
 							AASetFont Font3
 							If strtemp <> "" Then
-								strtemp = Right(Left(strtemp, (Int(MilliSecs2()/300) Mod Len(strtemp))),10)
+								strtemp = Right(Left(strtemp, (Int(MilliSecs()/300) Mod Len(strtemp))),10)
 								AAText(x+32, y+33, strtemp)
 							EndIf
 							
@@ -6722,7 +6709,7 @@ Function DrawGUI()
 					EndIf
 					
 					If (Not NavWorks) Then
-						If (MilliSecs2() Mod 1000) > 300 Then
+						If (MilliSecs() Mod 1000) > 300 Then
 							Color(200, 0, 0)
 							AAText(x, y + height / 2 - 80, "ERROR 06", True)
 							AAText(x, y + height / 2 - 60, "LOCATION UNKNOWN", True)						
@@ -6796,7 +6783,7 @@ Function DrawGUI()
 							Else
 								Color (30,30,30)
 							EndIf
-							If (MilliSecs2() Mod 1000) > 300 Then
+							If (MilliSecs() Mod 1000) > 300 Then
 								If SelectedItem\itemtemplate\tempname <> "nav310" And SelectedItem\itemtemplate\tempname <> "navulti" Then
 									AAText(x - width/2 + 10, y - height/2 + 10, "MAP DATABASE OFFLINE")
 								EndIf
@@ -6812,7 +6799,7 @@ Function DrawGUI()
 							EndIf
 							
 							Local SCPs_found% = 0
-							If SelectedItem\itemtemplate\tempname = "navulti" And (MilliSecs2() Mod 600) < 400 Then
+							If SelectedItem\itemtemplate\tempname = "navulti" And (MilliSecs() Mod 600) < 400 Then
 								If Curr173<>Null Then
 									Local dist# = EntityDistance(Camera, Curr173\obj)
 									dist = Ceil(dist / 8.0) * 8.0
@@ -7186,11 +7173,11 @@ Function DrawGUI()
 	
 	If PrevInvOpen And (Not InvOpen) Then MoveMouse viewport_center_x, viewport_center_y
 	
-	CatchErrors("DrawGUI")
+	;CatchErrors("DrawGUI")
 End Function
 
 Function DrawMenu()
-	CatchErrors("Uncaught (DrawMenu)")
+	;CatchErrors("Uncaught (DrawMenu)")
 	
 	Local x%, y%, width%, height%
 	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
@@ -7897,7 +7884,7 @@ Function DrawMenu()
 	
 	AASetFont Font1
 	
-	CatchErrors("DrawMenu")
+	;CatchErrors("DrawMenu")
 End Function
 
 Function MouseOn%(x%, y%, width%, height%)
@@ -7913,7 +7900,7 @@ End Function
 
 Include "Source Code\LoadAllSounds.bb"
 Function LoadEntities()
-	CatchErrors("Uncaught (LoadEntities)")
+	;CatchErrors("Uncaught (LoadEntities)")
 	DrawLoading(0)
 	
 	Local i%
@@ -8458,11 +8445,11 @@ Function LoadEntities()
 	
 	;LoadRoomMeshes()
 	
-	CatchErrors("LoadEntities")
+	;CatchErrors("LoadEntities")
 End Function
 
 Function InitNewGame()
-	CatchErrors("Uncaught (InitNewGame)")
+	;CatchErrors("Uncaught (InitNewGame)")
 	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
 	DrawLoading(45)
@@ -8614,11 +8601,11 @@ Function InitNewGame()
 	DropSpeed = 0
 	
 	PrevTime = MilliSecs()
-	CatchErrors("InitNewGame")
+	;CatchErrors("InitNewGame")
 End Function
 
 Function InitLoadGame()
-	CatchErrors("Uncaught (InitLoadGame)")
+	;CatchErrors("Uncaught (InitLoadGame)")
 	Local d.Doors, sc.SecurityCams, rt.RoomTemplates, e.Events
 	
 	DrawLoading(80)
@@ -8702,7 +8689,7 @@ Function InitLoadGame()
 	
 	FreeTextureCache
 	
-	CatchErrors("InitLoadGame")
+	;CatchErrors("InitLoadGame")
 	DrawLoading(100)
 	
 	PrevTime = MilliSecs()
@@ -8712,7 +8699,7 @@ Function InitLoadGame()
 End Function
 
 Function NullGame(playbuttonsfx%=True)
-	CatchErrors("Uncaught (NullGame)")
+	;CatchErrors("Uncaught (NullGame)")
 	Local i%, x%, y%, lvl
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
@@ -8984,7 +8971,7 @@ Function NullGame(playbuttonsfx%=True)
 	Sky = 0
 	InitFastResize()
 	
-	CatchErrors("NullGame")
+	;CatchErrors("NullGame")
 End Function
 
 Include "Source Code\save.bb"
@@ -10703,7 +10690,7 @@ Function UpdateInfect()
 			HeartBeatRate = Max(HeartBeatRate, 100)
 			HeartBeatVolume = Max(HeartBeatVolume, Infect/120.0)
 			
-			EntityAlpha InfectOverlay, Min(((Infect*0.2)^2)/1000.0,0.5) * (Sin(MilliSecs2()/8.0)+2.0)
+			EntityAlpha InfectOverlay, Min(((Infect*0.2)^2)/1000.0,0.5) * (Sin(MilliSecs()/8.0)+2.0)
 			
 			For i = 0 To 6
 				If Infect>i*15+10 And temp =< i*15+10 Then
@@ -10755,7 +10742,7 @@ Function UpdateInfect()
 			
 			If teleportForInfect
 				If Infect < 94.7 Then
-					EntityAlpha InfectOverlay, 0.5 * (Sin(MilliSecs2()/8.0)+2.0)
+					EntityAlpha InfectOverlay, 0.5 * (Sin(MilliSecs()/8.0)+2.0)
 					BlurTimer = 900
 					
 					If Infect > 94.5 Then BlinkTimer = Max(Min(-50*(Infect-94.5),BlinkTimer),-10)
@@ -10770,7 +10757,7 @@ Function UpdateInfect()
 					Animate2(PlayerRoom\NPC[0]\obj, AnimTime(PlayerRoom\NPC[0]\obj), 357, 381, 0.3)
 				ElseIf Infect < 98.5
 					
-					EntityAlpha InfectOverlay, 0.5 * (Sin(MilliSecs2()/5.0)+2.0)
+					EntityAlpha InfectOverlay, 0.5 * (Sin(MilliSecs()/5.0)+2.0)
 					BlurTimer = 950
 					
 					ForceMove = 0.0
@@ -10813,9 +10800,9 @@ Function UpdateInfect()
 					EndIf
 					
 					PositionEntity Head, EntityX(PlayerRoom\NPC[0]\Collider,True), EntityY(PlayerRoom\NPC[0]\Collider,True)+0.65,EntityZ(PlayerRoom\NPC[0]\Collider,True),True
-					RotateEntity Head, (1.0+Sin(MilliSecs2()/5.0))*15, PlayerRoom\angle-180, 0, True
+					RotateEntity Head, (1.0+Sin(MilliSecs()/5.0))*15, PlayerRoom\angle-180, 0, True
 					MoveEntity Head, 0,0,-0.4
-					TurnEntity Head, 80+(Sin(MilliSecs2()/5.0))*30,(Sin(MilliSecs2()/5.0))*40,0
+					TurnEntity Head, 80+(Sin(MilliSecs()/5.0))*30,(Sin(MilliSecs()/5.0))*40,0
 				EndIf
 			Else
 				Kill()
@@ -10952,22 +10939,6 @@ Function CircleToLineSegIsect% (cx#, cy#, r#, l1x#, l1y#, l2x#, l2y#)
 	
 	;Jos päästään tänne saakka, ympyrä ja jana leikkaavat (tai ovat sisäkkäin)
 	Return True
-End Function
-
-Function Min#(a#, b#)
-	If a < b Then
-		Return a
-	Else
-		Return b
-	EndIf
-End Function
-
-Function Max#(a#, b#)
-	If a > b Then
-		Return a
-	Else
-		Return b
-	EndIf
 End Function
 
 ;Weight < 1: Bias towards Max
@@ -11831,7 +11802,7 @@ Function RenderWorld2()
 	CameraProjMode ark_blur_cam,0
 	
 	If BlinkTimer < - 16 Or BlinkTimer > - 6
-		If (WearingNightVision=1 Or WearingNightVision=2) And (hasBattery=1) And ((MilliSecs2() Mod 800) < 400) Then
+		If (WearingNightVision=1 Or WearingNightVision=2) And (hasBattery=1) And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
 			AASetFont Font3
 			
@@ -12089,53 +12060,30 @@ Function ScaledMouseY%()
 End Function
 
 Function CatchErrors(location$)
-	Local errStr$ = ErrorLog()
-	Local errF%
-	If Len(errStr)>0 Then
-		If FileType(ErrorDir)=0 Then
-			CreateDir(ErrorDir)
-		EndIf
-		If FileType(ErrorFile)=0 Then
-			errF = WriteFile(ErrorFile)
-			WriteLine errF,"An error occured in SCP - Containment Breach!"
-			WriteLine errF,"Version: "+VersionNumber
-			WriteLine errF,"Save compatible version: "+CompatibleNumber
-			WriteLine errF,"Date and time: "+CurrentDate()+" at "+CurrentTime()
-			WriteLine errF,"Total video memory (MB): "+TotalVidMem()/1024/1024
-			WriteLine errF,"Available video memory (MB): "+AvailVidMem()/1024/1024
-			GlobalMemoryStatus m.MEMORYSTATUS
-			WriteLine errF,"Global memory status: "+(m\dwAvailPhys%/1024/1024)+" MB/"+(m\dwTotalPhys%/1024/1024)+" MB ("+(m\dwAvailPhys%/1024)+" KB/"+(m\dwTotalPhys%/1024)+" KB)"
-			WriteLine errF,"Triangles rendered: "+CurrTrisAmount
-			WriteLine errF,"Active textures: "+ActiveTextures()
-			WriteLine errF,""
-			WriteLine errF,"Error(s):"
-		Else
-			Local canwriteError% = True
-			errF = OpenFile(ErrorFile)
-			While (Not Eof(errF))
-				Local l$ = ReadLine(errF)
-				If Left(l,Len(location))=location
-					canwriteError = False
-					Exit
-				EndIf
-			Wend
-			If canwriteError
-				SeekFile errF,FileSize(ErrorFile)
-			EndIf
-		EndIf
-		If canwriteError
-			WriteLine errF,location+" ***************"
-			While Len(errStr)>0
-				WriteLine errF,errStr
-				DebugLog errStr
-				errStr = ErrorLog()
-			Wend
-		EndIf
-		Msg = "Blitz3D Error! Details in " + Chr(34) + ErrorFile + Chr(34)
-		MsgTimer = 20*70
-		CloseFile errF
-	EndIf
-End Function
+    Local gv.GlobalVariables = First GlobalVariables
+    Local e.Events
+    Local errtxt$
+    errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
+    errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+gv\OSBit+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
+    errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
+    errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
+    ;errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
+    ;errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
+    errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
+    If NTF_GameModeFlag<>3 Then
+        If PlayerRoom <> Null Then
+            errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
+            
+            For ev.Events = Each Events
+                If ev\room = PlayerRoom Then
+                    errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
+                    Exit
+                EndIf
+            Next
+        EndIf
+    EndIf
+    errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
+    ErrorMessage errtxt
 
 Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
 	Local img% = CreateImage(width,height)

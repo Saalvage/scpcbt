@@ -95,7 +95,7 @@ Function SyncGame()
 	RenderWorld
 	Flip
 
-	; Synch the timing. This assumes that the 'G_old_time' global holds the Millisecs() time
+	; Synch the timing. This assumes that the 'G_old_time' global holds the MilliSecs() time
 	; set at the start of the previous loop and is used with render-tweening or delta-timing.
 	G_old_time = MilliSecs()
 	

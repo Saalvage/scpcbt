@@ -682,7 +682,7 @@ End Function
 
 
 Function UpdateNPCs()
-	CatchErrors("Uncaught (UpdateNPCs)")
+	;CatchErrors("Uncaught (UpdateNPCs)")
 	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
 	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
@@ -744,12 +744,12 @@ Function UpdateNPCs()
 								;player is looking at it -> doesn't move
 								If move=False Then
 									BlurVolume = Max(Max(Min((4.0 - dist) / 6.0, 0.9), 0.1), BlurVolume)
-									CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs2())/20.0)+1.0)*15.0*Max((3.5-dist)/3.5,0.0))								
+									CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0)*15.0*Max((3.5-dist)/3.5,0.0))								
 									
-									If dist < 3.5 And MilliSecs2() - n\LastSeen > 60000 And temp Then
+									If dist < 3.5 And MilliSecs() - n\LastSeen > 60000 And temp Then
 										PlaySound_Strict(HorrorSFX(Rand(3,4)))
 										
-										n\LastSeen = MilliSecs2()
+										n\LastSeen = MilliSecs()
 									EndIf
 									
 									If dist < 1.5 And Rand(700) = 1 Then PlaySound2(Scp173SFX(Rand(0, 2)), Camera, n\obj)
@@ -924,12 +924,12 @@ Function UpdateNPCs()
 								EndIf
 							EndIf
 							
-							PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) + 0.05 + Sin(MilliSecs2()*0.08)*0.02, EntityZ(n\Collider))
+							PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) + 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
 							RotateEntity (n\obj, 0, EntityYaw(n\Collider)-180, 0)
 							
 							ShowEntity n\obj2
 							
-							PositionEntity(n\obj2, EntityX(n\Collider), EntityY(n\Collider) - 0.05 + Sin(MilliSecs2()*0.08)*0.02, EntityZ(n\Collider))
+							PositionEntity(n\obj2, EntityX(n\Collider), EntityY(n\Collider) - 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
 							RotateEntity (n\obj2, 0, EntityYaw(n\Collider)-180, 0)
 						EndIf
 					EndIf
@@ -1031,12 +1031,12 @@ Function UpdateNPCs()
 											GiveAchievement(Achv106)
 											
 											BlurVolume = Max(Max(Min((4.0 - dist) / 6.0, 0.9), 0.1), BlurVolume)
-											CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs2())/20.0)+1.0) * 20.0 * Max((4.0-dist)/4.0,0))
+											CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0) * 20.0 * Max((4.0-dist)/4.0,0))
 											
-											If MilliSecs2() - n\LastSeen > 60000 Then 
+											If MilliSecs() - n\LastSeen > 60000 Then 
 												CurrCameraZoom = 40
 												PlaySound_Strict(HorrorSFX(6))
-												n\LastSeen = MilliSecs2()
+												n\LastSeen = MilliSecs()
 											EndIf
 										EndIf
 									Else
@@ -1310,7 +1310,7 @@ Function UpdateNPCs()
 
 					Case 4
 
-						CurrCameraZoom = CurveValue(Max(CurrCameraZoom, (Sin(Float(MilliSecs2())/20.0)+1.0) * 10.0),CurrCameraZoom,8.0)
+						CurrCameraZoom = CurveValue(Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0) * 10.0),CurrCameraZoom,8.0)
 						
 						If n\Target = Null Then 
 							;If n\Sound = 0 Then
@@ -1347,14 +1347,14 @@ Function UpdateNPCs()
 						
 						If KillTimer =>0 Then
 							
-							If MilliSecs2() > n\State3 Then
+							If MilliSecs() > n\State3 Then
 								n\LastSeen=0
 								If n\Target=Null Then
 									If EntityVisible(Collider, n\Collider) Then n\LastSeen=1
 								Else
 									If EntityVisible(n\Target\Collider, n\Collider) Then n\LastSeen=1
 								EndIf
-								n\State3=MilliSecs2()+3000
+								n\State3=MilliSecs()+3000
 							EndIf
 							
 							If n\LastSeen=1 Then
@@ -1580,7 +1580,7 @@ Function UpdateNPCs()
 										;AnimateNPC(n, 1653,1724, n\CurrSpeed*45) ;walk
 									EndIf
 									
-									If MilliSecs2() > n\State3 Then
+									If MilliSecs() > n\State3 Then
 										n\LastSeen=0
 										If EntityVisible(Collider, n\Collider) Then 
 											n\LastSeen=1
@@ -1592,7 +1592,7 @@ Function UpdateNPCs()
 											EndIf
 											ShowEntity n\Collider
 										EndIf
-										n\State3=MilliSecs2()+3000
+										n\State3=MilliSecs()+3000
 									EndIf
 									
 									If n\LastSeen Then 
@@ -2462,7 +2462,7 @@ Function UpdateNPCs()
 						
 						If Rand(400) = 1 Then n\Angle = Rnd(-180, 180)
 						
-						RotateEntity(n\Collider, 0, CurveAngle(n\Angle + Sin(MilliSecs2() / 50) * 2, EntityYaw(n\Collider), 150.0), 0, True)
+						RotateEntity(n\Collider, 0, CurveAngle(n\Angle + Sin(MilliSecs() / 50) * 2, EntityYaw(n\Collider), 150.0), 0, True)
 						
 						dist# = EntityDistance(n\Collider, Collider)
 						If dist < 15.0 Then
@@ -2721,7 +2721,7 @@ Function UpdateNPCs()
 						n\PathStatus = 0
 						AnimateNPC(n,77,201,0.2)
 						
-						RotateEntity(n\Collider, 0, CurveAngle(n\Angle + n\PrevState + Sin(MilliSecs2() / 50) * 2, EntityYaw(n\Collider), 50), 0, True)
+						RotateEntity(n\Collider, 0, CurveAngle(n\Angle + n\PrevState + Sin(MilliSecs() / 50) * 2, EntityYaw(n\Collider), 50), 0, True)
 
 				End Select
 				
@@ -2857,7 +2857,7 @@ Function UpdateNPCs()
 						EndIf
 						
 						temp = Rnd(-1.0,1.0)
-						PositionEntity n\obj2, EntityX(n\Collider)+n\PrevX*temp, EntityY(n\Collider) - 0.2 + Sin((MilliSecs2()/8-45) Mod 360)*0.05, EntityZ(n\Collider)+n\PrevZ*temp
+						PositionEntity n\obj2, EntityX(n\Collider)+n\PrevX*temp, EntityY(n\Collider) - 0.2 + Sin((MilliSecs()/8-45) Mod 360)*0.05, EntityZ(n\Collider)+n\PrevZ*temp
 						RotateEntity n\obj2, 0, EntityYaw(n\obj), 0
 						If (Floor(AnimTime(n\obj2))<>Floor(n\Frame)) Then SetAnimTime n\obj2, n\Frame
 						
@@ -2942,7 +2942,7 @@ Function UpdateNPCs()
 							EndIf
 						EndIf
 						
-						PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.2 + Sin((MilliSecs2()/8) Mod 360)*0.1, EntityZ(n\Collider))
+						PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.2 + Sin((MilliSecs()/8) Mod 360)*0.1, EntityZ(n\Collider))
 						
 						Select n\State 
 							Case 1
@@ -2997,8 +2997,8 @@ Function UpdateNPCs()
 							If Rand(300)=1 Then PlaySound2(RustleSFX(Rand(0,2)),Camera, n\obj, 8, Rnd(0.0,0.2))
 						EndIf
 					Else
-						PositionEntity(n\obj, EntityX(n\Collider) + Rnd(-0.005, 0.005), EntityY(n\Collider)+0.3+0.1*Sin(MilliSecs2()/2), EntityZ(n\Collider) + Rnd(-0.005, 0.005))
-						RotateEntity n\obj, 0, EntityYaw(n\Collider), ((MilliSecs2()/5) Mod 360)
+						PositionEntity(n\obj, EntityX(n\Collider) + Rnd(-0.005, 0.005), EntityY(n\Collider)+0.3+0.1*Sin(MilliSecs()/2), EntityZ(n\Collider) + Rnd(-0.005, 0.005))
+						RotateEntity n\obj, 0, EntityYaw(n\Collider), ((MilliSecs()/5) Mod 360)
 						
 						AnimateNPC(n, 32, 113, 0.4)
 						;Animate2(n\obj, AnimTime(n\obj), 32, 113, 0.4)
@@ -3185,7 +3185,7 @@ Function UpdateNPCs()
 							TurnEntity(n\obj2,0,20.0*FPSfactor,0)
 							TurnEntity(n\obj3,20.0*FPSfactor,0,0)
 							
-							TurnEntity n\Collider,0,-FPSfactor*7,0;Sin(MilliSecs2()/40)*FPSfactor
+							TurnEntity n\Collider,0,-FPSfactor*7,0;Sin(MilliSecs()/40)*FPSfactor
 							n\State2=n\State2+FPSfactor*0.3
 							
 							target=CreatePivot()
@@ -3887,7 +3887,7 @@ Function UpdateNPCs()
 							AnimateNPC(n, 451, 612, 0.2, True)
 							;Animate2(n\obj, AnimTime(n\obj), 451, 612, 0.2, True)
 							
-							If n\State2 < MilliSecs2() Then
+							If n\State2 < MilliSecs() Then
 								For w.waypoints = Each WayPoints
 									If w\door = Null Then
 										If Abs(EntityX(w\obj,True)-EntityX(n\Collider))<4.0 Then
@@ -3901,7 +3901,7 @@ Function UpdateNPCs()
 										EndIf
 									EndIf
 								Next
-								n\State2 = MilliSecs2()+5000
+								n\State2 = MilliSecs()+5000
 							EndIf
 						ElseIf dist < 8.0
 							n\LastDist = Rnd(1.0, 2.5)
@@ -4163,7 +4163,7 @@ Function UpdateNPCs()
 							RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),20.0),0.0
 							
 							If n\State3<900 Then
-								BlurTimer = ((Sin(MilliSecs2()/50)+1.0)*200)/dist
+								BlurTimer = ((Sin(MilliSecs()/50)+1.0)*200)/dist
 								
 								If (WearingNightVision>0) Then GiveAchievement(Achv966)
 								
@@ -4273,7 +4273,7 @@ Function UpdateNPCs()
 										
 									EndIf
 								Else
-									If MilliSecs2() > n\State2 And dist<16.0 Then
+									If MilliSecs() > n\State2 And dist<16.0 Then
 										HideEntity n\Collider
 										EntityPick(n\Collider, 1.5)
 										If PickedEntity() <> 0 Then
@@ -4281,7 +4281,7 @@ Function UpdateNPCs()
 										EndIf
 										ShowEntity n\Collider
 										
-										n\State2=MilliSecs2()+1000
+										n\State2=MilliSecs()+1000
 										
 										If Rand(5)=1 Then n\State=0
 									EndIf	
@@ -5046,7 +5046,7 @@ Function UpdateNPCs()
 			n\DropSpeed = 0
 		EndIf
 		
-		CatchErrors(Chr(34)+n\NVName+Chr(34)+" NPC")
+		;CatchErrors(Chr(34)+n\NVName+Chr(34)+" NPC")
 		
 	Next
 	
