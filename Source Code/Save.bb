@@ -440,6 +440,8 @@ Function SaveGame(file$)
 	EndIf
 	WriteFloat f, CameraFogFar
 	WriteFloat f, StoredCameraFogFar
+	
+	Local I_427.SCP427 = First SCP427
 	WriteByte f, I_427\Using
 	WriteFloat f, I_427\Timer
 	
@@ -1154,6 +1156,8 @@ Function LoadGame(file$)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
 	EndIf
+	
+	Local I_427.SCP427 = First SCP427
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	
@@ -1875,6 +1879,8 @@ Function LoadGameQuick(file$)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
 	EndIf
+	
+	Local I_427.SCP427 = First SCP427
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	

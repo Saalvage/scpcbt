@@ -421,6 +421,7 @@ Function RemoveItem(i.Items)
 			Case "bad1499","scp1499","super1499","fine1499"
 				Wearing1499 = False
 			Case "scp427"
+				Local I_427.SCP427 = First SCP427
 				I_427\Using = False
 		End Select
 		
@@ -739,6 +740,7 @@ Function DropItem(item.Items,playdropsound%=True)
 		Case "bad1499","scp1499","super1499","fine1499"
 			Wearing1499 = False
 		Case "scp427"
+			Local I_427.SCP427 = First SCP427
 			I_427\Using = False
 	End Select
 	

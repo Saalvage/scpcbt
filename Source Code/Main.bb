@@ -1539,6 +1539,7 @@ Function UpdateConsole()
 
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
+					Local I_427.SCP427 = First SCP427
 					I_427\Timer = Float(StrTemp)*70.0
 
 				Case "teleport106"
@@ -2903,9 +2904,10 @@ Type SCP427
 	Field Timer#
 	Field Sound[1]
 	Field SoundCHN[1]
+	Field Amount%
 End Type
 
-Global I_427.SCP427 = New SCP427
+Local I_427.SCP427 = New SCP427
 
 ; This is necessary to avoid lags when looking at monitors
 Type LocalSaveMSGs
@@ -4366,6 +4368,7 @@ Function MovePlayer()
 	If Injuries > 1.0 Then
 		temp2 = Bloodloss
 		BlurTimer = Max(Max(Sin(MilliSecs2()/100.0)*Bloodloss*30.0,Bloodloss*2*(2.0-CrouchState)),BlurTimer)
+		Local I_427.SCP427 = First SCP427
 		If (Not I_427\Using And I_427\Timer < 70*360) Then
 			Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
 		EndIf
@@ -4605,6 +4608,8 @@ Function MouseLook()
 		EntityTexture(Fog, FogTexture)
 	EndIf
 	
+	Local I_427.SCP427 = First SCP427
+	
 	For i = 0 To 6
 		If SCP1025state[i]>0 Then
 			Select i
@@ -4701,6 +4706,7 @@ Function DrawGUI()
 	Local e.Events, it.Items
 	
 	Local I_Cheats.Cheats = First Cheats
+	Local I_427.SCP427 = First SCP427
 	
 	If MenuOpen Or ConsoleOpen Or SelectedDoor <> Null Or InvOpen Or OtherOpen<>Null Or EndingTimer < 0 Then
 		ShowPointer()
@@ -7036,7 +7042,7 @@ Function DrawGUI()
 					EndIf
 
 				Case "coin"
-
+					
 					If SelectedItem\state = 0
 						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
 					EndIf
@@ -7047,7 +7053,7 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 
 				Case "scp427"
-
+					
 					If I_427\Using=1 Then
 						Msg = GetLocalString("Messages", "427close")
 						I_427\Using = False
@@ -7060,7 +7066,7 @@ Function DrawGUI()
 					SelectedItem = Null
 
 				Case "pill"
-
+					
 					If CanUseItem(False, False, True)
 						Msg = GetLocalString("Messages", "pillswallow")
 						MsgTimer = 70*7
@@ -8777,8 +8783,10 @@ Function NullGame(playbuttonsfx%=True)
 		CameraFogFar = StoredCameraFogFar
 		WearingNightVision = 0
 	EndIf
-	I_427\Using = 0
-	I_427\Timer = 0.0
+	
+	Local I_427.SCP427 = First SCP427
+	Delete I_427 ;Just delete it and create it anew as all values have a default of 0
+	I_427 = New SCP427
 	
 	ForceMove = 0.0
 	ForceAngle = 0.0	
@@ -10508,6 +10516,7 @@ End Function
 
 Function Use427()
 	Local i%,pvt%,de.Decals,tempchn%
+	Local I_427.SCP427 = First SCP427
 	Local prevI427Timer# = I_427\Timer
 	
 	If I_427\Timer < 70*360
@@ -10714,6 +10723,7 @@ Function UpdateInfect()
 		
 		If Infect < 93.0 Then
 			temp=Infect
+			Local I_427.SCP427 = First SCP427
 			If (Not I_427\Using And I_427\Timer < 70*360) Then
 				Infect = Min(Infect+FPSfactor*0.002,100)
 			EndIf
