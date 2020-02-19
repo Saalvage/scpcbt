@@ -180,7 +180,7 @@ Function UpdateMainMenu()
 				Case 3
 					txt = Upper(GetLocalString("Menu", "quit"))
 					If temp Then
-						FSOUND_Stream_Stop(CurrMusicStream)
+						StopChannel(CurrMusicStream)
 						End
 					EndIf
 			End Select
@@ -1278,12 +1278,12 @@ Function UpdateLauncher()
 			EndIf
 		Else
 			Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode) + ", 32")
-			If GfxModeWidths(SelectedGFXMode)<G_viewport_width Then
+			If GfxModeWidths(SelectedGFXMode)<DesktopWidth() Then
 				Text(x, y + 15, "(" + loc_upscale)
-				Text(x, y + 30, G_viewport_width + "x" + G_viewport_height + ", 32)")
-			ElseIf GfxModeWidths(SelectedGFXMode)>G_viewport_width Then
+				Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight() + ", 32)")
+			ElseIf GfxModeWidths(SelectedGFXMode)>DesktopWidth() Then
 				Text(x, y + 15, "(" + loc_downscale)
-				Text(x, y + 30, G_viewport_width + "x" + G_viewport_height + ", 32)")
+				Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight() + ", 32)")
 			EndIf
 		EndIf
 		

@@ -1655,7 +1655,7 @@ Function UpdateEvents()
 							tempF2# = EntityYaw(Collider)
 							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
 							TurnEntity Collider, 0,tempF3/4,0,True
-							tempF# = Abs(point_distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
+							tempF# = Abs(Distance(EntityX(Collider,True),EntityZ(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True)))
 							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
 							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
 							
@@ -2506,7 +2506,7 @@ Function UpdateEvents()
 								If MouseHit1 Then
 									temp = True
 									For it.Items = Each Items
-										If it\Picked=False Then
+										If it\Picked=0 Then
 											If EntityX(it\collider)-EntityX(e\room\Objects[1],True)=0 Then
 												If EntityZ(it\collider)-EntityZ(e\room\Objects[1],True)=0 Then
 													temp = False
@@ -2634,7 +2634,7 @@ Function UpdateEvents()
 								TeleportEntity(it\collider,EntityX(it\collider),EntityY(it\collider),EntityZ(it\collider),-0.02,True,10)
 								For i = 0 To 1
 									it2.Items = CreateItem("quarter",1,1,1)
-									it2\Picked = True
+									it2\Picked = 1
 									it2\Dropped = -1
 									it2\itemtemplate\found=True
 									it\SecondInv[i] = it2
@@ -4601,7 +4601,7 @@ Function UpdateEvents()
 												If itt\tempname = "paper" And Rand(6)=1 Then
 													Inventory(i) = CreateItem(itt\tempname, 1,1,1, itt\namespec)
 													HideEntity Inventory(i)\collider
-													Inventory(i)\Picked = True
+													Inventory(i)\Picked = 1
 													Exit
 												EndIf
 											Next
@@ -4627,7 +4627,7 @@ Function UpdateEvents()
 								If Inventory(i)<>Null Then RemoveItem(Inventory(i))
 								Inventory(i) = CreateItem("paper", 1,1,1, "strange")
 								HideEntity Inventory(i)\collider
-								Inventory(i)\Picked = True
+								Inventory(i)\Picked = 1
 							Case 35
 								For i = 0 To 3
 									de.Decals = CreateDecal(17, e\room\x+Rnd(-2,2), 700*RoomScale, e\room\z+Rnd(-2,2), 270, Rand(360), 0)
@@ -7227,7 +7227,7 @@ Function UpdateEvents()
 									
 									If angle < 181 And angle > 90 Then
 										For it.Items = Each Items
-											If it\collider <> 0 And it\Picked = False Then
+											If it\collider <> 0 And it\Picked = 0 Then
 												If Abs(EntityX(it\collider) - (e\room\x - 712.0 * RoomScale)) < 200.0 Then
 													If Abs(EntityY(it\collider) - (e\room\y + 648.0 * RoomScale)) < 104.0 Then
 														e\EventState = 1
@@ -7347,7 +7347,7 @@ Function UpdateEvents()
 						
 						If e\EventState > (12 * 70) Then							
 							For it.Items = Each Items
-								If it\collider <> 0 And it\Picked = False Then
+								If it\collider <> 0 And it\Picked = 0 Then
 									If Distance(EntityX(it\collider), EntityZ(it\collider), EntityX(e\room\Objects[2], True), EntityZ(e\room\Objects[2], True)) < (180.0 * RoomScale) Then
 										Use914(it, setting, EntityX(e\room\Objects[3], True), EntityY(e\room\Objects[3], True), EntityZ(e\room\Objects[3], True))
 										
@@ -7592,7 +7592,7 @@ Function UpdateEvents()
 					PositionEntity pp,976,128,-640,False
 					
 					For it.Items = Each Items
-						If (Not it\Picked)
+						If (it\Picked = 0)
 							If EntityDistance(it\collider,e\room\Objects[0])<0.75
 								Pick1162% = False
 							EndIf

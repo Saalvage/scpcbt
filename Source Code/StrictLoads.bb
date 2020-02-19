@@ -156,68 +156,52 @@ Function FreeSound_Strict(sndHandle%)
 End Function
 
 Type Stream
-	Field sfx%
 	Field chn%
 End Type
 
-Function StreamSound_Strict(file$,volume#=1.0,custommode=Mode)
+Function StreamSound_Strict(file$,volume#=1.0,custommode=2)
 	Local I_Loc.Loc = First Loc
 	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		file = I_Loc\LangPath + file
 	EndIf
+	
 	If FileType(file$)<>1
-		CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
-		If ConsoleOpening
-			ConsoleOpen = True
-		EndIf
-		Return 0
-	EndIf
-	
-	Local st.Stream = New Stream
-	st\sfx = FSOUND_Stream_Open(file$,custommode,0)
-	
-	If st\sfx = 0
-		CreateConsoleMsg("Failed to stream Sound (returned 0): " + Chr(34) + file$ + Chr(34))
-		If ConsoleOpening
-			ConsoleOpen = True
-		EndIf
-		Return 0
-	EndIf
-	
-	st\chn = FSOUND_Stream_Play(FreeChannel,st\sfx)
-	
-	If st\chn = -1
-		CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
-		If ConsoleOpening
-			ConsoleOpen = True
-		EndIf
-		Return -1
-	EndIf
-	
-	FSOUND_SetVolume(st\chn,volume*255)
-	FSOUND_SetPaused(st\chn,False)
-	
-	Return Handle(st)
+        CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
+        If ConsoleOpening
+            ConsoleOpen = True
+        EndIf
+        Return 0
+    EndIf
+    
+    Local st.Stream = New Stream
+    
+    st\chn = PlayMusic(file$,custommode)
+    
+    If st\chn = -1
+        CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
+        If ConsoleOpening
+            ConsoleOpen = True
+        EndIf
+        Return -1
+    EndIf
+    ChannelVolume(st\chn,volume*1.0)
+    Return Handle(st)
 End Function
 
 Function StopStream_Strict(streamHandle%)
-	Local st.Stream = Object.Stream(streamHandle)
-	
-	If st = Null
-		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
-		Return
-	EndIf
-	If st\chn=0 Or st\chn=-1
-		CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
-		Return
-	EndIf
-	
-	FSOUND_StopSound(st\chn)
-	FSOUND_Stream_Stop(st\sfx)
-	FSOUND_Stream_Close(st\sfx)
-	Delete st
-	
+    Local st.Stream = Object.Stream(streamHandle)
+    
+    If st = Null
+        CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+        Return
+    EndIf
+    If st\chn=0 Or st\chn=-1
+        CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
+        Return
+    EndIf
+    StopChannel(st\chn)
+    Delete st
 End Function
 
 Function SetStreamVolume_Strict(streamHandle%,volume#)
@@ -232,8 +216,7 @@ Function SetStreamVolume_Strict(streamHandle%,volume#)
 		Return
 	EndIf
 	
-	FSOUND_SetVolume(st\chn,volume*255.0)
-	FSOUND_SetPaused(st\chn,False)
+	ChannelVolume(st\chn,volume)
 	
 End Function
 
@@ -249,7 +232,11 @@ Function SetStreamPaused_Strict(streamHandle%,paused%)
 		Return
 	EndIf
 	
-	FSOUND_SetPaused(st\chn,paused)
+	If paused Then
+		PauseChannel(st\chn)
+	Else
+		ResumeChannel(st\chn)
+	EndIf
 	
 End Function
 
@@ -265,7 +252,7 @@ Function IsStreamPlaying_Strict(streamHandle%)
 		Return
 	EndIf
 	
-	Return FSOUND_IsPlaying(st\chn)
+	Return ChannelPlaying(st\chn)
 	
 End Function
 
@@ -281,12 +268,10 @@ Function SetStreamPan_Strict(streamHandle%,pan#)
 		Return
 	EndIf
 	
-	;-1 = Left = 0
-	;0 = Middle = 127.5 (127)
-	;1 = Right = 255
-	Local fmod_pan% = 0
-	fmod_pan% = Int((255.0/2.0)+((255.0/2.0)*pan#))
-	FSOUND_SetPan(st\chn,fmod_pan%)
+	;-1 = Left
+	;0 = Middle
+	;1 = Right
+	ChannelPan(st\chn,pan)
 	
 End Function
 

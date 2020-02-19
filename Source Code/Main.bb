@@ -14,9 +14,6 @@ If Len(InitErrorStr)>0 Then
 	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
 EndIf
 
-Include "Source Code\FMod.bb"
-Include "Source Code\fullscreen_window_fix.bb"
-
 Include "Source Code\DevilParticleSystem.bb"
 
 Const OptionFile$ = "Data\options.ini"
@@ -148,33 +145,6 @@ If LauncherEnabled Then
 	AppTitle GetLocalString("Menu", "titlelauncher")
 	
 	UpdateLauncher()
-	
-	;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, But it's an alliteration (and it's true)!! ~Salvage
-	If BorderlessWindowed
-		DebugLog "Using Borderless Windowed Mode"
-		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
-		
-		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
-		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
-		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
-		
-		RealGraphicWidth = G_viewport_width
-		RealGraphicHeight = G_viewport_height
-		
-		AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
-		
-		Fullscreen = False
-	Else
-		AspectRatioRatio = 1.0
-		RealGraphicWidth = GraphicWidth
-		RealGraphicHeight = GraphicHeight
-		If Fullscreen Then
-			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
-		Else
-			Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
-		EndIf
-	EndIf
-	
 Else
 	For i% = 1 To TotalGFXModes
 		Local samefound% = False
@@ -191,33 +161,28 @@ Else
 	
 	GraphicWidth = GfxModeWidths(SelectedGFXMode)
 	GraphicHeight = GfxModeHeights(SelectedGFXMode)
+EndIf
+
+;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, But it's an alliteration (and it's true)!! ~Salvage
+If BorderlessWindowed
+	DebugLog "Using Borderless Windowed Mode"
+	Graphics3DExt DesktopWidth(), DesktopHeight(), 0, 4
 	
-	;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, Refer to my comment above ~Salvage
-	If BorderlessWindowed
-		DebugLog "Using Faked Fullscreen"
-		Graphics3DExt G_viewport_width, G_viewport_height, 0, 2
-		
-		; -- Change the window style to 'WS_POPUP' and then set the window position to force the style to update.
-		api_SetWindowLong( G_app_handle, C_GWL_STYLE, C_WS_POPUP )
-		api_SetWindowPos( G_app_handle, C_HWND_TOP, G_viewport_x, G_viewport_y, G_viewport_width, G_viewport_height, C_SWP_SHOWWINDOW )
-		
-		RealGraphicWidth = G_viewport_width
-		RealGraphicHeight = G_viewport_height
-		
-		AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
-		
-		Fullscreen = False
+	RealGraphicWidth = DesktopWidth()
+	RealGraphicHeight = DesktopHeight()
+	
+	AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
+	
+	Fullscreen = False
+Else
+	AspectRatioRatio = 1.0
+	RealGraphicWidth = GraphicWidth
+	RealGraphicHeight = GraphicHeight
+	If Fullscreen Then
+		Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
 	Else
-		AspectRatioRatio = 1.0
-		RealGraphicWidth = GraphicWidth
-		RealGraphicHeight = GraphicHeight
-		If Fullscreen Then
-			Graphics3DExt(GraphicWidth, GraphicHeight, (16*Bit16Mode), 1)
-		Else
-			Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
-		EndIf
+		Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
 	EndIf
-	
 EndIf
 
 If FileType(I_Loc\LangPath + Data294) = 1 Then
@@ -5247,7 +5212,7 @@ Function DrawGUI()
 					
 					SelectedItem\DropSpeed = 0.0
 					
-					SelectedItem\Picked = False
+					SelectedItem\Picked = 0
 					For z% = 0 To OtherSize - 1
 						If OtherOpen\SecondInv[z] = SelectedItem Then OtherOpen\SecondInv[z] = Null
 					Next
@@ -5359,46 +5324,9 @@ Function DrawGUI()
 			
 			If Inventory(n) <> Null Then
 				Color 200, 200, 200
-				Select Inventory(n)\itemtemplate\tempname
-					Case "badgasmask"
-						If WearingGasMask=-1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "gasmask"
-						If WearingGasMask=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "supergasmask"
-						If WearingGasMask=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "heavygasmask"
-						If WearingGasMask=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "hazmat"
-						If WearingHazmat=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "hazmat2"
-						If WearingHazmat=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "hazmat3"
-						If WearingHazmat=3 Then Rect(x - 3, y - 3, width + 6, height + 6)	
-					Case "vest"
-						If WearingVest=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "finevest"
-						If WearingVest=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "scp714"
-						If Wearing714=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "nvg"
-						If WearingNightVision=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "supernvg"
-						If WearingNightVision=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "bad1499"
-						If Wearing1499=-1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "scp1499"
-						If Wearing1499=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "super1499"
-						If Wearing1499=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "fine1499"
-						If Wearing1499=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "finenvgoggles"
-						If WearingNightVision=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "scp427"
-						If I_427\Using=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					Case "super427"
-						If I_427\Using=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-				End Select
+				If Inventory(n)\Picked = 2 Then
+					Rect(x - 3, y - 3, width + 6, height + 6)
+				EndIf
 			EndIf
 			
 			If isMouseOn Then
@@ -5683,21 +5611,31 @@ Function DrawGUI()
 		
 		If SelectedItem <> Null Then
 			Select SelectedItem\itemtemplate\tempname
-				Case "nvg"
+				Case "nvg","supernvg","finenvg"
 
 					If Wearing1499 = 0 And WearingHazmat=0 Then
-						If WearingNightVision = 1 Then
+						If SelectedItem\Picked = 2 Then
 							Msg = GetLocalString("Messages", "nvgoff")
+							WearingNightVision = 0
 							CameraFogFar = StoredCameraFogFar
-						Else
+							SelectedItem\Picked = 1
+						ElseIf WearingNightVision=0
 							Msg = GetLocalString("Messages", "nvgon")
 							WearingGasMask = 0
-							WearingNightVision = 0
+							Select SelectedItem\itemtemplate\tempname
+								Case "nvg"
+									WearingNightVision = 1
+								Case "supernvg"
+									WearingNightVision = 2
+								Case "finenvg"
+									WearingNightVision = 3
+							End Select
 							StoredCameraFogFar = CameraFogFar
 							CameraFogFar = 30
+							SelectedItem\Picked = 2
+						Else
+							Msg = GetLocalString("Messages", "nvgdouble")
 						EndIf
-						
-						WearingNightVision = (Not WearingNightVision)
 					ElseIf Wearing1499 <> 0 Then
 						Msg = GetLocalString("Messages", "nvg1499")
 					Else
@@ -5705,65 +5643,6 @@ Function DrawGUI()
 					EndIf
 					SelectedItem = Null
 					MsgTimer = 70 * 5
-
-				Case "supernvg"
-
-					If Wearing1499 = 0 And WearingHazmat=0 Then
-						If WearingNightVision = 2 Then
-							Msg = GetLocalString("Messages", "nvgoff")
-							CameraFogFar = StoredCameraFogFar
-						Else
-							Msg = GetLocalString("Messages", "nvgon")
-							WearingGasMask = 0
-							WearingNightVision = 0
-							StoredCameraFogFar = CameraFogFar
-							CameraFogFar = 30
-						EndIf
-						
-						WearingNightVision = (Not WearingNightVision) * 2
-					ElseIf Wearing1499 <> 0 Then
-						Msg = GetLocalString("Messages", "nvg1499")
-					Else
-						Msg = GetLocalString("Messages", "nvghaz")
-					EndIf
-					SelectedItem = Null
-					MsgTimer = 70 * 5
-
-				Case "finenvg"
-
-					If Wearing1499 = 0 And WearingHazmat = 0 Then
-						If WearingNightVision = 3 Then
-							Msg = GetLocalString("Messages", "nvgoff")
-							CameraFogFar = StoredCameraFogFar
-						Else
-							Msg = GetLocalString("Messages", "nvgon")
-							WearingGasMask = 0
-							WearingNightVision = 0
-							StoredCameraFogFar = CameraFogFar
-							CameraFogFar = 30
-						EndIf
-						
-						WearingNightVision = (Not WearingNightVision) * 3
-					ElseIf Wearing1499 <> 0 Then
-						Msg = GetLocalString("Messages", "nvg1499")
-					Else
-						Msg = GetLocalString("Messages", "nvghaz")
-					EndIf
-					SelectedItem = Null
-					MsgTimer = 70 * 5
-
-				Case "ring"
-
-					If Wearing714=2 Then
-						Msg = GetLocalString("Messages", "714remove")
-						Wearing714 = False
-					Else
-						;Achievements(Achv714)=True
-						Msg = GetLocalString("Messages", "714puton")
-						Wearing714 = 2
-					EndIf
-					MsgTimer = 70 * 5
-					SelectedItem = Null
 
 				Case "scp1123"
 
@@ -6119,7 +5998,7 @@ Function DrawGUI()
 							MsgTimer = 70*6		
 						Else
 							it.Items = CreateItem("emptycup", 0,0,0)
-							it\Picked = True
+							it\Picked = 1
 							For i = 0 To MaxItemAmount-1
 								If Inventory(i)=SelectedItem Then Inventory(i) = it : Exit
 							Next					
@@ -6551,13 +6430,17 @@ Function DrawGUI()
 
 				Case "scp714"
 
-					If Wearing714=1 Then
+					If SelectedItem\Picked = 2 Then
 						Msg = GetLocalString("Messages", "714remove")
 						Wearing714 = False
-					Else
+						SelectedItem\Picked = 1
+					ElseIf Wearing714 = False
 						GiveAchievement(Achv714)
 						Msg = GetLocalString("Messages", "714puton")
 						Wearing714 = True
+						SelectedItem\Picked = 2
+					Else
+						Msg = GetLocalString("Messages", "714double")
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null	
@@ -6598,6 +6481,7 @@ Function DrawGUI()
 								If WearingNightVision Then CameraFogFar = StoredCameraFogFar
 								WearingGasMask = 0
 								WearingNightVision = 0
+								SelectedItem\Picked = 2
 							EndIf
 							SelectedItem\state=0
 							MsgTimer = 70 * 5
@@ -6627,6 +6511,7 @@ Function DrawGUI()
 							Msg = GetLocalString("Messages", "vestremove")
 							WearingVest = False
 							DropItem(SelectedItem)
+							SelectedItem\Picked = 0
 						Else
 							If SelectedItem\itemtemplate\tempname="vest" Then
 								Msg = GetLocalString("Messages", "vestslightly")
@@ -6636,34 +6521,41 @@ Function DrawGUI()
 								WearingVest = 2
 							EndIf
 							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+							SelectedItem\Picked = 2
 						EndIf
 						SelectedItem\state=0
 						MsgTimer = 70 * 5
 						SelectedItem = Null
+
 					EndIf
 
 				Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 
 					If Wearing1499 = 0 And WearingHazmat = 0 Then
-						If WearingGasMask <> 0 Then
+						If SelectedItem\Picked = 2 Then
 							Msg = GetLocalString("Messages", "gasmaskremove")
 							WearingGasMask = 0
-						Else
-							If SelectedItem\itemtemplate\tempname = "badgasmask"
-								Msg = GetLocalString("Messages", "gasmaskharder")
-								WearingGasMask = -1
-							ElseIf SelectedItem\itemtemplate\tempname = "supergasmask"
-								Msg = GetLocalString("Messages", "gasmaskeasier")
-								WearingGasMask = 2
-							ElseIf SelectedItem\itemtemplate\tempname = "heavygasmask"
-								Msg = GetLocalString("Messages", "gasmaskputon")
+							SelectedItem\Picked = 1
+						ElseIf WearingGasMask=0
+							Select SelectedItem\itemtemplate\tempname
+								Case "badgasmask"
+									Msg = GetLocalString("Messages", "gasmaskharder")
+									WearingGasMask = -1
+								Case "gasmask"
+									Msg = GetLocalString("Messages", "gasmaskputon")
+									WearingGasMask = 1
+								Case "supergasmask"
+									Msg = GetLocalString("Messages", "gasmaskeasier")
+									WearingGasMask = 2
+								Case "heavygasmask"
+									Msg = GetLocalString("Messages", "gasmaskputon")
 								WearingGasMask = 3
-							Else
-								Msg = GetLocalString("Messages", "gasmaskputon")
-								WearingGasMask = 1
-							EndIf
+							End Select
 							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
 							WearingNightVision = 0
+							SelectedItem\Picked = 2
+						Else
+							Msg = GetLocalString("Messages", "gasmaskdouble")
 						EndIf
 					ElseIf Wearing1499 <> 0 Then
 						Msg = GetLocalString("Messages", "gasmask1499")
@@ -6870,100 +6762,109 @@ Function DrawGUI()
 					EndIf
 
 				Case "bad1499","scp1499","super1499","fine1499"
+				
+					If SelectedItem\Picked = 2 Lor Wearing1499 = 0 Then
 
-					If WearingHazmat>0
-						Msg = GetLocalString("Messages", "1499hazmat")
-						MsgTimer = 70 * 5
-						SelectedItem=Null
-						Return
-					EndIf
-					
-					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-					
-					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-					
-					width% = 300
-					height% = 20
-					x% = GraphicWidth / 2 - width / 2
-					y% = GraphicHeight / 2 + 80
-					Rect(x, y, width+4, height, False)
-					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
-						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
-					Next
-					
-					If SelectedItem\itemtemplate\tempname = "fine1499" Then
-						SelectedItem\state = Min(SelectedItem\state+(FPSfactor*2),100)
-					Else If SelectedItem\itemtemplate\tempname = "bad1499"
-						SelectedItem\state = Min(SelectedItem\state+(FPSfactor*0.5),100)
-					Else
-						SelectedItem\state = Min(SelectedItem\state+(FPSfactor),100)
-					EndIf
-					
-					If SelectedItem\state=100 Then
-						If Wearing1499<>0 Then
-							Wearing1499 = False
-							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-						Else
-							If SelectedItem\itemtemplate\tempname="bad1499" Then
-								Wearing1499 = -1
-							Else If SelectedItem\itemtemplate\tempname="scp1499"
-								Wearing1499 = 1
-							Else If SelectedItem\itemtemplate\tempname = "super1499"
-								Wearing1499 = 2
-							Else
-								Wearing1499 = 3
-							EndIf
-							If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-							GiveAchievement(Achv1499)
-							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-							WearingGasMask = 0
-							WearingNightVision = 0
-							For r.Rooms = Each Rooms
-								If r\RoomTemplate\Name = "dimension1499" Then
-									BlinkTimer = -1
-									NTF_1499PrevRoom = PlayerRoom
-									NTF_1499PrevX# = EntityX(Collider)
-									NTF_1499PrevY# = EntityY(Collider)
-									NTF_1499PrevZ# = EntityZ(Collider)
-									
-									If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
-										PositionEntity (Collider, r\x+6086.0*RoomScale, r\y+304.0*RoomScale, r\z+2292.5*RoomScale)
-										RotateEntity Collider,0,90,0,True
-									Else
-										PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
-									EndIf
-									ResetEntity(Collider)
-									UpdateDoors()
-									UpdateRooms()
-									For it.Items = Each Items
-										it\disttimer = 0
-									Next
-									PlayerRoom = r
-									PlaySound_Strict (LoadTempSound("SFX\SCP\1499\Enter.ogg"))
-									NTF_1499X# = 0.0
-									NTF_1499Y# = 0.0
-									NTF_1499Z# = 0.0
-									If Curr096<>Null Then
-										If Curr096\SoundChn<>0 Then
-											SetStreamVolume_Strict(Curr096\SoundChn,0.0)
-										EndIf
-									EndIf
-									For e.Events = Each Events
-										If e\EventName = "dimension1499" Then
-											If EntityDistance(e\room\obj,Collider)>8300.0*RoomScale Then
-												If e\EventState2 < 5 Then
-													e\EventState2 = e\EventState2 + 1
-												EndIf
-											EndIf
-											Exit
-										EndIf
-									Next
-									Exit
-								EndIf
-							Next
+						If WearingHazmat>0
+							Msg = GetLocalString("Messages", "1499hazmat")
+							MsgTimer = 70 * 5
+							SelectedItem=Null
+							Return
 						EndIf
-						SelectedItem\state=0
-						SelectedItem = Null
+						
+						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+						
+						DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+						
+						width% = 300
+						height% = 20
+						x% = GraphicWidth / 2 - width / 2
+						y% = GraphicHeight / 2 + 80
+						Rect(x, y, width+4, height, False)
+						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+						Next
+						
+						If SelectedItem\itemtemplate\tempname = "fine1499" Then
+							SelectedItem\state = Min(SelectedItem\state+(FPSfactor*2),100)
+						Else If SelectedItem\itemtemplate\tempname = "bad1499"
+							SelectedItem\state = Min(SelectedItem\state+(FPSfactor*0.5),100)
+						Else
+							SelectedItem\state = Min(SelectedItem\state+(FPSfactor),100)
+						EndIf
+						
+						If SelectedItem\state=100 Then
+							If Wearing1499<>0 Then
+								Wearing1499 = 0
+								If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+								SelectedItem\Picked = 1
+							Else
+								If SelectedItem\itemtemplate\tempname="bad1499" Then
+									Wearing1499 = -1
+								Else If SelectedItem\itemtemplate\tempname="scp1499"
+									Wearing1499 = 1
+								Else If SelectedItem\itemtemplate\tempname = "super1499"
+									Wearing1499 = 2
+								Else
+									Wearing1499 = 3
+								EndIf
+								If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+								GiveAchievement(Achv1499)
+								If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+								WearingGasMask = 0
+								WearingNightVision = 0
+								SelectedItem\Picked = 2
+								For r.Rooms = Each Rooms
+									If r\RoomTemplate\Name = "dimension1499" Then
+										BlinkTimer = -1
+										NTF_1499PrevRoom = PlayerRoom
+										NTF_1499PrevX# = EntityX(Collider)
+										NTF_1499PrevY# = EntityY(Collider)
+										NTF_1499PrevZ# = EntityZ(Collider)
+										
+										If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
+											PositionEntity (Collider, r\x+6086.0*RoomScale, r\y+304.0*RoomScale, r\z+2292.5*RoomScale)
+											RotateEntity Collider,0,90,0,True
+										Else
+											PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
+										EndIf
+										ResetEntity(Collider)
+										UpdateDoors()
+										UpdateRooms()
+										For it.Items = Each Items
+											it\disttimer = 0
+										Next
+										PlayerRoom = r
+										PlaySound_Strict (LoadTempSound("SFX\SCP\1499\Enter.ogg"))
+										NTF_1499X# = 0.0
+										NTF_1499Y# = 0.0
+										NTF_1499Z# = 0.0
+										If Curr096<>Null Then
+											If Curr096\SoundChn<>0 Then
+												SetStreamVolume_Strict(Curr096\SoundChn,0.0)
+											EndIf
+										EndIf
+										For e.Events = Each Events
+											If e\EventName = "dimension1499" Then
+												If EntityDistance(e\room\obj,Collider)>8300.0*RoomScale Then
+													If e\EventState2 < 5 Then
+														e\EventState2 = e\EventState2 + 1
+													EndIf
+												EndIf
+												Exit
+											EndIf
+										Next
+										Exit
+									EndIf
+								Next
+							EndIf
+							SelectedItem\state=0
+							SelectedItem = Null
+						EndIf
+						
+					Else
+						Msg = GetLocalString("Messages", "1499double")
+						MsgTimer = 70 * 10
 					EndIf
 
 				Case "badge"
@@ -7036,30 +6937,34 @@ Function DrawGUI()
 
 				Case "scp427"
 					
-					If I_427\Using=1 Then
+					If SelectedItem\Picked = 2 Then
 						Msg = GetLocalString("Messages", "427close")
 						I_427\Using = 0
-					ElseIf I_427\Using=2
+						SelectedItem\Picked = 1
+					ElseIf I_427\Using>0
 						Msg = GetLocalString("Messages", "427double")
 					Else
 						GiveAchievement(Achv427)
 						Msg = GetLocalString("Messages", "427open")
 						I_427\Using = 1
+						SelectedItem\Picked = 2
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null
 					
 				Case "super427"
 					
-					If I_427\Using=2 Then
+					If SelectedItem\Picked = 2 Then
 						Msg = GetLocalString("Messages", "427close")
 						I_427\Using = 0
-					ElseIf I_427\Using=1
+						SelectedItem\Picked = 1
+					ElseIf I_427\Using>0
 						Msg = GetLocalString("Messages", "427double")
 					Else
 						GiveAchievement(Achv427)
 						Msg = GetLocalString("Messages", "427open")
 						I_427\Using = 2
+						SelectedItem\Picked = 2
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null
@@ -8523,7 +8428,7 @@ Function InitNewGame()
 			PositionEntity (Collider, EntityX(r\obj)+3584*RoomScale, 704*RoomScale, EntityZ(r\obj)+1024*RoomScale)
 			PlayerRoom = r
 			it = CreateItem("paper", 1, 1, 1, "classd")
-			it\Picked = True
+			it\Picked = 1
 			it\Dropped = -1
 			it\itemtemplate\found=True
 			Inventory(0) = it
@@ -9715,7 +9620,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					remove = 0
 				Case "fine", "very fine"
 					For it.Items = Each Items
-						If it<>item And it\collider <> 0 And it\Picked = False Then
+						If it<>item And it\collider <> 0 And it\Picked = 0 Then
 							If Distance(EntityX(it\collider,True), EntityZ(it\collider,True), x,z) < (180.0 * RoomScale)
 								Select it\itemtemplate\tempname
 									Case "badgasmask", "gasmask", "supergasmask"
@@ -10954,13 +10859,6 @@ Function point_direction#(x1#,z1#,x2#,z2#)
 	Return ATan2(dz,dx)
 End Function
 
-Function point_distance#(x1#,z1#,x2#,z2#)
-	Local dx#,dy#
-	dx = x1 - x2
-	dy = z1 - z2
-	Return Sqr((dx*dx)+(dy*dy)) 
-End Function
-
 Function angleDist#(a0#,a1#)
 	Local b# = a0-a1
 	Local bb#
@@ -11491,8 +11389,8 @@ End Function
 
 Function DefaultOptionsINI()
 	
-	PutINIValue(OptionFile, "options", "width", G_viewport_width)
-	PutINIValue(OptionFile, "options", "height", G_viewport_height)
+	PutINIValue(OptionFile, "options", "width", DesktopWidth())
+	PutINIValue(OptionFile, "options", "height", DesktopHeight())
 	PutINIValue(OptionFile, "options", "fullscreen", 1)
 	PutINIValue(OptionFile, "options", "borderless windowed", 0)
 	PutINIValue(OptionFile, "options", "gfx driver", 2)
@@ -11607,21 +11505,6 @@ Function GetMeshExtents(Mesh%)
 	Mesh_MagZ = maxz-minz
 	
 End Function
-
-Function EntityScaleX#(entity%, globl% = False)
-	If globl Then TFormVector 1, 0, 0, entity, 0 Else TFormVector 1, 0, 0, entity, GetParent(entity)
-	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
-End Function 
-
-Function EntityScaleY#(entity%, globl% = False)
-	If globl Then TFormVector 0, 1, 0, entity, 0 Else TFormVector 0, 1, 0, entity, GetParent(entity)
-	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
-End Function 
-
-Function EntityScaleZ#(entity%, globl% = False)
-	If globl Then TFormVector 0, 0, 1, entity, 0 Else TFormVector 0, 0, 1, entity, GetParent(entity)
-	Return Sqr(TFormedX() * TFormedX() + TFormedY() * TFormedY() + TFormedZ() * TFormedZ())
-End Function 
 
 Function Graphics3DExt%(width%,height%,depth%=32,mode%=2)
 	;If FE_InitExtFlag = 1 Then DeInitExt() ;prevent FastExt from breaking itself
@@ -12059,31 +11942,32 @@ Function ScaledMouseY%()
 	Return Float(MouseY())*Float(GraphicHeight)/Float(RealGraphicHeight)
 End Function
 
-Function CatchErrors(location$)
-    Local gv.GlobalVariables = First GlobalVariables
-    Local e.Events
-    Local errtxt$
-    errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
-    errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+gv\OSBit+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
-    errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
-    errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
+;Function CatchErrors(location$)
+    ;Local gv.GlobalVariables = First GlobalVariables
+    ;Local e.Events
+    ;Local errtxt$
+    ;errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
+    ;errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+gv\OSBit+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
+    ;errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
+    ;errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
     ;errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
     ;errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
-    errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
-    If NTF_GameModeFlag<>3 Then
-        If PlayerRoom <> Null Then
-            errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
-            
-            For ev.Events = Each Events
-                If ev\room = PlayerRoom Then
-                    errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
-                    Exit
-                EndIf
-            Next
-        EndIf
-    EndIf
-    errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
-    ErrorMessage errtxt
+    ;errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
+    ;If NTF_GameModeFlag<>3 Then
+    ;    If PlayerRoom <> Null Then
+    ;        errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
+    ;        
+    ;        For ev.Events = Each Events
+    ;            If ev\room = PlayerRoom Then
+    ;                errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
+    ;                Exit
+    ;            EndIf
+    ;        Next
+    ;    EndIf
+    ;EndIf
+    ;errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
+    ;ErrorMessage errtxt
+;End Function
 
 Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
 	Local img% = CreateImage(width,height)

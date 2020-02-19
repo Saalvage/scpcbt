@@ -408,7 +408,7 @@ Function RemoveItem(i.Items)
 		EndIf
 	Next
 	If SelectedItem = i Then
-		Select SelectedItem\itemtemplate\tempname 
+		Select SelectedItem\itemtemplate\tempname
 			Case "nvg", "supernvg"
 				WearingNightVision = False
 			Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
@@ -416,7 +416,7 @@ Function RemoveItem(i.Items)
 			Case "vest", "finevest", "veryfinevest"
 				WearingVest = False
 			Case "hazmat","hazmat2","hazmat3"
-				WearingHazmat = False	
+				WearingHazmat = False
 			Case "scp714"
 				Wearing714 = False
 			Case "bad1499","scp1499","super1499","fine1499"
@@ -452,7 +452,7 @@ Function UpdateItems()
 	For i.Items = Each Items
 		i\Dropped = 0
 		
-		If (Not i\Picked) Then
+		If (i\Picked = 0) Then
 			If i\disttimer < MilliSecs() Then
 				i\dist = EntityDistance(Camera, i\collider)
 				i\disttimer = MilliSecs() + 700
@@ -503,7 +503,7 @@ Function UpdateItems()
 				
 				If i\dist<HideDist*0.2 Then
 					For i2.Items = Each Items
-						If i<>i2 And (Not i2\Picked) And i2\dist<HideDist*0.2 Then
+						If i<>i2 And (i2\Picked = 0) And i2\dist<HideDist*0.2 Then
 							
 							xtemp# = (EntityX(i2\collider,True)-EntityX(i\collider,True))
 							ytemp# = (EntityY(i2\collider,True)-EntityY(i\collider,True))
@@ -566,7 +566,11 @@ Function PickItem(item.Items)
 	Next
 	
 	If WearingHazmat > 0 Then
-		Msg = GetLocalString("Messages", "cantpickhazmat")
+		If Instr(item\itemtemplate\tempname,"hazmat") Then
+			Msg = GetLocalString("Messages", "hazmatdouble")
+		Else
+			Msg = GetLocalString("Messages", "cantpickhazmat")
+		EndIf
 		MsgTimer = 70*5
 		Return
 	EndIf
@@ -639,7 +643,7 @@ Function PickItem(item.Items)
 						Next
 						
 						If canpickitem=False Then
-							Msg = GetLocalString("Messages", "canttwohaz")
+							Msg = GetLocalString("Messages", "hazmatdouble")
 							MsgTimer = 70 * 5
 							Return
 						ElseIf canpickitem=2 Then
@@ -665,7 +669,7 @@ Function PickItem(item.Items)
 						Next
 						
 						If canpickitem=False Then
-							Msg = GetLocalString("Messages", "canttwovest")
+							Msg = GetLocalString("Messages", "vestdouble")
 							MsgTimer = 70 * 5
 							Return
 						ElseIf canpickitem=2 Then
@@ -679,7 +683,7 @@ Function PickItem(item.Items)
 				End Select
 				
 				If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
-				item\Picked = True
+				item\Picked = 1
 				item\Dropped = -1
 				
 				item\itemtemplate\found=True
@@ -719,7 +723,7 @@ Function DropItem(item.Items,playdropsound%=True)
 	
 	ResetEntity (item\collider)
 	
-	item\Picked = False
+	item\Picked = 0
 	For z% = 0 To MaxItemAmount - 1
 		If Inventory(z) = item Then Inventory(z) = Null
 	Next
