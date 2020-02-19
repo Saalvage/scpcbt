@@ -133,7 +133,10 @@ Function InitItemTemplates()
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "joint")
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "smellyjoint")
 	CreateItemTemplate("scp427", "GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.001, 3)
+	CreateItemTemplate("super427", "GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.0011, 3)
 	it = CreateItemTemplate("scp500", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001, 2) : EntityColor it\obj,255,0,0
+	it = CreateItemTemplate("upgradedpill", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001, 2) : EntityColor it\obj,255,0,75
+	it = CreateItemTemplate("pill", "GFX\items\pill.b3d", "GFX\items\INVpillwhite.jpg", "", 0.0001, 2) : EntityColor it\obj,255,255,255
 	CreateItemTemplate("scp513", "GFX\items\513.b3d", "GFX\items\INV513.jpg", "", 0.1, 2)
 	CreateItemTemplate("scp714", "GFX\items\scp714.b3d", "GFX\items\INV714.jpg", "", 0.3, 3)
 	CreateItemTemplate("scp860", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, 3)
@@ -272,8 +275,6 @@ Function InitItemTemplates()
 	CreateItemTemplate("quarter", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
 	CreateItemTemplate("wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005, 2, "","","",1)
 	CreateItemTemplate("clipboard", "GFX\items\clipboard.b3d", "GFX\items\INVclipboard.jpg", "", 0.003, 1, "", "", "GFX\items\INVclipboard2.jpg", 1)
-	it = CreateItemTemplate("upgradedpill", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001, 2) : EntityColor it\obj,255,0,0
-	it = CreateItemTemplate("pill", "GFX\items\pill.b3d", "GFX\items\INVpillwhite.jpg", "", 0.0001, 2) : EntityColor it\obj,255,255,255
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -420,9 +421,9 @@ Function RemoveItem(i.Items)
 				Wearing714 = False
 			Case "bad1499","scp1499","super1499","fine1499"
 				Wearing1499 = False
-			Case "scp427"
+			Case "scp427", "super427"
 				Local I_427.SCP427 = First SCP427
-				I_427\Using = False
+				I_427\Using = 0
 		End Select
 		
 		SelectedItem = Null
@@ -739,9 +740,9 @@ Function DropItem(item.Items,playdropsound%=True)
 			Wearing714 = False
 		Case "bad1499","scp1499","super1499","fine1499"
 			Wearing1499 = False
-		Case "scp427"
+		Case "scp427", "super427"
 			Local I_427.SCP427 = First SCP427
-			I_427\Using = False
+			I_427\Using = 0
 	End Select
 	
 	CatchErrors("DropItem")

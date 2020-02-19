@@ -25,7 +25,7 @@
 	- Added version of SCP-1499 that is faster to put on.
 	- Added Blank Document.
 	- Added ability to downgrade Keycards.
-	- Added refinements for SCP-427.
+	- Added "Super" SCP-427 and refinements for SCP-427.
 	- Added refinements for the Strange Bottle.
 	- Added extremely low chance to get SCP-1499 by refining a gas mask.
 	- Added consistency.

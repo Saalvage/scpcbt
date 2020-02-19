@@ -4369,7 +4369,7 @@ Function MovePlayer()
 		temp2 = Bloodloss
 		BlurTimer = Max(Max(Sin(MilliSecs2()/100.0)*Bloodloss*30.0,Bloodloss*2*(2.0-CrouchState)),BlurTimer)
 		Local I_427.SCP427 = First SCP427
-		If (Not I_427\Using And I_427\Timer < 70*360) Then
+		If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 			Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
 		EndIf
 		
@@ -4642,7 +4642,7 @@ Function MouseLook()
 					Stamina = Stamina - FPSfactor * 0.1
 				Case 3 ;appendicitis
 					;0.035/sec = 2.1/min
-					If (Not I_427\Using And I_427\Timer < 70*360) Then
+					If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 						SCP1025state[i]=SCP1025state[i]+FPSfactor*0.0005
 					EndIf
 					If SCP1025state[i]>20.0 Then
@@ -4663,7 +4663,7 @@ Function MouseLook()
 						CurrSpeed = CurveValue(0, CurrSpeed, 10+Stamina*15)
 					EndIf
 				Case 5;cardiac arrest
-					If (Not I_427\Using And I_427\Timer < 70*360) Then
+					If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 						SCP1025state[i]=SCP1025state[i]+FPSfactor*0.35
 					EndIf
 					;35/sec
@@ -4679,7 +4679,7 @@ Function MouseLook()
 						HeartBeatVolume = 1.0
 					EndIf
 				Case 6;stamina disease
-					If (Not I_427\Using And I_427\Timer < 70*360) Then
+					If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 						SCP1025state[i]=SCP1025state[i]+0.00025*FPSfactor*(100/SCP1025state[i])
 					EndIf
 					Stamina = Min(100, Stamina + (90.0-Stamina)*SCP1025state[i]*FPSfactor*0.00008)
@@ -5393,13 +5393,6 @@ Function DrawGUI()
 						If WearingVest=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "scp714"
 						If Wearing714=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-						;BoH items
-					;Case "ring"
-					;	If Wearing714=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					;Case "scp178"
-					;	If Wearing178=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
-					;Case "glasses"
-					;	If Wearing178=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "nvg"
 						If WearingNightVision=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "supernvg"
@@ -5416,6 +5409,8 @@ Function DrawGUI()
 						If WearingNightVision=3 Then Rect(x - 3, y - 3, width + 6, height + 6)
 					Case "scp427"
 						If I_427\Using=1 Then Rect(x - 3, y - 3, width + 6, height + 6)
+					Case "super427"
+						If I_427\Using=2 Then Rect(x - 3, y - 3, width + 6, height + 6)
 				End Select
 			EndIf
 			
@@ -7056,11 +7051,28 @@ Function DrawGUI()
 					
 					If I_427\Using=1 Then
 						Msg = GetLocalString("Messages", "427close")
-						I_427\Using = False
+						I_427\Using = 0
+					ElseIf I_427\Using=2
+						Msg = GetLocalString("Messages", "427double")
 					Else
 						GiveAchievement(Achv427)
 						Msg = GetLocalString("Messages", "427open")
-						I_427\Using = True
+						I_427\Using = 1
+					EndIf
+					MsgTimer = 70 * 5
+					SelectedItem = Null
+					
+				Case "super427"
+					
+					If I_427\Using=2 Then
+						Msg = GetLocalString("Messages", "427close")
+						I_427\Using = 0
+					ElseIf I_427\Using=1
+						Msg = GetLocalString("Messages", "427double")
+					Else
+						GiveAchievement(Achv427)
+						Msg = GetLocalString("Messages", "427open")
+						I_427\Using = 2
 					EndIf
 					MsgTimer = 70 * 5
 					SelectedItem = Null
@@ -9482,6 +9494,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 	RefinedItems = RefinedItems+1
 	
 	Local it2.Items
+	Local remove% = 1
 	Select item\itemtemplate\tempname
 		Case "key1", "key2", "key3", "key4", "key5"
 			Local level% = Right(item\itemtemplate\tempname, 1)
@@ -9670,8 +9683,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							EndIf
 					End Select
 			End Select
-			
-			RemoveItem(item)
 		Case "keyomni"
 			Select setting
 				Case "rough"
@@ -9690,28 +9701,23 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					EndIf
 				Case "1:1"
 					If Rand(3)=1 Then
-						it2 = CreateItem("key5", x, y, z)
-					Else
 						If Rand(2)=1 Then
 							it2 = CreateItem("misc", x, y, z, "keymaster")
 						Else
 							it2 = CreateItem("misc", x, y, z, "keyplay")
 						EndIf
+					Else
+						it2 = CreateItem("key5", x, y, z)
 					EndIf
 				Case "fine", "very fine"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					it2 = CreateItem("misc", x, y, z, "keymaster")
 			End Select
-			
-			RemoveItem(item)
 		Case "scp148"
 			Select setting
 				Case "rough", "coarse"
 					it2 = CreateItem("scp148ingot", x, y, z)
-					RemoveItem(item)
 				Case "1:1", "fine", "very fine"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 			End Select
 		Case "scp148ingot"
 			Select setting
@@ -9719,8 +9725,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.35 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 				Case "fine", "very fine"
 					For it.Items = Each Items
 						If it<>item And it\collider <> 0 And it\Picked = False Then
@@ -9728,15 +9733,12 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 								Select it\itemtemplate\tempname
 									Case "badgasmask", "gasmask", "supergasmask"
 										it2 = CreateItem("heavygasmask", x, y, z)
-										RemoveItem(it)
 										Exit
 									Case "vest"
 										it2 = CreateItem("finevest", x, y, z)
-										RemoveItem(it)
 										Exit
 									Case "hazmat","hazmat2"
 										it2 = CreateItem("hazmat3", x, y, z)
-										RemoveItem(it)
 										Exit
 								End Select
 							EndIf
@@ -9746,7 +9748,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					If it2 = Null Then
 						it2 = CreateItem("scp148", x, y, z)
 					EndIf
-					RemoveItem(item)
 			End Select
 		Case "scp420j"
 			Select setting
@@ -9760,15 +9761,13 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "fine", "very fine"
 					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
 			End Select
-			RemoveItem(item)
 		Case "cigarette"
 			Select setting
 				Case "rough", "coarse"	
 					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
-					PositionEntity(item\collider, x + 1.5, y + 0.5, z + 1.0)
-					ResetEntity(item\collider)
+					remove = 0
 				Case "fine"
 					If Rand(3) = 1 Then
 						it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
@@ -9790,8 +9789,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						If Rand(3) = 1 Then
 							it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
 						Else
-							PositionEntity(item\collider, x + 1.5, y + 0.5, z + 1.0)
-							ResetEntity(item\collider)
+							remove = 0 ;TODO check if this works
 						EndIf
 					Case "fine", "very fine"
 						it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
@@ -9807,8 +9805,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
 						EndIf
 					Case "1:1", "fine", "very fine"
-						PositionEntity(item\collider, x + 1.5, y + 0.5, z + 1.0)
-						ResetEntity(item\collider)
+						remove = 0
 				End Select
 			EndIf
 		Case "scp427"
@@ -9816,96 +9813,147 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "rough"
 					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
 				Case "coarse"
 					it2 = CreateItem("scp500", x, y, z)
-					RemoveItem(item)
+				Case "1:1"
+					remove = 0
+				Case "fine", "very fine"
+					it2 = CreateItem("super427", x, y, z)
+			End Select
+		Case "super427"
+			Select setting
+				Case "rough"
+					it2 = CreateItem("scp500", x, y, z)
+				Case "coarse"
+					it2 = CreateItem("scp427", x, y, z)
 				Case "1:1", "fine", "very fine"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
+			End Select
+		Case "scp500"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					it2 = CreateItem("pill", x, y, z)
+				Case "fine"
+					Local I_427.SCP427 = First SCP427
+					If (Rand(I_427\Amount + 1) = 1) Then
+						it2 = CreateItem("scp427", x, y, z)
+						I_427\Amount = I_427\Amount + 1
+					Else
+						it2 = CreateItem("upgradedpill", x, y, z)
+					EndIf
+				Case "very fine"
+					it2 = CreateItem("upgradedpill", x, y, z)
+			End Select
+		Case "upgradedpill"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("scp500", x, y, z)
+					Else
+						it2 = CreateItem("pill", x, y, z)
+					EndIf
+				Case "1:1", "fine", "very fine"
+					remove = 0
+			End Select
+		Case "pill"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("scp500", x, y, z)
+					Else
+						remove = 0
+					EndIf
+				Case "fine", "very fine"
+					it2 = CreateItem("upgradedpill", x, y, z)
+			End Select
+		Case "scp513"
+			Select setting
+				Case "rough","coarse"
+					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1","fine","very fine"
+					remove = 0
+			End Select
+		;SCP-714 intentionally omitted
+		Case "scp860"
+			Select setting
+				Case "rough","coarse"
+					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1", "fine", "very fine"
+					remove = 0
 			End Select
 		Case "badgasmask"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
 				Case "1:1"
 					If Rand(50) = 1 Then
 						it2 = CreateItem("bad1499", x, y, z)
-						RemoveItem(item)
 					Else
-						PositionEntity(item\collider, x, y, z)
-						ResetEntity(item\collider)
+						remove = 0
 					EndIf
 				Case "fine"
 					it2 = CreateItem("gasmask", x, y, z)
-					RemoveItem(item)
 				Case "very fine"
 					it2 = CreateItem("supergasmask", x, y, z)
-					RemoveItem(item)
 			End Select
 		Case "gasmask"
 			Select setting
 				Case "rough"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
 				Case "coarse"
 					it2 = CreateItem("badgasmask", x, y, z)
-					RemoveItem(item)
 				Case "1:1"
 					If Rand(100) = 1 Then
 						it2 = CreateItem("scp1499", x, y, z)
-						RemoveItem(item)
 					Else
-						PositionEntity(item\collider, x, y, z)
-						ResetEntity(item\collider)
+						remove = 0
 					EndIf
 				Case "fine", "very fine"
 					it2 = CreateItem("supergasmask", x, y, z)
-					RemoveItem(item)
 			End Select
 		Case "supergasmask", "heavygasmask"
 			Select setting
 				Case "rough"
 					it2 = CreateItem("badgasmask", x, y, z)
-					RemoveItem(item)
 				Case "coarse"
 					it2 = CreateItem("gasmask", x, y, z)
-					RemoveItem(item)
 				Case "1:1"
 					If Rand(200) = 1 Then
 						If Rand(3) = 1 Then
 							it2 = CreateItem("super1499", x, y, z)
-							RemoveItem(item)
 						Else
 							it2 = CreateItem("fine1499", x, y, z)
-							RemoveItem(item)
 						EndIf
 					Else
-						PositionEntity(item\collider, x, y, z)
-						ResetEntity(item\collider)
+						remove = 0
 					EndIf
 				Case "fine", "very fine"
 					it2 = CreateItem("supergasmask", x, y, z)
-					RemoveItem(item)
 			End Select
 		Case "scp1499"
 			Select setting
 				Case "rough"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
 				Case "coarse"
 					it2 = CreateItem("bad1499", x, y, z)
-					RemoveItem(item)
 				Case "1:1"
 					it2 = CreateItem("gasmask", x, y, z)
-					RemoveItem(item)
 				Case "fine"
 					it2 = CreateItem("super1499", x, y, z)
-					RemoveItem(item)
 				Case "very fine"
 					If Rand(3)=1 Then
 						n.NPCs = CreateNPC(NPCtype1499,x,y,z)
@@ -9916,23 +9964,18 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					Else
 						it2 = CreateItem("fine1499", x, y, z)
 					EndIf
-					RemoveItem(item)
 			End Select
 		Case "vest"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 				Case "fine"
 					it2 = CreateItem("finevest", x, y, z)
-					RemoveItem(item)
 				Case "very fine"
 					it2 = CreateItem("veryfinevest", x, y, z)
-					RemoveItem(item)
 			End Select
 		Case "clipboard"
 			Select setting
@@ -9943,45 +9986,27 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						If item\SecondInv[i]<>Null Then RemoveItem(item\SecondInv[i])
 						item\SecondInv[i]=Null
 					Next
-					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 				Case "fine"
 					item\invSlots = Max(item\state2,15)
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 				Case "very fine"
 					item\invSlots = Max(item\state2,20)
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
-			End Select
-		Case "scp513"
-			Select setting
-				Case "rough","coarse"
-					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
-				Case "1:1","fine","very fine"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 			End Select
 		Case "nvg", "finenvg", "supernvg"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-					RemoveItem(item)
 				Case "1:1"
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)
+					remove = 0
 				Case "fine"
 					it2 = CreateItem("finenvg", x, y, z)
-					RemoveItem(item)
 				Case "very fine"
 					it2 = CreateItem("supernvg", x, y, z)
 					it2\state = item\state
-					RemoveItem(item)
 			End Select
 		Case "hand", "hand2"
 			Select setting
@@ -9995,7 +10020,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						it2 = CreateItem("hand", x, y, z)
 					EndIf
 			End Select
-			RemoveItem(item)
 		Case "firstaid", "firstaid2"
 			Select setting
 				Case "rough", "coarse"
@@ -10012,7 +10036,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					it2 = CreateItem("veryfinefirstaid", x, y, z)
 			End Select
-			RemoveItem(item)
 		Case "finefirstaid"
 			Select setting
 				Case "rough"
@@ -10025,7 +10048,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "fine", "very fine"
 					it2 = CreateItem("veryfinefirstaid", x, y, z)
 			End Select
-			RemoveItem(item)
 		Case "veryfinefirstaid"
 			Select setting
 				Case "rough"
@@ -10052,7 +10074,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					it2 = CreateItem("veryfinefirstaid", x, y, z)
 			End Select
-			RemoveItem(item)
 		Case "coin", "quarter"
 			Select setting
 				Case "rough", "coarse"
@@ -10063,8 +10084,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "fine", "very fine"
 					it2 = CreateItem("key2", x, y, z)
 			End Select
-			
-			RemoveItem(item)
 		Case "nav300", "nav310", "nav", "navulti"
 			Select setting
 				Case "rough", "coarse"
@@ -10079,8 +10098,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("navulti", x, y, z)
 					it2\state = 101
 			End Select
-			
-			RemoveItem(item)
 		Case "radio", "fineradio", "veryfineradio"
 			Select setting
 				Case "rough", "coarse"
@@ -10095,8 +10112,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("veryfineradio", x, y, z)
 					it2\state = 101
 			End Select
-			
-			RemoveItem(item)
 		Case "scp513"
 			Select setting
 				Case "rough", "coarse"
@@ -10108,10 +10123,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1", "fine", "very fine"
 					it2 = CreateItem("scp513", x, y, z)
-					
 			End Select
-			
-			RemoveItem(item)
 		Case "bat", "18vbat", "killbat"
 			Select setting
 				Case "rough", "coarse"
@@ -10124,8 +10136,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					it2 = CreateItem("killbat", x, y, z)
 			End Select
-			
-			RemoveItem(item)
 		Case "eyedrops", "redeyedrops"
 			Select setting
 				Case "rough", "coarse"
@@ -10137,9 +10147,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					it2 = CreateItem("fineeyedrops", x,y,z)
 				Case "very fine"
 					it2 = CreateItem("supereyedrops", x,y,z)
-			End Select
-			
-			RemoveItem(item)		
+			End Select	
 		Case "hazmatsuit"
 			Select setting
 				Case "rough", "coarse"
@@ -10152,8 +10160,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					it2 = CreateItem("hazmat2", x,y,z)
 			End Select
-			
-			RemoveItem(item)
 		Case "syringe"
 			Select setting
 				Case "rough", "coarse"
@@ -10166,8 +10172,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					it2 = CreateItem("veryfinesyringe", x, y, z)
 			End Select
-			
-			RemoveItem(item)
 		Case "finesyringe"
 			Select setting
 				Case "rough"
@@ -10180,8 +10184,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "fine", "very fine"
 					it2 = CreateItem("veryfinesyringe", x, y, z)
 			End Select
-			
-			RemoveItem(item)
 		Case "veryfinesyringe"
 			Select setting
 				Case "rough", "coarse", "1:1", "fine"
@@ -10189,9 +10191,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					n.NPCs = CreateNPC(NPCtype008,x,y,z)
 					n\State = 2
-			End Select
-			
-			RemoveItem(item)	
+			End Select	
 		Case "misc"
 			Select item\itemtemplate\namespec
 				Case "keymaster"
@@ -10224,39 +10224,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							it2 = CreateItem("key2", x, y, z)
 					End Select
 				Default
-					PositionEntity(item\collider, x, y, z)
-					ResetEntity(item\collider)	
+					remove = 0
 			End Select
-			
-			RemoveItem(item)
-			
-		Case "scp500", "upgradedpill", "pill"
-			Select setting
-				Case "rough", "coarse"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					it2 = CreateItem("pill", x, y, z)
-					RemoveItem(item)
-				Case "fine"
-					Local no427Spawn% = False
-					For it3.Items = Each Items
-						If it3\itemtemplate\tempname = "scp427" Then
-							no427Spawn = True
-							Exit
-						EndIf
-					Next
-					If (Not no427Spawn) Then
-						it2 = CreateItem("scp427", x, y, z)
-					Else
-						it2 = CreateItem("upgradedpill", x, y, z)
-					EndIf
-					RemoveItem(item)
-				Case "very fine"
-					it2 = CreateItem("upgradedpill", x, y, z)
-					RemoveItem(item)
-			End Select
-
 		Case "cup"
 			Select setting
 				Case "rough", "coarse"
@@ -10286,9 +10255,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						ExplosionTimer = 135
 					EndIf
 			End Select	
-			
-			RemoveItem(item)
-			
 		Case "paper"
 			Select setting
 				Case "rough"
@@ -10314,12 +10280,16 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "fine", "very fine"
 					it2 = CreateItem("misc", x, y, z, "origami")
 			End Select
-			
-			RemoveItem(item)
 		Default
-			PositionEntity(item\collider, x, y, z)
-			ResetEntity(item\collider)
+			remove = 0
 	End Select
+	
+	If remove Then
+		RemoveItem(item)
+	Else
+		PositionEntity(item\collider, x, y, z)
+		ResetEntity(item\collider)
+	EndIf
 	
 	If it2 <> Null Then EntityType (it2\collider, HIT_ITEM)
 End Function
@@ -10520,8 +10490,8 @@ Function Use427()
 	Local prevI427Timer# = I_427\Timer
 	
 	If I_427\Timer < 70*360
-		If I_427\Using=True Then
-			I_427\Timer = I_427\Timer + FPSfactor
+		If I_427\Using>0 Then
+			I_427\Timer = I_427\Timer + FPSfactor * I_427\Using
 			If Injuries > 0.0 Then
 				Injuries = Max(Injuries - 0.0005 * FPSfactor,0.0)
 			EndIf
@@ -10724,7 +10694,7 @@ Function UpdateInfect()
 		If Infect < 93.0 Then
 			temp=Infect
 			Local I_427.SCP427 = First SCP427
-			If (Not I_427\Using And I_427\Timer < 70*360) Then
+			If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 				Infect = Min(Infect+FPSfactor*0.002,100)
 			EndIf
 			
