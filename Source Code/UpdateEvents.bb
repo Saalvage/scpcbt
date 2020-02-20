@@ -1,5 +1,5 @@
 Function UpdateEvents()
-	;CatchErrors("UpdateEvents")
+	CatchErrors("UpdateEvents")
 	Local dist#, i%, temp%, pvt%, strtemp$, j%, k%
 	
 	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, it2.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
@@ -8540,9 +8540,9 @@ Function UpdateEvents()
 		End Select
 		
 		If e<>Null Then
-			;CatchErrors("Uncaught" + Chr(34)+e\EventName+Chr(34)+" event")
+			CatchErrors("Uncaught " + Chr(34)+e\EventName+Chr(34)+" event")
 		Else
-			;CatchErrors("Uncaught Deleted event")
+			CatchErrors("Uncaught Deleted event")
 		EndIf
 	Next
 	

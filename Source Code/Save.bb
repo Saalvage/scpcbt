@@ -1,6 +1,6 @@
 
 Function SaveGame(file$)
-	;CatchErrors("Uncaught (SaveGame)")
+	CatchErrors("SaveGame")
 	
 	Local I_Cheats.Cheats = First Cheats
 	Local I_Loc.Loc = First Loc
@@ -460,13 +460,13 @@ Function SaveGame(file$)
 		;SetSaveMSG("Game progress saved.")
 	EndIf
 	
-	;CatchErrors("SaveGame")
+	CatchErrors("Uncaught SaveGame")
 End Function
 
 Function LoadGame(file$)
 	Local version$ = ""
 	
-	;CatchErrors("Uncaught (LoadGame)")
+	CatchErrors("LoadGame")
 	DebugLog "---------------------------------------------------------------------------"
 	
 	Local I_Cheats.Cheats = First Cheats
@@ -1238,13 +1238,13 @@ Function LoadGame(file$)
 	
 	UpdateDoorsTimer = 0
 	
-	;CatchErrors("LoadGame")
+	CatchErrors("Uncaught LoadGame")
 End Function
 
 Function LoadGameQuick(file$)
 	Local version$ = ""
 	
-	;CatchErrors("Uncaught (LoadGameQuick)")
+	CatchErrors("LoadGameQuick")
 	DebugLog "---------------------------------------------------------------------------"
 	
 	Local I_Cheats.Cheats = First Cheats
@@ -1953,11 +1953,11 @@ Function LoadGameQuick(file$)
 	CameraFogMode(Camera, 1)
 	HideDistance# = 15.0
 	
-	;CatchErrors("LoadGameQuick")
+	CatchErrors("Uncaught LoadGameQuick")
 End Function
 
 Function LoadSaveGames()
-	;CatchErrors("Uncaught (LoadSaveGames)")
+	CatchErrors("LoadSaveGames")
 	SaveGameAmount = 0
 	If FileType(SavePath)=1 Then RuntimeError "Can't create dir "+Chr(34)+SavePath+Chr(34)
 	If FileType(SavePath)=0 Then CreateDir(SavePath)
@@ -2016,12 +2016,12 @@ Function LoadSaveGames()
 		CloseFile f
 	Next
 	
-	;CatchErrors("LoadSaveGames")
+	CatchErrors("Uncaught LoadSaveGames")
 End Function
 
 
 Function LoadSavedMaps()
-	;CatchErrors("Uncaught (LoadSavedMaps)")
+	CatchErrors("LoadSavedMaps")
 	Local i%, Dir, file$
 	
 	For i = 0 To SavedMapsAmount
@@ -2077,11 +2077,11 @@ Function LoadSavedMaps()
 		EndIf 
 	Forever 
 	CloseDir Dir 
-	;CatchErrors("LoadSavedMaps")
+	CatchErrors("Uncaught LoadSavedMaps")
 End Function
 
 Function LoadMap(file$)
-	;CatchErrors("Uncaught (LoadMap)")
+	CatchErrors("LoadMap")
 	Local f%, x%, y%, name$, angle%, prob#
 	Local r.Rooms, rt.RoomTemplates, e.Events
 	Local roomamount%,forestpieceamount%,mtpieceamount%,i%
@@ -2459,5 +2459,5 @@ Function LoadMap(file$)
 		Next
 	Next
 	
-	;CatchErrors("LoadMap")
+	CatchErrors("Uncaught LoadMap")
 End Function

@@ -31,7 +31,7 @@
 	- Added consistency.
 	- Fixed SCP-148's refinements.
 	- And some other minor stuff.
-- Geometry the player can't interact with no longer has collision, should result in a performance boost. (Idea by Third Subdivision Studio/Vane Brain and ENDSHN)
+- Geometry the player can't interact with no longer has collision, should result in a performance boost.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
 - Added some space between the page indicator and the next/previous page buttons on the load game screen.
@@ -62,6 +62,7 @@ Bug Fixes:
 	- Fixed inventory not being fully centered.
 	- Fixed an exploit allowing the player to avoid SCP-1025 resetting by opening the inventory.
 	- Fixed being able to walk/run while getting up from bed in the intro sequence.
+	- Fixed multiple items appearing to be worn, when multiple items of the same type are held.
 	- Fixed the MTFs not closing the door after recontaining SCP-173.
 	- Fixed SCP-049 spam-closing the door behind it, if the player tries to open it.
 	- Fixed SCP-106's eyes glowing in the dark and flying in midair while he is emerging.
