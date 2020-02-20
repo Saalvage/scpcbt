@@ -1928,7 +1928,7 @@ Function PlaceAdjacentDoors()
 						If shouldSpawnDoor
 							If (x+1)<(MapWidth+1)
 								If MapTemp(x + 1, y) > 0 Then
-									d.Doors = CreateDoor(Float(x) * spacing + spacing / 2.0, zone * -1000, Float(y) * spacing, 90, r, temp)
+									d.Doors = CreateDoor(Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, temp)
 									r\AdjDoor[0] = d
 								EndIf
 							EndIf
@@ -1958,7 +1958,7 @@ Function PlaceAdjacentDoors()
 						If shouldSpawnDoor
 							If (y+1)<(MapHeight+1)
 								If MapTemp(x, y + 1) > 0 Then
-									d.Doors = CreateDoor(Float(x) * spacing, zone * -1000, Float(y) * spacing + spacing / 2.0, 0, r, temp)
+									d.Doors = CreateDoor(Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, temp)
 									r\AdjDoor[3] = d
 								EndIf
 							EndIf

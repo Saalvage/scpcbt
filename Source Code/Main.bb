@@ -7,6 +7,8 @@
 
 ;    See Credits.txt for a list of contributors
 
+Const DO_DA_ZONE = 1
+
 Local InitErrorStr$ = ""
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 
@@ -1277,18 +1279,6 @@ Function UpdateConsole()
 						EndIf
 					Next
 					CreateConsoleMsg("Stopped all sounds.")
-				Case "down"
-					PositionEntity(Collider, EntityX(Collider), EntityY(Collider) - 1000, EntityZ(Collider))
-					PositionEntity(Camera, EntityX(Collider), EntityY(Collider) - 1000, EntityZ(Collider))
-					ResetEntity(Collider)
-					ResetEntity(Camera)
-					CurrentZone = CurrentZone - 1
-				Case "up"
-					PositionEntity(Collider, EntityX(Collider), EntityY(Collider) + 1000, EntityZ(Collider))
-					PositionEntity(Camera, EntityX(Collider), EntityY(Collider) + 1000, EntityZ(Collider))
-					ResetEntity(Collider)
-					ResetEntity(Camera)
-					CurrentZone = CurrentZone + 1
 				Case "cls", "clear"
 					For c.ConsoleMsg = Each ConsoleMsg
 						Delete c
@@ -2171,7 +2161,7 @@ Function UpdateDoors()
 					If d\buttons[i] <> 0 Then
 						If Abs(EntityX(Collider)-EntityX(d\buttons[i],True)) < 1.0 Then 
 							If Abs(EntityZ(Collider)-EntityZ(d\buttons[i],True)) < 1.0 Then 
-								dist# = Distance(EntityX(Collider, True), EntityZ(Collider, True), EntityX(d\buttons[i], True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
+								dist# = Distance(EntityX(Collider, True), EntityX(d\buttons[i], True), EntityZ(Collider, True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
 								If dist < 0.7 Then
 									Local temp% = CreatePivot()
 									PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
@@ -6624,32 +6614,32 @@ Function DrawGUI()
 								For z2 = Max(0, PlayerZ - 6) To Min(MapHeight, PlayerZ + 6)
 									
 									If CoffinDistance > 16.0 Or Rnd(16.0)<CoffinDistance Then 
-										If MapTemp(PlayerRoom\zone, x2, z2)>0 And (MapFound(PlayerRoom\zone, x2, z2) > 0 Or SelectedItem\itemtemplate\tempname = "nav310" Or SelectedItem\itemtemplate\tempname = "navulti") Then
+										If MapTemp(x2, z2)>0 And (MapFound(x2, z2) > 0 Or SelectedItem\itemtemplate\tempname = "nav310" Or SelectedItem\itemtemplate\tempname = "navulti") Then
 											Local drawx% = x + (PlayerX - 1 - x2) * 24 , drawy% = y - (PlayerZ - 1 - z2) * 24
 											
 											If x2+1<=MapWidth Then
-												If MapTemp(PlayerRoom\zone, x2+1,z2)=False
+												If MapTemp(x2+1,z2)=False
 													DrawImage NavImages(3),drawx-12,drawy-12
 												EndIf
 											Else
 												DrawImage NavImages(3),drawx-12,drawy-12
 											EndIf
 											If x2-1>=0 Then
-												If MapTemp(PlayerRoom\zone, x2-1,z2)=False
+												If MapTemp(x2-1,z2)=False
 													DrawImage NavImages(1),drawx-12,drawy-12
 												EndIf
 											Else
 												DrawImage NavImages(1),drawx-12,drawy-12
 											EndIf
 											If z2-1>=0 Then
-												If MapTemp(PlayerRoom\zone, x2,z2-1)=False
+												If MapTemp(x2,z2-1)=False
 													DrawImage NavImages(0),drawx-12,drawy-12
 												EndIf
 											Else
 												DrawImage NavImages(0),drawx-12,drawy-12
 											EndIf
 											If z2+1<=MapHeight Then
-												If MapTemp(PlayerRoom\zone, x2,z2+1)=False
+												If MapTemp(x2,z2+1)=False
 													DrawImage NavImages(2),drawx-12,drawy-12
 												EndIf
 											Else
@@ -7682,10 +7672,10 @@ Function DrawMenu()
 								z = Abs(EntityZ(Collider) - EntityZ(r\obj))
 								
 								If x < 12.0 And z < 12.0 Then
-									MapFound(CurrentZone, Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(CurrentZone, Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
+									MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
 									If x < 4.0 And z < 4.0 Then
 										If Abs(EntityY(Collider) - EntityY(r\obj)) < 1.5 Then PlayerRoom = r
-										MapFound(CurrentZone, Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
+										MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
 									EndIf
 								EndIf
 							Next
@@ -7738,10 +7728,10 @@ Function DrawMenu()
 							z = Abs(EntityZ(Collider) - EntityZ(r\obj))
 							
 							If x < 12.0 And z < 12.0 Then
-								MapFound(CurrentZone, Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(CurrentZone, Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
+								MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = Max(MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)), 1)
 								If x < 4.0 And z < 4.0 Then
 									If Abs(EntityY(Collider) - EntityY(r\obj)) < 1.5 Then PlayerRoom = r
-									MapFound(CurrentZone, Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
+									MapFound(Floor(EntityX(r\obj) / 8.0), Floor(EntityZ(r\obj) / 8.0)) = 1
 								EndIf
 							EndIf
 						Next
@@ -8635,12 +8625,10 @@ Function NullGame(playbuttonsfx%=True)
 	
 	HideDistance# = 15.0
 	
-	For lvl = 0 To 2
-		For x = 0 To MapWidth+1
-			For y = 0 To MapHeight+1
-				MapTemp(lvl, x, y) = 0
-				MapFound(lvl, x, y) = 0
-			Next
+	For x = 0 To MapWidth+1
+		For y = 0 To MapHeight+1
+			MapTemp(x, y) = 0
+			MapFound(x, y) = 0
 		Next
 	Next
 	
@@ -9621,7 +9609,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "fine", "very fine"
 					For it.Items = Each Items
 						If it<>item And it\collider <> 0 And it\Picked = 0 Then
-							If Distance(EntityX(it\collider,True), EntityZ(it\collider,True), x,z) < (180.0 * RoomScale)
+							If Distance(EntityX(it\collider,True), x, EntityZ(it\collider,True), z) < (180.0 * RoomScale)
 								Select it\itemtemplate\tempname
 									Case "badgasmask", "gasmask", "supergasmask"
 										it2 = CreateItem("heavygasmask", x, y, z)
@@ -9647,11 +9635,11 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "coarse"
-					it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
+					it2 = CreateItem("cigarette", x, y, z)
 				Case "1:1"
-					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
+					it2 = CreateItem("420s", x, y, z, "joint")
 				Case "fine", "very fine"
-					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
+					it2 = CreateItem("420s", x, y, z, "smellyjoint")
 			End Select
 		Case "cigarette"
 			Select setting
@@ -9662,12 +9650,12 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					remove = 0
 				Case "fine"
 					If Rand(3) = 1 Then
-						it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
+						it2 = CreateItem("scp420j", x, y, z)
 					Else
-						it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
+						it2 = CreateItem("420s", x, y, z, "joint")
 					EndIf
 				Case "very fine"
-					it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
+					it2 = CreateItem("420s", x, y, z, "smellyjoint")
 			End Select
 		Case "420s"
 			If item\itemtemplate\namespec = "joint" Then
@@ -9676,25 +9664,25 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 						d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 					Case "coarse"
-						it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
+						it2 = CreateItem("cigarette", x, y, z)
 					Case "1:1"
 						If Rand(3) = 1 Then
-							it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
+							it2 = CreateItem("scp420j", x, y, z)
 						Else
-							remove = 0 ;TODO check if this works
+							remove = 0
 						EndIf
 					Case "fine", "very fine"
-						it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "smellyjoint")
+						it2 = CreateItem("420s", x, y, z, "smellyjoint")
 				End Select
 			Else ;smellyjoint
 				Select setting
 					Case "rough"
-						it2 = CreateItem("cigarette", x + 1.5, y + 0.5, z + 1.0)
+						it2 = CreateItem("cigarette", x, y, z)
 					Case "coarse"
 						If Rand(3) = 1 Then
-							it2 = CreateItem("scp420j", x + 1.5, y + 0.5, z + 1.0)
+							it2 = CreateItem("scp420j", x, y, z)
 						Else
-							it2 = CreateItem("420s", x + 1.5, y + 0.5, z + 1.0, "joint")
+							it2 = CreateItem("420s", x, y, z, "joint")
 						EndIf
 					Case "1:1", "fine", "very fine"
 						remove = 0
@@ -10744,12 +10732,6 @@ Function GenerateSeedNumber(seed$)
  	Return temp
 End Function
 
-Function Distance#(x1#, y1#, x2#, y2#)
-	Local x# = x2 - x1, y# = y2 - y1
-	Return(Sqr(x*x + y*y))
-End Function
-
-
 Function CurveValue#(number#, old#, smooth#)
 	If FPSfactor = 0 Then Return old
 	
@@ -10797,11 +10779,11 @@ Function CircleToLineSegIsect% (cx#, cy#, r#, l1x#, l1y#, l2x#, l2y#)
 	
 	;Ympyrän keskipisteen ja (ainakin toisen) janan päätepisteen etäisyys < r
 	;-> leikkaus
-	If Distance(cx, cy, l1x, l1y) <= r Then
+	If Distance(cx, llx, cy, l1y) <= r Then
 		Return True
 	EndIf
 	
-	If Distance(cx, cy, l2x, l2y) <= r Then
+	If Distance(cx, l2x, cy, l2y) <= r Then
 		Return True
 	EndIf	
 	
@@ -11817,7 +11799,7 @@ Function UpdateLeave1499()
 	
 End Function
 
-Function CheckForPlayerInFacility() ;TODO
+Function CheckForPlayerInFacility()
 	;False (=0): NPC is not in facility (mostly meant for "dimension1499")
 	;True (=1): NPC is in facility
 	;2: NPC is in tunnels (maintenance tunnels/049 tunnels/939 storage room, etc...)

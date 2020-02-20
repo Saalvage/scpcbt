@@ -1196,8 +1196,8 @@ Function UpdateMainMenu()
 	AASetFont Font1
 End Function
 
-Const L_WIDTH = 1024
-Const L_HEIGHT = 768
+Const L_WIDTH = 640
+Const L_HEIGHT = 480
 
 Function UpdateLauncher()
 	MenuScale = 1

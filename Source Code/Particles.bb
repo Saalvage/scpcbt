@@ -120,7 +120,7 @@ Function UpdateEmitters()
 			
 			If InSmoke = False Then
 				If WearingGasMask=0 And WearingHazmat=0 Then
-					Local dist# = Distance(EntityX(Camera, True), EntityZ(Camera, True), EntityX(e\obj, True), EntityZ(e\obj, True))
+					Local dist# = Distance(EntityX(Camera, True), EntityX(e\obj, True), EntityZ(Camera, True), EntityZ(e\obj, True))
 					If dist < 0.8 Then
 						If Abs(EntityY(Camera, True)-EntityY(e\obj,True))<5.0 Then InSmoke = True
 					EndIf
@@ -241,7 +241,7 @@ Function UpdateDevilEmitters()
 				dem\SoundCHN = LoopSound2(HissSFX, dem\SoundCHN, Camera, dem\obj)
 				If InSmoke = False Then
 					If WearingGasMask=0 And WearingHazmat=0 Then
-						Local dist# = Distance(EntityX(Camera, True), EntityZ(Camera, True), EntityX(dem\obj, True), EntityZ(dem\obj, True))
+						Local dist# = Distance(EntityX(Camera, True), EntityX(dem\obj, True), EntityZ(Camera, True), EntityZ(dem\obj, True))
 						If dist < 0.8 Then
 							If Abs(EntityY(Camera, True)-EntityY(dem\obj,True))<5.0 Then InSmoke = True
 						EndIf

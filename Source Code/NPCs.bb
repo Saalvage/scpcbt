@@ -728,7 +728,7 @@ Function UpdateNPCs()
 										EndIf
 									EndIf										
 									
-									Local SoundVol# = Max(Min((Distance(EntityX(n\Collider), EntityZ(n\Collider), n\PrevX, n\PrevZ) * 2.5), 1.0), 0.0)
+									Local SoundVol# = Max(Min((Distance(EntityX(n\Collider), n\PrevX, EntityZ(n\Collider), n\PrevZ) * 2.5), 1.0), 0.0)
 									n\SoundChn = LoopSound2(StoneDragSFX, n\SoundChn, Camera, n\Collider, 10.0, n\State)
 									
 									n\PrevX = EntityX(n\Collider)
@@ -874,7 +874,7 @@ Function UpdateNPCs()
 											
 										Else ;player is not visible -> move to the location where he was last seen							
 											If n\EnemyX <> 0 Then						
-												If Distance(EntityX(n\Collider), EntityZ(n\Collider), n\EnemyX, n\EnemyZ) > 0.5 Then
+												If DistanceSquared(EntityX(n\Collider), n\EnemyX, EntityZ(n\Collider), n\EnemyZ) > 0.25 Then ;0.5
 													AlignToVector(n\Collider, n\EnemyX-EntityX(n\Collider), 0, n\EnemyZ-EntityZ(n\Collider), 3)
 													MoveEntity(n\Collider, 0, 0, n\Speed * FPSfactor)
 													If Rand(500) = 1 Then n\EnemyX = 0 : n\EnemyY = 0 : n\EnemyZ = 0
@@ -1824,7 +1824,7 @@ Function UpdateNPCs()
 													If n\Path[n\PathLocation-1]\door <> Null Then
 														If n\Path[n\PathLocation-1]\door\openstate = 180.0 Then
 															If (Not n\Path[n\PathLocation-1]\door\IsElevatorDoor) Then
-																If EntityDistance(n\Path[n\PathLocation-1]\obj,n\Collider)>0.3 Then
+																If EntityDistanceSquared(n\Path[n\PathLocation-1]\obj,n\Collider)>0.09 Then ;0.3
 																	If (n\Path[n\PathLocation-1]\door\MTFClose) And (n\Path[n\PathLocation-1]\door\open) And (n\Path[n\PathLocation-1]\door\buttons[0]<>0 Or n\Path[n\PathLocation-1]\door\buttons[1]<>0) Then
 																		UseDoor(n\Path[n\PathLocation-1]\door, False)
 																	EndIf
@@ -1914,7 +1914,7 @@ Function UpdateNPCs()
 												;Breaking up the path if no "real" path has been found (only 1 waypoint and it is too close)
 												If n\PathStatus = 1 Then
 													If n\Path[1]<>Null Then
-														If n\Path[2]=Null And EntityDistance(n\Path[1]\obj,n\Collider)<0.4 Then
+														If n\Path[2]=Null And EntityDistanceSquared(n\Path[1]\obj,n\Collider)<0.16 Then ;0.4
 															n\PathLocation = 0
 															n\PathStatus = 0
 															DebugLog "Breaking up path for 049 because no waypoint number 2 has been found and waypoint number 1 is too close."
@@ -2035,7 +2035,7 @@ Function UpdateNPCs()
 								n\State = 2
 								n\State3 = 0
 								For r.Rooms = Each Rooms
-									If EntityDistance(r\obj,n\Collider)<4.0 Then
+									If EntityDistanceSquared(r\obj,n\Collider)<16.0 Then ;4
 										TeleportEntity(n\Collider,EntityX(r\obj),0.1,EntityZ(r\obj),n\CollRadius,True)
 										Exit
 									EndIf
@@ -2089,7 +2089,7 @@ Function UpdateNPCs()
 											If n\Path[n\PathLocation-1] <> Null
 												If n\Path[n\PathLocation-1]\door <> Null Then
 													If n\Path[n\PathLocation-1]\door\KeyCard=0
-														If EntityDistance(n\Path[n\PathLocation-1]\obj,n\Collider)>0.3
+														If EntityDistanceSquared(n\Path[n\PathLocation-1]\obj,n\Collider)>0.09 ;0.3
 															If n\Path[n\PathLocation-1]\door\open Then UseDoor(n\Path[n\PathLocation-1]\door, False)
 														EndIf
 													EndIf
@@ -2166,7 +2166,7 @@ Function UpdateNPCs()
 								
 								If n\Frame=777 Then
 									If Rand(700)=1 Then
-										If EntityDistance(Collider, n\Collider)<5.0 Then
+										If EntityDistanceSquared(Collider, n\Collider)<25.0 Then ;5
 											n\Frame = 719
 										EndIf
 									EndIf
@@ -2188,7 +2188,7 @@ Function UpdateNPCs()
 							Case 2 ;following the player
 
 								If n\State3 < 0 Then ;check if the player is visible every three seconds
-									If EntityDistance(Collider, n\Collider)<5.0 Then 
+									If EntityDistanceSquared(Collider, n\Collider)<25.0 Then ;5
 										If EntityVisible(Collider, n\Collider) Then n\State2 = 70*5
 									EndIf
 									n\State3=70*3
@@ -2244,7 +2244,7 @@ Function UpdateNPCs()
 											AnimateNPC(n, 936, 1017, n\CurrSpeed*60)
 											;Animate2(n\obj, AnimTime(n\obj), 936, 1017, n\CurrSpeed*60)
 											
-											If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+											If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
 												n\PathLocation = n\PathLocation + 1
 											EndIf 
 										EndIf
@@ -2276,7 +2276,7 @@ Function UpdateNPCs()
 									AnimateNPC(n, 2, 65, 0.7, False)
 									
 									If prevFrame < 23 And n\Frame=>23 Then
-										If (Not I_Cheats\GodMode) And EntityDistance(n\Collider,Collider)<1.1 And (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
+										If (Not I_Cheats\GodMode) And EntityDistanceSquared(n\Collider,Collider)<1.21 And (Abs(DeltaYaw(n\Collider,Collider))<=60.0) ;1.1
 											PlaySound_Strict DamageSFX(Rand(5,8))
 											Injuries = Injuries+Rnd(0.4,1.0)
 											DeathMSG = GetLocalString("Deaths", "0492")
@@ -2287,7 +2287,7 @@ Function UpdateNPCs()
 								Else
 									AnimateNPC(n, 66, 132, 0.7, False)
 									If prevFrame < 90 And n\Frame=>90 Then
-										If (Not I_Cheats\GodMode) And EntityDistance(n\Collider,Collider)<1.1 And (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
+										If (Not I_Cheats\GodMode) And EntityDistanceSquared(n\Collider,Collider)<1.21 And (Abs(DeltaYaw(n\Collider,Collider))<=60.0) ;1.1
 											PlaySound_Strict DamageSFX(Rand(5,8))
 											Injuries = Injuries+Rnd(0.4,1.0)
 											DeathMSG = GetLocalString("Deaths", "0492")
@@ -2446,7 +2446,7 @@ Function UpdateNPCs()
 								
 								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 								
-								If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+								If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
 									n\PathLocation = n\PathLocation + 1
 								EndIf 
 							EndIf
@@ -2479,7 +2479,7 @@ Function UpdateNPCs()
 						
 						RotateEntity n\Collider, 0, CurveAngle(VectorYaw(n\EnemyX-EntityX(n\Collider), 0, n\EnemyZ-EntityZ(n\Collider))+n\Angle, EntityYaw(n\Collider), 20.0), 0
 						
-						dist# = Distance(EntityX(n\Collider),EntityZ(n\Collider),n\EnemyX,n\EnemyZ)
+						dist# = Distance(EntityX(n\Collider),n\EnemyX,EntityZ(n\Collider),n\EnemyZ)
 						
 						AnimateNPC(n,1,38,n\CurrSpeed*40)
 						
@@ -2591,7 +2591,7 @@ Function UpdateNPCs()
 										
 										RotateEntity n\Collider, 0, CurveAngle(EntityYaw(n\obj), EntityYaw(n\Collider), 20.0), 0
 										
-										If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+										If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
 											n\PathLocation = n\PathLocation + 1
 										EndIf
 									EndIf
@@ -2602,7 +2602,7 @@ Function UpdateNPCs()
 									wayPointCloseToPlayer = Null
 									
 									For wp.WayPoints = Each WayPoints
-										If EntityDistance(wp\obj,Collider)<2.0
+										If EntityDistanceSquared(wp\obj,Collider)<4.0 ;2
 											wayPointCloseToPlayer = wp
 											Exit
 										EndIf
@@ -2700,7 +2700,7 @@ Function UpdateNPCs()
 								
 								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 								
-								If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+								If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
 									n\PathLocation = n\PathLocation + 1
 								EndIf 
 							EndIf
@@ -2910,7 +2910,7 @@ Function UpdateNPCs()
 								EndIf
 							Else
 								
-								If EntityDistance(n\Collider, n\Path[0]\obj) > 1.0 Then
+								If EntityDistanceSquared(n\Collider, n\Path[0]\obj) > 1.0 Then
 									PointEntity n\obj, n\Path[0]\obj
 									RotateEntity n\Collider, CurveAngle(EntityPitch(n\obj),EntityPitch(n\Collider),15.0), CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),15.0), 0, True
 									n\CurrSpeed = CurveValue(0.05*Max((7.0-dist)/7.0,0.0),n\CurrSpeed,15.0)
@@ -3118,11 +3118,11 @@ Function UpdateNPCs()
 									RotateEntity n\Collider, CurveAngle(Min(WrapAngle(EntityPitch(n\obj)),40.0),EntityPitch(n\Collider),40.0), CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),90.0), EntityRoll(n\Collider), True
 									PositionEntity(n\Collider, EntityX(n\Collider), CurveValue(EntityY(target)+8.0,EntityY(n\Collider),70.0), EntityZ(n\Collider))
 									
-									dist# = Distance(EntityX(target),EntityZ(target),EntityX(n\Collider),EntityZ(n\Collider))
+									dist# = Distance(EntityX(target),EntityX(n\Collider),EntityZ(target),EntityZ(n\Collider))
 									
 									n\CurrSpeed = CurveValue(Min(dist-6.5,6.5)*0.008, n\CurrSpeed, 50.0)
 									
-									;If Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\collider),EntityZ(n\collider)) > 6.5 Then
+									;If Distance(EntityX(Collider),EntityX(n\collider),EntityZ(Collider),EntityZ(n\collider)) > 42.25 Then ;6.5
 									;	n\currspeed = CurveValue(0.08,n\currspeed,50.0)
 									;Else
 									;	n\currspeed = CurveValue(0.0,n\currspeed,30.0)
@@ -3195,7 +3195,7 @@ Function UpdateNPCs()
 							MoveEntity n\obj, 0,0,FPSfactor*0.001*n\State2
 							PositionEntity(n\Collider, EntityX(n\obj), EntityY(n\obj), EntityZ(n\obj))
 							
-							If EntityDistance(n\obj, target) <0.3 Then
+							If EntityDistanceSquared(n\obj, target) <0.09 Then ;0.3
 								;If TempSound2 <> 0 Then FreeSound_Strict TempSound2 : TempSound2 = 0
 								;TempSound2 = LoadSound_Strict("SFX\Character\Apache\Crash"+Rand(1,2)+".ogg")
 								CameraShake = Max(CameraShake, 3.0)
@@ -3771,7 +3771,7 @@ Function UpdateNPCs()
 									EndIf
 									
 									If temp Then
-										If (Not I_Cheats\GodMode) And Distance(n\EnemyX, n\EnemyZ, EntityX(n\Collider), EntityZ(n\Collider))<1.5 Then
+										If (Not I_Cheats\GodMode) And DistanceSquared(n\EnemyX, EntityX(n\Collider), n\EnemyZ, EntityZ(n\Collider))<2.25 Then ;1.5
 											PlaySound_Strict n\Sound2
 											Injuries = Injuries + Rnd(1.5, 2.5)-WearingVest*0.5
 											BlurTimer = 500		
@@ -3797,7 +3797,7 @@ Function UpdateNPCs()
 											PlaySound2(StepSFX(1, 1, Rand(0,7)), Camera, n\Collider, 12.0)
 										EndIf										
 										
-										If Distance(n\EnemyX, n\EnemyZ, EntityX(n\Collider), EntityZ(n\Collider))<1.1 Then ;player is visible
+										If DistanceSquared(n\EnemyX, EntityX(n\Collider), n\EnemyZ, EntityZ(n\Collider))<1.21 Then ;player is visible (1.1)
 											n\Frame = 18
 											;SetAnimTime(n\obj, 18.0)
 										EndIf
@@ -3876,7 +3876,7 @@ Function UpdateNPCs()
 			Case NPCtype066
 
 				
-				dist = Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))
+				dist = Distance(EntityX(Collider),EntityX(n\Collider),EntityZ(Collider),EntityZ(n\Collider))
 				
 				Select n\State
 					Case 0 
@@ -3921,7 +3921,7 @@ Function UpdateNPCs()
 							;Animate2(n\obj, AnimTime(n\obj), 636, 646, 0.4, False)
 							;If AnimTime(n\obj)=646 Then SetAnimTime (n\obj, 2)
 						EndIf
-						dist = Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))
+						dist = Distance(EntityX(Collider),EntityX(n\Collider),EntityZ(Collider),EntityZ(n\Collider))
 						
 						If Rand(700)=1 Then PlaySound2(LoadTempSound("SFX\SCP\066\Eric"+Rand(1,3)+".ogg"),Camera, n\Collider, 8.0)
 						
@@ -3971,7 +3971,7 @@ Function UpdateNPCs()
 												de.Decals = CreateDecal(1, EntityX(n\Collider), 0.01, EntityZ(n\Collider), 90, Rand(360), 0)
 												de\Size = 0.3 : UpdateDecals
 												PlaySound_Strict(LoadTempSound("SFX\General\BodyFall.ogg"))
-												If ((Not I_Cheats\GodMode)) And Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))<0.8 Then
+												If ((Not I_Cheats\GodMode)) And DistanceSquared(EntityX(Collider),EntityX(n\Collider),EntityZ(Collider),EntityZ(n\Collider))<0.64 Then ;0.8
 													Injuries = Injuries + Rnd(0.3,0.5)
 												EndIf
 											EndIf
@@ -4447,7 +4447,7 @@ Function UpdateNPCs()
 										ShowEntity n\Collider
 									Else
 										n\Angle = EntityYaw(n\Collider) + DeltaYaw(n\Collider,n\Target\Collider)
-										If EntityDistance(n\Collider,n\Target\Collider)<1.5 Then
+										If EntityDistanceSquared(n\Collider,n\Target\Collider)<2.25 Then ;1.5
 											n\CurrSpeed = 0.0
 											n\Target\CurrSpeed = 0.0
 											n\Reload = 1
@@ -4541,7 +4541,7 @@ Function UpdateNPCs()
 													If n2\NPCtype=n\NPCtype Then
 														If n2\Target = Null Then
 															If n2\PrevState=0 Then
-																If EntityDistance(n\Collider,n2\Collider)<20.0 Then
+																If EntityDistanceSquared(n\Collider,n2\Collider)<400.0 Then ;20
 																	n\Target = n2
 																	n2\Target = n
 																	n\Target\CurrSpeed = n\Target\CurrSpeed + 0.0001
@@ -4791,7 +4791,7 @@ Function UpdateNPCs()
 								n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 								
-								If EntityDistance(n\Collider,Collider)<1.0
+								If EntityDistanceSquared(n\Collider,Collider)<1.0
 									If (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
 										n\State = 3
 									EndIf
@@ -4874,14 +4874,14 @@ Function UpdateNPCs()
 						Case 3 ;Attacking
 							AnimateNPC(n, 126, 165, 0.4, False)
 							If (n\Frame => 146 And prevFrame < 146)
-								If (Not I_Cheats\GodMode) And EntityDistance(n\Collider,Collider)<1.1 And (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
+								If (Not I_Cheats\GodMode) And EntityDistanceSquared(n\Collider,Collider)<1.21 And (Abs(DeltaYaw(n\Collider,Collider))<=60.0) ;1.1
 									PlaySound_Strict DamageSFX(Rand(5,8))
 									Injuries = Injuries+Rnd(0.4,1.0)
 									Infect = Infect + (1+(1*SelectedDifficulty\aggressiveNPCs))
 									DeathMSG = GetLocalString("Deaths", "008zombie")
 								EndIf
 							ElseIf n\Frame => 164
-								If EntityDistance(n\Collider,Collider)<1.1
+								If EntityDistanceSquared(n\Collider,Collider)<1.21 ;1.1
 									If (Abs(DeltaYaw(n\Collider,Collider))<=60.0)
 										SetNPCFrame(n,126)
 									Else
@@ -4906,7 +4906,7 @@ Function UpdateNPCs()
 										ShowEntity n\obj
 										For w.waypoints = Each WayPoints
 											If w\door=Null And w\room\dist < HideDistance And Rand(3)=1 Then
-												If EntityDistance(w\room\obj,n\Collider)<EntityDistance(Collider,n\Collider)
+												If EntityDistanceSquared(w\room\obj,n\Collider)<EntityDistanceSquared(Collider,n\Collider)
 													x = Abs(EntityX(n\Collider)-EntityX(w\obj,True))
 													If x < 12.0 And x > 4.0 Then
 														z = Abs(EntityZ(n\Collider)-EntityZ(w\obj,True))
@@ -4950,7 +4950,7 @@ Function UpdateNPCs()
 			EntityType n\Collider,HIT_DEAD
 		EndIf
 		
-		Local gravityDist = Distance(EntityX(Collider),EntityZ(Collider),EntityX(n\Collider),EntityZ(n\Collider))
+		Local gravityDist = Distance(EntityX(Collider),EntityX(n\Collider),EntityZ(Collider),EntityZ(n\Collider))
 		
 		If gravityDist<HideDistance*0.7 Or n\NPCtype = NPCtype1499 Then
 			If n\InFacility = InFacility
@@ -5119,7 +5119,7 @@ End Function
 Function OtherNPCSeesMeNPC%(me.NPCs,other.NPCs)
 	If other\BlinkTimer<=0.0 Then Return False
 	
-	If EntityDistance(other\Collider,me\Collider)<6.0 Then
+	If EntityDistanceSquared(other\Collider,me\Collider)<36.0 Then ;6
 		If Abs(DeltaYaw(other\Collider,me\Collider))<60.0 Then
 			Return True
 		EndIf
@@ -5313,7 +5313,7 @@ Function UpdateMTFUnit(n.NPCs)
 							Next
 						Else
 							Local tmp = False
-							If EntityDistance(n\Collider,Curr173\Collider)>4.0
+							If EntityDistanceSquared(n\Collider,Curr173\Collider)>16.0 ;4
 								If (Not EntityVisible(n\Collider,Curr173\Collider))
 									tmp = True
 								EndIf
@@ -5326,20 +5326,19 @@ Function UpdateMTFUnit(n.NPCs)
 										Local pvt% = CreatePivot()
 										PositionEntity pvt%,EntityX(r\obj,True)+4736*RoomScale,0.5,EntityZ(r\obj,True)+1692*RoomScale
 										
-										If Distance(EntityX(pvt%),EntityZ(pvt%),EntityX(n\Collider),EntityZ(n\Collider))<3.5
+										If DistanceSquared(EntityX(pvt%),EntityX(n\Collider),EntityZ(pvt%),EntityZ(n\Collider))<12.25 ;3.5
 											foundChamber% = True
-											DebugLog Distance(EntityX(pvt%),EntityZ(pvt%),EntityX(n\Collider),EntityZ(n\Collider))
 										EndIf
 										
 										FreeEntity pvt%
 										
-										If Distance(EntityX(n\Collider),EntityZ(n\Collider),EntityX(r\obj,True)+4736*RoomScale,EntityZ(r\obj,True)+1692*RoomScale)>1.6 And (Not foundChamber)
+										If DistanceSquared(EntityX(n\Collider),EntityX(r\obj,True)+4736*RoomScale,EntityZ(n\Collider),EntityZ(r\obj,True)+1692*RoomScale)>2.56 And (Not foundChamber) ;1.6
 											x = EntityX(r\obj,True)+4736*RoomScale
 											y = 0.1
 											z = EntityZ(r\obj,True)+1692*RoomScale
 											DebugLog "Move to 173's chamber"
 											Exit
-										ElseIf Distance(EntityX(n\Collider),EntityZ(n\Collider),EntityX(r\obj,True)+4736*RoomScale,EntityZ(r\obj,True)+1692*RoomScale)>1.6 And foundChamber
+										ElseIf DistanceSquared(EntityX(n\Collider),EntityX(r\obj,True)+4736*RoomScale,EntityZ(n\Collider),EntityZ(r\obj,True)+1692*RoomScale)>2.56 And foundChamber ;1.6
 											n\PathX = EntityX(r\obj,True)+4736*RoomScale
 											n\PathZ = EntityZ(r\obj,True)+1692*RoomScale
 											DebugLog "Move inside 173's chamber"
@@ -5457,7 +5456,7 @@ Function UpdateMTFUnit(n.NPCs)
 						TranslateEntity n\Collider, Cos(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, True
 						AnimateNPC(n,488, 522, n\CurrSpeed*26)
 						
-						If Distance(EntityX(n\Collider),EntityZ(n\Collider),n\PathX#,n\PathZ#)<0.2
+						If DistanceSquared(EntityX(n\Collider),n\PathX#,EntityZ(n\Collider),n\PathZ#)<0.04 ;0.2
 							n\PathX# = 0.0
 							n\PathZ# = 0.0
 							n\PathTimer = 70.0 * Rnd(6.0,10.0)
@@ -5472,7 +5471,7 @@ Function UpdateMTFUnit(n.NPCs)
 							EndIf
 							FinishWalking(n,488,522,n\Speed*26)
 							n\CurrSpeed = 0.0
-						ElseIf EntityDistance(n\Collider,n\MTFLeader\Collider)>1.0 Then
+						ElseIf EntityDistanceSquared(n\Collider,n\MTFLeader\Collider)>1.0 Then
 							PointEntity n\Collider,n\MTFLeader\Collider
 							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
 							
@@ -5535,8 +5534,8 @@ Function UpdateMTFUnit(n.NPCs)
 				
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
                 If Curr173\Idle<2 Then
-					Local SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), EntityZ(Curr173\Collider), Curr173\PrevX, Curr173\PrevZ) * 2.5), 1.0), 0.0)
-					If OtherNPCSeesMeNPC(Curr173,n) Or (SoundVol173#>0.0 And EntityDistance(n\Collider,Curr173\Collider)<6.0) Then
+					Local SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), Curr173\PrevX, EntityZ(Curr173\Collider), Curr173\PrevZ) * 2.5), 1.0), 0.0)
+					If OtherNPCSeesMeNPC(Curr173,n) Or (SoundVol173#>0.0 And EntityDistanceSquared(n\Collider,Curr173\Collider)<36.0) Then ;6.0
 						If EntityVisible(n\Collider,Curr173\Collider) Or SoundVol173#>0.0 Then							
 							n\State = 2
 							n\EnemyX = EntityX(Curr173\Collider,True)
@@ -5555,7 +5554,7 @@ Function UpdateMTFUnit(n.NPCs)
 				EndIf
 				
 				If Curr106\State <= 0
-					If OtherNPCSeesMeNPC(Curr106,n) Or EntityDistance(n\Collider,Curr106\Collider)<3.0 Then
+					If OtherNPCSeesMeNPC(Curr106,n) Or EntityDistanceSquared(n\Collider,Curr106\Collider)<9.0 Then ;3.0
 						If EntityVisible(n\Collider,Curr106\Collider) Then
 							n\State = 4
 							n\EnemyX = EntityX(Curr106\Collider,True)
@@ -5707,7 +5706,7 @@ Function UpdateMTFUnit(n.NPCs)
 						For n2.NPCs = Each NPCs
 							If n2\NPCtype = NPCtypeMTF And n2 <> n
 								If n2\State = 0
-									If EntityDistance(n\Collider,n2\Collider)<6.0
+									If EntityDistanceSquared(n\Collider,n2\Collider)<36.0 ;6.0
 										n\PrevState = 1
 										n2\LastSeen = (70*Rnd(30,40))
 										n2\LastDist = 1
@@ -5832,7 +5831,7 @@ Function UpdateMTFUnit(n.NPCs)
 							n\PathTimer=n\PathTimer-FPSfactor ;timer goes down slow
 						Else
 							PositionEntity n\obj,n\EnemyX,n\EnemyY,n\EnemyZ,True
-							If (Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),n\EnemyX,n\EnemyZ)<0.2) Or (Not EntityVisible(n\obj,n\Collider)) Then
+							If (DistanceSquared(EntityX(n\Collider,True),n\EnemyX,EntityZ(n\Collider,True),n\EnemyZ)<0.04) Or (Not EntityVisible(n\obj,n\Collider)) Then ;0.2
 								If Rand(1,35)=1 Then
 									RotateEntity n\Collider,0.0,Rnd(360.0),0.0,True
 								EndIf
@@ -5840,7 +5839,7 @@ Function UpdateMTFUnit(n.NPCs)
 								If Rand(1,35)=1 Then
 									For wp.Waypoints = Each WayPoints
 										If (Rand(1,3)=1) Then
-											If (EntityDistance(wp\obj,n\Collider)<6.0) Then
+											If (EntityDistanceSquared(wp\obj,n\Collider)<36.0) Then ;6.0
 												n\EnemyX = EntityX(wp\obj,True)
 												n\EnemyY = EntityY(wp\obj,True)
 												n\EnemyZ = EntityZ(wp\obj,True)
@@ -5891,8 +5890,8 @@ Function UpdateMTFUnit(n.NPCs)
                 
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
                 If Curr173\Idle<2 Then
-					SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), EntityZ(Curr173\Collider), Curr173\PrevX, Curr173\PrevZ) * 2.5), 1.0), 0.0)
-					If OtherNPCSeesMeNPC(Curr173,n) Or (SoundVol173#>0.0 And EntityDistance(n\Collider,Curr173\Collider)<6.0) Then
+					SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), Curr173\PrevX, EntityZ(Curr173\Collider), Curr173\PrevZ) * 2.5), 1.0), 0.0)
+					If OtherNPCSeesMeNPC(Curr173,n) Or (SoundVol173#>0.0 And EntityDistanceSquared(n\Collider,Curr173\Collider)<36.0) Then ;6.0
 						If EntityVisible(n\Collider,Curr173\Collider) Or SoundVol173#>0.0 Then	
 							n\State = 2
 							n\EnemyX = EntityX(Curr173\Collider,True)
@@ -5911,7 +5910,7 @@ Function UpdateMTFUnit(n.NPCs)
 				EndIf
 				
 				If Curr106\State <= 0
-					If OtherNPCSeesMeNPC(Curr106,n) Or EntityDistance(n\Collider,Curr106\Collider)<3.0 Then
+					If OtherNPCSeesMeNPC(Curr106,n) Or EntityDistanceSquared(n\Collider,Curr106\Collider)<9.0 Then ;3.0
 						If EntityVisible(n\Collider,Curr106\Collider) Then
 							n\State = 4
 							n\EnemyX = EntityX(Curr106\Collider,True)
@@ -5997,9 +5996,6 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 				Next
-				
-                ;DebugLog Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),n\EnemyX,n\EnemyZ)
-                
                 
 			Case 2 ;searching for/looking at 173
                 
@@ -6014,7 +6010,7 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					Next
 					
-					Local curr173Dist# = Distance(EntityX(n\Collider,True),EntityZ(n\Collider,True),EntityX(Curr173\Collider,True),EntityZ(Curr173\Collider,True))
+					Local curr173Dist# = Distance(EntityX(n\Collider,True),EntityX(Curr173\Collider,True),EntityZ(n\Collider,True),EntityZ(Curr173\Collider,True))
 					
 					If curr173Dist<5.0 Then
 						If Curr173\Idle <> 2 Then Curr173\Idle = True
@@ -6163,7 +6159,7 @@ Function UpdateMTFUnit(n.NPCs)
 							;If Rand(5)=1 Then 
 							;	For n2.NPCs = Each NPCs
 							;		If n2\NPCtype = n\NPCtype And n2<>n Then
-							;			If EntityDistance(n\Collider, n2\Collider)<2 Then
+							;			If EntityDistanceSquared(n\Collider, n2\Collider)<4 Then ;2
 							;				n\Idle = 150
 							;			EndIf
 							;		EndIf
@@ -6178,7 +6174,7 @@ Function UpdateMTFUnit(n.NPCs)
 								MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
 								
 								;If dist2 < (0.25+((n\Path[Min(n\PathLocation+1,19)]=Null)*0.3 * (n\ID Mod 3))) Then
-								If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj)<0.5
+								If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj)<0.25 ;0.5
 									n\PathLocation = n\PathLocation + 1
 								EndIf
 							EndIf
@@ -6241,7 +6237,7 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 					
-					If EntityDistance(n\Target\Collider,n\Collider)<3.0 And n\State3 >= 0.0
+					If EntityDistanceSquared(n\Target\Collider,n\Collider)<9.0 And n\State3 >= 0.0 ;3.0
 						n\State3 = 70*5
 					EndIf
 					
@@ -6279,7 +6275,7 @@ Function UpdateMTFUnit(n.NPCs)
 						Else
 							For r = Each Rooms
 								If ((Abs(r\x-EntityX(n\Collider,True))>12.0) Or (Abs(r\z-EntityZ(n\Collider,True))>12.0)) And (Rand(1,Max(4-Int(Abs(r\z-EntityZ(n\Collider,True)/8.0)),2))=1) Then
-									If EntityDistance(r\obj,n\Target\Collider)>6.0
+									If EntityDistanceSquared(r\obj,n\Target\Collider)>36.0 ;6
 										x = r\x
 										y = 0.1
 										z = r\z
@@ -6376,7 +6372,7 @@ Function UpdateMTFUnit(n.NPCs)
 					EndIf
 					
 					If n\PathStatus = 1 And n\Reload =< 0 Then
-						dist# = Distance(EntityX(target),EntityZ(target),EntityX(n\Collider),EntityZ(n\Collider))
+						dist# = Distance(EntityX(target),EntityX(n\Collider),EntityZ(target),EntityZ(n\Collider))
 						
 						;If dist<20.0 Then
 						;	pvt = CreatePivot()
@@ -6566,7 +6562,7 @@ Function UpdateMTFUnit(n.NPCs)
 							;EndIf
 							FinishWalking(n,488,522,n\Speed*26)
 							n\CurrSpeed = 0.0
-						ElseIf EntityDistance(n\Collider,n\MTFLeader\Collider)>1.0 Then
+						ElseIf EntityDistanceSquared(n\Collider,n\MTFLeader\Collider)>1.0 Then
 							PointEntity n\Collider,n\MTFLeader\Collider
 							RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
 							
@@ -6585,7 +6581,7 @@ Function UpdateMTFUnit(n.NPCs)
 					EndIf
                 EndIf
 				
-				If (Not EntityVisible(n\Collider,Curr096\Collider)) Or EntityDistance(n\Collider,Curr096\Collider)>6.0
+				If (Not EntityVisible(n\Collider,Curr096\Collider)) Or EntityDistanceSquared(n\Collider,Curr096\Collider)>36.0 ;6.0
 					n\State = 0
 				EndIf
 
@@ -6596,7 +6592,7 @@ Function UpdateMTFUnit(n.NPCs)
 					RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
 					n\Angle = EntityYaw(n\Collider)
 					
-					If EntityDistance(n\Target\Collider,n\Collider)<1.3
+					If EntityDistanceSquared(n\Target\Collider,n\Collider)<1.69 ;1.3
 						n\State3 = 70*2
 					EndIf
 					
@@ -6741,7 +6737,7 @@ Function UpdateMTFUnit(n.NPCs)
 		
 		If n\State <> 3 And n\State <> 5 And n\State <> 6 And n\State <> 7
 			If n\MTFLeader<>Null Then
-				If EntityDistance(n\Collider,n\MTFLeader\Collider)<0.7 Then
+				If EntityDistanceSquared(n\Collider,n\MTFLeader\Collider)<0.49 Then ;0.7
 					PointEntity n\Collider,n\MTFLeader\Collider
 					RotateEntity n\Collider,0.0,EntityYaw(n\Collider,True),0.0,True
 					n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
@@ -6752,7 +6748,7 @@ Function UpdateMTFUnit(n.NPCs)
 				For n2.NPCs = Each NPCs
 					If n2<>n And n2\IsDead=False Then
 						If Abs(DeltaYaw(n\Collider,n2\Collider))<80.0 Then
-							If EntityDistance(n\Collider,n2\Collider)<0.7 Then							
+							If EntityDistanceSquared(n\Collider,n2\Collider)<0.49 Then ;0.7
 								TranslateEntity n2\Collider, Cos(EntityYaw(n\Collider,True)+90)* 0.01 * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90)* 0.01 * FPSfactor, True
 							EndIf
 						EndIf
@@ -7309,7 +7305,7 @@ Function FindNextElevator(n.NPCs)
 					If eo2 <> eo
 						If eo2\InFacility = n\InFacility
 							If Abs(EntityY(eo2\obj,True)-EntityY(n\Collider))<10.0
-								If EntityDistance(eo2\obj,n\Collider)<EntityDistance(eo\obj,n\Collider)
+								If EntityDistanceSquared(eo2\obj,n\Collider)<EntityDistanceSquared(eo\obj,n\Collider)
 									n\PathStatus = FindPath(n, EntityX(eo2\obj,True),EntityY(eo2\obj,True),EntityZ(eo2\obj,True))
 									n\CurrElevator = eo2
 									DebugLog "eo2 found for "+n\NPCtype

@@ -301,8 +301,6 @@ Type Items
 	
 	Field r%,g%,b%,a#
 	
-	Field level
-	
 	Field SoundChn%
 	
 	Field dist#, disttimer#
@@ -529,7 +527,7 @@ Function UpdateItems()
 					Next
 				EndIf
 				
-				;If EntityY(i\collider) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\localname:RemoveItem(i):deletedItem=True ;TODO REIMPLEMENT?
+				If EntityY(i\collider) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\localname:RemoveItem(i):deletedItem=True
 			Else
 				HideEntity i\collider
 			EndIf
