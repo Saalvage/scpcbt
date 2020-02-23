@@ -141,7 +141,7 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	If Len(txt)=0 Then Return
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
-	If (GraphicsBuffer()<>BackBuffer()) Or (Not AATextEnable) Or (Not font\isAA) Then
+	If (GraphicsBuffer()<>BackBuffer()) Lor (Not AATextEnable) Lor (Not font\isAA) Then
 		SetFont font\lowResFont
 		Local oldr% = ColorRed() : Local oldg% = ColorGreen() : Local oldb% = ColorBlue()
 		Color oldr*a,oldg*a,oldb*a

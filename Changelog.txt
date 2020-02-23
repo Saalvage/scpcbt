@@ -4,6 +4,8 @@
 - Added FOV option (Made by TheHappyJammer).
 	- Decreased default FOV to 60.
 	- Made FOV also internally an integer, fixing an issue with the sliders allowing for float values.
+- Added support for resolutions of up to 4k.
+- Added anisotropic filtering.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague/Graviter Aegrota Anthropophagia Febris" (SCP-008).
 - Added vehicle in the intro sequence (Made by Ultimate Edition Team).
 	- Made it faster and adjusted the tire speed.
@@ -28,6 +30,12 @@
 	- Added "Super" SCP-427 and refinements for SCP-427.
 	- Added refinements for the Strange Bottle.
 	- Added extremely low chance to get SCP-1499 by refining a gas mask.
+	- Added SCP-1025 refinements.
+	- Added a very special book.
+	- Added ability to get electronics via Electronical Components.
+	- Added worse clipboards.
+	- Added Bad Hazmat Suit.
+	- Added a weird vest.
 	- Added consistency.
 	- Fixed SCP-148's refinements.
 	- And some other minor stuff.
@@ -43,7 +51,8 @@
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
-- Increased the size of the SCP-148 ingot.
+- Increased size of the SCP-148 ingot.
+- Increased size of Electronical Components.
 - Added ability to clear current console input via Ctrl + Backspace.
 - Added "clear" command, which clears the console.
 - Added "ulti" command, which spawns a set of ultimate tools.
@@ -53,7 +62,9 @@
 - Removed Check for updates feature in launcher.
 - Removed event load text to increase immersion.
 - Removed scene in which Guard Ulgrin provides D-9341 with classified information (the document will now be found just after the initial intro).
+- Removed 16-Bit mode.
 - Removed and renamed a few commands.
+- Removed unused and duplicate files.
 
 
 Bug Fixes:
@@ -71,6 +82,7 @@ Bug Fixes:
 	- Fixed godmode not protecting against all injuries.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
+	- Fixed z-fighting on monitor model.
 	- Fixed and reworked the "revive" command.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.
 

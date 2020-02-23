@@ -313,7 +313,7 @@ For e.Emitter = Each Emitter
 		e\cnt_loop = (e\cnt_loop + 1) Mod e\tmp\interval
 		If e\cnt_loop = 0 And e\del = False Then
 			For i = 1 To e\tmp\particles_per_interval
-				If (e\tmp\max_particles > -1 And cnt_particles < e\tmp\max_particles) Or e\tmp\max_particles = -1 Then
+				If (e\tmp\max_particles > -1 And cnt_particles < e\tmp\max_particles) Lor e\tmp\max_particles = -1 Then
 					p.Particle = New Particle
 					p\emitter = e
 					p\max_time = Rand(e\tmp\min_time, e\tmp\max_time)

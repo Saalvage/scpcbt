@@ -66,7 +66,7 @@ Function UpdateParticles()
 		EndIf
 		
 		p\lifetime=p\lifetime-FPSfactor
-		If p\lifetime <= 0 Or p\size < 0.00001 Or p\A =< 0 Then
+		If p\lifetime <= 0 Lor p\size < 0.00001 Lor p\A =< 0 Then
 			RemoveParticle(p)
 		EndIf
 	Next
@@ -103,8 +103,8 @@ End Type
 Function UpdateEmitters()
 	InSmoke = False
 	For e.emitters = Each Emitters
-		If FPSfactor > 0 And (PlayerRoom = e\room Or e\room\dist < 8) Then
-			;If ParticleAmount = 2 Or SmokeDelay#=0.0
+		If FPSfactor > 0 And (PlayerRoom = e\room Lor e\room\dist < 8) Then
+			;If ParticleAmount = 2 Lor SmokeDelay#=0.0
 			Local p.Particles = CreateParticle(EntityX(e\obj, True), EntityY(e\obj, True), EntityZ(e\obj, True), Rand(e\minimage, e\maximage), e\size, e\gravity, e\lifetime)
 			p\speed = e\speed
 			RotateEntity(p\pvt, EntityPitch(e\Obj, True), EntityYaw(e\Obj, True), EntityRoll(e\Obj, True), True)
@@ -228,7 +228,7 @@ Function UpdateDevilEmitters()
 	Local InSmoke = False
 	
 	For dem = Each DevilEmitters
-		If FPSfactor > 0 And (PlayerRoom = dem\room Or dem\room\dist < 8)
+		If FPSfactor > 0 And (PlayerRoom = dem\room Lor dem\room\dist < 8)
 			If dem\timer = 0
 				SetEmitter(dem\obj,ParticleEffect[dem\particleID])
 				dem\timer = FPSfactor

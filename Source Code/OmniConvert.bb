@@ -13,7 +13,7 @@ Function StripPath$(file$)
 		For i=Len(file$) To 1 Step -1 
 			
 			mi$=Mid$(file$,i,1) 
-			If mi$="\" Or mi$="/" Then Return name$
+			If mi$="\" Lor mi$="/" Then Return name$
 			
 			name$=mi$+name$ 
 		Next 
@@ -29,7 +29,7 @@ Function StripFilename$(file$)
 	If Len(file)>0
 		For i%=1 To Len(file)
 			mi=Mid(file$,i,1)
-			If mi="\" Or mi="/" Then
+			If mi="\" Lor mi="/" Then
 				lastSlash=i
 			EndIf
 		Next
@@ -80,7 +80,7 @@ End Function
 Function isAlpha%(tex%) ;detect transparency in textures
 	Local temp1s$=StripPath(TextureName(tex))
 	Local temp1i%
-	If Instr(temp1s,".png")<>0 Or Instr(temp1s,".tga")<>0 Or Instr(temp1s,".tpic")<>0 Then ;texture is PNG or TARGA
+	If Instr(temp1s,".png")<>0 Lor Instr(temp1s,".tga")<>0 Lor Instr(temp1s,".tpic")<>0 Then ;texture is PNG or TARGA
 		LockBuffer(TextureBuffer(tex))
 		For x%=0 To TextureWidth(tex)-1
 			For y%=0 To TextureHeight(tex)-1
@@ -455,7 +455,7 @@ Function GetINIString$(file$, section$, parameter$)
 					CloseFile f
 					Return Trim( Right(TemporaryString,Len(TemporaryString)-Instr(TemporaryString,"=")) )
 				EndIf
-			Until Left(TemporaryString,1) = "[" Or Eof(f)
+			Until Left(TemporaryString,1) = "[" Lor Eof(f)
 			CloseFile f
 			Return ""
 		EndIf

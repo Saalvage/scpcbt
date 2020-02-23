@@ -196,7 +196,7 @@ Function StopStream_Strict(streamHandle%)
         CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
         Return
     EndIf
-    If st\chn=0 Or st\chn=-1
+    If st\chn=0 Lor st\chn=-1
         CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
         Return
     EndIf
@@ -211,7 +211,7 @@ Function SetStreamVolume_Strict(streamHandle%,volume#)
 		CreateConsoleMsg("Failed to set stream Sound volume: Unknown Stream")
 		Return
 	EndIf
-	If st\chn=0 Or st\chn=-1
+	If st\chn=0 Lor st\chn=-1
 		CreateConsoleMsg("Failed to set stream Sound volume: Return value "+st\chn)
 		Return
 	EndIf
@@ -227,7 +227,7 @@ Function SetStreamPaused_Strict(streamHandle%,paused%)
 		CreateConsoleMsg("Failed to pause/unpause stream Sound: Unknown Stream")
 		Return
 	EndIf
-	If st\chn=0 Or st\chn=-1
+	If st\chn=0 Lor st\chn=-1
 		CreateConsoleMsg("Failed to pause/unpause stream Sound: Return value "+st\chn)
 		Return
 	EndIf
@@ -247,7 +247,7 @@ Function IsStreamPlaying_Strict(streamHandle%)
 		CreateConsoleMsg("Failed to find stream Sound: Unknown Stream")
 		Return
 	EndIf
-	If st\chn=0 Or st\chn=-1
+	If st\chn=0 Lor st\chn=-1
 		CreateConsoleMsg("Failed to find stream Sound: Return value "+st\chn)
 		Return
 	EndIf
@@ -263,7 +263,7 @@ Function SetStreamPan_Strict(streamHandle%,pan#)
 		CreateConsoleMsg("Failed to find stream Sound: Unknown Stream")
 		Return
 	EndIf
-	If st\chn=0 Or st\chn=-1
+	If st\chn=0 Lor st\chn=-1
 		CreateConsoleMsg("Failed to find stream Sound: Return value "+st\chn)
 		Return
 	EndIf

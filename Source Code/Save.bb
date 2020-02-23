@@ -7,7 +7,7 @@ Function SaveGame(file$)
 	
 	If Not Playable Then Return ;don't save if the player can't move at all
 	
-	If DropSpeed#>0.02*FPSfactor Or DropSpeed#<-0.02*FPSfactor Then Return
+	If DropSpeed#>0.02*FPSfactor Lor DropSpeed#<-0.02*FPSfactor Then Return
 	
 	If KillTimer < 0 Then Return
 	
@@ -67,7 +67,7 @@ Function SaveGame(file$)
 	
 	WriteString f, DeathMSG
 	
-	For i = 0 To 6
+	For i = 0 To 7
 		WriteFloat f, SCP1025state[i]
 	Next
 	
@@ -130,8 +130,6 @@ Function SaveGame(file$)
 	Next
 	WriteInt f, RefinedItems
 	
-	WriteInt f, MapWidth
-	WriteInt f, MapHeight
 	For lvl = 0 To 2
 		For x = 0 To MapWidth
 			For y = 0 To MapHeight
@@ -385,6 +383,8 @@ Function SaveGame(file$)
 		WriteByte f, it\b
 		WriteFloat f, it\a
 		
+		WriteFloat f, it\state2
+		
 		WriteFloat f, EntityPitch(it\collider)
 		WriteFloat f, EntityYaw(it\collider)
 		
@@ -534,7 +534,7 @@ Function LoadGame(file$)
 	
 	DeathMSG = ReadString(f)
 	
-	For i = 0 To 6
+	For i = 0 To 7
 		SCP1025state[i]=ReadFloat(f)
 	Next
 	
@@ -588,8 +588,6 @@ Function LoadGame(file$)
 	Next
 	RefinedItems = ReadInt(f)
 	
-	MapWidth = ReadInt(f)
-	MapHeight = ReadInt(f)
 	For lvl = 0 To 2
 		For x = 0 To MapWidth 
 			For y = 0 To MapHeight
@@ -809,11 +807,8 @@ Function LoadGame(file$)
 			lx# = ReadFloat(f)
 			ly# = ReadFloat(f)
 			lz# = ReadFloat(f)
-			If hasForest=1 Then
-				PlaceForest(r\fr,lx,ly,lz,r)
-			Else
-				PlaceForest_MapCreator(r\fr,lx,ly,lz,r)
-			EndIf
+			
+			PlaceForest(r\fr,lx,ly,lz,r)
 		ElseIf r\fr<>Null Then ;remove the old forest
 			DestroyForest(r\fr)
 			Delete r\fr
@@ -847,15 +842,15 @@ Function LoadGame(file$)
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2
-									If r\angle=90 Or r\angle=270
+									If r\angle=90 Lor r\angle=270
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2C
-									If r\angle=0 Or r\angle=90
+									If r\angle=0 Lor r\angle=90
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM3
-									If r\angle=0 Or r\angle=180 Or r\angle=90
+									If r\angle=0 Lor r\angle=180 Lor r\angle=90
 										shouldSpawnDoor = True
 									EndIf
 								Default
@@ -877,15 +872,15 @@ Function LoadGame(file$)
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2
-									If r\angle=0 Or r\angle=180
+									If r\angle=0 Lor r\angle=180
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2C
-									If r\angle=180 Or r\angle=90
+									If r\angle=180 Lor r\angle=90
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM3
-									If r\angle=180 Or r\angle=90 Or r\angle=270
+									If r\angle=180 Lor r\angle=90 Lor r\angle=270
 										shouldSpawnDoor = True
 									EndIf
 								Default
@@ -1063,6 +1058,8 @@ Function LoadGame(file$)
 		a = ReadFloat(f)
 		
 		it.Items = CreateItem(tempName, x, y, z, ittName, red, green, blue, a)
+		
+		it\state2 = ReadFloat(f)
 		
 		EntityType it\collider, HIT_ITEM
 		
@@ -1344,7 +1341,7 @@ Function LoadGameQuick(file$)
 	
 	DeathMSG = ReadString(f)
 	
-	For i = 0 To 6
+	For i = 0 To 7
 		SCP1025state[i]=ReadFloat(f)
 	Next
 	
@@ -1398,8 +1395,6 @@ Function LoadGameQuick(file$)
 	Next
 	RefinedItems = ReadInt(f)
 	
-	MapWidth = ReadInt(f)
-	MapHeight = ReadInt(f)
 	For lvl = 0 To 2
 		For x = 0 To MapWidth
 			For y = 0 To MapHeight
@@ -1767,6 +1762,7 @@ Function LoadGameQuick(file$)
 		a = ReadFloat(f)
 		
 		it.Items = CreateItem(tempName, x, y, z, ittName, red, green, blue, a)
+		it\state2 = ReadFloat(f)
 		
 		EntityType it\collider, HIT_ITEM
 		
@@ -2017,447 +2013,4 @@ Function LoadSaveGames()
 	Next
 	
 	CatchErrors("Uncaught LoadSaveGames")
-End Function
-
-
-Function LoadSavedMaps()
-	CatchErrors("LoadSavedMaps")
-	Local i%, Dir, file$
-	
-	For i = 0 To SavedMapsAmount
-		SavedMaps(i)=""
-		SavedMapsAuthor(i)=""
-	Next
-	SavedMapsAmount = 0
-	
-	Dir=ReadDir("Map Creator\Maps")
-	Repeat
-		file$=NextFile$(Dir)
-		
-		DebugLog file
-		
-		If file$="" Then Exit
-		DebugLog (CurrentDir()+"Map Creator\Maps\"+file$)
-		If FileType(CurrentDir()+"Map Creator\Maps\"+file$) = 1 Then 
-			If file <> "." And file <> ".." Then
-				If Right(file,6)="cbmap2" Or Right(file,5)="cbmap" Then
-					SavedMapsAmount = SavedMapsAmount + 1
-				EndIf
-			EndIf
-		EndIf 
-	Forever 
-	CloseDir Dir
-	
-	Dim SavedMaps(SavedMapsAmount+1)
-	Dim SavedMapsAuthor$(SavedMapsAmount+1)
-	
-	i = 0
-	Dir=ReadDir("Map Creator\Maps") 
-	Repeat
-		file$=NextFile$(Dir)
-		
-		DebugLog file
-		
-		If file$="" Then Exit
-		DebugLog (CurrentDir()+"Map Creator\Maps\"+file$)
-		If FileType(CurrentDir()+"Map Creator\Maps\"+file$) = 1 Then 
-			If file <> "." And file <> ".." Then
-				If Right(file,6)="cbmap2" Or Right(file,5)="cbmap" Then
-					SavedMaps(i) = file
-					If Right(file,6)="cbmap2" Then
-						Local f = ReadFile("Map Creator\Maps\"+file)
-						SavedMapsAuthor$(i) = ReadLine(f)
-						CloseFile f
-					Else
-						SavedMapsAuthor$(i) = "[Unknown]"
-					EndIf
-					i=i+1
-				EndIf
-			EndIf
-		EndIf 
-	Forever 
-	CloseDir Dir 
-	CatchErrors("Uncaught LoadSavedMaps")
-End Function
-
-Function LoadMap(file$)
-	CatchErrors("LoadMap")
-	Local f%, x%, y%, name$, angle%, prob#
-	Local r.Rooms, rt.RoomTemplates, e.Events
-	Local roomamount%,forestpieceamount%,mtpieceamount%,i%
-	
-	f% = ReadFile(file)
-	DebugLog file
-	
-	Dim MapTemp%(MapWidth+1, MapHeight+1)
-	Dim MapFound%(MapWidth+1, MapHeight+1)
-	CoffinDistance = 100
-	
-	For x = 0 To MapWidth+1
-		For y = 0 To MapHeight+1
-			MapTemp(x,y)=False
-			MapFound(x,y)=False
-		Next
-	Next
-	
-	If Right(file,6)="cbmap2" Then
-		ReadLine(f)
-		ReadLine(f)
-		roomamount = ReadInt(f)
-		forestpieceamount = ReadInt(f)
-		mtpieceamount = ReadInt(f)
-		
-		;Facility rooms
-		For i = 0 To roomamount-1
-			x = ReadByte(f)
-			y = ReadByte(f)
-			name$ = Lower(ReadString(f))
-			
-			angle = ReadByte(f)*90.0
-			
-			DebugLog x+", "+y+": "+name
-			DebugLog "angle: "+angle
-			
-			For rt.RoomTemplates=Each RoomTemplates
-				If Lower(rt\Name) = name Then
-					
-					r.Rooms = CreateRoom(0, rt\Shape, (MapWidth-x) * 8.0, 0, y * 8.0, name)
-					DebugLog "createroom"
-					
-					r\angle = angle
-					If r\angle<>90 And r\angle<>270
-						r\angle = r\angle + 180
-					EndIf
-					r\angle = WrapAngle(r\angle)
-					
-					TurnEntity(r\obj, 0, r\angle, 0)
-					
-					MapTemp(MapWidth-x,y)=True
-					
-					Exit
-				EndIf
-			Next
-			
-			name = ReadString(f)
-			prob# = ReadFloat(f)
-			
-			If r<>Null Then
-				If prob>0.0 Then
-					If Rnd(0.0,1.0)<=prob Then
-						e.Events = New Events
-						e\EventName = name
-						e\room = r   
-					EndIf
-				ElseIf prob = 0.0 And name <> "" Then
-					e.Events = New Events
-					e\EventName = name
-					e\room = r  
-				EndIf
-			EndIf
-		Next
-		
-		Local ForestRoom.Rooms
-		For r.Rooms = Each Rooms
-			If r\RoomTemplate\Name = "room860" Then
-				ForestRoom = r
-				Exit
-			EndIf
-		Next
-		
-		If ForestRoom<>Null Then
-			Local fr.Forest = New Forest
-		EndIf
-		
-		;Forest rooms
-		For i = 0 To forestpieceamount-1
-			x = ReadByte(f)
-			y = ReadByte(f)
-			name$ = Lower(ReadString(f))
-			
-			angle = ReadByte(f)
-			
-			DebugLog x+", "+y+": "+name
-			DebugLog "angle: "+angle
-			
-			If angle <> 0 And angle <> 2 Then
-				angle = angle + 2
-			EndIf
-			angle = angle + 1
-			If angle > 3 Then
-				angle = (angle Mod 4)
-			EndIf
-			
-			x = (gridsize-1)-x
-			
-			If fr<>Null Then
-				Select name
-					;1,2,3,4 = ROOM1
-					;5,6,7,8 = ROOM2
-					;9,10,11,12 = ROOM2C
-					;13,14,15,16 = ROOM3
-					;17,18,19,20 = ROOM4
-					;21,22,23,24 = DOORROOM
-					Case "scp-860-1 endroom"
-						fr\grid[(y*gridsize)+x] = 1+angle
-					Case "scp-860-1 path"
-						fr\grid[(y*gridsize)+x] = 5+angle
-					Case "scp-860-1 corner"
-						fr\grid[(y*gridsize)+x] = 9+angle
-					Case "scp-860-1 t-shaped path"
-						fr\grid[(y*gridsize)+x] = 13+angle
-					Case "scp-860-1 4-way path"
-						fr\grid[(y*gridsize)+x] = 17+angle
-					Case "scp-860-1 door"
-						fr\grid[(y*gridsize)+x] = 21+angle
-				End Select
-				DebugLog "created forest piece "+Chr(34)+name+Chr(34)+" successfully"
-			EndIf
-		Next
-		
-		If fr<>Null Then
-			ForestRoom\fr=fr
-			PlaceForest_MapCreator(ForestRoom\fr,ForestRoom\x,ForestRoom\y+30.0,ForestRoom\z,ForestRoom)
-		EndIf
-		
-		Local MTRoom.Rooms
-		For r.Rooms = Each Rooms
-			If r\RoomTemplate\Name = "room2tunnel" Then
-				MTRoom = r
-				Exit
-			EndIf
-		Next
-		
-		If MTRoom<>Null Then
-			MTRoom\grid = New Grids
-		EndIf
-		
-		;Maintenance tunnels rooms
-		For i = 0 To mtpieceamount-1
-			x = ReadByte(f)
-			y = ReadByte(f)
-			name$ = Lower(ReadString(f))
-			
-			angle = ReadByte(f)
-			
-			DebugLog x+", "+y+": "+name
-			DebugLog "angle: "+angle
-			
-			If angle<>1 And angle<>3 Then
-				angle = angle + 2
-			EndIf
-			If name = "maintenance tunnel corner" Or name = "maintenance tunnel t-shaped room" Then
-				angle = angle + 3
-			EndIf
-			If angle > 3 Then
-				angle = (angle Mod 4)
-			EndIf
-			
-			x = (gridsz-1)-x
-			
-			If MTRoom<>Null Then
-				Select name
-					Case "maintenance tunnel endroom"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM1
-					Case "maintenance tunnel corridor"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM2
-					Case "maintenance tunnel corner"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM2C
-					Case "maintenance tunnel t-shaped room"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM3
-					Case "maintenance tunnel 4-way room"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM4
-					Case "maintenance tunnel elevator"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM4+1
-					Case "maintenance tunnel generator room"
-						MTRoom\grid\grid[x+(y*gridsz)]=ROOM4+2
-				End Select
-				MTRoom\grid\angles[x+(y*gridsz)]=angle
-				DebugLog "created mtunnel piece "+Chr(34)+name+Chr(34)+" successfully"
-			EndIf
-		Next
-		
-		;If MTRoom<>Null Then
-		;	PlaceGrid_MapCreator(MTRoom)
-		;EndIf
-	Else
-		
-		While Not Eof(f)
-			x = ReadByte(f)
-			y = ReadByte(f)
-			name$ = Lower(ReadString(f))
-			
-			angle = ReadByte(f)*90.0
-			
-			DebugLog x+", "+y+": "+name
-			DebugLog "angle: "+angle
-			
-			For rt.RoomTemplates=Each RoomTemplates
-				If Lower(rt\Name) = name Then
-					
-					r.Rooms = CreateRoom(0, rt\Shape, (MapWidth-x) * 8.0, 0, y * 8.0, name)
-					DebugLog "createroom"
-					
-					r\angle = angle
-					If r\angle<>90 And r\angle<>270
-						r\angle = r\angle + 180
-					EndIf
-					r\angle = WrapAngle(r\angle)
-					
-					TurnEntity(r\obj, 0, r\angle, 0)
-					
-					MapTemp(MapWidth-x,y)=True
-					
-					Exit
-				EndIf
-			Next
-			
-			name = ReadString(f)
-			prob# = ReadFloat(f)
-			
-			If r<>Null Then
-				If prob>0.0 Then
-					If Rnd(0.0,1.0)<=prob Then
-						e.Events = New Events
-						e\EventName = name
-						e\room = r   
-					EndIf
-				ElseIf prob = 0.0 And name <> "" Then
-					e.Events = New Events
-					e\EventName = name
-					e\room = r
-				EndIf
-			EndIf
-			
-		Wend
-	EndIf
-	
-	CloseFile f
-	
-	Local temp = 0
-	Local spacing# = 8.0
-	Local shouldSpawnDoor% = False
-	Local d.Doors
-	For zone% = DO_DA_ZONE To DO_DA_ZONE
-		For y = MapHeight To 0 Step -1
-			For x = MapWidth To 0 Step -1
-				If MapTemp(x,y) > 0 Then
-					
-					For r.Rooms = Each Rooms
-						r\angle = WrapAngle(r\angle)
-						If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
-							shouldSpawnDoor = False
-							Select r\RoomTemplate\Shape
-								Case ROOM1
-									If r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2
-									If r\angle=90 Or r\angle=270
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2C
-									If r\angle=0 Or r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM3
-									If r\angle=0 Or r\angle=180 Or r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Default
-									shouldSpawnDoor = True
-							End Select
-							If shouldSpawnDoor
-								If (x+1)<(MapWidth+1)
-									If MapTemp(x + 1, y) > 0 Then
-										d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), (zone Mod 2) * 2)
-										r\AdjDoor[0] = d
-									EndIf
-								EndIf
-							EndIf
-							
-							shouldSpawnDoor = False
-							Select r\RoomTemplate\Shape
-								Case ROOM1
-									If r\angle=180
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2
-									If r\angle=0 Or r\angle=180
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2C
-									If r\angle=180 Or r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM3
-									If r\angle=180 Or r\angle=90 Or r\angle=270
-										shouldSpawnDoor = True
-									EndIf
-								Default
-									shouldSpawnDoor = True
-							End Select
-							If shouldSpawnDoor
-								If (y+1)<(MapHeight+1)
-									If MapTemp(x, y + 1) > 0 Then
-										d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), (zone Mod 2) * 2)
-										r\AdjDoor[3] = d
-									EndIf
-								EndIf
-							EndIf
-							
-							Exit
-						EndIf
-					Next
-					
-				EndIf
-				
-			Next
-		Next
-	Next
-	
-	;r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "room173")
-	;r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
-	;r = CreateRoom(0, ROOM1, 0, 0, 8, "gatea")
-	If IntroEnabled Then r = CreateRoom(0, ROOM1, 8, 0, (MapHeight+2) * 8, "room173")
-	r = CreateRoom(0, ROOM1, (MapWidth+2) * 8, 0, (MapHeight+2) * 8, "pocketdimension")
-	r = CreateRoom(0, ROOM1, 0, 500, -16, "gatea")
-	r = CreateRoom(0, ROOM1, -16, 800, 0, "dimension1499")
-	
-	CreateEvent("173", "room173", 0)
-	CreateEvent("pocketdimension", "pocketdimension", 0)   
-	CreateEvent("gatea", "gatea", 0)
-	CreateEvent("dimension1499", "dimension1499", 0)
-	
-	For r.Rooms = Each Rooms
-		r\Adjacent[0]=Null
-		r\Adjacent[1]=Null
-		r\Adjacent[2]=Null
-		r\Adjacent[3]=Null
-		For r2.Rooms = Each Rooms
-			If r<>r2 Then
-				If r\zone=r2\zone Then
-					If r2\z=r\z Then
-						If (r2\x)=(r\x+8.0) Then
-							r\Adjacent[0]=r2
-							If r\AdjDoor[0] = Null Then r\AdjDoor[0] = r2\AdjDoor[2]
-						ElseIf (r2\x)=(r\x-8.0)
-							r\Adjacent[2]=r2
-							If r\AdjDoor[2] = Null Then r\AdjDoor[2] = r2\AdjDoor[0]
-						EndIf
-					ElseIf r2\x=r\x Then
-						If (r2\z)=(r\z-8.0) Then
-							r\Adjacent[1]=r2
-							If r\AdjDoor[1] = Null Then r\AdjDoor[1] = r2\AdjDoor[3]
-						ElseIf (r2\z)=(r\z+8.0)
-							r\Adjacent[3]=r2
-							If r\AdjDoor[3] = Null Then r\AdjDoor[3] = r2\AdjDoor[1]
-						EndIf
-					EndIf
-				EndIf
-			EndIf
-			If (r\Adjacent[0]<>Null) And (r\Adjacent[1]<>Null) And (r\Adjacent[2]<>Null) And (r\Adjacent[3]<>Null) Then Exit
-		Next
-	Next
-	
-	CatchErrors("Uncaught LoadMap")
 End Function

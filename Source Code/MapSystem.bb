@@ -58,7 +58,7 @@ Function StripFilename$(file$)
 	If Len(file)>0
 		For i%=1 To Len(file)
 			mi=Mid(file$,i,1)
-			If mi="\" Or mi="/" Then
+			If mi="\" Lor mi="/" Then
 				lastSlash=i
 			EndIf
 		Next
@@ -531,7 +531,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				
 				temp2s$ =ReadString(f)
 				
-				If temp1<>0 Or temp2<>0 Or temp3<>0 Then 
+				If temp1<>0 Lor temp2<>0 Lor temp3<>0 Then 
 					Local ts.TempScreens = New TempScreens	
 					ts\x = temp1
 					ts\y = temp2
@@ -558,7 +558,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				temp2=ReadFloat(f)*RoomScale
 				temp3=ReadFloat(f)*RoomScale
 				
-				If temp1<>0 Or temp2<>0 Or temp3<>0 Then 
+				If temp1<>0 Lor temp2<>0 Lor temp3<>0 Then 
 					range# = ReadFloat(f)/2000.0
 					lcolor$=ReadString(f)
 					intensity# = Min(ReadFloat(f)*0.8,1.0)
@@ -577,7 +577,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				temp2=ReadFloat(f)*RoomScale
 				temp3=ReadFloat(f)*RoomScale
 				
-				If temp1<>0 Or temp2<>0 Or temp3<>0 Then 
+				If temp1<>0 Lor temp2<>0 Lor temp3<>0 Then 
 					range# = ReadFloat(f)/2000.0
 					lcolor$=ReadString(f)
 					intensity# = Min(ReadFloat(f)*0.8,1.0)
@@ -709,7 +709,7 @@ Function StripPath$(file$)
 		For i=Len(file$) To 1 Step -1 
 			
 			mi$=Mid$(file$,i,1) 
-			If mi$="\" Or mi$="/" Then Return name$
+			If mi$="\" Lor mi$="/" Then Return name$
 			
 			name$=mi$+name$ 
 		Next 
@@ -815,179 +815,11 @@ Function turn_if_deviating%(max_deviation_distance_%,pathx%,center_%,dir%,retval
 	;check if deviating and return the answer. if deviating, turn around
 	Local current_deviation% = center_ - pathx
 	Local deviated% = False
-	If (dir = 0 And current_deviation >= max_deviation_distance_) Or (dir = 2 And current_deviation <= -max_deviation_distance_) Then
+	If (dir = 0 And current_deviation >= max_deviation_distance_) Lor (dir = 2 And current_deviation <= -max_deviation_distance_) Then
 		dir = (dir + 2) Mod 4
 		deviated = True
 	EndIf
 	If retval=0 Then Return dir Else Return deviated
-End Function
-
-Function GenForestGrid(fr.Forest)
-	CatchErrors("GenForestGrid")
-	fr\ID=LastForestID+1
-	LastForestID=LastForestID+1
-	
-	Local door1_pos%,door2_pos%
-	Local i%,j%
-	door1_pos=Rand(3,7)
-	door2_pos=Rand(3,7)
-	
-	;clear the grid
-	For i=0 To gridsize-1
-		For j=0 To gridsize-1
-			fr\grid[(j*gridsize)+i]=0
-		Next
-	Next
-	
-	;set the position of the concrete and doors
-	;For i=0 To gridsize-1
-	;	fr\grid[i]=2
-	;	fr\grid[((gridsize-1)*gridsize)+i]=2
-	;Next
-	fr\grid[door1_pos]=3
-	fr\grid[((gridsize-1)*gridsize)+door2_pos]=3
-	
-	;generate the path
-	Local pathx = door2_pos
-	Local pathy = 1
-	Local dir = 1 ;0 = left, 1 = up, 2 = right
-	fr\grid[((gridsize-1-pathy)*gridsize)+pathx] = 1
-	
-	Local deviated%
-	
-	While pathy < gridsize -4
-		If dir = 1 Then ;determine whether to go forward or to the side
-			If chance(deviation_chance) Then
-				;pick a branch direction
-				dir = 2 * Rand(0,1)
-				;make sure you have not passed max side distance
-				dir = turn_if_deviating(max_deviation_distance,pathx,center,dir)
-				deviated = turn_if_deviating(max_deviation_distance,pathx,center,dir,1)
-				If deviated Then fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
-				pathx=move_forward(dir,pathx,pathy)
-				pathy=move_forward(dir,pathx,pathy,1)
-			EndIf
-			
-		Else
-			;we are going to the side, so determine whether to keep going or go forward again
-			dir = turn_if_deviating(max_deviation_distance,pathx,center,dir)
-			deviated = turn_if_deviating(max_deviation_distance,pathx,center,dir,1)
-			If deviated Or chance(return_chance) Then dir = 1
-			
-			pathx=move_forward(dir,pathx,pathy)
-			pathy=move_forward(dir,pathx,pathy,1)
-			;if we just started going forward go twice so as to avoid creating a potential 2x2 line
-			If dir=1 Then
-				fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
-				pathx=move_forward(dir,pathx,pathy)
-				pathy=move_forward(dir,pathx,pathy,1)
-			EndIf
-		EndIf
-		
-		;add our position to the grid
-		fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
-		
-	Wend
-	;finally, bring the path back to the door now that we have reached the end
-	dir = 1
-	While pathy < gridsize-2
-		pathx=move_forward(dir,pathx,pathy)
-		pathy=move_forward(dir,pathx,pathy,1)
-		fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
-	Wend
-	
-	If pathx<>door1_pos Then
-		dir=0
-		If door1_pos>pathx Then dir=2
-		While pathx<>door1_pos
-			pathx=move_forward(dir,pathx,pathy)
-			pathy=move_forward(dir,pathx,pathy,1)
-			fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
-		Wend
-	EndIf
-	
-	;attempt to create new branches
-	Local new_y%,temp_y%,new_x%
-	Local branch_type%,branch_pos%
-	new_y=-3 ;used for counting off; branches will only be considered once every 4 units so as to avoid potentially too many branches
-	While new_y<gridsize-6
-		new_y=new_y+4
-		temp_y=new_y
-		new_x=0
-		If chance(branch_chance) Then
-			branch_type=-1
-			If chance(cobble_chance) Then
-				branch_type=-2
-			EndIf
-			;create a branch at this spot
-			;determine if on left or on right
-			branch_pos=2*Rand(0,1)
-			;get leftmost or rightmost path in this row
-			leftmost=gridsize
-			rightmost=0
-			For i=0 To gridsize
-				If fr\grid[((gridsize-1-new_y)*gridsize)+i]=1 Then
-					If i<leftmost Then leftmost=i
-					If i>rightmost Then rightmost=i
-				EndIf
-			Next
-			If branch_pos=0 Then new_x=leftmost-1 Else new_x=rightmost+1
-			;before creating a branch make sure there are no 1's above or below
-			If (temp_y<>0 And fr\grid[((gridsize-1-temp_y+1)*gridsize)+new_x]=1) Or fr\grid[((gridsize-1-temp_y-1)*gridsize)+new_x]=1 Then
-				Exit ;break simply to stop creating the branch
-			EndIf
-			fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;make 4s so you don't confuse your branch for a path; will be changed later
-			If branch_pos=0 Then new_x=leftmost-2 Else new_x=rightmost+2
-			fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;branch out twice to avoid creating an unwanted 2x2 path with the real path
-			i = 2
-			While i<branch_max_life
-				i=i+1
-				If chance(branch_die_chance) Then
-					Exit
-				EndIf
-				If Rand(0,3)=0 Then ;have a higher chance to go up to confuse the player
-					If branch_pos = 0 Then
-						new_x=new_x-1
-					Else
-						new_x=new_x+1
-					EndIf
-				Else
-					temp_y=temp_y+1
-				EndIf
-				
-				;before creating a branch make sure there are no 1's above or below
-				n=((gridsize - 1 - temp_y + 1)*gridsize)+new_x
-				If n < gridsize-1 Then 
-					If temp_y <> 0 And fr\grid[n]=1 Then Exit
-				EndIf
-				n=((gridsize - 1 - temp_y - 1)*gridsize)+new_x
-				If n>0 Then 
-					If fr\grid[n]=1 Then Exit
-				EndIf
-				
-				;If (temp_y <> 0 And fr\grid[((gridsize - 1 - temp_y + 1)*gridsize)+new_x]=1) Or fr\grid[((gridsize - 1 - temp_y - 1)*gridsize)+new_x] = 1 Then
-				;	Exit
-				;EndIf
-				fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;make 4s so you don't confuse your branch for a path; will be changed later
-				If temp_y>=gridsize-2 Then Exit
-			Wend
-		EndIf
-	Wend
-	
-	;change branches from 4s to 1s (they were 4s so that they didn't accidently create a 2x2 path unintentionally)
-	For i=0 To gridsize-1
-		For j=0 To gridsize-1
-			If fr\grid[(i*gridsize)+j]=-1 Then
-				fr\grid[(i*gridsize)+j]=1
-			ElseIf fr\grid[(i*gridsize)+j]=-2
-				fr\grid[(i*gridsize)+j]=1
-			;ElseIf fr\grid[(i*gridsize)+j]=0
-				
-			EndIf
-		Next
-	Next
-	
-	CatchErrors("Uncaught GenForestGrid")
 End Function
 
 Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
@@ -1259,232 +1091,6 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	CatchErrors("Uncaught PlaceForest")
 End Function
 
-Function PlaceForest_MapCreator(fr.Forest,x#,y#,z#,r.Rooms)
-	CatchErrors("PlaceForest_MapCreator")
-	;local variables
-	Local tx%,ty%
-	Local tile_size#=12.0
-	Local tile_type%
-	Local tile_entity%,detail_entity%
-	
-	Local tempf1#,tempf2#,tempf3#
-	Local i%
-	
-	If fr\Forest_Pivot<>0 Then FreeEntity fr\Forest_Pivot : fr\Forest_Pivot=0
-	For i%=0 To 3
-		If fr\TileMesh[i]<>0 Then FreeEntity fr\TileMesh[i] : fr\TileMesh[i]=0
-	Next
-	For i%=0 To 4
-		If fr\DetailMesh[i]<>0 Then FreeEntity fr\DetailMesh[i] : fr\DetailMesh[i]=0
-	Next
-	For i%=0 To 9
-		If fr\TileTexture[i]<>0 Then FreeEntity fr\TileTexture[i] : fr\TileTexture[i]=0
-	Next
-	
-	fr\Forest_Pivot=CreatePivot()
-	PositionEntity fr\Forest_Pivot,x,y,z,True
-	
-	;load assets
-	
-	Local hmap[ROOM4], mask[ROOM4]
-	Local GroundTexture = LoadTexture_Strict("GFX\map\forest\forestfloor.jpg")
-	;TextureBlend GroundTexture, FE_ALPHACURRENT
-	Local PathTexture = LoadTexture_Strict("GFX\map\forest\forestpath.jpg")
-	;TextureBlend PathTexture, FE_ALPHACURRENT
-	
-	hmap[ROOM1]=LoadImage_Strict("GFX\map\forest\forest1h.png")
-	mask[ROOM1]=LoadTexture_Strict("GFX\map\forest\forest1h_mask.png",1+2)
-	
-	hmap[ROOM2]=LoadImage_Strict("GFX\map\forest\forest2h.png")
-	mask[ROOM2]=LoadTexture_Strict("GFX\map\forest\forest2h_mask.png",1+2)
-	
-	hmap[ROOM2C]=LoadImage_Strict("GFX\map\forest\forest2Ch.png")
-	mask[ROOM2C]=LoadTexture_Strict("GFX\map\forest\forest2Ch_mask.png",1+2)
-	
-	hmap[ROOM3]=LoadImage_Strict("GFX\map\forest\forest3h.png")
-	mask[ROOM3]=LoadTexture_Strict("GFX\map\forest\forest3h_mask.png",1+2)
-	
-	hmap[ROOM4]=LoadImage_Strict("GFX\map\forest\forest4h.png")
-	mask[ROOM4]=LoadTexture_Strict("GFX\map\forest\forest4h_mask.png",1+2)
-	
-	For i = ROOM1 To ROOM4
-		;TextureBlend mask[i], FE_ALPHAMODULATE
-		
-		fr\TileMesh[i]=load_terrain(hmap[i],0.03,GroundTexture,PathTexture,mask[i])
-	Next
-	
-	;detail meshes
-	;fr\DetailMesh[0]=LoadMesh_strict("GFX\map\forest\detail\860_1_tree1.b3d")
-	;fr\DetailMesh[1]=LoadMesh_strict("GFX\map\forest\detail\860_1_tree1_leaves.b3d")
-	fr\DetailMesh[1]=LoadMesh_Strict("GFX\map\forest\detail\treetest4.b3d");1.b3d)
-	;EntityParent fr\DetailMesh[1],fr\DetailMesh[0]
-	fr\DetailMesh[2]=LoadMesh_Strict("GFX\map\forest\detail\rock.b3d")
-	fr\DetailMesh[3]=LoadMesh_Strict("GFX\map\forest\detail\rock2.b3d")
-	fr\DetailMesh[4]=LoadMesh_Strict("GFX\map\forest\detail\treetest5.b3d")
-	fr\DetailMesh[5]=LoadMesh_Strict("GFX\map\forest\wall.b3d")
-	
-	For i%=ROOM1 To ROOM4
-		HideEntity fr\TileMesh[i]
-	Next
-	For i%=1 To 5
-		HideEntity fr\DetailMesh[i]
-	Next
-	
-	tempf3=MeshWidth(fr\TileMesh[ROOM1])
-	tempf1=tile_size/tempf3
-	
-	DebugLog "ForestINIT"
-	
-	For tx%=0 To gridsize-1
-		For ty%=0 To gridsize-1
-			If fr\grid[(ty*gridsize)+tx]>0 Then 
-				
-				tile_type = 0
-				Local angle%=0
-				
-				tile_type = Ceil(Float(fr\grid[(ty*gridsize)+tx])/4.0)
-				If tile_type = 6 Then
-					tile_type = 2
-				EndIf
-				angle = (fr\grid[(ty*gridsize)+tx] Mod 4)*90
-				
-				tile_entity = CopyEntity(fr\TileMesh[tile_type])
-				
-				DebugLog "Tile: "+tile_type+"| Angle: "+angle
-				
-				If tile_type > 0 Then 
-					
-					Local itemPlaced[4]
-					;2, 5, 8
-					Local it.Items = Null
-					If (ty Mod 3)=2 And itemPlaced[Floor(ty/3)]=False Then
-						itemPlaced[Floor(ty/3)]=True
-						it.Items = CreateItem("paper", 0,0.5,0, "log" + Int(Floor(ty/3)+1))
-						EntityType(it\collider, HIT_ITEM)
-						EntityParent(it\collider, tile_entity)
-					EndIf
-					
-					;place trees and other details
-					;only placed on spots where the value of the heightmap is above 100
-					SetBuffer ImageBuffer(hmap[tile_type])
-					width = ImageWidth(hmap[tile_type])
-					tempf4# = (tempf3/Float(width))
-					For lx = 3 To width-2
-						For ly = 3 To width-2
-							GetColor lx,width-ly
-							
-							If ColorRed()>Rand(100,260) Then
-								detail_entity = 0
-								Select Rand(0,7)
-									Case 0,1,2,3,4,5,6 ;create a tree
-										detail_entity=CopyEntity(fr\DetailMesh[1])
-										;EntityType detail_entity,HIT_MAP
-										tempf2=Rnd(0.25,0.4)
-										
-										For i = 0 To 3
-											d=CopyEntity(fr\DetailMesh[4])
-											;ScaleEntity d,tempf2*1.1,tempf2,tempf2*1.1,True
-											RotateEntity d, 0, 90*i+Rnd(-20,20), 0
-											EntityParent(d,detail_entity)
-											
-											EntityFX d, 1;+8
-										Next
-										
-										ScaleEntity detail_entity,tempf2*1.1,tempf2,tempf2*1.1,True
-										PositionEntity detail_entity,lx*tempf4-(tempf3/2.0),ColorRed()*0.03-Rnd(3.0,3.2),ly*tempf4-(tempf3/2.0),True
-										
-										RotateEntity detail_entity,Rnd(-5,5),Rnd(360.0),0.0,True
-										
-										;EntityAutoFade(detail_entity,4.0,6.0)
-									Case 7 ;add a rock
-										detail_entity=CopyEntity(fr\DetailMesh[2])
-										;EntityType detail_entity,HIT_MAP
-										tempf2=Rnd(0.01,0.012)
-										;ScaleEntity detail_entity,tempf2,tempf2*Rnd(1.0,2.0),tempf2,True
-										
-										PositionEntity detail_entity,lx*tempf4-(tempf3/2.0),ColorRed()*0.03-1.3,ly*tempf4-(tempf3/2.0),True
-										
-										EntityFX detail_entity, 1
-										
-										RotateEntity detail_entity,0.0,Rnd(360.0),0.0,True
-									Case 6 ;add a stump
-										detail_entity=CopyEntity(fr\DetailMesh[4])
-										;EntityType detail_entity,HIT_MAP
-										tempf2=Rnd(0.1,0.12)
-										ScaleEntity detail_entity,tempf2,tempf2,tempf2,True
-										
-										PositionEntity detail_entity,lx*tempf4-(tempf3/2.0),ColorRed()*0.03-1.3,ly*tempf4-(tempf3/2.0),True
-								End Select
-								
-								If detail_entity <> 0 Then
-									EntityFX detail_entity, 1
-									;PositionEntity detail_entity,Rnd(0.0,tempf3)-(tempf3/2.0),ColorRed()*0.03-0.05,Rnd(0.0,tempf3)-(tempf3/2.0),True
-									EntityParent detail_entity,tile_entity
-								EndIf
-							EndIf
-						Next
-					Next
-					SetBuffer BackBuffer()
-					
-					TurnEntity tile_entity, 0, angle, 0
-					
-					PositionEntity tile_entity,x+(tx*tile_size),y,z+(ty*tile_size),True
-					
-					DebugLog "tile_entity: "+(x+(tx*tile_size))+"|"+(y)+"|"+(z+(ty*tile_size))
-					
-					ScaleEntity tile_entity,tempf1,tempf1,tempf1
-					EntityType tile_entity,HIT_MAP
-					EntityFX tile_entity,1
-					EntityParent tile_entity,fr\Forest_Pivot
-					EntityPickMode tile_entity,2
-					
-					If it<>Null Then EntityParent it\collider,0
-					
-					fr\TileEntities[tx+(ty*gridsize)] = tile_entity
-				Else
-					DebugLog "INVALID TILE @ ("+tx+", "+ty+ "): "+tile_type
-				EndIf
-				
-				If Ceil(fr\grid[(ty*gridsize)+tx]/4.0)=6 Then
-					For i = 0 To 1
-						If fr\Door[i]=0 Then
-							fr\DetailEntities[i]=CopyEntity(fr\DetailMesh[5])
-							ScaleEntity fr\DetailEntities[i],RoomScale,RoomScale,RoomScale
-							
-							fr\Door[i] = CopyEntity(r\Objects[3])
-							PositionEntity fr\Door[i],72*RoomScale,32.0*RoomScale,0,True
-							RotateEntity fr\Door[i], 0,180,0
-							ScaleEntity fr\Door[i],48*RoomScale,45*RoomScale,48*RoomScale,True
-							EntityParent fr\Door[i],fr\DetailEntities[i]
-							
-							Local frame = CopyEntity(r\Objects[2],fr\Door[i])
-							PositionEntity frame,0,32.0*RoomScale,0,True
-							ScaleEntity frame,48*RoomScale,45*RoomScale,48*RoomScale,True
-							EntityParent frame,fr\DetailEntities[i]
-							
-							EntityType fr\DetailEntities[i],HIT_MAP
-							EntityPickMode fr\DetailEntities[i],2
-							
-							PositionEntity fr\DetailEntities[i],x+(tx*tile_size),y,z+(ty*tile_size),True
-							RotateEntity fr\DetailEntities[i],0,angle+180,0
-							MoveEntity fr\DetailEntities[i],0,0,-6
-							
-							EntityParent fr\DetailEntities[i],fr\Forest_Pivot
-							Exit
-						EndIf
-					Next
-				EndIf
-			Else
-				DebugLog "NO TILE FOUND @ ("+tx+", "+ty+ ")"
-			EndIf
-		Next
-	Next
-	
-	DebugLog "ForestINIT END"
-	
-	CatchErrors("Uncaught PlaceForest_MapCreator")
-End Function
-
 Function DestroyForest(fr.Forest)
 	CatchErrors("DestroyForest")
 	Local tx%,ty%
@@ -1706,7 +1312,7 @@ LoadRoomTemplates("Data\rooms.ini")
 Const ZONE_AMOUNT = 3
 
 Global RoomScale# = 8.0 / 2048.0
-Global MapWidth% = GetINIInt(OptionFile, "options", "map size"), MapHeight% = GetINIInt(OptionFile, "options", "map size")
+Const MapWidth% = 12, MapHeight% = 12
 Dim MapTemp%(MapWidth+1, MapHeight+1)
 Dim MapFound%(MapWidth+1, MapHeight+1)
 
@@ -1780,7 +1386,8 @@ Type Rooms
 	Field MaxX#, MaxY#, MaxZ#
 End Type 
 
-Const gridsz%=19 ;Same size as the main map itself (better for the map creator)
+Const gridsz%=13 ;Same size as the main map itself (better for the map creator)
+
 Type Grids
 	Field grid%[gridsz*gridsz]
 	Field angles%[gridsz*gridsz]
@@ -1808,175 +1415,6 @@ Function UpdateGrid(grid.Grids)
 			EndIf
 		Next
 	Next
-End Function
-
-Function PlaceGrid_MapCreator(r.Rooms)
-	Local x,y,i
-	Local Meshes[6]
-	Local dr.Doors,it.Items
-	
-	For i=0 To 6
-		Meshes[i]=CopyEntity(OBJTunnel(i))
-		DebugLog i
-		HideEntity Meshes[i]
-	Next
-	
-	For y = 0 To (gridsz-1)
-		For x = 0 To (gridsz-1)
-			If r\grid\grid[x+(y*gridsz)]>0 Then
-				Local tile_type = 0
-				Local angle%=0
-				
-				tile_type = r\grid\grid[x+(y*gridsz)]
-				angle = r\grid\angles[x+(y*gridsz)]*90.0
-				
-				Local tile_entity = CopyEntity(Meshes[tile_type-1])
-				RotateEntity tile_entity,0,angle,0
-				ScaleEntity tile_entity,RoomScale,RoomScale,RoomScale,True
-				PositionEntity tile_entity,r\x+x*2.0,8.0,r\z+y*2.0,True
-				
-				Select r\grid\grid[x+(y*gridsz)]
-					Case ROOM1
-						AddLight%(Null, r\x+x*2.0, 8.0+(368.0*RoomScale), r\z+y*2.0, 2, 500.0 * RoomScale, 255, 255, 255)
-					Case ROOM2,ROOM2C
-						AddLight%(Null, r\x+x*2.0, 8.0+(368.0*RoomScale), r\z+y*2.0, 2, 500.0 * RoomScale, 255, 255, 255)
-					Case ROOM2C
-						AddLight%(Null, r\x+x*2.0, 8.0+(412.0*RoomScale), r\z+y*2.0, 2, 500.0 * RoomScale, 255, 255, 255)
-					Case ROOM3,ROOM4
-						AddLight%(Null,r\x+x*2.0, 8.0+(412.0*RoomScale), r\z+y*2.0, 2, 500.0 * RoomScale, 255, 255, 255)
-					Case ROOM4+1
-						dr=CreateDoor(r\zone,r\x+(x*2.0)+(Cos(EntityYaw(tile_entity,True))*240.0*RoomScale),r\y+8.0,r\z+(y*2.0)+(Sin(EntityYaw(tile_entity,True))*240.0*RoomScale),EntityYaw(tile_entity,True)+90.0,Null,False,3,False,"")
-						PositionEntity dr\buttons[0],EntityX(dr\buttons[0],True)+(Cos(EntityYaw(tile_entity,True))*0.05),EntityY(dr\buttons[0],True)+0.0,EntityZ(dr\buttons[0],True)+(Sin(EntityYaw(tile_entity,True))*0.05),True
-						
-						AddLight%(Null, r\x+x*2.0+(Cos(EntityYaw(tile_entity,True))*555.0*RoomScale), 8.0+(469.0*RoomScale), r\z+y*2.0+(Sin(EntityYaw(tile_entity,True))*555.0*RoomScale), 2, 600.0 * RoomScale, 255, 255, 255)
-						
-						Local tempInt2=CreatePivot()
-						RotateEntity tempInt2,0,EntityYaw(tile_entity,True)+180.0,0,True
-						PositionEntity tempInt2,r\x+(x*2.0)+(Cos(EntityYaw(tile_entity,True))*552.0*RoomScale),8.0+(240.0*RoomScale),r\z+(y*2.0)+(Sin(EntityYaw(tile_entity,True))*552.0*RoomScale)
-						If r\RoomDoors[1]=Null Then
-							r\RoomDoors[1]=dr
-							r\Objects[3]=tempInt2
-							PositionEntity r\Objects[0],r\x+x*2.0,8.0,r\z+y*2.0,True
-							DebugLog "Created door 1 successfully!"
-						ElseIf r\RoomDoors[1]<>Null And r\RoomDoors[3]=Null Then
-							r\RoomDoors[3]=dr
-							r\Objects[5]=tempInt2
-							PositionEntity r\Objects[1],r\x+x*2.0,8.0,r\z+y*2.0,True
-							DebugLog "Created door 2 successfully!"
-						EndIf
-					Case ROOM4+2
-						AddLight%(Null, r\x+x*2.0-(Sin(EntityYaw(tile_entity,True))*504.0*RoomScale)+(Cos(EntityYaw(tile_entity,True))*16.0*RoomScale), 8.0+(396.0*RoomScale), r\z+y*2.0+(Cos(EntityYaw(tile_entity,True))*504.0*RoomScale)+(Sin(EntityYaw(tile_entity,True))*16.0*RoomScale), 2, 500.0 * RoomScale, 255, 200, 200)
-						it = CreateItem("scp500",r\x+x*2.0+(Cos(EntityYaw(tile_entity,True))*(-208.0)*RoomScale)-(Sin(EntityYaw(tile_entity,True))*1226.0*RoomScale),8.0+(80.0*RoomScale),r\z+y*2.0+(Sin(EntityYaw(tile_entity,True))*(-208.0)*RoomScale)+(Cos(EntityYaw(tile_entity,True))*1226.0*RoomScale))
-						EntityType (it\collider, HIT_ITEM)
-						
-						it = CreateItem("nvg",r\x+x*2.0-(Sin(EntityYaw(tile_entity,True))*504.0*RoomScale)+(Cos(EntityYaw(tile_entity,True))*16.0*RoomScale), 8.0+(80.0*RoomScale), r\z+y*2.0+(Cos(EntityYaw(tile_entity,True))*504.0*RoomScale)+(Sin(EntityYaw(tile_entity,True))*16.0*RoomScale))
-						EntityType (it\collider, HIT_ITEM)
-				End Select
-				
-				r\grid\Entities[x+(y*gridsz)]=tile_entity
-				wayp.WayPoints = CreateWaypoint(r\x+(x*2.0),8.2,r\z+(y*2.0),Null,r)
-				r\grid\waypoints[x+(y*gridsz)]=wayp
-				
-				If y<gridsz-1 Then
-					If r\grid\waypoints[x+((y+1)*gridsz)]<>Null Then
-						dist=EntityDistance(r\grid\waypoints[x+(y*gridsz)]\obj,r\grid\waypoints[x+((y+1)*gridsz)]\obj)
-						For i=0 To 3
-							If r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x+((y+1)*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x+((y+1)*gridsz)]
-								r\grid\waypoints[x+(y*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-						For i=0 To 3
-							If r\grid\waypoints[x+((y+1)*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+((y+1)*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+((y+1)*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)]
-								r\grid\waypoints[x+((y+1)*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-					EndIf
-				EndIf
-				If y>0 Then
-					If r\grid\waypoints[x+((y-1)*gridsz)]<>Null Then
-						dist=EntityDistance(r\grid\waypoints[x+(y*gridsz)]\obj,r\grid\waypoints[x+((y-1)*gridsz)]\obj)
-						For i=0 To 3
-							If r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x+((y-1)*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x+((y-1)*gridsz)]
-								r\grid\waypoints[x+(y*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-						For i=0 To 3
-							If r\grid\waypoints[x+((y-1)*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+((y-1)*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)]
-								r\grid\waypoints[x+((y-1)*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-					EndIf
-				EndIf
-				If x>0 Then
-					If r\grid\waypoints[x-1+(y*gridsz)]<>Null Then
-						dist=EntityDistance(r\grid\waypoints[x+(y*gridsz)]\obj,r\grid\waypoints[x-1+(y*gridsz)]\obj)
-						For i=0 To 3
-							If r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x-1+(y*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x-1+(y*gridsz)]
-								r\grid\waypoints[x+(y*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-						For i=0 To 3
-							If r\grid\waypoints[x-1+(y*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x-1+(y*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)]
-								r\grid\waypoints[x-1+(y*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-					EndIf
-				EndIf
-				If x<gridsz-1 Then
-					If r\grid\waypoints[x+1+(y*gridsz)]<>Null Then
-						dist=EntityDistance(r\grid\waypoints[x+(y*gridsz)]\obj,r\grid\waypoints[x+1+(y*gridsz)]\obj)
-						For i=0 To 3
-							If r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x+1+(y*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+(y*gridsz)]\connected[i]=r\grid\waypoints[x+1+(y*gridsz)]
-								r\grid\waypoints[x+(y*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-						For i=0 To 3
-							If r\grid\waypoints[x+1+(y*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)] Then
-								Exit
-							ElseIf r\grid\waypoints[x+(y*gridsz)]\connected[i]=Null Then
-								r\grid\waypoints[x+1+(y*gridsz)]\connected[i]=r\grid\waypoints[x+(y*gridsz)]
-								r\grid\waypoints[x+1+(y*gridsz)]\dist[i]=dist
-								Exit
-							EndIf
-						Next
-					EndIf
-				EndIf
-			EndIf
-		Next
-	Next
-	
-	For i=0 To 6
-		r\grid\Meshes[i]=Meshes[i]
-	Next
-	
 End Function
 
 Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
@@ -4206,7 +3644,7 @@ Function FillRoom(r.Rooms)
 			
 			For r2.Rooms = Each Rooms
 				If r2<>r Then
-					If r2\RoomTemplate\Name = "room2tesla" Or r2\RoomTemplate\Name = "room2tesla_lcz" Or r2\RoomTemplate\Name = "room2tesla_hcz" Then
+					If r2\RoomTemplate\Name = "room2tesla" Lor r2\RoomTemplate\Name = "room2tesla_lcz" Lor r2\RoomTemplate\Name = "room2tesla_hcz" Then
 						r\Objects[7] = CopyEntity(r2\Objects[7],r\obj) ;don't load the mesh again
 						Exit
 					EndIf
@@ -4998,7 +4436,7 @@ Function FillRoom(r.Rooms)
 			
 			For r2.Rooms = Each Rooms
 				If r2<>r Then
-					If r2\RoomTemplate\Name = "room2gw" Or r2\RoomTemplate\Name = "room2gw_b" Then
+					If r2\RoomTemplate\Name = "room2gw" Lor r2\RoomTemplate\Name = "room2gw_b" Then
 						r\Objects[3] = CopyEntity(r2\Objects[3],r\obj) ;don't load the mesh again
 						Exit
 					EndIf
@@ -5022,7 +4460,7 @@ Function FillRoom(r.Rooms)
 					EndIf
 				EndIf
 				
-				If (room2gw_brokendoor = 0 And Rand(1,2)=1) Or bd_temp%
+				If (room2gw_brokendoor = 0 And Rand(1,2)=1) Lor bd_temp%
 					r\Objects[1] = CopyEntity(DoorOBJ)
 					ScaleEntity(r\Objects[1], (204.0 * RoomScale) / MeshWidth(r\Objects[1]), 312.0 * RoomScale / MeshHeight(r\Objects[1]), 16.0 * RoomScale / MeshDepth(r\Objects[1]))
 					EntityType r\Objects[1], HIT_MAP
@@ -5820,11 +5258,11 @@ Function InitWayPoints(loadingstart=45)
 		
 		While (w2<>Null)
 			
-			If (w\room=w2\room Or w\door<>Null Or w2\door<>Null)
+			If (w\room=w2\room Lor w\door<>Null Lor w2\door<>Null)
 				
 				dist# = EntityDistance(w\obj, w2\obj);;Sqr(x*x+y*y+z*z)
 				
-				If w\room\MaxWayPointY# = 0.0 Or w2\room\MaxWayPointY# = 0.0
+				If w\room\MaxWayPointY# = 0.0 Lor w2\room\MaxWayPointY# = 0.0
 					canCreateWayPoint = True
 				Else
 					If Abs(EntityY(w\obj)-EntityY(w2\obj))<=w\room\MaxWayPointY
@@ -6275,7 +5713,7 @@ Function UpdateSecurityCams()
 		If sc\room = Null Then
 			HideEntity sc\Cam
 		Else
-			If sc\room\dist < 6.0 Or PlayerRoom=sc\room Then 
+			If sc\room\dist < 6.0 Lor PlayerRoom=sc\room Then 
 				close = True
 			ElseIf sc\Cam<>0
 				HideEntity sc\Cam
@@ -6285,7 +5723,7 @@ Function UpdateSecurityCams()
 				If sc\room\RoomTemplate\Name$ = "room2sl" Then sc\CoffinEffect = 0
 			EndIf
 			
-			If close Or sc=CoffinCam Then 
+			If close Lor sc=CoffinCam Then 
 				If sc\FollowPlayer Then
 					If sc<>CoffinCam
 						If EntityVisible(sc\CameraObj,Camera)
@@ -6344,7 +5782,7 @@ Function UpdateSecurityCams()
 					
 					If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera) Then
 						If EntityVisible(Camera,sc\ScrObj) Then
-							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3) Then
+							If (sc\CoffinEffect=1 Lor sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3) Then
 								If BlinkTimer > - 5
 									Sanity=Sanity-FPSfactor
 									DebugLog Sanity
@@ -6378,7 +5816,7 @@ Function UpdateSecurityCams()
 						If BlinkTimer > - 5 And EntityInView(sc\ScrObj, Camera)Then
 							If EntityVisible(Camera,sc\ScrObj) Then
 								;sc\InSight = True
-								If CoffinCam = Null Or Rand(5)=5 Or sc\CoffinEffect <> 3 Then
+								If CoffinCam = Null Lor Rand(5)=5 Lor sc\CoffinEffect <> 3 Then
 									HideEntity(Camera)
 									ShowEntity(sc\Cam)
 									Cls
@@ -6413,7 +5851,7 @@ Function UpdateSecurityCams()
 						sc\State = 0
 					EndIf
 					
-					If ((sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3)) Then
+					If ((sc\CoffinEffect=1 Lor sc\CoffinEffect=3) And (Not Wearing714) And (WearingHazmat<3) And (WearingGasMask<3)) Then
 						If sc\InSight Then
 							Local pvt% = CreatePivot()
 							PositionEntity pvt, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
@@ -6426,7 +5864,7 @@ Function UpdateSecurityCams()
 							user_camera_pitch=user_camera_pitch-90
 							
 							FreeEntity pvt
-							If (sc\CoffinEffect=1 Or sc\CoffinEffect=3) And (Not Wearing714) Then
+							If (sc\CoffinEffect=1 Lor sc\CoffinEffect=3) And (Not Wearing714) Then
 								If Sanity < - 800 Then
 									If Rand(3) = 1 Then EntityTexture(sc\ScrOverlay, MonitorTexture)
 									If Rand(6) < 5 Then
@@ -6459,13 +5897,13 @@ Function UpdateSecurityCams()
 						EndIf
 					Else
 						If sc\InSight Then
-							If (Wearing714) Or (WearingHazmat=3) Or (WearingGasMask=3) Then
+							If (Wearing714) Lor (WearingHazmat=3) Lor (WearingGasMask=3) Then
 								EntityTexture(sc\ScrOverlay, MonitorTexture)
 							EndIf
 						EndIf
 					EndIf
 					
-					If sc\InSight And sc\CoffinEffect=0 Or sc\CoffinEffect=2 Then
+					If sc\InSight And sc\CoffinEffect=0 Lor sc\CoffinEffect=2 Then
 						If sc\PlayerState = 0 Then
 							sc\PlayerState = Rand(60000, 65000)
 						EndIf
@@ -6522,7 +5960,7 @@ Function UpdateMonitorSaving()
 	For sc = Each SecurityCams
 		If sc\AllowSaving And sc\Screen Then
 			close = False
-			If sc\room\dist < 6.0 Or PlayerRoom=sc\room Then 
+			If sc\room\dist < 6.0 Lor PlayerRoom=sc\room Then 
 				close = True
 			EndIf
 			
@@ -6574,7 +6012,7 @@ Function UpdateLever(obj, locked=False)
 				
 				prevpitch# = EntityPitch(obj)
 				
-				If (MouseDown1 Or MouseHit1) Then
+				If (MouseDown1 Lor MouseHit1) Then
 					If GrabbedEntity <> 0 Then
 						If GrabbedEntity = obj Then
 							DrawHandIcon = True 
@@ -6645,13 +6083,13 @@ Function UpdateElevators#(State#, door1.Doors, door2.Doors, room1, room2, event.
 	If door1\open = True And door2\open = False And door1\openstate = 180 Then 
 		State = -1
 		door1\locked = False
-		If (ClosestButton = door2\buttons[0] Or ClosestButton = door2\buttons[1]) And MouseHit1 Then
+		If (ClosestButton = door2\buttons[0] Lor ClosestButton = door2\buttons[1]) And MouseHit1 Then
 			UseDoor(door1,False)
 		EndIf
 	ElseIf door2\open = True And door1\open = False And door2\openstate = 180 Then
 		State = 1
 		door2\locked = False
-		If (ClosestButton = door1\buttons[0] Or ClosestButton = door1\buttons[1]) And MouseHit1 Then
+		If (ClosestButton = door1\buttons[0] Lor ClosestButton = door1\buttons[1]) And MouseHit1 Then
 			UseDoor(door2,False)
 		EndIf
 	ElseIf Abs(door1\openstate-door2\openstate)<0.2 Then
@@ -6975,7 +6413,7 @@ Function CreateMap()
 			For i = 1 To yhallways
 				
 				x2 = Max(Min(Rand(x, x + width-1),MapWidth-2),2)
-				While MapTemp(x2, y - 1) Or MapTemp(x2 - 1, y - 1) Or MapTemp(x2 + 1, y - 1)
+				While MapTemp(x2, y - 1) Lor MapTemp(x2 - 1, y - 1) Lor MapTemp(x2 + 1, y - 1)
 					x2=x2+1
 				Wend
 				
@@ -7103,16 +6541,16 @@ Function CreateMap()
 				For x = 2 To MapWidth - 2
 					If MapTemp(x,y)=3 Then
 						Select 0 ;see if adding a ROOM1 is possible
-							Case (MapTemp(x+1,y) Or MapTemp(x+1,y+1) Or MapTemp(x+1,y-1) Or MapTemp(x+2,y))
+							Case (MapTemp(x+1,y) Lor MapTemp(x+1,y+1) Lor MapTemp(x+1,y-1) Lor MapTemp(x+2,y))
 								MapTemp(x+1,y)=1
 								temp=1
-							Case (MapTemp(x-1,y) Or MapTemp(x-1,y+1) Or MapTemp(x-1,y-1) Or MapTemp(x-2,y))
+							Case (MapTemp(x-1,y) Lor MapTemp(x-1,y+1) Lor MapTemp(x-1,y-1) Lor MapTemp(x-2,y))
 								MapTemp(x-1,y)=1
 								temp=1
-							Case (MapTemp(x,y+1) Or MapTemp(x+1,y+1) Or MapTemp(x-1,y+1) Or MapTemp(x,y+2))
+							Case (MapTemp(x,y+1) Lor MapTemp(x+1,y+1) Lor MapTemp(x-1,y+1) Lor MapTemp(x,y+2))
 								MapTemp(x,y+1)=1
 								temp=1
-							Case (MapTemp(x,y-1) Or MapTemp(x+1,y-1) Or MapTemp(x-1,y-1) Or MapTemp(x,y-2))
+							Case (MapTemp(x,y-1) Lor MapTemp(x+1,y-1) Lor MapTemp(x-1,y-1) Lor MapTemp(x,y-2))
 								MapTemp(x,y-1)=1
 								temp=1
 						End Select
@@ -7495,15 +6933,15 @@ Function CreateMap()
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2
-									If r\angle=90 Or r\angle=270
+									If r\angle=90 Lor r\angle=270
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2C
-									If r\angle=0 Or r\angle=90
+									If r\angle=0 Lor r\angle=90
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM3
-									If r\angle=0 Or r\angle=180 Or r\angle=90
+									If r\angle=0 Lor r\angle=180 Lor r\angle=90
 										shouldSpawnDoor = True
 									EndIf
 								Default
@@ -7525,15 +6963,15 @@ Function CreateMap()
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2
-									If r\angle=0 Or r\angle=180
+									If r\angle=0 Lor r\angle=180
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM2C
-									If r\angle=180 Or r\angle=90
+									If r\angle=180 Lor r\angle=90
 										shouldSpawnDoor = True
 									EndIf
 								Case ROOM3
-									If r\angle=180 Or r\angle=90 Or r\angle=270
+									If r\angle=180 Lor r\angle=90 Lor r\angle=270
 										shouldSpawnDoor = True
 									EndIf
 								Default
@@ -7605,10 +7043,10 @@ Function SetRoom(room_name$,room_type%, room_amount%, zone%) ;place a room witho
 			Else
 				pos = pos - 1
 			EndIf
-			If pos < 0 Or pos > (room_amount - 1) Then valid = False : Exit
+			If pos < 0 Lor pos > (room_amount - 1) Then valid = False : Exit
 		Else
 			pos = pos + posstep
-			If (pos > (room_amount - 1)) Or (pos < 0)
+			If (pos > (room_amount - 1)) Lor (pos < 0)
 				reached = True
 				pos = pos - posstep
 			EndIf
@@ -7736,7 +7174,7 @@ Function UpdateRoomLights(cam%)
 	Local r.Rooms, i, random#, alpha#, dist#
 	
 	For r.Rooms = Each Rooms
-		If r\dist < HideDistance*0.7 Or r = PlayerRoom Then
+		If r\dist < HideDistance*0.7 Lor r = PlayerRoom Then
 			For i = 0 To r\MaxLights%
 				If r\Lights%[i]<>0 Then
 					If EnableRoomLights% And (SecondaryLightOn>0.5) And cam%=Camera Then
@@ -7756,8 +7194,8 @@ Function UpdateRoomLights(cam%)
 								EndIf
 							EndIf
 							
-							If (EntityDistanceSquared(cam%,r\LightSprites2[i])<72.25 Or r\RoomTemplate\UseLightCones) Then ;<8.5
-								If EntityVisible(cam%,r\LightSpritesPivot[i]) Or r\RoomTemplate\UseLightCones Then
+							If (EntityDistanceSquared(cam%,r\LightSprites2[i])<72.25 Lor r\RoomTemplate\UseLightCones) Then ;<8.5
+								If EntityVisible(cam%,r\LightSpritesPivot[i]) Lor r\RoomTemplate\UseLightCones Then
 									If r\LightSpriteHidden%[i] Then
 										ShowEntity r\LightSprites2%[i]
 										r\LightSpriteHidden%[i] = False
@@ -7790,7 +7228,7 @@ Function UpdateRoomLights(cam%)
 									EndIf
 									
 									If r\RoomTemplate\UseLightCones Then
-										If EntityDistanceSquared(cam%,r\LightSprites2[i])>=72.25 Or (Not EntityVisible(cam%,r\LightSpritesPivot[i])) Then ;>=8.5
+										If EntityDistanceSquared(cam%,r\LightSprites2[i])>=72.25 Lor (Not EntityVisible(cam%,r\LightSpritesPivot[i])) Then ;>=8.5
 											HideEntity r\LightSprites2%[i]
 											r\LightSpriteHidden%[i] = True
 										EndIf
@@ -7834,7 +7272,7 @@ Function UpdateRoomLights(cam%)
 								EndIf
 							EndIf
 						Else
-							If (EntityDistanceSquared(cam%,r\LightSprites2[i])<72.25 Or r\RoomTemplate\UseLightCones) Then ;8.5
+							If (EntityDistanceSquared(cam%,r\LightSprites2[i])<72.25 Lor r\RoomTemplate\UseLightCones) Then ;8.5
 								If PlayerRoom\RoomTemplate\Name$ = "room173" Then
 									random# = Rnd(0.38,0.42)
 								Else
@@ -8231,7 +7669,7 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 		For n = Each NPCs
 			If n\NPCtype = NPCtype1499 Then
 				If n\PrevState=0 Then
-					If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Or EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5 Then
+					If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Lor EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5 Then
 						;This will be updated like this so that new NPCs can spawn for the player
 						RemoveNPC(n)
 					EndIf
@@ -8415,8 +7853,8 @@ Function CalculateRoomExtents(r.Rooms)
 End Function
 
 Function CheckRoomOverlap(r1.Rooms, r2.Rooms)
-	If (r1\MaxX	<= r2\MinX Or r1\MaxY <= r2\MinY Or r1\MaxZ <= r2\MinZ) Then Return False
-	If (r1\MinX	>= r2\MaxX Or r1\MinY >= r2\MaxY Or r1\MinZ >= r2\MaxZ) Then Return False
+	If (r1\MaxX	<= r2\MinX Lor r1\MaxY <= r2\MinY Lor r1\MaxZ <= r2\MinZ) Then Return False
+	If (r1\MinX	>= r2\MaxX Lor r1\MinY >= r2\MaxY Lor r1\MinZ >= r2\MaxZ) Then Return False
 	
 	Return True
 End Function
@@ -8429,7 +7867,7 @@ Function PreventRoomOverlap(r.Rooms)
 	Local isIntersecting% = False
 	
 	;Just skip it when it would try to check for the checkpoints
-	If r\RoomTemplate\Name = "checkpoint1" Or r\RoomTemplate\Name = "checkpoint2" Or r\RoomTemplate\Name = "start" Then Return True
+	If r\RoomTemplate\Name = "checkpoint1" Lor r\RoomTemplate\Name = "checkpoint2" Lor r\RoomTemplate\Name = "start" Then Return True
 	
 	;First, check if the room is actually intersecting at all
 	For r2 = Each Rooms

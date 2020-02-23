@@ -1,5 +1,3 @@
-Global BurntNote%
-
 Global MaxItemAmount%
 Global ItemAmount%
 Dim Inventory.Items(0)
@@ -141,6 +139,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("scp714", "GFX\items\scp714.b3d", "GFX\items\INV714.jpg", "", 0.3, 3)
 	CreateItemTemplate("scp860", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, 3)
 	CreateItemTemplate("scp1025", "GFX\items\scp1025.b3d", "GFX\items\INV1025.jpg", "", 0.1, 0)
+	CreateItemTemplate("book", "GFX\items\scp1025.b3d", "GFX\items\INVbook.jpg", "", 0.07, 0, "", "GFX\items\book_diff.png")
 	CreateItemTemplate("scp1123", "GFX\items\HGIB_Skull1.b3d", "GFX\items\inv1123.jpg", "", 0.015, 2)
 	CreateItemTemplate("bad1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.022, 2)
 	CreateItemTemplate("scp1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.023, 2)
@@ -195,7 +194,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVbn.jpg", "GFX\items\docL4.jpg", 0.0025, 0, "lburnt1", "GFX\items\BurntNoteTexture.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVbn.jpg", "GFX\items\docL5.jpg", 0.0025, 0, "lburnt2", "GFX\items\BurntNoteTexture.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVbn.jpg", "GFX\items\docL6.jpg", 0.0025, 0, "scorched", "GFX\items\BurntNoteTexture.jpg")
-	it = CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVbn.jpg", "GFX\items\bn.it", 0.003, 0, "burnt", "GFX\items\BurntNoteTexture.jpg") : it\img = BurntNote
+	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVbn.jpg", "GFX\items\bn.it", 0.003, 0, "burnt", "GFX\items\BurntNoteTexture.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\docGonzales.jpg", 0.0025, 0, "journal")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\f4.jpg", 0.004, 0, "log1", "GFX\items\f4.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\f5.jpg", 0.004, 0, "log2", "GFX\items\f4.jpg")
@@ -204,23 +203,37 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVnote.jpg", "GFX\items\sn.it", 0.003, 0, "mysterious", "GFX\items\notetexture.jpg")	
 	CreateItemTemplate("paper", "GFX\items\note.x", "GFX\items\INVnote2.jpg", "GFX\items\docdan.jpg", 0.0025, 0, "daniel")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVnote.jpg", "GFX\items\docRAND1.jpg", 0.003, 0, "notification", "GFX\items\notetexture.jpg")
-	CreateItemTemplate("oldpaper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003, 0, "hearing")
+	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003, 0, "hearing")
 	CreateItemTemplate("paper", "GFX\items\note.x", "GFX\items\INVnote2.jpg", "GFX\items\note682.jpg", 0.0025, 0, "sticky")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003, 0, "drawing")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\leaflet.jpg", 0.003, 0, "leaflet", "GFX\items\notetexture.jpg")
 	
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaperblank.jpg", "GFX\items\docBlank.png", 0.003, 0, "dblank", "GFX\items\paperblanktexture.jpg")
+	
 	CreateItemTemplate("misc", "GFX\items\origami.b3d", "GFX\items\INVorigami.jpg", "", 0.003, 0, "origami")
+	
+	CreateItemTemplate("misc", "GFX\items\electronics.b3d", "GFX\items\INVelectronics.jpg", "", 0.0015, 1, "electronical")
 	
 	CreateItemTemplate("badge", "GFX\items\badge.x", "GFX\items\INVbadge.jpg", "GFX\items\badge1.jpg", 0.0001, 1, "", "GFX\items\badge1_tex.jpg")
 	
-	CreateItemTemplate("vest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.02, 2, "","GFX\items\Vest.png")
-	CreateItemTemplate("finevest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.022, 2, "","GFX\items\Vest.png")
-	CreateItemTemplate("veryfinevest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.025, 2, "","GFX\items\Vest.png")
+	CreateItemTemplate("badgasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.019, 2)
+	CreateItemTemplate("gasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.02, 2)
+	CreateItemTemplate("supergasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.021, 2)
+	CreateItemTemplate("heavygasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.021, 2)
 	
+	CreateItemTemplate("hazmat0", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.012, 2)
 	CreateItemTemplate("hazmat", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.013, 2)
-	CreateItemTemplate("hazmat2", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.013, 2)
-	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.013, 2)
+	CreateItemTemplate("hazmat2", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.014, 2)
+	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.015, 2)
+	
+	CreateItemTemplate("nvg", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02, 2)
+	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02, 2)
+	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02, 2)
+	
+	CreateItemTemplate("badvest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.018, 2)
+	CreateItemTemplate("vest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.02, 2)
+	CreateItemTemplate("finevest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.022, 2)
+	CreateItemTemplate("veryfinevest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.025, 2)
 	
 	CreateItemTemplate("cup", "GFX\items\cup.b3d", "GFX\items\INVcup.jpg", "", 0.04, 2)
 	CreateItemTemplate("emptycup", "GFX\items\cup.b3d", "GFX\items\INVcup.jpg", "", 0.04, 2)
@@ -229,13 +242,6 @@ Function InitItemTemplates()
 	CreateItemTemplate("finefirstaid", "GFX\items\firstaid.x", "GFX\items\INVfirstaid.jpg", "", 0.03, 1)
 	CreateItemTemplate("firstaid2", "GFX\items\firstaid.x", "GFX\items\INVfirstaid2.jpg", "", 0.03, 1, "", "GFX\items\firstaidkit2.jpg")
 	CreateItemTemplate("veryfinefirstaid", "GFX\items\eyedrops.b3d", "GFX\items\INVbottle.jpg", "", 0.002, 1, "", "GFX\items\bottle.jpg")	
-	
-	CreateItemTemplate("badgasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.019, 2)
-	CreateItemTemplate("gasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.02, 2)
-	CreateItemTemplate("supergasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.021, 2)
-	CreateItemTemplate("heavygasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.021, 2)
-	
-	CreateItemTemplate("misc", "GFX\items\electronics.b3d", "GFX\items\INVelectronics.jpg", "", 0.0011, 1, "electronical")
 	
 	CreateItemTemplate("nav300", "GFX\items\navigator.x", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("nav", "GFX\items\navigator.x", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
@@ -258,10 +264,6 @@ Function InitItemTemplates()
 	CreateItemTemplate("supereyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
 	CreateItemTemplate("eyedrops","GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
 	CreateItemTemplate("eyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedropsred.jpg", "", 0.0012, 1, "redeyedrops", "GFX\items\eyedropsred.jpg")
-	
-	CreateItemTemplate("nvg", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02, 2)
-	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02, 2)
-	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02, 2)
 	
 	CreateItemTemplate("syringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005, 2)
 	CreateItemTemplate("finesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005, 2)
@@ -411,9 +413,9 @@ Function RemoveItem(i.Items)
 				WearingNightVision = False
 			Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 				WearingGasMask = False
-			Case "vest", "finevest", "veryfinevest"
+			Case "badvest", "vest", "finevest"
 				WearingVest = False
-			Case "hazmat","hazmat2","hazmat3"
+			Case "hazmat0","hazmat","hazmat2","hazmat3"
 				WearingHazmat = False
 			Case "scp714"
 				Wearing714 = False
@@ -467,7 +469,7 @@ Function UpdateItems()
 								ClosestItem = i
 							EndIf
 						EndIf
-					ElseIf ClosestItem = i Or i\dist < EntityDistance(Camera, ClosestItem\collider) Then 
+					ElseIf ClosestItem = i Lor i\dist < EntityDistance(Camera, ClosestItem\collider) Then 
 						If EntityInView(i\model, Camera) Then
 							If EntityVisible(i\collider,Camera) Then
 								ClosestItem = i
@@ -563,7 +565,7 @@ Function PickItem(item.Items)
 		EndIf
 	Next
 	
-	If WearingHazmat > 0 Then
+	If WearingHazmat <> 0 Then
 		If Instr(item\itemtemplate\tempname,"hazmat") Then
 			Msg = GetLocalString("Messages", "hazmatdouble")
 		Else
@@ -626,14 +628,14 @@ Function PickItem(item.Items)
 						GiveAchievement(AchvSNAV)
 					Case "fineradio", "veryfineradio"
 						item\state = 101
-					Case "hazmat", "hazmat2", "hazmat3"
+					Case "hazmat0", "hazmat", "hazmat2", "hazmat3"
 						canpickitem = True
 						For z% = 0 To MaxItemAmount - 1
 							If Inventory(z) <> Null Then
-								If Inventory(z)\itemtemplate\tempname="hazmat" Or Inventory(z)\itemtemplate\tempname="hazmat2" Or Inventory(z)\itemtemplate\tempname="hazmat3" Then
+								If Inventory(z)\itemtemplate\tempname="hazmat0" Lor Inventory(z)\itemtemplate\tempname="hazmat" Lor Inventory(z)\itemtemplate\tempname="hazmat2" Lor Inventory(z)\itemtemplate\tempname="hazmat3" Then
 									canpickitem% = False
 									Exit
-								ElseIf Inventory(z)\itemtemplate\tempname="vest" Or Inventory(z)\itemtemplate\tempname="finevest" Then
+								ElseIf Inventory(z)\itemtemplate\tempname="badvest" Lor Inventory(z)\itemtemplate\tempname="vest" Lor Inventory(z)\itemtemplate\tempname="finevest" Then
 									canpickitem% = 2
 									Exit
 								EndIf
@@ -652,14 +654,14 @@ Function PickItem(item.Items)
 							;TakeOffStuff(1+16)
 							SelectedItem = item
 						EndIf
-					Case "vest","finevest"
+					Case "badvest","vest","finevest"
 						canpickitem = True
 						For z% = 0 To MaxItemAmount - 1
 							If Inventory(z) <> Null Then
-								If Inventory(z)\itemtemplate\tempname="vest" Or Inventory(z)\itemtemplate\tempname="finevest" Then
+								If Inventory(z)\itemtemplate\tempname="badvest" Lor Inventory(z)\itemtemplate\tempname="vest" Lor Inventory(z)\itemtemplate\tempname="finevest" Then
 									canpickitem% = False
 									Exit
-								ElseIf Inventory(z)\itemtemplate\tempname="hazmat" Or Inventory(z)\itemtemplate\tempname="hazmat2" Or Inventory(z)\itemtemplate\tempname="hazmat3" Then
+								ElseIf Inventory(z)\itemtemplate\tempname="hazmat0" Lor Inventory(z)\itemtemplate\tempname="hazmat" Lor Inventory(z)\itemtemplate\tempname="hazmat2" Lor Inventory(z)\itemtemplate\tempname="hazmat3" Then
 									canpickitem% = 2
 									Exit
 								EndIf
@@ -700,7 +702,7 @@ Function PickItem(item.Items)
 End Function
 
 Function DropItem(item.Items,playdropsound%=True)
-	If WearingHazmat > 0 Then
+	If WearingHazmat <> 0 Then
 		Msg = GetLocalString("Messages", "cantdrophaz")
 		MsgTimer = 70*5
 		Return
@@ -728,9 +730,9 @@ Function DropItem(item.Items,playdropsound%=True)
 	Select item\itemtemplate\tempname
 		Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 			WearingGasMask = False
-		Case "hazmat",  "hazmat2", "hazmat3"
+		Case "hazmat0", "hazmat", "hazmat2", "hazmat3"
 			WearingHazmat = False
-		Case "vest", "finevest"
+		Case "badvest", "vest", "finevest"
 			WearingVest = False
 		Case "nvg"
 			If WearingNightVision = 1 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
