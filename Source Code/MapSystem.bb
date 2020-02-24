@@ -317,6 +317,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			Else
 				AddMesh childMesh,Opaque
 				EntityParent childMesh,Opaque
+				EntityPickMode childMesh,2
 			EndIf
 		Else
 			If isAlpha=1 Then

@@ -82,6 +82,7 @@ Bug Fixes:
 	- Fixed SCP-1025's appendicitis messages not showing up.
 	- Fixed SCP-1074-A's scream being able to be heard anywhere.
 	- Fixed godmode not protecting against all injuries.
+	- Fixed launcher options not saving when quitting instead of launching.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed z-fighting on monitor model.

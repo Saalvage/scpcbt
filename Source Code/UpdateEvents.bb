@@ -7433,7 +7433,7 @@ Function UpdateEvents()
 							EndIf
 							dist = Clamp((EntityDistanceSquared(e\room\Objects[0], Collider)-9)/25, 0, 1) ;3 is full audio distance, 5 is distance after full in which it fades
 							ChannelVolume(e\SoundCHN, 1 - dist)
-							Local volume# = Max(1.0 - (Abs(prevFrame - 600.0)/100.0) - (dist/2), 0.0)
+							Local volume# = Max(1.0 - (Abs(prevFrame - 600.0)/100.0) - dist, 0.0)
 							CreateConsoleMsg(dist)
 							
 							BlurTimer = volume*1000.0

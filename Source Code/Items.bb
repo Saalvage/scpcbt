@@ -32,7 +32,7 @@ Function CreateItemTemplate.ItemTemplates(tempname$, objpath$, invimgpath$, imgp
 	If namespec <> "" Then
 		If Left(namespec, 1) = "!" Then
 			namespec = Right(namespec, Len(namespec) - 1)
-			it\localname = Replace(GetLocalString("Items", tempname), "%s", namespec)
+			it\localname = GetLocalStringR("Items", tempname, namespec)
 			tempname = tempname + namespec
 			namespec = ""
 		Else

@@ -888,7 +888,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						ExplosionTimer = 135
 					EndIf
 			End Select
-		;Case "emptycup" ;no idea ,fill it would cause issues with localization
+		;Case "emptycup" ;no idea, fill it would cause issues with localization
 		;TODO am here
 		Case "firstaid", "firstaid2"
 			Select setting

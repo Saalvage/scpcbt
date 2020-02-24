@@ -1123,7 +1123,8 @@ Function UpdateConsole()
 		
 		Color 255,255,255
 		
-		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+		Local I_Opt.Options = First Options
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	EndIf
 	
 	AASetFont Font1

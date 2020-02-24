@@ -1080,7 +1080,8 @@ Function UpdateMainMenu()
 	
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
-	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+	Local I_Opt.Options = First Options
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	AASetFont Font1
 End Function
@@ -1089,6 +1090,8 @@ Const L_WIDTH = 640
 Const L_HEIGHT = 480
 
 Function UpdateLauncher()
+	Local I_Opt.Options = First Options
+	
 	MenuScale = 1
 	
 	Graphics3DExt(L_WIDTH, L_HEIGHT, 0, 2)
@@ -1149,22 +1152,21 @@ Function UpdateLauncher()
 		Local x% = 25
 		Local y% = 200
 		
-		If (Not BorderlessWindowed)
-			If Fullscreen
+		Select I_Opt\GraphicMode
+			Case 0
 				Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
-			Else
+			Case 1
 				Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
-			EndIf
-		Else
-			Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
-			If GfxModeWidths(SelectedGFXMode)<DesktopWidth() Then
-				Text(x, y + 15, "(" + GetLocalString("Launcher", "upscale"))
-				Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
-			ElseIf GfxModeWidths(SelectedGFXMode)>DesktopWidth() Then
-				Text(x, y + 15, "(" + GetLocalString("Launcher", "downscale"))
-				Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
-			EndIf
-		EndIf
+				If GfxModeWidths(SelectedGFXMode)<DesktopWidth() Then
+					Text(x, y + 15, "(" + GetLocalString("Launcher", "upscale"))
+					Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
+				ElseIf GfxModeWidths(SelectedGFXMode)>DesktopWidth() Then
+					Text(x, y + 15, "(" + GetLocalString("Launcher", "downscale"))
+					Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
+				EndIf
+			Case 2
+				Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
+		End Select
 		
 		If DrawButton(x, y + 50, 100, 30, "+", False, False, False) Then SelectedGFXMode = Min(SelectedGFXMode + 1, GFXModes - 1)
 		If DrawButton(x + 150, y + 50, 100, 30, "-", False, False, False) Then SelectedGFXMode = Max(SelectedGFXMode - 1, 0)
@@ -1197,28 +1199,13 @@ Function UpdateLauncher()
 			y=y+20
 		Next
 		
-		Fullscreen = DrawTick(40 + 430 - 15, 260 - 55 + 5 - 8, Fullscreen, BorderlessWindowed)
-		BorderlessWindowed = DrawTick(40 + 430 - 15, 260 - 55 + 35, BorderlessWindowed)
-		lock% = False
-
-		If BorderlessWindowed Lor (Not Fullscreen) Then lock% = True
 		LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 95 + 8, LauncherEnabled)
-
-		If BorderlessWindowed
- 		   Color 255, 0, 0
- 		   Fullscreen = False
-		Else
-  		  Color 255, 255, 255
-		EndIf
-
-		Text(40 + 430 + 15, 262 - 55 + 5 - 8, GetLocalString("Launcher", "fullscreen"))
-		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55 + 40 - 8, GetLocalString("Launcher", "fakefull"))
-
-		If BorderlessWindowed Lor (Not Fullscreen)
- 		   Color 255, 0, 0
-		Else
-			Color 255, 255, 255
+		
+		;0 = Full, 1 = Borderless, 2 = Windowed
+		Text(40 + 430 + 15, 262 - 55, GetLocalString("Launcher", "mode" + I_Opt\GraphicMode))
+		
+		If DrawButton(40 + 430 - 15, 260 - 55 + 50, 100, 30, "Nice", False, False, False) Then
+			I_Opt\GraphicMode = (I_Opt\GraphicMode + 1) Mod 3
 		EndIf
 		
 		Color 255, 255, 255
@@ -1240,9 +1227,8 @@ Function UpdateLauncher()
 	
 	PutINIValue(OptionFile, "options", "width", GfxModeWidths(SelectedGFXMode))
 	PutINIValue(OptionFile, "options", "height", GfxModeHeights(SelectedGFXMode))
-	PutINIValue(OptionFile, "options", "fullscreen", Fullscreen)
+	PutINIValue(OptionFile, "options", "mode", I_Opt\GraphicMode)
 	PutINIValue(OptionFile, "options", "launcher enabled", LauncherEnabled)
-	PutINIValue(OptionFile, "options", "borderless windowed", BorderlessWindowed)
 	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)
 	PutINIValue(OptionFile, "options", "pack", Locs(SelectedLoc))
 	
@@ -1498,7 +1484,8 @@ Function DrawLoading(percent%, shortloading=False)
 			FlushMouse()
 		EndIf
 		
-		If BorderlessWindowed Then
+		Local I_Opt.Options = First Options
+		If I_Opt\GraphicMode = 1 Then
 			If (RealGraphicWidth<>GraphicWidth) Lor (RealGraphicHeight<>GraphicHeight) Then
 				SetBuffer TextureBuffer(fresize_texture)
 				ClsColor 0,0,0 : Cls

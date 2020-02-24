@@ -102,23 +102,8 @@ End Function
 
 ;With Formatting! %s in a String gets replaced
 Function GetLocalStringR$(Section$, Parameter$, Replace$)
-
-	For l.LocalString = Each LocalString
-		If l\section = Section And l\parameter = Parameter Then
-			Return l\value
-		EndIf
-	Next
-
-	Local I_Loc.Loc = First Loc
-
-	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
-		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
-		If temp <> "" Then
-			Return Replace(temp, "%s", Replace)
-		EndIf
-	EndIf
 	
-	Return Replace(GetINIString("Data\local.ini", Section, Parameter), "%s", Replace)
+	Return Replace(GetLocalString(Section, Parameter), "%s", Replace)
 	
 End Function
 
@@ -180,11 +165,21 @@ Global Data294$ = "Data\SCP-294.ini"
 
 Global AchvIni$ = "Data\achievements.ini"
 
+Type Options
+	Field LauncherEnabled
+	Field GraphicWidth
+	Field GraphicHeight
+	Field GraphicMode
+End Type
+
+Local I_Opt.Options = New Options
+
+I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
+
 Global LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
 
 Global GraphicWidth% = GetINIInt(OptionFile, "options", "width")
 Global GraphicHeight% = GetINIInt(OptionFile, "options", "height")
-Global Depth% = 0, Fullscreen% = GetINIInt(OptionFile, "options", "fullscreen")
 
 Global SelectedGFXMode%
 Global SelectedGFXDriver% = Max(GetINIInt(OptionFile, "options", "gfx driver"), 1)
@@ -218,7 +213,6 @@ Repeat
 Forever
 CloseDir Dir
 
-Global BorderlessWindowed% = GetINIInt(OptionFile, "options", "borderless windowed")
 Global RealGraphicWidth%,RealGraphicHeight%
 Global AspectRatioRatio#
 
@@ -273,7 +267,7 @@ Else
 EndIf
 
 ;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, But it's an alliteration (and it's true)!! ~Salvage
-If BorderlessWindowed
+If I_Opt\GraphicMode = 1
 	DebugLog "Using Borderless Windowed Mode"
 	Graphics3DExt DesktopWidth(), DesktopHeight(), 0, 4
 	
@@ -281,13 +275,11 @@ If BorderlessWindowed
 	RealGraphicHeight = DesktopHeight()
 	
 	AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
-	
-	Fullscreen = False
 Else
 	AspectRatioRatio = 1.0
 	RealGraphicWidth = GraphicWidth
 	RealGraphicHeight = GraphicHeight
-	If Fullscreen Then
+	If I_Opt\GraphicMode = 0 Then
 		Graphics3DExt(GraphicWidth, GraphicHeight, 0, 1)
 	Else
 		Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
@@ -337,7 +329,6 @@ Global Vsync% = GetINIInt(OptionFile, "options", "vsync")
 Global Opt_AntiAlias = GetINIInt(OptionFile, "options", "antialias")
 
 Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
-;If Fullscreen Then UpdateScreenGamma()
 
 Global FOV% = GetINIInt(OptionFile, "options", "fov")
 
@@ -2321,7 +2312,7 @@ Repeat
 		UpdateAchievementMsg()
 	EndIf
 	
-	If BorderlessWindowed Then
+	If I_Opt\GraphicMode = 1 Then
 		If (RealGraphicWidth<>GraphicWidth) Lor (RealGraphicHeight<>GraphicHeight) Then
 			SetBuffer TextureBuffer(fresize_texture)
 			ClsColor 0,0,0 : Cls
@@ -2851,7 +2842,8 @@ Function DrawEnding()
 		
 	EndIf
 	
-	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+	Local I_Opt.Options = First Options
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	AASetFont Font1
 End Function
@@ -3610,6 +3602,7 @@ Function DrawGUI()
 	
 	Local e.Events, it.Items
 	
+	Local I_Opt.Options = First Options
 	Local I_Cheats.Cheats = First Cheats
 	Local I_427.SCP427 = First SCP427
 	
@@ -3968,7 +3961,7 @@ Function DrawGUI()
 				Next
 			Next
 			
-			If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+			If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 			
 			If MouseHit2 Then
 				SelectedDoor = Null
@@ -4227,7 +4220,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If Fullscreen Then DrawImage CursorIMG,ScaledMouseX(),ScaledMouseY()
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG,ScaledMouseX(),ScaledMouseY()
 		If (closedInv) And (Not InvOpen) Then 
 			ResumeSounds() 
 			OtherOpen=Null
@@ -4553,7 +4546,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 		
 		If InvOpen = False Then 
 			ResumeSounds() 
@@ -6739,7 +6732,8 @@ Function DrawMenu()
 			If KillTimer < 0 Then RowText(DeathMSG$, x, y + 80*MenuScale, 390*MenuScale, 600*MenuScale)
 		EndIf
 		
-		If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+		Local I_Opt.Options = First Options
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 		
 	EndIf
 	
@@ -8338,7 +8332,8 @@ Function Use294()
 	x = GraphicWidth/2 - (ImageWidth(Panel294)/2)
 	y = GraphicHeight/2 - (ImageHeight(Panel294)/2)
 	DrawImage Panel294, x, y
-	If Fullscreen Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+	Local I_Opt.Options = First Options
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	temp = True
 	If PlayerRoom\SoundCHN<>0 Then temp = False
@@ -9470,8 +9465,7 @@ Function DefaultOptionsINI()
 	
 	PutINIValue(OptionFile, "options", "width", DesktopWidth())
 	PutINIValue(OptionFile, "options", "height", DesktopHeight())
-	PutINIValue(OptionFile, "options", "fullscreen", 1)
-	PutINIValue(OptionFile, "options", "borderless windowed", 0)
+	PutINIValue(OptionFile, "options", "mode", 0)
 	PutINIValue(OptionFile, "options", "gfx driver", 2)
 	PutINIValue(OptionFile, "options", "audio driver", 0)
 	PutINIValue(OptionFile, "options", "brightness", 50)
