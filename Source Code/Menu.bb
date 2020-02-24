@@ -1129,17 +1129,6 @@ Function UpdateLauncher()
 		EndIf
 	Next
 	
-	loc_resolution$ = GetLocalString("Launcher", "resolution")
-	loc_upscale$ = GetLocalString("Launcher", "upscale")
-	loc_downscale$ = GetLocalString("Launcher", "downscale")
-	loc_cycle$ = GetLocalString("Launcher", "cycle")
-	loc_graphics$ = GetLocalString("Launcher", "graphics")
-	loc_fullscreen$ = GetLocalString("Launcher", "fullscreen")
-	loc_fakefull$ = GetLocalString("Launcher", "fakefull")
-	loc_uselauncher$ = GetLocalString("Launcher", "uselauncher")
-	loc_launch$ = GetLocalString("Launcher", "launch")
-	loc_exit$ = GetLocalString("Launcher", "exit")
-	
 	BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
 	
 	Local quit% = False
@@ -1155,7 +1144,7 @@ Function UpdateLauncher()
 		Color 255, 255, 255
 		DrawImage(IMG, 0, 0)
 		
-		Text(20, 240 - 65, loc_resolution)
+		Text(20, 240 - 65, GetLocalString("Launcher", "resolution"))
 		
 		Local x% = 25
 		Local y% = 200
@@ -1169,10 +1158,10 @@ Function UpdateLauncher()
 		Else
 			Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
 			If GfxModeWidths(SelectedGFXMode)<DesktopWidth() Then
-				Text(x, y + 15, "(" + loc_upscale)
+				Text(x, y + 15, "(" + GetLocalString("Launcher", "upscale"))
 				Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
 			ElseIf GfxModeWidths(SelectedGFXMode)>DesktopWidth() Then
-				Text(x, y + 15, "(" + loc_downscale)
+				Text(x, y + 15, "(" + GetLocalString("Launcher", "downscale"))
 				Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
 			EndIf
 		EndIf
@@ -1183,7 +1172,7 @@ Function UpdateLauncher()
 		
 		y = y + 100
 		
-		If DrawButton(x + 100, y, 150, 30, loc_cycle, False, False, False) Then
+		If DrawButton(x + 100, y, 150, 30, GetLocalString("Launcher", "cycle"), False, False, False) Then
 			SelectedLoc = (SelectedLoc + 1) Mod LocsAmount
 			UpdateLang(First Loc, Locs(SelectedLoc))
 		EndIf
@@ -1193,7 +1182,7 @@ Function UpdateLauncher()
 		;-----------------------------------------------------------------
 		x = 30
 		y = 369
-		Text(x - 10, y - 25, loc_graphics)
+		Text(x - 10, y - 25, GetLocalString("Launcher", "graphics"))
 		
 		y=y+10
 		For i = 1 To CountGfxDrivers()
@@ -1222,20 +1211,20 @@ Function UpdateLauncher()
   		  Color 255, 255, 255
 		EndIf
 
-		Text(40 + 430 + 15, 262 - 55 + 5 - 8, loc_fullscreen)
+		Text(40 + 430 + 15, 262 - 55 + 5 - 8, GetLocalString("Launcher", "fullscreen"))
 		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55 + 40 - 8, loc_fakefull)
+		Text(40 + 430 + 15, 262 - 55 + 40 - 8, GetLocalString("Launcher", "fakefull"))
 
 		If BorderlessWindowed Lor (Not Fullscreen)
  		   Color 255, 0, 0
 		Else
-		    Color 255, 255, 255
+			Color 255, 255, 255
 		EndIf
 		
 		Color 255, 255, 255
-		Text(40 + 430 + 15, 262 - 55 + 95 + 8, loc_uselauncher)
+		Text(40 + 430 + 15, 262 - 55 + 95 + 8, GetLocalString("Launcher", "uselauncher"))
 		
-		If DrawButton(L_WIDTH - 30 - 90, L_HEIGHT - 50 - 55, 100, 30, loc_launch, False, False, False) Then
+		If DrawButton(L_WIDTH - 30 - 90, L_HEIGHT - 50 - 55, 100, 30, GetLocalString("Launcher", "launch"), False, False, False) Then
 			GraphicWidth = GfxModeWidths(SelectedGFXMode)
 			GraphicHeight = GfxModeHeights(SelectedGFXMode)
 			RealGraphicWidth = GraphicWidth
@@ -1243,7 +1232,7 @@ Function UpdateLauncher()
 			Exit
 		EndIf
 		
-		If DrawButton(L_WIDTH - 30 - 90, L_HEIGHT - 50, 100, 30, loc_exit, False, False, False) Then quit = True : Exit
+		If DrawButton(L_WIDTH - 30 - 90, L_HEIGHT - 50, 100, 30, GetLocalString("Launcher", "exit"), False, False, False) Then quit = True : Exit
 		Flip
 	Forever
 	
@@ -1362,8 +1351,6 @@ Function DrawLoading(percent%, shortloading=False)
 			EndIf
 		Next
 	EndIf
-	
-	loc_pressany$ = GetLocalString("Menu", "pressany")
 	
 	firstloop = True
 	Repeat 
@@ -1505,7 +1492,7 @@ Function DrawLoading(percent%, shortloading=False)
 		
 		If percent = 100 Then 
 			If firstloop And SelectedLoadingScreen\title <> "CWM" Then PlaySound_Strict LoadTempSound(("SFX\Horror\Horror8.ogg"))
-			AAText(GraphicWidth / 2, GraphicHeight - 50, loc_pressany, True, True)
+			AAText(GraphicWidth / 2, GraphicHeight - 50, GetLocalString("Menu", "pressany"), True, True)
 		Else
 			FlushKeys()
 			FlushMouse()

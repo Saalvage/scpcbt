@@ -1149,7 +1149,7 @@ Function LoadGame(file$)
 	EndIf
 	
 	CameraFogFar = ReadFloat(f)
-    StoredCameraFogFar = ReadFloat(f)
+	StoredCameraFogFar = ReadFloat(f)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
 	EndIf
@@ -1533,8 +1533,8 @@ Function LoadGameQuick(file$)
 		temp2 = ReadByte(f)	
 		
 		If angle >= 360
-            angle = angle-360
-        EndIf
+			angle = angle-360
+		EndIf
 		
 		For r.Rooms = Each Rooms
 			If r\x = x And r\z = z Then
@@ -1871,7 +1871,7 @@ Function LoadGameQuick(file$)
 	RestoreSanity = True
 	
 	CameraFogFar = ReadFloat(f)
-    StoredCameraFogFar = ReadFloat(f)
+	StoredCameraFogFar = ReadFloat(f)
 	If CameraFogFar = 0 Then
 		CameraFogFar = 6
 	EndIf

@@ -370,20 +370,20 @@ Function UpdateConsole()
 					CreateConsoleMsg("******************************")
 					CreateConsoleMsg("Status: ")
 					CreateConsoleMsg("Coordinates: ")
-					CreateConsoleMsg("    - collider: "+EntityX(Collider)+", "+EntityY(Collider)+", "+EntityZ(Collider))
-					CreateConsoleMsg("    - camera: "+EntityX(Camera)+", "+EntityY(Camera)+", "+EntityZ(Camera))
+					CreateConsoleMsg("	- collider: "+EntityX(Collider)+", "+EntityY(Collider)+", "+EntityZ(Collider))
+					CreateConsoleMsg("	- camera: "+EntityX(Camera)+", "+EntityY(Camera)+", "+EntityZ(Camera))
 					
 					CreateConsoleMsg("Rotation: ")
-					CreateConsoleMsg("    - collider: "+EntityPitch(Collider)+", "+EntityYaw(Collider)+", "+EntityRoll(Collider))
-					CreateConsoleMsg("    - camera: "+EntityPitch(Camera)+", "+EntityYaw(Camera)+", "+EntityRoll(Camera))
+					CreateConsoleMsg("	- collider: "+EntityPitch(Collider)+", "+EntityYaw(Collider)+", "+EntityRoll(Collider))
+					CreateConsoleMsg("	- camera: "+EntityPitch(Camera)+", "+EntityYaw(Camera)+", "+EntityRoll(Camera))
 					
 					CreateConsoleMsg("Room: "+PlayerRoom\RoomTemplate\Name)
 					For ev.Events = Each Events
 						If ev\room = PlayerRoom Then
 							CreateConsoleMsg("Room event: "+ev\EventName)	
-							CreateConsoleMsg("-    state: "+ev\EventState)
-							CreateConsoleMsg("-    state2: "+ev\EventState2)	
-							CreateConsoleMsg("-    state3: "+ev\EventState3)
+							CreateConsoleMsg("-	state: "+ev\EventState)
+							CreateConsoleMsg("-	state2: "+ev\EventState2)	
+							CreateConsoleMsg("-	state3: "+ev\EventState3)
 							Exit
 						EndIf
 					Next

@@ -167,41 +167,41 @@ Function StreamSound_Strict(file$,volume#=1.0,custommode=2)
 	EndIf
 	
 	If FileType(file$)<>1
-        CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
-        If ConsoleOpening
-            ConsoleOpen = True
-        EndIf
-        Return 0
-    EndIf
-    
-    Local st.Stream = New Stream
-    
-    st\chn = PlayMusic(file$,custommode)
-    
-    If st\chn = -1
-        CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
-        If ConsoleOpening
-            ConsoleOpen = True
-        EndIf
-        Return -1
-    EndIf
-    ChannelVolume(st\chn,volume*1.0)
-    Return Handle(st)
+		CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
+		If ConsoleOpening
+			ConsoleOpen = True
+		EndIf
+		Return 0
+	EndIf
+	
+	Local st.Stream = New Stream
+	
+	st\chn = PlayMusic(file$,custommode)
+	
+	If st\chn = -1
+		CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
+		If ConsoleOpening
+			ConsoleOpen = True
+		EndIf
+		Return -1
+	EndIf
+	ChannelVolume(st\chn,volume*1.0)
+	Return Handle(st)
 End Function
 
 Function StopStream_Strict(streamHandle%)
-    Local st.Stream = Object.Stream(streamHandle)
-    
-    If st = Null
-        CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
-        Return
-    EndIf
-    If st\chn=0 Lor st\chn=-1
-        CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
-        Return
-    EndIf
-    StopChannel(st\chn)
-    Delete st
+	Local st.Stream = Object.Stream(streamHandle)
+	
+	If st = Null
+		CreateConsoleMsg("Failed to stop stream Sound: Unknown Stream")
+		Return
+	EndIf
+	If st\chn=0 Lor st\chn=-1
+		CreateConsoleMsg("Failed to stop stream Sound: Return value "+st\chn)
+		Return
+	EndIf
+	StopChannel(st\chn)
+	Delete st
 End Function
 
 Function SetStreamVolume_Strict(streamHandle%,volume#)

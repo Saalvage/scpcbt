@@ -46,7 +46,7 @@ DebugLog CountChildren(h)
 				WriteLine XE_XF,"   1.000000;1.000000;1.000000;;"
 				WriteLine XE_XF,"   0.000000;0.000000;0.000000;;"
 				WriteLine XE_XF,"   TextureFilename {"
-				WriteLine XE_XF,"      "+Chr(34)+XE_XFilen$+Chr(34)+";"
+				WriteLine XE_XF,"	  "+Chr(34)+XE_XFilen$+Chr(34)+";"
 				WriteLine XE_XF,"   }"
 				WriteLine XE_XF,"}"
 				XE_MAXtextures=XE_MAXtextures+1
@@ -100,11 +100,11 @@ Function RecursiveAddMesh(h,basescaleX#=1,basescaleY#=1,basescaleZ#=1)
 		mesh=h
 
 		WriteLine XE_XF,"   Frame "+ChiName$+" {"
-		WriteLine XE_XF,"      FrameTransformMatrix {"
-		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,0,0)+","+GetStringofMatElement(mesh,0,1)+","+GetStringofMatElement(mesh,0,2)+",0.000000,"
-		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,1,0)+","+GetStringofMatElement(mesh,1,1)+","+GetStringofMatElement(mesh,1,2)+",0.000000,"
-		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,2,0)+","+GetStringofMatElement(mesh,2,1)+","+GetStringofMatElement(mesh,2,2)+",0.000000,"
-		WriteLine XE_XF,"         "+GetStringofMatElement(mesh,3,0)+","+GetStringofMatElement(mesh,3,1)+","+GetStringofMatElement(mesh,3,2)+",1.000000;;"
+		WriteLine XE_XF,"	  FrameTransformMatrix {"
+		WriteLine XE_XF,"		 "+GetStringofMatElement(mesh,0,0)+","+GetStringofMatElement(mesh,0,1)+","+GetStringofMatElement(mesh,0,2)+",0.000000,"
+		WriteLine XE_XF,"		 "+GetStringofMatElement(mesh,1,0)+","+GetStringofMatElement(mesh,1,1)+","+GetStringofMatElement(mesh,1,2)+",0.000000,"
+		WriteLine XE_XF,"		 "+GetStringofMatElement(mesh,2,0)+","+GetStringofMatElement(mesh,2,1)+","+GetStringofMatElement(mesh,2,2)+",0.000000,"
+		WriteLine XE_XF,"		 "+GetStringofMatElement(mesh,3,0)+","+GetStringofMatElement(mesh,3,1)+","+GetStringofMatElement(mesh,3,2)+",1.000000;;"
 		WriteLine XE_XF,"   }"
 
 		
@@ -114,78 +114,78 @@ Function RecursiveAddMesh(h,basescaleX#=1,basescaleY#=1,basescaleZ#=1)
 				verts=CountVertices(surf)
 				tris=CountTriangles(surf)
 				;meshinfo
-				WriteLine XE_XF,"      Mesh "+ChiName$+" {"
+				WriteLine XE_XF,"	  Mesh "+ChiName$+" {"
 	
 	
 				;Number of verts;
-				WriteLine XE_XF,"         "+verts+";"
+				WriteLine XE_XF,"		 "+verts+";"
 	
 	
 				;X;Y;Z; of verts;
 				For v=0 To verts-1
 					If v=verts-1 Then term$=";;" Else term$=";,"
-					WriteLine XE_XF,"         "+VertexX (surf,v)+";"+VertexY (surf,v)+";"+VertexZ (surf,v)+term$
+					WriteLine XE_XF,"		 "+VertexX (surf,v)+";"+VertexY (surf,v)+";"+VertexZ (surf,v)+term$
 				Next
 	
 				
 				;No of tris;
-				WriteLine XE_XF,"         "+tris+";"
+				WriteLine XE_XF,"		 "+tris+";"
 	
 	
 				;Tri ordering 3;t0,t1,t2;,
 				For t=0 To Tris-1
 					If t=tris-1 Then term$=";;" Else term$=";,"
-					WriteLine XE_XF,"         3;"+TriangleVertex(Surf,t,0)+","+TriangleVertex(Surf,t,1)+","+TriangleVertex(Surf,t,2)+term$
+					WriteLine XE_XF,"		 3;"+TriangleVertex(Surf,t,0)+","+TriangleVertex(Surf,t,1)+","+TriangleVertex(Surf,t,2)+term$
 				Next 
 	
 				;Material List
-				WriteLine XE_XF,"         MeshMaterialList {"
-				WriteLine XE_XF,"            1;";num of materials for mesh
-				WriteLine XE_XF,"            "+tris+";";number of faces/tris
+				WriteLine XE_XF,"		 MeshMaterialList {"
+				WriteLine XE_XF,"			1;";num of materials for mesh
+				WriteLine XE_XF,"			"+tris+";";number of faces/tris
 				For t=0 To tris-1
 					If t=tris-1 Then term$=";;" Else term$=","
-					WriteLine XE_XF,"            0"+term$ ; face indexes?
+					WriteLine XE_XF,"			0"+term$ ; face indexes?
 				Next 
-				WriteLine XE_XF,"            {dx_brush"+LookUpTindex(surf)+"}"
-				WriteLine XE_XF,"         } // end of material list"
+				WriteLine XE_XF,"			{dx_brush"+LookUpTindex(surf)+"}"
+				WriteLine XE_XF,"		 } // end of material list"
 	
 				;Normals List
-				WriteLine XE_XF,"         MeshNormals {"
-				WriteLine XE_XF,"            "+verts+";"
+				WriteLine XE_XF,"		 MeshNormals {"
+				WriteLine XE_XF,"			"+verts+";"
 				For v=0 To verts-1
 					If v=verts-1 Then term$=";;" Else term$=";,"
-					WriteLine XE_XF,"            "+VertexNX (surf,v)+";"+VertexNY (surf,v)+";"+VertexNZ (surf,v)+term$
+					WriteLine XE_XF,"			"+VertexNX (surf,v)+";"+VertexNY (surf,v)+";"+VertexNZ (surf,v)+term$
 				Next
-				WriteLine XE_XF,"            "+tris+";"
+				WriteLine XE_XF,"			"+tris+";"
 				For t=0 To Tris-1
 					If t=tris-1 Then term$=";;" Else term$=";,"
-					WriteLine XE_XF,"            3;"+TriangleVertex(Surf,t,0)+","+TriangleVertex(Surf,t,1)+","+TriangleVertex(Surf,t,2)+term$
+					WriteLine XE_XF,"			3;"+TriangleVertex(Surf,t,0)+","+TriangleVertex(Surf,t,1)+","+TriangleVertex(Surf,t,2)+term$
 				Next 
-				WriteLine XE_XF,"         } // end of normal list"
+				WriteLine XE_XF,"		 } // end of normal list"
 	
 				;Texturecoords List
-				WriteLine XE_XF,"         MeshTextureCoords {"
-				WriteLine XE_XF,"            "+verts+";"
+				WriteLine XE_XF,"		 MeshTextureCoords {"
+				WriteLine XE_XF,"			"+verts+";"
 				For v=0 To verts-1
 					If v=verts-1 Then term$=";;" Else term$=";,"
-					WriteLine XE_XF,"            "+VertexU (surf,v)+";"+VertexV (surf,v)+term$
+					WriteLine XE_XF,"			"+VertexU (surf,v)+";"+VertexV (surf,v)+term$
 				Next
-				WriteLine XE_XF,"         } // end of Texturecoord list"
+				WriteLine XE_XF,"		 } // end of Texturecoord list"
 	
 				;Vertexcolor List
-				WriteLine XE_XF,"         MeshVertexColors {"
-				WriteLine XE_XF,"            "+verts+";"
+				WriteLine XE_XF,"		 MeshVertexColors {"
+				WriteLine XE_XF,"			"+verts+";"
 				For v=0 To verts-1
 					If v=verts-1 Then term$=";;" Else term$=";,"
 					vred#=VertexRed (surf,v)/256
 					vgreen#=VertexGreen (surf,v)/256
 					vblue#=VertexBlue (surf,v)/256
-					WriteLine XE_XF,"            "+v+";"+vred+";"+vgreen+";"+vblue+";"+VertexAlpha (surf,v)+term$
+					WriteLine XE_XF,"			"+v+";"+vred+";"+vgreen+";"+vblue+";"+VertexAlpha (surf,v)+term$
 				Next
-				WriteLine XE_XF,"         } // end of Vertexcolor list"
+				WriteLine XE_XF,"		 } // end of Vertexcolor list"
 	
 				;End of mesh
-				WriteLine XE_XF,"      } // end of mesh block for "+ChiName$
+				WriteLine XE_XF,"	  } // end of mesh block for "+ChiName$
 	
 			Next	 
 		EndIf

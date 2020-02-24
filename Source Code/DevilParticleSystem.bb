@@ -7,24 +7,24 @@
 
 
 Type Template
-	Field sub_template.Template[7]                                  ;Sub templates
-	Field emitter_blend                                             ;blendmode of emitter entity
-	Field interval, particles_per_interval                          ;particle interval
-	Field max_particles                                             ;max particles
-	Field emitter_max_time                                          ;Emitter life time
-	Field min_time, max_time                                        ;Particle life time
-	Field tex, animtex, texframe#, maxtexframes, texspeed#          ;Texture
-	Field min_ox#, max_ox#, min_oy#, max_oy#, min_oz#, max_oz#      ;Offset
-	Field min_xv#, max_xv#, min_yv#, max_yv#, min_zv#, max_zv#      ;Velocity
+	Field sub_template.Template[7]								  ;Sub templates
+	Field emitter_blend											 ;blendmode of emitter entity
+	Field interval, particles_per_interval						  ;particle interval
+	Field max_particles											 ;max particles
+	Field emitter_max_time										  ;Emitter life time
+	Field min_time, max_time										;Particle life time
+	Field tex, animtex, texframe#, maxtexframes, texspeed#		  ;Texture
+	Field min_ox#, max_ox#, min_oy#, max_oy#, min_oz#, max_oz#	  ;Offset
+	Field min_xv#, max_xv#, min_yv#, max_yv#, min_zv#, max_zv#	  ;Velocity
 	Field rot_vel1#, rot_vel2#, align_to_fall, align_to_fall_offset ;Rotation
-	Field gravity#                                                  ;Gravity
-	Field alpha#, alpha_vel                                         ;Alpha
-	Field sx#, sy#, size_multiplicator1#, size_multiplicator2#      ;Size
-	Field size_add#, size_mult#                                     ;Size velocity
-	Field r1, g1, b1, r2, g2, b2                                    ;Colors
-	Field Brightness                                                ;Brightness
-	Field floor_y#, floor_bounce#                                   ;Floor
-	Field pitch_fix, yaw_fix                                        ;Fix angles
+	Field gravity#												  ;Gravity
+	Field alpha#, alpha_vel										 ;Alpha
+	Field sx#, sy#, size_multiplicator1#, size_multiplicator2#	  ;Size
+	Field size_add#, size_mult#									 ;Size velocity
+	Field r1, g1, b1, r2, g2, b2									;Colors
+	Field Brightness												;Brightness
+	Field floor_y#, floor_bounce#								   ;Floor
+	Field pitch_fix, yaw_fix										;Fix angles
 	
 	Field yaw#
 End Type
@@ -38,10 +38,10 @@ End Type
 Type Particle
 	Field emitter.Emitter
 	Field age, max_time  ;Life time
-	Field x#, y#, z#     ;Position
+	Field x#, y#, z#	 ;Position
 	Field xv#, yv#, zv#  ;Velocity
 	Field rot#, rot_vel# ;Rotation
-	Field sx#, sy#       ;Size
+	Field sx#, sy#	   ;Size
 End Type
 Global ParticleCam, ParticlePiv
 

@@ -464,8 +464,8 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 				;						BrushTexture b, t1, 0, 1
 				;						PaintSurface sf,b
 				;						
-				;                  ;If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
-				;                  ;FreeBrush b   
+				;				  ;If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
+				;				  ;FreeBrush b   
 				;				End Select
 				;				FreeTexture t1
 				;			EndIf
@@ -3043,18 +3043,18 @@ Function UpdateNPCs()
 
 				Select n\State
 					Case 0 ;idle
-					    n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
+						n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
 					Case 1 ;rides
 						n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 						Animate2(n\obj, AnimTime(n\obj), 1, 20, n\CurrSpeed * 5)
 				End Select
 				
 				If n\State = 0 Then
-				    If ChannelPlaying(n\SoundCHN2) = True Then StopChannel n\SoundCHN2 
-				    n\SoundCHN = LoopSound2(VehicleSFX(1), n\SoundCHN, Camera, n\Collider, 13, 1.0)
+					If ChannelPlaying(n\SoundCHN2) = True Then StopChannel n\SoundCHN2 
+					n\SoundCHN = LoopSound2(VehicleSFX(1), n\SoundCHN, Camera, n\Collider, 13, 1.0)
 				ElseIf n\State = 1
-				    If ChannelPlaying(n\SoundCHN) = True Then StopChannel n\SoundCHN  
-				    n\SoundCHN2 = LoopSound2(VehicleSFX(0), n\SoundCHN2, Camera, n\Collider, 13, 1.0)
+					If ChannelPlaying(n\SoundCHN) = True Then StopChannel n\SoundCHN  
+					n\SoundCHN2 = LoopSound2(VehicleSFX(0), n\SoundCHN2, Camera, n\Collider, 13, 1.0)
 				EndIf
 												
 				MoveEntity(n\Collider, 0, 0, n\CurrSpeed * FPSfactor)
@@ -4086,7 +4086,7 @@ Function UpdateNPCs()
 						HideEntity n\obj
 						If dist<1 And n\Reload <= 0 And MsgTimer <= 0 Then
 							Msg = GetLocalString("Messages", "966" + Rand(6))
-                            n\Reload = 20*70
+							n\Reload = 20*70
 							MsgTimer=8*70
 						EndIf
 						n\Reload = n\Reload - FPSfactor
@@ -4291,8 +4291,8 @@ Function UpdateNPCs()
 								EndIf
 								
 								If (prevFrame < 604 And n\Frame=>604) Lor (prevFrame < 627 And n\Frame=>627) Then
-                                    PlaySound2(StepSFX(4,0,Rand(0,3)),Camera, n\Collider, 7.0, Rnd(0.5,0.7))
-                                EndIf
+									PlaySound2(StepSFX(4,0,Rand(0,3)),Camera, n\Collider, 7.0, Rnd(0.5,0.7))
+								EndIf
 								
 								RotateEntity n\Collider, 0, CurveAngle(n\Angle,EntityYaw(n\Collider),10.0),0
 								
@@ -5193,41 +5193,41 @@ Function UpdateMTFUnit(n.NPCs)
 		Local realType$ = ""
 		Select n\NPCtype
 			Case NPCtype173
-                realType = "173"
+				realType = "173"
 			Case NPCtypeOldMan
-                realType = "106"
+				realType = "106"
 			Case NPCtypeGuard
-                realType = "guard"
+				realType = "guard"
 			Case NPCtypeD
-                realType = "d"
+				realType = "d"
 			Case NPCtype372
-                realType = "372"
+				realType = "372"
 			Case NPCtypeVehicle
-                realType = "Vehicle"
+				realType = "Vehicle"
 			Case NPCtypeApache
-                realType = "apache"
+				realType = "apache"
 			Case NPCtype096
-                realType = "096"
+				realType = "096"
 			Case NPCtype049
-                realType = "049"
+				realType = "049"
 			Case NPCtypeZombie
-                realType = "zombie"
+				realType = "zombie"
 			Case NPCtype5131
-                realType = "513-1"
+				realType = "513-1"
 			Case NPCtypeTentacle
-                realType = "tentacle"
+				realType = "tentacle"
 			Case NPCtype860
-                realType = "860"
+				realType = "860"
 			Case NPCtype939
-                realType = "939"
+				realType = "939"
 			Case NPCtype066
-                realType = "066"
+				realType = "066"
 			Case NPCtypePdPlane
-                realType = "PDPlane"
+				realType = "PDPlane"
 			Case NPCtype966
-                realType = "966"
+				realType = "966"
 			Case NPCtype1048a
-                realType = "1048-A"
+				realType = "1048-A"
 			Case NPCtype1499
 				realType = "1499-1"
 		End Select
@@ -5285,9 +5285,9 @@ Function UpdateMTFUnit(n.NPCs)
 	Else
 		Select Int(n\State) ;what is this MTF doing
 			Case 0 ;wandering around
-                
-                n\Speed = 0.015
-                If n\PathTimer<=0.0 Then ;update path
+				
+				n\Speed = 0.015
+				If n\PathTimer<=0.0 Then ;update path
 					If n\MTFLeader<>Null Then ;i'll follow the leader
 						n\PathStatus = FindPath(n,EntityX(n\MTFLeader\Collider,True),EntityY(n\MTFLeader\Collider,True)+0.1,EntityZ(n\MTFLeader\Collider,True)) ;whatever you say boss
 					Else ;i am the leader
@@ -5380,7 +5380,7 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 					n\PathTimer = 70.0 * Rnd(6.0,10.0) ;search again after 6-10 seconds
-                ElseIf (n\PathTimer<=70.0 * 2.5) And (n\MTFLeader=Null) Then
+				ElseIf (n\PathTimer<=70.0 * 2.5) And (n\MTFLeader=Null) Then
 					n\PathTimer=n\PathTimer-FPSfactor
 					n\CurrSpeed = 0.0
 					If Rand(1,35)=1 Then
@@ -5389,7 +5389,7 @@ Function UpdateMTFUnit(n.NPCs)
 					FinishWalking(n,488,522,n\Speed*26)
 					n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 					RotateEntity n\obj,-90.0,n\Angle,0.0,True
-                Else
+				Else
 					If n\PathStatus=2 Then
 						n\PathTimer=n\PathTimer-(FPSfactor*2.0) ;timer goes down fast
 						n\CurrSpeed = 0.0
@@ -5437,7 +5437,7 @@ Function UpdateMTFUnit(n.NPCs)
 									n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
 								EndIf
 							EndIf
-                            
+							
 							If (newDist<0.2) Lor ((prevDist<newDist) And (prevDist<1.0)) Then
 								n\PathLocation=n\PathLocation+1
 							EndIf
@@ -5488,13 +5488,13 @@ Function UpdateMTFUnit(n.NPCs)
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 						RotateEntity n\obj,-90.0,n\Angle,0.0,True
 					EndIf
-                EndIf
-                
+				EndIf
+				
 				Local temp = MeNPCSeesPlayer(n)
 				
 				If NoTarget Then temp = False
 				
-                If temp>False Then
+				If temp>False Then
 					If n\LastSeen > 0 And n\LastSeen < 70*15 Then
 						If temp < 2
 							If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
@@ -5530,10 +5530,10 @@ Function UpdateMTFUnit(n.NPCs)
 					;If EntityDistance(n\Collider,Collider)>HideDistance*0.7
 					;	TeleportMTFGroup(n)
 					;EndIf
-                EndIf
+				EndIf
 				
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
-                If Curr173\Idle<2 Then
+				If Curr173\Idle<2 Then
 					Local SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), Curr173\PrevX, EntityZ(Curr173\Collider), Curr173\PrevZ) * 2.5), 1.0), 0.0)
 					If OtherNPCSeesMeNPC(Curr173,n) Lor (SoundVol173#>0.0 And EntityDistanceSquared(n\Collider,Curr173\Collider)<36.0) Then ;6.0
 						If EntityVisible(n\Collider,Curr173\Collider) Lor SoundVol173#>0.0 Then							
@@ -5658,12 +5658,12 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 				Next
-                
+				
 			Case 1 ;searching for player
-                
-                n\Speed = 0.015
-                n\State2=n\State2-FPSfactor
-                If MeNPCSeesPlayer(n) = True Then
+				
+				n\Speed = 0.015
+				n\State2=n\State2-FPSfactor
+				If MeNPCSeesPlayer(n) = True Then
 					
 					;if close enough, start shooting at the player
 					If playerDist < 4.0 Then
@@ -5760,7 +5760,7 @@ Function UpdateMTFUnit(n.NPCs)
 						TranslateEntity n\Collider, Cos(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, 0, Sin(EntityYaw(n\Collider,True)+90.0)*n\CurrSpeed * FPSfactor, True
 						AnimateNPC(n,488, 522, n\CurrSpeed*26)
 					EndIf
-                Else
+				Else
 					n\LastSeen = n\LastSeen - FPSfactor
 					
 					;n\Reload = 200-(100*SelectedDifficulty\aggressiveNPCs)
@@ -5874,9 +5874,9 @@ Function UpdateMTFUnit(n.NPCs)
 					;If EntityDistance(n\Collider,Collider)>HideDistance*0.7
 					;	TeleportMTFGroup(n)
 					;EndIf
-                EndIf
-                
-                If n\State2<=0.0 And n\State2+FPSfactor >0.0 Then
+				EndIf
+				
+				If n\State2<=0.0 And n\State2+FPSfactor >0.0 Then
 					If n\MTFLeader = Null Then
 						DebugLog "targetlost: "+n\State2
 						PlayMTFSound(LoadTempSound("SFX\Character\MTF\Targetlost"+Rand(1,3)+".ogg"),n)
@@ -5888,10 +5888,10 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 					n\State = 0
-                EndIf
-                
+				EndIf
+				
 				;B3D doesn't do short-circuit evaluation, so this retarded nesting is an optimization
-                If Curr173\Idle<2 Then
+				If Curr173\Idle<2 Then
 					SoundVol173# = Max(Min((Distance(EntityX(Curr173\Collider), Curr173\PrevX, EntityZ(Curr173\Collider), Curr173\PrevZ) * 2.5), 1.0), 0.0)
 					If OtherNPCSeesMeNPC(Curr173,n) Lor (SoundVol173#>0.0 And EntityDistanceSquared(n\Collider,Curr173\Collider)<36.0) Then ;6.0
 						If EntityVisible(n\Collider,Curr173\Collider) Lor SoundVol173#>0.0 Then	
@@ -5998,12 +5998,12 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 				Next
-                
+				
 			Case 2 ;searching for/looking at 173
-                
-                If Curr173\Idle = 2 Then
+				
+				If Curr173\Idle = 2 Then
 					n\State = 0
-                Else
+				Else
 					For n2.NPCs = Each NPCs
 						If n2<>n Then
 							If n2\NPCtype = NPCtypeMTF Then
@@ -6127,8 +6127,8 @@ Function UpdateMTFUnit(n.NPCs)
 							EndIf
 						EndIf
 					EndIf
-                EndIf
-                
+				EndIf
+				
 			Case 3 ;following a path
 
 				
@@ -6227,7 +6227,7 @@ Function UpdateMTFUnit(n.NPCs)
 			Case 4 ;SCP-106/049 detected
 
 				n\Speed = 0.03
-                n\State2=n\State2-FPSfactor
+				n\State2=n\State2-FPSfactor
 				If n\State2 > 0.0
 					If OtherNPCSeesMeNPC(n\Target,n)
 						n\State2 = 70*15
@@ -6465,7 +6465,7 @@ Function UpdateMTFUnit(n.NPCs)
 				n\BoneToManipulate = "head"
 				n\ManipulateBone = True
 				n\ManipulationType = 2
-                If n\PathTimer<=0.0 Then ;update path
+				If n\PathTimer<=0.0 Then ;update path
 					If n\MTFLeader<>Null Then ;i'll follow the leader
 						n\PathStatus = FindPath(n,EntityX(n\MTFLeader\Collider,True),EntityY(n\MTFLeader\Collider,True)+0.1,EntityZ(n\MTFLeader\Collider,True)) ;whatever you say boss
 					Else ;i am the leader
@@ -6496,7 +6496,7 @@ Function UpdateMTFUnit(n.NPCs)
 						EndIf
 					EndIf
 					n\PathTimer = 70.0 * Rnd(6.0,10.0) ;search again after 6-10 seconds
-                ElseIf (n\PathTimer<=70.0 * 2.5) And (n\MTFLeader=Null) Then
+				ElseIf (n\PathTimer<=70.0 * 2.5) And (n\MTFLeader=Null) Then
 					n\PathTimer=n\PathTimer-FPSfactor
 					n\CurrSpeed = 0.0
 					;If Rand(1,35)=1 Then
@@ -6505,7 +6505,7 @@ Function UpdateMTFUnit(n.NPCs)
 					FinishWalking(n,488,522,n\Speed*26)
 					n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 					RotateEntity n\obj,-90.0,n\Angle,0.0,True
-                Else
+				Else
 					If n\PathStatus=2 Then
 						n\PathTimer=n\PathTimer-(FPSfactor*2.0) ;timer goes down fast
 						n\CurrSpeed = 0.0
@@ -6550,7 +6550,7 @@ Function UpdateMTFUnit(n.NPCs)
 									n\Path[n\PathLocation]\door\timerstate = 70.0*5.0
 								EndIf
 							EndIf
-                            
+							
 							If (newDist<0.2) Lor ((prevDist<newDist) And (prevDist<1.0)) Then
 								n\PathLocation=n\PathLocation+1
 							EndIf
@@ -6581,7 +6581,7 @@ Function UpdateMTFUnit(n.NPCs)
 						n\Angle = CurveAngle(EntityYaw(n\Collider,True),n\Angle,20.0)
 						RotateEntity n\obj,-90.0,n\Angle,0.0,True
 					EndIf
-                EndIf
+				EndIf
 				
 				If (Not EntityVisible(n\Collider,Curr096\Collider)) Lor EntityDistanceSquared(n\Collider,Curr096\Collider)>36.0 ;6.0
 					n\State = 0

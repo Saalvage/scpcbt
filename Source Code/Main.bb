@@ -1,11 +1,11 @@
 ;SCP - Containment Breach
 
-;    The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
+;	The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
 
-;    The source code is licensed under Creative Commons Attribution-ShareAlike 3.0 License.
-;    http://creativecommons.org/licenses/by-sa/3.0/
+;	The source code is licensed under Creative Commons Attribution-ShareAlike 3.0 License.
+;	http://creativecommons.org/licenses/by-sa/3.0/
 
-;    See Credits.txt for a list of contributors
+;	See Credits.txt for a list of contributors
 
 Global DO_DA_ZONE = 1
 
@@ -32,15 +32,122 @@ Type Loc
 	Field Localized%
 End Type
 
+Type LocalString
+	Field section$
+	Field parameter$
+	Field value$
+End Type
+
 Function UpdateLang(I_Loc.Loc, Lang$)
 	I_Loc\Lang = Lang
 	I_Loc\LangPath = "Localization\" + Lang + "\"
 	I_Loc\Localized = Lang <> "English"
+	For l.LocalString = Each LocalString
+		Delete l
+	Next
+	;These are the strings to be cached in order to allow for better framerates.
+	;Order is important, first created is fastest to access.
+	SetLocalString("Messages", "savecantloc")
+	SetLocalString("Messages", "savecantmom")
+	SetLocalString("Messages", "saved")
+	SetLocalString("Messages", "savepress")
+	SetLocalString("Menu", "paused")
+	SetLocalString("Menu", "difficulty")
+	SetLocalString("Menu", "save")
+	SetLocalString("Menu", "seed")
+	SetLocalString("Menu", "resume")
+	SetLocalString("Menu", "loadgame")
+	SetLocalString("Menu", "ach")
+	SetLocalString("Menu", "options")
+	SetLocalString("Menu", "back")
+	SetLocalString("Menu", "quit")
 End Function
 
 Local I_Loc.Loc = New Loc
 
-UpdateLang(I_Loc.Loc, GetINIString(OptionFile, "options", "pack"))	
+UpdateLang(I_Loc.Loc, GetINIString(OptionFile, "options", "pack"))
+
+Function SetLocalString(Section$, Parameter$)
+	Local l.LocalString = New LocalString
+	l\value = GetLocalString(Section, Parameter) ;need to set the value first, otherwise it is being set to itself
+	l\section = Section
+	l\parameter = Parameter
+End Function
+
+;Returns localized version of a String, if no translation exists, use English
+Function GetLocalString$(Section$, Parameter$)
+
+	;CreateConsoleMsg("OwO")
+
+	For l.LocalString = Each LocalString
+		If l\section = Section And l\parameter = Parameter Then
+			Return l\value
+		EndIf
+	Next
+	
+	;CreateConsoleMsg("YES DADDY" + Section + Parameter)
+	
+	Local I_Loc.Loc = First Loc
+	
+	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
+		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
+		If temp <> "" Then
+			Return temp
+		EndIf
+	EndIf
+	
+	Return GetINIString("Data\local.ini", Section, Parameter)
+	
+End Function
+
+;With Formatting! %s in a String gets replaced
+Function GetLocalStringR$(Section$, Parameter$, Replace$)
+
+	For l.LocalString = Each LocalString
+		If l\section = Section And l\parameter = Parameter Then
+			Return l\value
+		EndIf
+	Next
+
+	Local I_Loc.Loc = First Loc
+
+	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
+		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
+		If temp <> "" Then
+			Return Replace(temp, "%s", Replace)
+		EndIf
+	EndIf
+	
+	Return Replace(GetINIString("Data\local.ini", Section, Parameter), "%s", Replace)
+	
+End Function
+
+Function LoadLocalFont(AA%, Font$, Size%)
+
+	Local I_Loc.Loc = First Loc
+	
+	path$ = I_Loc\LangPath + "GFX\font\"
+	file$ = path + "fonts.ini"
+	
+	If (Not I_Loc\Localized) Lor FileType(file) = 0 Then
+		path = "GFX\font\"
+		file = path + "fonts.ini"
+	EndIf
+	name$ = GetINIString(file, Font, "name")
+	
+	If name = "" Then
+		path = "GFX\font\"
+		file = path + "fonts.ini"
+		name = GetINIString(file, Font, "name")
+	EndIf
+	
+	If AA Then
+		Return AALoadFont(path + name + ".ttf", size, GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
+	Else
+		Return LoadFont_Strict(path + name + ".ttf", size, GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
+	EndIf
+	
+End Function
 
 Include "Source Code\StrictLoads.bb"
 Include "Source Code\KeyName.bb"
@@ -194,13 +301,6 @@ EndIf
 If FileType(I_Loc\LangPath + AchvIni) = 1 Then
 	AchvIni = I_Loc\LangPath + AchvIni
 EndIf
-
-Local I_LocalSaveMSGs.LocalSaveMSGs = New LocalSaveMSGs
-
-I_LocalSaveMSGs\savepress$ = GetLocalString("Messages", "savepress")
-I_LocalSaveMSGs\saved$ = GetLocalString("Messages", "saved")
-I_LocalSaveMSGs\savecantloc$ = GetLocalString("Messages", "savecantloc")
-I_LocalSaveMSGs\savecantmom$ = GetLocalString("Messages", "savecantmom")
 
 Type Cheats 
 	Field GodMode%
@@ -1280,14 +1380,14 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 				If Not (d\IsElevatorDoor>0) Then
 					PlaySound_Strict ButtonSFX2
 					If PlayerRoom\RoomTemplate\Name <> "room2elevator" Then
-                        If d\open Then
-                            Msg = GetLocalString("Messages", "elevnothing")
-                        Else    
-                            Msg = GetLocalString("Messages", "elevlocked")
-                        EndIf    
-                    Else
-                        Msg = GetLocalString("Messages", "elevbroken")
-                    EndIf
+						If d\open Then
+							Msg = GetLocalString("Messages", "elevnothing")
+						Else	
+							Msg = GetLocalString("Messages", "elevlocked")
+						EndIf	
+					Else
+						Msg = GetLocalString("Messages", "elevbroken")
+					EndIf
 					MsgTimer = 70 * 5
 				Else
 					If d\IsElevatorDoor = 1 Then
@@ -1686,14 +1786,14 @@ MainMenuOpen = True
 ;---------------------------------------------------------------------------------------------------
 
 Type MEMORYSTATUS
-    Field dwLength%
-    Field dwMemoryLoad%
-    Field dwTotalPhys%
-    Field dwAvailPhys%
-    Field dwTotalPageFile%
-    Field dwAvailPageFile%
-    Field dwTotalVirtual%
-    Field dwAvailVirtual%
+	Field dwLength%
+	Field dwMemoryLoad%
+	Field dwTotalPhys%
+	Field dwAvailPhys%
+	Field dwTotalPageFile%
+	Field dwAvailPageFile%
+	Field dwTotalVirtual%
+	Field dwAvailVirtual%
 End Type
 
 Global m.MEMORYSTATUS = New MEMORYSTATUS
@@ -1721,16 +1821,8 @@ End Type
 
 Local I_427.SCP427 = New SCP427
 
-; This is necessary to avoid lags when looking at monitors
-Type LocalSaveMSGs
-	Field savepress$
-	Field saved$
-	Field savecantloc$
-	Field savecantmom
-End Type
-
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
-;----------------------------------------------       		MAIN LOOP                 ---------------------------------------------------------------
+; MAIN LOOP
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
 Repeat
@@ -1747,7 +1839,7 @@ Repeat
 	If MenuOpen Lor InvOpen Lor OtherOpen<>Null Lor ConsoleOpen Lor SelectedDoor <> Null Lor SelectedScreen <> Null Lor Using294 Then FPSfactor = 0
 	
 	If Framelimit > 0 Then
-	    ;Framelimit
+		;Framelimit
 		Local WaitingTime% = (1000.0 / Framelimit) - (MilliSecs() - LoopDelay)
 		Delay WaitingTime%
 		
@@ -2101,10 +2193,10 @@ Repeat
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ = "room173" Lor RN$ = "gatea" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale)
-					Msg = I_LocalSaveMSGs\savecantloc
+					Msg = GetLocalString("Messages", "savecantloc")
 					MsgTimer = 70 * 4
 				ElseIf (Not CanSave) Lor QuickLoad_CurrEvent <> Null
-					Msg = I_LocalSaveMSGs\savecantmom
+					Msg = GetLocalString("Messages", "savecantmom")
 					MsgTimer = 70 * 4
 					If QuickLoad_CurrEvent <> Null Then
 						Msg = Msg + " " + GetLocalString("Messages", "saveload")
@@ -2119,10 +2211,10 @@ Repeat
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
 					If RN$ = "room173" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale) Lor RN$ = "gatea"
-						Msg = I_LocalSaveMSGs\savecantloc
+						Msg = GetLocalString("Messages", "savecantloc")
 						MsgTimer = 70 * 4
 					ElseIf (Not CanSave) Lor QuickLoad_CurrEvent <> Null
-						Msg = I_LocalSaveMSGs\savecantmom
+						Msg = GetLocalString("Messages", "savecantmom")
 						MsgTimer = 70 * 4
 						If QuickLoad_CurrEvent <> Null Then
 							Msg = Msg + " " + GetLocalString("Messages", "saveload")
@@ -2141,8 +2233,8 @@ Repeat
 				MsgTimer = 70 * 4
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Lor SelectedMonitor<>Null)
-			If (Msg<>I_LocalSaveMSGs\saved And Msg<>I_LocalSaveMSGs\savecantloc And Msg<>I_LocalSaveMSGs\savecantmom) Lor MsgTimer<=0 Then
-				Msg = Replace(I_LocalSaveMSGs\savepress, "%s", KeyName(KEY_SAVE))
+			If (Msg<>GetLocalString("Messages", "saved") And Msg<>GetLocalString("Messages", "savecantloc") And Msg<>GetLocalString("Messages", "savecantmom")) Lor MsgTimer<=0 Then
+				Msg = Replace(GetLocalString("Messages", "savepress"), "%s", KeyName(KEY_SAVE))
 				MsgTimer = 70*4
 			EndIf
 			
@@ -2233,10 +2325,10 @@ Repeat
 		If (RealGraphicWidth<>GraphicWidth) Lor (RealGraphicHeight<>GraphicHeight) Then
 			SetBuffer TextureBuffer(fresize_texture)
 			ClsColor 0,0,0 : Cls
-			CopyRect 0,0,GraphicWidth,GraphicHeight,1024-GraphicWidth/2,1024-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+			CopyRect 0,0,GraphicWidth,GraphicHeight,2048-GraphicWidth/2,2048-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 			SetBuffer BackBuffer()
 			ClsColor 0,0,0 : Cls
-			ScaleRender(0,0,2050.0 / Float(GraphicWidth) * AspectRatioRatio, 2050.0 / Float(GraphicWidth) * AspectRatioRatio)
+			ScaleRender(0,0,4096.0 / Float(GraphicWidth) * AspectRatioRatio, 4096.0 / Float(GraphicWidth) * AspectRatioRatio)
 			;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
 			;everyone uses landscape so it's probably a non-issue
 		EndIf
@@ -2245,19 +2337,19 @@ Repeat
 	;not by any means a perfect solution
 	;Not even proper gamma correction but it's a nice looking alternative that works in windowed mode
 	If ScreenGamma>1.0 Then
-		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,2048-RealGraphicWidth/2,2048-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 		EntityBlend fresize_image,1
 		ClsColor 0,0,0 : Cls
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
 		EntityFX fresize_image,1+32
 		EntityBlend fresize_image,3
 		EntityAlpha fresize_image,ScreenGamma-1.0
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
 	ElseIf ScreenGamma<1.0 Then
-		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,2048-RealGraphicWidth/2,2048-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 		EntityBlend fresize_image,1
 		ClsColor 0,0,0 : Cls
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
 		EntityFX fresize_image,1+32
 		EntityBlend fresize_image,2
 		EntityAlpha fresize_image,1.0
@@ -2265,7 +2357,7 @@ Repeat
 		ClsColor 255*ScreenGamma,255*ScreenGamma,255*ScreenGamma
 		Cls
 		SetBuffer BackBuffer()
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
 		SetBuffer(TextureBuffer(fresize_texture2))
 		ClsColor 0,0,0
 		Cls
@@ -2653,7 +2745,7 @@ Function DrawEnding()
 		If EndingTimer > -700 Then 
 			
 			;-200 -> -700
-			;Max(50 - (Abs(KillTimer)-200),0)    =    0->50
+			;Max(50 - (Abs(KillTimer)-200),0)	=	0->50
 			If Rand(1,150)<Min((Abs(EndingTimer)-200),155) Then
 				DrawImage EndingScreen, GraphicWidth/2-400, GraphicHeight/2-400
 			Else
@@ -2797,13 +2889,13 @@ Function InitCredits()
 End Function
 
 Function DrawCredits()
-    Local credits_Y# = (EndingTimer+2000)/2+(GraphicHeight+10)
-    Local cl.CreditsLine
-    Local id%
-    Local endlinesamount%
+	Local credits_Y# = (EndingTimer+2000)/2+(GraphicHeight+10)
+	Local cl.CreditsLine
+	Local id%
+	Local endlinesamount%
 	Local LastCreditLine.CreditsLine
 	
-    Cls
+	Cls
 	
 	If Rand(1,300)>1
 		DrawImage CreditsScreen, GraphicWidth/2-400, GraphicHeight/2-400
@@ -2878,16 +2970,16 @@ Function DrawCredits()
 		FreeImage EndingScreen
 		EndingScreen = 0
 		Delete Each CreditsLine
-        NullGame(False)
-        StopStream_Strict(MusicCHN)
-        ShouldPlay = 21
-        MenuOpen = False
-        MainMenuOpen = True
-        MainMenuTab = 0
-        CurrSave = ""
-        FlushKeys()
+		NullGame(False)
+		StopStream_Strict(MusicCHN)
+		ShouldPlay = 21
+		MenuOpen = False
+		MainMenuOpen = True
+		MainMenuTab = 0
+		CurrSave = ""
+		FlushKeys()
 	EndIf
-    
+	
 End Function
 
 
@@ -2923,10 +3015,10 @@ Function MovePlayer()
 	EndIf
 	
 	If CurrSpeed > 0 Then
-        Stamina = Min(Stamina + 0.15 * FPSfactor/1.25, 100.0)
-    Else
-        Stamina = Min(Stamina + 0.15 * FPSfactor*1.25, 100.0)
-    EndIf
+		Stamina = Min(Stamina + 0.15 * FPSfactor/1.25, 100.0)
+	Else
+		Stamina = Min(Stamina + 0.15 * FPSfactor*1.25, 100.0)
+	EndIf
 	
 	If StaminaEffectTimer > 0 Then
 		StaminaEffectTimer = StaminaEffectTimer - (FPSfactor/70)
@@ -3272,7 +3364,7 @@ Function MouseLook()
 		If Int(EntityX(Collider))=Int(Nan1) Then
 			
 			PositionEntity Collider, EntityX(Camera, True), EntityY(Camera, True) - 0.5, EntityZ(Camera, True), True
-			Msg = "EntityX(Collider) = NaN, RESETTING COORDINATES    -    New coordinates: "+EntityX(Collider)
+			Msg = "EntityX(Collider) = NaN, RESETTING COORDINATES	-	New coordinates: "+EntityX(Collider)
 			MsgTimer = 300				
 		EndIf
 		;EndIf
@@ -3293,12 +3385,12 @@ Function MouseLook()
 		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, (6.0 / (MouseSens + 1.0))*MouseSmooth) 
 		If Int(mouse_x_speed_1) = Int(Nan1) Then mouse_x_speed_1 = 0
 		If PrevFPSFactor>0 Then
-            If Abs(FPSfactor/PrevFPSFactor-1.0)>1.0 Then
-                ;lag spike detected - stop all camera movement
-                mouse_x_speed_1 = 0.0
-                mouse_y_speed_1 = 0.0
-            EndIf
-        EndIf
+			If Abs(FPSfactor/PrevFPSFactor-1.0)>1.0 Then
+				;lag spike detected - stop all camera movement
+				mouse_x_speed_1 = 0.0
+				mouse_y_speed_1 = 0.0
+			EndIf
+		EndIf
 		If InvertMouse Then
 			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
 		Else
@@ -3710,7 +3802,7 @@ Function DrawGUI()
 			Next
 			AAText x - 50, 280, "Room coordinates: (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"
 			AAText x - 50, 300, "Stamina: " + f2s(Stamina, 3)
-			AAText x - 50, 320, "Death timer: " + f2s(KillTimer, 3)               
+			AAText x - 50, 320, "Death timer: " + f2s(KillTimer, 3)			   
 			AAText x - 50, 340, "Blink timer: " + f2s(BlinkTimer, 3)
 			AAText x - 50, 360, "Injuries: " + Injuries
 			AAText x - 50, 380, "Bloodloss: " + Bloodloss
@@ -4974,13 +5066,13 @@ Function DrawGUI()
 							Select Int(SelectedItem\state2)
 								Case 0 ;randomkanava
 									ResumeChannel(RadioCHN(0))
-									strtemp = "        USER TRACK PLAYER - "
+									strtemp = "		USER TRACK PLAYER - "
 									If (Not EnableUserTracks)
 										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
-										strtemp = strtemp + "NOT ENABLED     "
+										strtemp = strtemp + "NOT ENABLED	 "
 									ElseIf UserTrackMusicAmount<1
 										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
-										strtemp = strtemp + "NO TRACKS FOUND     "
+										strtemp = strtemp + "NO TRACKS FOUND	 "
 									Else
 										If (Not ChannelPlaying(RadioCHN(0)))
 											If (Not UserTrackFlag%)
@@ -5001,7 +5093,7 @@ Function DrawGUI()
 											DebugLog "CurrTrack: "+RadioState(0)
 											DebugLog UserTrackName$(RadioState(0))
 										Else
-											strtemp = strtemp + Upper(UserTrackName$(RadioState(0))) + "          "
+											strtemp = strtemp + Upper(UserTrackName$(RadioState(0))) + "		  "
 											UserTrackFlag = False
 										EndIf
 										
@@ -5030,7 +5122,7 @@ Function DrawGUI()
 									DebugLog RadioState(1) 
 									
 									ResumeChannel(RadioCHN(1))
-									strtemp = "        WARNING - CONTAINMENT BREACH          "
+									strtemp = "		WARNING - CONTAINMENT BREACH		  "
 									If ChannelPlaying(RadioCHN(1)) = False Then
 										
 										If RadioState(1) => 5 Then
@@ -5045,7 +5137,7 @@ Function DrawGUI()
 									
 								Case 2 ;scp-radio
 									ResumeChannel(RadioCHN(2))
-									strtemp = "        SCP Foundation On-Site Radio          "
+									strtemp = "		SCP Foundation On-Site Radio		  "
 									If ChannelPlaying(RadioCHN(2)) = False Then
 										RadioState(2)=RadioState(2)+1
 										If RadioState(2) = 17 Then RadioState(2) = 1
@@ -5057,7 +5149,7 @@ Function DrawGUI()
 									EndIf 
 								Case 3
 									ResumeChannel(RadioCHN(3))
-									strtemp = "             EMERGENCY CHANNEL - RESERVED FOR COMMUNICATION IN THE EVENT OF A CONTAINMENT BREACH         "
+									strtemp = "			 EMERGENCY CHANNEL - RESERVED FOR COMMUNICATION IN THE EVENT OF A CONTAINMENT BREACH		 "
 									If ChannelPlaying(RadioCHN(3)) = False Then RadioCHN(3) = PlaySound_Strict(RadioStatic)
 									
 									If MTFtimer > 0 Then 
@@ -5954,8 +6046,8 @@ Function DrawMenu()
 			MenuOpen = True
 			PauseSounds()
 		EndIf
-        Delay 1000 ;Reduce the CPU take while game is not in focus
-    EndIf
+		Delay 1000 ;Reduce the CPU take while game is not in focus
+	EndIf
 	If MenuOpen Then
 		
 		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
@@ -8055,18 +8147,18 @@ Function KillSounds()
 End Function
 
 Function GetStepSound(entity%)
-    Local picker%,brush%,texture%,name$
-    Local mat.Materials
-    
-    picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
-    If picker <> 0 Then
-        If GetEntityType(picker) <> HIT_MAP Then Return 0
-        brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
-        If brush <> 0 Then
-            texture = GetBrushTexture(brush,3)
-            If texture <> 0 Then
-                name = StripPath(TextureName(texture))
-                If (name <> "") Then FreeTexture(texture)
+	Local picker%,brush%,texture%,name$
+	Local mat.Materials
+	
+	picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
+	If picker <> 0 Then
+		If GetEntityType(picker) <> HIT_MAP Then Return 0
+		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
+		If brush <> 0 Then
+			texture = GetBrushTexture(brush,3)
+			If texture <> 0 Then
+				name = StripPath(TextureName(texture))
+				If (name <> "") Then FreeTexture(texture)
 				For mat.Materials = Each Materials
 					If mat\name = name Then
 						If mat\StepSound > 0 Then
@@ -8075,7 +8167,7 @@ Function GetStepSound(entity%)
 						EndIf
 						Exit
 					EndIf
-				Next                
+				Next				
 			EndIf
 			texture = GetBrushTexture(brush,2)
 			If texture <> 0 Then
@@ -8089,7 +8181,7 @@ Function GetStepSound(entity%)
 						EndIf
 						Exit
 					EndIf
-				Next                
+				Next				
 			EndIf
 			texture = GetBrushTexture(brush,1)
 			If texture <> 0 Then
@@ -8103,12 +8195,12 @@ Function GetStepSound(entity%)
 						EndIf
 						Exit
 					EndIf
-				Next                
+				Next				
 			EndIf
 		EndIf
 	EndIf
-    
-    Return 0
+	
+	Return 0
 End Function
 
 Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
@@ -8837,8 +8929,8 @@ Function CircleToLineSegIsect% (cx#, cy#, r#, l1x#, l1y#, l2x#, l2y#)
 	
 	;Palauttaa:
 	;  True (1) kun:
-	;      Ympyrä [keskipiste = (cx, cy): säde = r]
-	;      leikkaa janan, joka kulkee pisteiden (l1x, l1y) & (l2x, l2y) kaitta
+	;	  Ympyrä [keskipiste = (cx, cy): säde = r]
+	;	  leikkaa janan, joka kulkee pisteiden (l1x, l1y) & (l2x, l2y) kaitta
 	;  False (0) muulloin
 	
 	;Ympyrän keskipisteen ja (ainakin toisen) janan päätepisteen etäisyys < r
@@ -9316,65 +9408,6 @@ Function INI_CreateKey%(INI_lFileHandle%, INI_sKey$, INI_sValue$)
 	
 End Function
 
-;Returns localized version of a String, if no translation exists, use English
-Function GetLocalString$(Section$, Parameter$)
-
-	Local I_Loc.Loc = First Loc
-	
-	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
-		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
-		If temp <> "" Then
-			Return temp
-		EndIf
-	EndIf
-	
-	Return GetINIString("Data\local.ini", Section, Parameter)
-	
-End Function
-
-;With Formatting! %s in a String gets replaced
-Function GetLocalStringR$(Section$, Parameter$, Replace$)
-
-	Local I_Loc.Loc = First Loc
-
-	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
-		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
-		If temp <> "" Then
-			Return Replace(temp, "%s", Replace)
-		EndIf
-	EndIf
-	
-	Return Replace(GetINIString("Data\local.ini", Section, Parameter), "%s", Replace)
-	
-End Function
-
-Function LoadLocalFont(AA%, Font$, Size%)
-
-	Local I_Loc.Loc = First Loc
-	
-	path$ = I_Loc\LangPath + "GFX\font\"
-	file$ = path + "fonts.ini"
-	
-	If (Not I_Loc\Localized) Lor FileType(file) = 0 Then
-		path = "GFX\font\"
-		file = path + "fonts.ini"
-	EndIf
-	name$ = GetINIString(file, Font, "name")
-	
-	If name = "" Then
-		path = "GFX\font\"
-		file = path + "fonts.ini"
-		name = GetINIString(file, Font, "name")
-	EndIf
-	
-	If AA Then
-		Return AALoadFont(path + name + ".ttf", size, GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
-	Else
-		Return LoadFont_Strict(path + name + ".ttf", size, GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
-	EndIf
-	
-End Function
-
 Function GetFileAmount(ReadDir$, OnlyFolders%=False)
 	Local Amount% = 0
 	Local Dir% = ReadDir(ReadDir)
@@ -9550,19 +9583,19 @@ Function Graphics3DExt%(width%,height%,depth%=32,mode%=2)
 End Function
 
 Function ResizeImage2(image%,width%,height%)
-    img% = CreateImage(width,height)
+	img% = CreateImage(width,height)
 	
 	oldWidth% = ImageWidth(image)
 	oldHeight% = ImageHeight(image)
-	CopyRect 0,0,oldWidth,oldHeight,1024-oldWidth/2,1024-oldHeight/2,ImageBuffer(image),TextureBuffer(fresize_texture)
+	CopyRect 0,0,oldWidth,oldHeight,2048-oldWidth/2,2048-oldHeight/2,ImageBuffer(image),TextureBuffer(fresize_texture)
 	SetBuffer BackBuffer()
-	ScaleRender(0,0,2048.0 / Float(RealGraphicWidth) * Float(width) / Float(oldWidth), 2048.0 / Float(RealGraphicWidth) * Float(height) / Float(oldHeight))
+	ScaleRender(0,0,4096.0 / Float(RealGraphicWidth) * Float(width) / Float(oldWidth), 4096.0 / Float(RealGraphicWidth) * Float(height) / Float(oldHeight))
 	;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
 	;everyone uses landscape so it's probably a non-issue
 	CopyRect RealGraphicWidth/2-width/2,RealGraphicHeight/2-height/2,width,height,0,0,BackBuffer(),ImageBuffer(img)
 	
-    FreeImage image
-    Return img
+	FreeImage image
+	Return img
 End Function
 
 
@@ -9747,7 +9780,7 @@ Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
 End Function
 
 Function InitFastResize()
-    ;Create Camera
+	;Create Camera
 	Local cam% = CreateCamera()
 	CameraProjMode cam, 2
 	CameraZoom cam, 0.1
@@ -9757,10 +9790,10 @@ Function InitFastResize()
 	
 	fresize_cam = cam
 	
-    ;ark_sw = GraphicsWidth()
-    ;ark_sh = GraphicsHeight()
+	;ark_sw = GraphicsWidth()
+	;ark_sh = GraphicsHeight()
 	
-    ;Create sprite
+	;Create sprite
 	Local spr% = CreateMesh(cam)
 	Local sf% = CreateSurface(spr)
 	AddVertex sf, -1, 1, 0, 0, 0
@@ -9776,7 +9809,7 @@ Function InitFastResize()
 	EntityBlend spr, 1
 	fresize_image = spr
 	
-    ;Create texture
+	;Create texture
 	fresize_texture = CreateTexture(4096, 4096, 1+256)
 	fresize_texture2 = CreateTexture(4096, 4096, 1+256)
 	TextureBlend fresize_texture2,3
@@ -9978,15 +10011,15 @@ Function ScaledMouseY%()
 End Function
 
 Function CatchErrors(location$)
-    Local e.Events
-    Local errtxt$
-    errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
-    errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
-    errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
-    errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
-    errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
-    errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
-    errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
+	Local e.Events
+	Local errtxt$
+	errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
+	errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
+	errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
+	errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
+	errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
+	errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
+	errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
 	If PlayerRoom <> Null Then
 		errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
 		
@@ -9997,8 +10030,8 @@ Function CatchErrors(location$)
 			EndIf
 		Next
 	EndIf
-    errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
-    ErrorMessage errtxt
+	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
+	ErrorMessage errtxt
 End Function
 
 Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)

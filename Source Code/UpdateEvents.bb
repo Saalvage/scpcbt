@@ -226,10 +226,10 @@ Function UpdateEvents()
 											BlinkTimer = -10
 											PlaySound2 (StoneDragSFX, Camera, Curr173\Collider)
 											If EntityDistanceSquared(Curr173\Collider,Collider)<6.25 And Abs(EntityY(Collider)-EntityY(Curr173\Collider))<1.0 Then ;2.5
-                                                PositionEntity Curr173\Collider, EntityX(Collider),EntityY(Collider),EntityZ(Collider)
-                                            Else
-                                                PositionEntity Curr173\Collider, 0,0,0
-                                            EndIf
+												PositionEntity Curr173\Collider, EntityX(Collider),EntityY(Collider),EntityZ(Collider)
+											Else
+												PositionEntity Curr173\Collider, 0,0,0
+											EndIf
 											ResetEntity Curr173\Collider
 											Msg = GetLocalStringR("Messages", "holdrun", KeyName(KEY_SPRINT))
 											MsgTimer = 70*8
@@ -649,11 +649,11 @@ Function UpdateEvents()
 							EndIf
 							
 							If e\room\NPC[11] <> Null Then
-							    If EntityX(e\room\NPC[11]\Collider)>EntityX(e\room\obj,True)-1200.0*RoomScale Then
-							        e\room\NPC[11]\State = 0
+								If EntityX(e\room\NPC[11]\Collider)>EntityX(e\room\obj,True)-1200.0*RoomScale Then
+									e\room\NPC[11]\State = 0
 									RemoveNPC(e\room\NPC[11])
-							    EndIf
-						    EndIf
+								EndIf
+							EndIf
 							
 							e\room\NPC[5]\SoundChn = LoopSound2(e\room\NPC[5]\Sound,e\room\NPC[5]\SoundChn,Camera,e\room\NPC[5]\obj,2,0.5)
 							
@@ -952,7 +952,7 @@ Function UpdateEvents()
 								e\room\NPC[10] = CreateNPC(NPCtypeGuard, e\room\x-4200.0*RoomScale, 1.0, e\room\z-3900.0*RoomScale)
 								e\room\NPC[10]\State = 7
 								e\room\NPC[11] = CreateNPC(NPCtypeVehicle, EntityX(e\room\Objects[11], True), EntityY(e\room\Objects[11], True), EntityZ(e\room\Objects[11], True))
-                                e\room\NPC[11]\State = 0
+								e\room\NPC[11]\State = 0
 								
 								For i = 8 To 11
 									PositionEntity pvt,EntityX(e\room\NPC[i]\Collider),EntityY(e\room\NPC[i]\Collider),EntityZ(e\room\NPC[i]\Collider)
@@ -1385,7 +1385,7 @@ Function UpdateEvents()
 						CameraRange(Camera, 0.05, 40)
 					EndIf	
 					CameraFogMode(Camera, 0)
-	 	            AmbientLight (140, 140, 140)
+	 				AmbientLight (140, 140, 140)
 	   				HideEntity(Fog)
 					
 					LightVolume = 4.0
@@ -3927,7 +3927,7 @@ Function UpdateEvents()
 							Curr106\Idle = True
 							PositionEntity(Curr106\Collider, EntityX(e\room\Objects[0], True), EntityY(Collider) - 0.15, EntityZ(e\room\Objects[0], True))
 							PointEntity(Curr106\Collider, e\room\Objects[1])
-							;200-250     (- 150)      50-100
+							;200-250	 (- 150)	  50-100
 							MoveEntity(Curr106\Collider, 0, 0, EntityDistance(e\room\Objects[0], e\room\Objects[1]) * ((e\EventState-150.0) / 100.0))
 							AnimateNPC(Curr106, 284, 333, 0.02*35)
 						EndIf
@@ -3960,29 +3960,29 @@ Function UpdateEvents()
 				EndIf
 
 			Case "room2pit106"
-                
-                If (Not Contained106) And Curr106\State>0 Then 
-                    If e\EventState = 0 Then
-                        If PlayerRoom = e\room Then e\EventState = 1
-                    Else
-                        e\EventState = e\EventState + 1
-                        PositionEntity(Curr106\Collider, EntityX(e\room\Objects[7], True), EntityY(e\room\Objects[7], True), EntityZ(e\room\Objects[7], True))
-                        ResetEntity(Curr106\Collider)
-                        
-                        PointEntity(Curr106\Collider, Camera)
-                        TurnEntity(Curr106\Collider, 0, Sin(MilliSecs() / 20) * 6.0, 0, True)
-                        MoveEntity(Curr106\Collider, 0, 0, Sin(MilliSecs() / 15) * 0.06)
-                        PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
-                        
-                        RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
-                        Curr106\Idle = True
-                        AnimateNPC(Curr106, 334, 494, 0.3)
-                        If e\EventState > 800 Then
-                            If BlinkTimer < - 5 Then Curr106\Idle = False : RemoveEvent(e)
-                        EndIf
-                    EndIf
-                EndIf
-                
+				
+				If (Not Contained106) And Curr106\State>0 Then 
+					If e\EventState = 0 Then
+						If PlayerRoom = e\room Then e\EventState = 1
+					Else
+						e\EventState = e\EventState + 1
+						PositionEntity(Curr106\Collider, EntityX(e\room\Objects[7], True), EntityY(e\room\Objects[7], True), EntityZ(e\room\Objects[7], True))
+						ResetEntity(Curr106\Collider)
+						
+						PointEntity(Curr106\Collider, Camera)
+						TurnEntity(Curr106\Collider, 0, Sin(MilliSecs() / 20) * 6.0, 0, True)
+						MoveEntity(Curr106\Collider, 0, 0, Sin(MilliSecs() / 15) * 0.06)
+						PositionEntity(Curr106\obj, EntityX(Curr106\Collider), EntityY(Curr106\Collider) - 0.15, EntityZ(Curr106\Collider))
+						
+						RotateEntity Curr106\obj, 0, EntityYaw(Curr106\Collider), 0
+						Curr106\Idle = True
+						AnimateNPC(Curr106, 334, 494, 0.3)
+						If e\EventState > 800 Then
+							If BlinkTimer < - 5 Then Curr106\Idle = False : RemoveEvent(e)
+						EndIf
+					EndIf
+				EndIf
+				
 			Case "room2pit"
 
 				If Curr173\Idle = 0 Then 
@@ -7391,8 +7391,7 @@ Function UpdateEvents()
 				
 				If e\room\Objects[0]=0 Then
 					If PlayerRoom<>e\room And BlinkTimer<-10 Then
-						dist = Distance(EntityX(Collider), EntityX(e\room\obj), EntityZ(Collider), EntityZ(e\room\obj))
-						If (dist<16.0) Then
+						If (DistanceSquared(EntityX(Collider), EntityX(e\room\obj), EntityZ(Collider), EntityZ(e\room\obj))<256.0) Then ;16
 							For e2.Events = Each Events
 								If e2\EventName = e\EventName Then
 									If e2\room <> e\room Then
@@ -7432,8 +7431,10 @@ Function UpdateEvents()
 							If (prevFrame <= 400.0 And AnimTime(e\room\Objects[0])>400.0) Then
 								e\SoundCHN = PlaySound_Strict(e\Sound)
 							EndIf
-							
-							Local volume# = Max(1.0 - Abs(prevFrame - 600.0)/100.0, 0.0)
+							dist = Clamp((EntityDistanceSquared(e\room\Objects[0], Collider)-9)/25, 0, 1) ;3 is full audio distance, 5 is distance after full in which it fades
+							ChannelVolume(e\SoundCHN, 1 - dist)
+							Local volume# = Max(1.0 - (Abs(prevFrame - 600.0)/100.0) - (dist/2), 0.0)
+							CreateConsoleMsg(dist)
 							
 							BlurTimer = volume*1000.0
 							CameraShake = volume*10.0
@@ -8497,16 +8498,16 @@ Function UpdateEvents()
 				EndIf
 
 			Case "room2shaft"
-                
-                If e\EventState = 0 Then
-                    e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True)+0.5, EntityZ(e\room\Objects[1],True))
-                    RotateEntity e\room\NPC[0]\Collider, 0, e\room\angle+180,0, True
+				
+				If e\EventState = 0 Then
+					e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True)+0.5, EntityZ(e\room\Objects[1],True))
+					RotateEntity e\room\NPC[0]\Collider, 0, e\room\angle+180,0, True
 					
-                    SetNPCFrame (e\room\NPC[0], 286)
-                    e\room\NPC[0]\State = 8
-                    
-                    e\EventState = 1
-                EndIf
+					SetNPCFrame (e\room\NPC[0], 286)
+					e\room\NPC[0]\State = 8
+					
+					e\EventState = 1
+				EndIf
 				
 				If PlayerRoom=e\room Then
 					UpdateButton(e\room\Objects[2])
@@ -8517,7 +8518,7 @@ Function UpdateEvents()
 						MouseHit1=0
 					EndIf
 				EndIf
-                
+				
 			Case "room1lifts"
 
 				If PlayerRoom=e\room Then
@@ -9150,7 +9151,7 @@ Function UpdateEndings()
 									EndIf
 								Else
 									If SelectedEnding = "" Then
-									    ShouldPlay = 66
+										ShouldPlay = 66
 										
 										StopStream_Strict(e\SoundCHN)
 										StopStream_Strict(e\SoundCHN2)

@@ -6,7 +6,8 @@
 	- Made FOV also internally an integer, fixing an issue with the sliders allowing for float values.
 - Added support for resolutions of up to 4k.
 - Added anisotropic filtering.
-- Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague/Graviter Aegrota Anthropophagia Febris" (SCP-008).
+- Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
+	- Also overhauled the design of its pages.
 - Added vehicle in the intro sequence (Made by Ultimate Edition Team).
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
@@ -79,6 +80,7 @@ Bug Fixes:
 	- Fixed SCP-106's eyes glowing in the dark and flying in midair while he is emerging.
 	- Fixed SCP-173's head poking out of its box when recontained by the MTF.
 	- Fixed SCP-1025's appendicitis messages not showing up.
+	- Fixed SCP-1074-A's scream being able to be heard anywhere.
 	- Fixed godmode not protecting against all injuries.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
@@ -179,67 +181,67 @@ v1.3.10
 - Removed SCP-178.
 
 - Updated the Map Creator (version 2.1)
-    - Added an option to enable/disable adjacent door spawning in the 3d viewer.
-    - Revamped the design for the 2d grid a bit.
-    - You can now select a room in the 3D view which will automaticly select that room in the 2D grid.
-    - New map format called ".cbmap2" which includes
+	- Added an option to enable/disable adjacent door spawning in the 3d viewer.
+	- Revamped the design for the 2d grid a bit.
+	- You can now select a room in the 3D view which will automaticly select that room in the 2D grid.
+	- New map format called ".cbmap2" which includes
 	- The ability to scale each zone (by adjusting the checkpoint lines for them).
 	- The ability to write the author's name and description of the map.
 	- The ability to make custom forest and maintenance tunnel layouts.
 	- The room amount that gets displayed when hovering over the "Load" button for selecting the map.
-    - Fixed a bug that caused the event chance to be 0% when you select an event of a room while "Set the event for the rooms by default" is disabled.
-    - Fixed a little visual glitch in which the selected room stats showed an empty event and the event chance when you moved the slider.
-    - Swapped the "Open map" and "Save map" texts when opening/saving a map (they were incorrectly named).
+	- Fixed a bug that caused the event chance to be 0% when you select an event of a room while "Set the event for the rooms by default" is disabled.
+	- Fixed a little visual glitch in which the selected room stats showed an empty event and the event chance when you moved the slider.
+	- Swapped the "Open map" and "Save map" texts when opening/saving a map (they were incorrectly named).
 
 Bug fixes:
-    - Fixed the tesla gate electric sprite freezing after death.
-    - Fixed an exploit that caused the blinking sprite to be rendered invisible after alt-tabbing the game.
-    - The inventory cannot be opened while the SCP-008 zombie cutscene plays.
-    - Removed the "room2doors" event from events.ini as the actual event used in the game is called "room2doors173"
-    - The keycard slot level for the archive rooms will now be saved instead of being generated newly each time.
-    - The "Battery low" text won't overlap with the "Scanning" text while wearing the blue night vision goggles anymore.
-    - The event where SCP-173 appears when entering the tunnel room won't pause anymore if you enter it and then leave the room afterwards.
-    - SCP-173 won't appear in the tunnel room when being contained.
-    - Gate A won't go any higher anymore if you quick-loaded the game.
-    - Fixed the player's rotation when the elevator arrives at Gate A.
-    - The ending screen won't appear anymore when you go to Gate A or B, load the game and die afterwards.
-    - SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
-    - The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
-    - The player cannot fly in the SCP-1499 dimension anymore.
-    - Fixed SCP-1499's dimension buildings spawning inside the facility.
-    - The progress bar of the first aid kit won't stay at it's current value if the item has been deselected.
-    - The inventory and the main menu cannot be opened anymore while using SCP-294.
-    - The camera won't turn rapidly anymore when leaving SCP-294.
-    - The maximum amount of achievements displayed at the ending screen is now correct.
-    - The correct damage sounds will now be played when the player gets attacked by the SCP-035 tentacles.
-    - The Debug HUD won't be enabled anymore if you start a new game after you have quit a game where it has been activated before.
-    - SCP-096 cannot spawn anymore if the room2servers event hasn't been triggered.
-    - Fixed the buttghost event having a chance not to spawn.
-    - Fixed SCP-008's container door not being saved.
-    - Fixed a bug when after reloading the save file SCP-173 was able to kill you when he was behind a door.
-    - Fixed MTF units getting stuck when they wanted to kill SCP-008 instances or SCP-049-2 instances but another MTF killed it.
-    - Fixed SCP-049-2 zombies damage range.
-    - Fixed the tunnel106 event.
-    - Fixed a bug that caused the camera screens not be able to be used for saving on euclid difficulty.
-    - The femur breaker can't be pressed anymore if the sound transmission is off.
-    - The navigator now works properly with custom maps.
-    - The intercom transmission from SCP-106's chamber won't play anymore if the player is in the SCP-1499 dimension, Pocket Dimension or the forest.
-    - Fixed the monitor in SCP-106's chamber being off after reloading the save file.
-    - Fixed the MTF gasmask sound.
-    - Fixed SCP-1048's room3pit event causing a Blitz3D error after loading a save file.
-    - Fixed the messages for the intro in your cell (all 3 of them are now displayed properly).
-    - SCP-714's wearing variable will now be saved by the game.
-    - Fixed a lot of memory leaks occuring at Gate A and B whenever you quickloaded the game after entering those.
-    - A lot of fixes related to SCP-106 not appearing in Pocket Dimension.
-    - The remote door control, secondary light and sound transmission won't stay the same when you quit a game to the menu and started a new one.
-    - Fixed a bug that caused the player to die when getting captured by SCP-106 in room3storage.
-    - Fixed the timer after which SCP-106 should appear when player leaves the Pocket Dimension.
-    - Added door collisions for a few doors when they are closing, which prevents the player from being able to go through them while the player shouldn't do it.
-    - Attempt to fix a bug where the player has the ability to fall through the map after reloading a save file.
-    - Attempt to fix SCP-096's ability to get stuck while running towards the player.
-    - Attempt to fix the clerk not dying at the tesla gate.
-    - Attempt to fix door objects appearing in the center of the rooms.
-    - The game was patched with the 4GB patch, which should prevent the game from lagging and crashing in most cases.
+	- Fixed the tesla gate electric sprite freezing after death.
+	- Fixed an exploit that caused the blinking sprite to be rendered invisible after alt-tabbing the game.
+	- The inventory cannot be opened while the SCP-008 zombie cutscene plays.
+	- Removed the "room2doors" event from events.ini as the actual event used in the game is called "room2doors173"
+	- The keycard slot level for the archive rooms will now be saved instead of being generated newly each time.
+	- The "Battery low" text won't overlap with the "Scanning" text while wearing the blue night vision goggles anymore.
+	- The event where SCP-173 appears when entering the tunnel room won't pause anymore if you enter it and then leave the room afterwards.
+	- SCP-173 won't appear in the tunnel room when being contained.
+	- Gate A won't go any higher anymore if you quick-loaded the game.
+	- Fixed the player's rotation when the elevator arrives at Gate A.
+	- The ending screen won't appear anymore when you go to Gate A or B, load the game and die afterwards.
+	- SCP-106 won't disappear from Gate A anymore if you use SCP-1499.
+	- The SCP-1499 dimension won't lag anymore if you saved in it and load the save file from the main menu.
+	- The player cannot fly in the SCP-1499 dimension anymore.
+	- Fixed SCP-1499's dimension buildings spawning inside the facility.
+	- The progress bar of the first aid kit won't stay at it's current value if the item has been deselected.
+	- The inventory and the main menu cannot be opened anymore while using SCP-294.
+	- The camera won't turn rapidly anymore when leaving SCP-294.
+	- The maximum amount of achievements displayed at the ending screen is now correct.
+	- The correct damage sounds will now be played when the player gets attacked by the SCP-035 tentacles.
+	- The Debug HUD won't be enabled anymore if you start a new game after you have quit a game where it has been activated before.
+	- SCP-096 cannot spawn anymore if the room2servers event hasn't been triggered.
+	- Fixed the buttghost event having a chance not to spawn.
+	- Fixed SCP-008's container door not being saved.
+	- Fixed a bug when after reloading the save file SCP-173 was able to kill you when he was behind a door.
+	- Fixed MTF units getting stuck when they wanted to kill SCP-008 instances or SCP-049-2 instances but another MTF killed it.
+	- Fixed SCP-049-2 zombies damage range.
+	- Fixed the tunnel106 event.
+	- Fixed a bug that caused the camera screens not be able to be used for saving on euclid difficulty.
+	- The femur breaker can't be pressed anymore if the sound transmission is off.
+	- The navigator now works properly with custom maps.
+	- The intercom transmission from SCP-106's chamber won't play anymore if the player is in the SCP-1499 dimension, Pocket Dimension or the forest.
+	- Fixed the monitor in SCP-106's chamber being off after reloading the save file.
+	- Fixed the MTF gasmask sound.
+	- Fixed SCP-1048's room3pit event causing a Blitz3D error after loading a save file.
+	- Fixed the messages for the intro in your cell (all 3 of them are now displayed properly).
+	- SCP-714's wearing variable will now be saved by the game.
+	- Fixed a lot of memory leaks occuring at Gate A and B whenever you quickloaded the game after entering those.
+	- A lot of fixes related to SCP-106 not appearing in Pocket Dimension.
+	- The remote door control, secondary light and sound transmission won't stay the same when you quit a game to the menu and started a new one.
+	- Fixed a bug that caused the player to die when getting captured by SCP-106 in room3storage.
+	- Fixed the timer after which SCP-106 should appear when player leaves the Pocket Dimension.
+	- Added door collisions for a few doors when they are closing, which prevents the player from being able to go through them while the player shouldn't do it.
+	- Attempt to fix a bug where the player has the ability to fall through the map after reloading a save file.
+	- Attempt to fix SCP-096's ability to get stuck while running towards the player.
+	- Attempt to fix the clerk not dying at the tesla gate.
+	- Attempt to fix door objects appearing in the center of the rooms.
+	- The game was patched with the 4GB patch, which should prevent the game from lagging and crashing in most cases.
 ----------------------------------------------------------------------------------
 
 v1.3.9
@@ -259,8 +261,8 @@ v1.3.9
 - Removed the ability to use "<" and ">" characters in the save name as this caused a crash when trying to save the game.
 - Minor improvements in the Server Room (room2servers) event.
 - Improvements in SCP-1123 event:
-    - Optimized Nazi officer model.
-    - The officer now has a reload animation.
+	- Optimized Nazi officer model.
+	- The officer now has a reload animation.
 - Optimized SCP-513-1's and SCP-096's models.
 
 Bug fixes:

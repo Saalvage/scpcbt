@@ -899,7 +899,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				If Rand(2)=1 Then
 					it2 = CreateItem("firstaid2", x, y, z)
 				Else
-				    it2 = CreateItem("firstaid", x, y, z)
+					it2 = CreateItem("firstaid", x, y, z)
 				EndIf
 				Case "fine"
 					it2 = CreateItem("finefirstaid", x, y, z)

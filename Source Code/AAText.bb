@@ -37,7 +37,7 @@ Function InitAAFont()
 		AATextCam = cam
 		CameraProjMode cam,0
 	
-	    ;Create sprite
+		;Create sprite
 		Local spr% = CreateMesh(cam)
 		Local sf% = CreateSurface(spr)
 		AddVertex sf, -1, 1, 0, 0, 0 ;vertex 0; uv:0,0

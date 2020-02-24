@@ -40,6 +40,6 @@ Function UpdateBlur(power#)
 	
 	EntityAlpha ark_blur_image, power#
 	
-	CopyRect 0, 0, opt\GraphicWidth, opt\GraphicHeight, 2048.0 - opt\GraphicWidth/2, 2048.0 - opt\GraphicHeight/2, BackBuffer(), TextureBuffer(ark_blur_texture)
+	CopyRect 0, 0, GraphicWidth, GraphicHeight, 2048.0 - (GraphicWidth/2), 2048.0 - (GraphicHeight/2), BackBuffer(), TextureBuffer(ark_blur_texture)
 	
 End Function

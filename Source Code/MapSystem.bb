@@ -2168,15 +2168,15 @@ Function FillRoom(r.Rooms)
 			PositionEntity r\Objects[0],r\x+1560.0*RoomScale,r\y,r\z+250.0*RoomScale,True
 			
 			r\Objects[1] = CreatePivot(r\obj)
-            PositionEntity r\Objects[1],r\x + 1344.0 * RoomScale, r\y - 752.0 * RoomScale,r\z - 384.0 * RoomScale,True
-            
-            de.Decals = CreateDecal(3,  r\x + 1334.0*RoomScale, r\y - 796.0*RoomScale+0.01, r\z-220.0*RoomScale,90,Rnd(360),0)
-            de\Size = 0.25
-            ScaleSprite(de\obj, de\Size,de\Size)
-            EntityParent de\obj, r\obj
+			PositionEntity r\Objects[1],r\x + 1344.0 * RoomScale, r\y - 752.0 * RoomScale,r\z - 384.0 * RoomScale,True
+			
+			de.Decals = CreateDecal(3,  r\x + 1334.0*RoomScale, r\y - 796.0*RoomScale+0.01, r\z-220.0*RoomScale,90,Rnd(360),0)
+			de\Size = 0.25
+			ScaleSprite(de\obj, de\Size,de\Size)
+			EntityParent de\obj, r\obj
 			
 			r\Objects[2] = CreateButton(r\x + 1181.0 *RoomScale, r\y + 180.0 * RoomScale, r\z - 512.0 * RoomScale, 0, 270)
-            EntityParent (r\Objects[2],r\obj)
+			EntityParent (r\Objects[2],r\obj)
 
 		Case "room2poffices"
 
@@ -3384,7 +3384,7 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[3]\AutoClose = False : r\RoomDoors[3]\open = False
 			
 			r\RoomDoors[4] = CreateDoor(r\zone, r\x-560.0 * RoomScale, r\y, r\z + 272.0 * RoomScale, 0, r, True, False, 3)
-            r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\open = False
+			r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\open = False
 			
 			it = CreateItem("scp714", r\x - 552.0 * RoomScale, r\y + 220.0 * RoomScale, r\z - 760.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
@@ -3406,14 +3406,14 @@ Function FillRoom(r.Rooms)
 			EntityParent(sc\obj, r\obj)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x + 560.0 * RoomScale, r\y + 386 * RoomScale, r\z + 480.0 * RoomScale, r)
-            sc\angle = 0 : sc\turn = 30
-            TurnEntity(sc\CameraObj, 30, 0, 0)
-            EntityParent(sc\obj, r\obj)
+			sc\angle = 0 : sc\turn = 30
+			TurnEntity(sc\CameraObj, 30, 0, 0)
+			EntityParent(sc\obj, r\obj)
 			
-            sc.SecurityCams = CreateSecurityCam(r\x - 560.0 * RoomScale, r\y + 386 * RoomScale, r\z + 480.0 * RoomScale, r)
-            sc\angle = 0 : sc\turn = 30
-            TurnEntity(sc\CameraObj, 30, 0, 0)
-            EntityParent(sc\obj, r\obj)
+			sc.SecurityCams = CreateSecurityCam(r\x - 560.0 * RoomScale, r\y + 386 * RoomScale, r\z + 480.0 * RoomScale, r)
+			sc\angle = 0 : sc\turn = 30
+			TurnEntity(sc\CameraObj, 30, 0, 0)
+			EntityParent(sc\obj, r\obj)
 			
 			it = CreateItem("paper", r\x - 728.0 * RoomScale, r\y + 288.0 * RoomScale, r\z - 360.0 * RoomScale, "d714")
 			EntityParent(it\collider, r\obj)
@@ -4405,7 +4405,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj)
 
 		Case "room2gw","room2gw_b"
-		    
+			
 			If r\RoomTemplate\Name = "room2gw_b"
 				r\Objects[2] = CreatePivot(r\obj)
 				PositionEntity (r\Objects[2], r\x - 156.825*RoomScale, r\y -37.3458*RoomScale, r\z+121.364*RoomScale, True)
@@ -4424,13 +4424,13 @@ Function FillRoom(r.Rooms)
 			
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, r\y, r\z - 382.0 * RoomScale, 0, r, False, False)
 			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
-            PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[0]\dir = 0 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
 			r\RoomDoors[0]\MTFClose = False
 			
 			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 336.0 * RoomScale, r\y, r\z + 462.0 * RoomScale, 180, r, False, False)
 			PositionEntity(r\RoomDoors[1]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
-            PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
 			r\RoomDoors[1]\MTFClose = False
 			
@@ -4476,7 +4476,7 @@ Function FillRoom(r.Rooms)
 			EndIf
 
 		Case "room3gw"
-	        
+			
 			d = CreateDoor(r\zone, r\x - 728.0 * RoomScale, r\y, r\z - 458.0 * RoomScale, 0, r, False, False, 3)
 			d\AutoClose = False	: d\open = False  : d\locked = False
 			
@@ -4485,13 +4485,13 @@ Function FillRoom(r.Rooms)
 			
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 459.0 * RoomScale, r\y, r\z + 339.0 * RoomScale, 90, r, False, False)
 			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
-            PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[0]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[0]\dir = 0 : r\RoomDoors[0]\AutoClose = False	: r\RoomDoors[0]\open = True  : r\RoomDoors[0]\locked = True	
 			r\RoomDoors[0]\MTFClose = False
 			
 			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 385.0 * RoomScale, r\y, r\z + 339.0 * RoomScale, 270, r, False, False)
 			PositionEntity(r\RoomDoors[1]\buttons[0], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[0],True), r\z - 606.679 * RoomScale, True)	
-            PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
+			PositionEntity(r\RoomDoors[1]\buttons[1], r\x + 580.822 * RoomScale, EntityY(r\RoomDoors[1]\buttons[1],True), r\z - 606.679 * RoomScale, True)
 			r\RoomDoors[1]\dir = 0 : r\RoomDoors[1]\AutoClose = False	: r\RoomDoors[1]\open = True  : r\RoomDoors[1]\locked = True
 			r\RoomDoors[1]\MTFClose = False
 			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
@@ -4510,7 +4510,7 @@ Function FillRoom(r.Rooms)
 			Next
 			If r\Objects[3]=0 Then r\Objects[3] = LoadMesh_Strict("GFX\map\room3gw_pipes.b3d",r\obj)
 			EntityPickMode r\Objects[3],2
-	        
+			
 		Case "room1162"
 
 			d = CreateDoor(r\zone, r\x + 248.0*RoomScale, r\y, r\z - 736.0*RoomScale, 90, r, False, False, 2)
@@ -4550,14 +4550,14 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj)
 			
 			sc.SecurityCams = CreateSecurityCam(r\x + 850.0 * RoomScale, r\y + 350.0 * RoomScale, r\z + 876.0 * RoomScale, r)
-            sc\angle = 220 : sc\turn = 30
-            TurnEntity(sc\CameraObj, 30, 0, 0)
-            EntityParent(sc\obj, r\obj)
+			sc\angle = 220 : sc\turn = 30
+			TurnEntity(sc\CameraObj, 30, 0, 0)
+			EntityParent(sc\obj, r\obj)
 			
-            sc.SecurityCams = CreateSecurityCam(r\x + 600.0 * RoomScale, r\y + 514.0 * RoomScale, r\z + 150.0 * RoomScale, r)
-            sc\angle = 180 : sc\turn = 30
-            TurnEntity(sc\CameraObj, 30, 0, 0)
-            EntityParent(sc\obj, r\obj)
+			sc.SecurityCams = CreateSecurityCam(r\x + 600.0 * RoomScale, r\y + 514.0 * RoomScale, r\z + 150.0 * RoomScale, r)
+			sc\angle = 180 : sc\turn = 30
+			TurnEntity(sc\CameraObj, 30, 0, 0)
+			EntityParent(sc\obj, r\obj)
 
 		Case "room3offices"
 			
@@ -4825,15 +4825,15 @@ Function FillRoom(r.Rooms)
 		Case "room2cpit"
 
 			em.Emitters = CreateEmitter(r\x + 512.0 * RoomScale, r\y-76 * RoomScale, r\z - 688 * RoomScale, 0)
-            TurnEntity(em\Obj, -90, 0, 0)
-            EntityParent(em\Obj, r\obj)
-            em\RandAngle = 55
-            em\Speed = 0.0005
-            em\Achange = -0.015
-            em\SizeChange = 0.007
-            
-            d = CreateDoor(r\zone,r\x-256.0*RoomScale, r\y, r\z-752.0*RoomScale,90,r,False,2,3)
-            d\locked = True : d\open = False : d\AutoClose = False : d\MTFClose = False : d\DisableWaypoint = True
+			TurnEntity(em\Obj, -90, 0, 0)
+			EntityParent(em\Obj, r\obj)
+			em\RandAngle = 55
+			em\Speed = 0.0005
+			em\Achange = -0.015
+			em\SizeChange = 0.007
+			
+			d = CreateDoor(r\zone,r\x-256.0*RoomScale, r\y, r\z-752.0*RoomScale,90,r,False,2,3)
+			d\locked = True : d\open = False : d\AutoClose = False : d\MTFClose = False : d\DisableWaypoint = True
 			PositionEntity d\buttons[0],r\x-240.0*RoomScale,EntityY(d\buttons[0],True),EntityZ(d\buttons[0],True),True
 			
 			it = CreateItem("paper", r\x - 160.0 * RoomScale, r\y + 32.0 * RoomScale, r\z - 353.0 * RoomScale, "l2")
@@ -5373,11 +5373,11 @@ Function FindPath(n.NPCs, x#, y#, z#)
 	dist = 350.0
 	For w.WayPoints = Each WayPoints
 		xtemp = EntityX(w\obj,True)-EntityX(temp,True)
-          ;If xtemp < 8.0 Then
+		  ;If xtemp < 8.0 Then
 		ztemp = EntityZ(w\obj,True)-EntityZ(temp,True)
-             ;If ztemp < 8.0 Then
+			 ;If ztemp < 8.0 Then
 		ytemp = EntityY(w\obj,True)-EntityY(temp,True)
-                ;If ytemp < 8.0 Then
+				;If ytemp < 8.0 Then
 		dist2# = (xtemp*xtemp)+(ytemp*ytemp)+(ztemp*ztemp)
 		If dist2 < dist Then 
 			;prefer waypoints that are visible
@@ -5387,36 +5387,36 @@ Function FindPath(n.NPCs, x#, y#, z#)
 				StartPoint = w
 			EndIf
 		EndIf
-                ;EndIf
-             ;EndIf
-          ;EndIf
+				;EndIf
+			 ;EndIf
+		  ;EndIf
 	Next
 	DebugLog "DIST: "+dist
 	
 	FreeEntity temp
 	
 	If StartPoint = Null Then Return 2
-	StartPoint\state = 1      
+	StartPoint\state = 1	  
 	
-       ;If EndPoint = Null Then
+	   ;If EndPoint = Null Then
 	EndPoint = Null
 	dist# = 400.0
 	For w.WayPoints = Each WayPoints
 		xtemp = EntityX(pvt,True)-EntityX(w\obj,True)
-          ;If xtemp =< 8.0 Then
+		  ;If xtemp =< 8.0 Then
 		ztemp = EntityZ(pvt,True)-EntityZ(w\obj,True)
-             ;If ztemp =< 8 Then
+			 ;If ztemp =< 8 Then
 		ytemp = EntityY(pvt,True)-EntityY(w\obj,True)
 		dist2# = (xtemp*xtemp)+(ytemp*ytemp)+(ztemp*ztemp)
 		
 		If dist2 < dist Then ; And EntityVisible(w\obj, pvt)
 			dist = dist2
 			EndPoint = w
-		EndIf            
-             ;EndIf
-          ;EndIf
+		EndIf			
+			 ;EndIf
+		  ;EndIf
 	Next
-       ;EndIf
+	   ;EndIf
 	
 	FreeEntity pvt
 	
@@ -5425,12 +5425,12 @@ Function FindPath(n.NPCs, x#, y#, z#)
 			Return 0
 		Else
 			n\Path[0]=EndPoint
-			Return 1               
+			Return 1			   
 		EndIf
 	EndIf
 	If EndPoint = Null Then Return 2
 	
-       ;aloitus- ja lopetuspisteet l�ydetty, aletaan etsi� reitti�
+	   ;aloitus- ja lopetuspisteet l�ydetty, aletaan etsi� reitti�
 	
 	Repeat
 		
@@ -5439,11 +5439,11 @@ Function FindPath(n.NPCs, x#, y#, z#)
 		dist# = 10000.0
 		For w.WayPoints = Each WayPoints
 			If w\state = 1 Then
-                temp = True
-                If (w\Fcost) < dist Then
+				temp = True
+				If (w\Fcost) < dist Then
 					dist = w\Fcost
 					smallest = w
-                EndIf
+				EndIf
 			EndIf
 		Next
 		
@@ -5453,7 +5453,7 @@ Function FindPath(n.NPCs, x#, y#, z#)
 			w\state = 2
 			
 			For i = 0 To 4
-                If w\connected[i]<>Null Then
+				If w\connected[i]<>Null Then
 					If w\connected[i]\state < 2 Then
 						
 						If w\connected[i]\state=1 Then ;open list
@@ -5476,16 +5476,16 @@ Function FindPath(n.NPCs, x#, y#, z#)
 							w\connected[i]\Fcost = w\Gcost+w\Hcost
 							w\connected[i]\parent = w
 							w\connected[i]\state=1
-						EndIf            
+						EndIf			
 					EndIf
 					
-                EndIf
+				EndIf
 			Next
 		Else ;open listilt� ei l�ytynyt mit��n
 			If EndPoint\state > 0 Then
-                StartPoint\parent = Null
-                EndPoint\state = 2
-                Exit
+				StartPoint\parent = Null
+				EndPoint\state = 2
+				Exit
 			EndIf
 		EndIf
 		
@@ -5507,7 +5507,7 @@ Function FindPath(n.NPCs, x#, y#, z#)
 			length = length +1
 			currpoint = currpoint\parent
 			If length>20 Then
-                twentiethpoint = twentiethpoint\parent
+				twentiethpoint = twentiethpoint\parent
 			EndIf
 		Until currpoint = Null
 		
