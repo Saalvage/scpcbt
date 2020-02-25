@@ -32,7 +32,7 @@ Function CreateBlurImage(I_Opt.Options)
 	ark_blur_image = spr
 	
 	;Create blur texture
-	ark_blur_texture = CreateTexture(2048, 2048, 0)
+	ark_blur_texture = CreateTexture(2048, 2048, 256)
 	EntityTexture spr, ark_blur_texture
 End Function
 

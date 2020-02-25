@@ -9653,8 +9653,6 @@ End Function
 
 Function Graphics3DExt%(width%,height%,depth%=32,mode%=2)
 	Graphics3D width,height,depth,mode
-	TextureFilter "", 8192 ;This turns on Anisotropic filtering for textures. Use TextureAnisotropic to change anisotropic level.
-	TextureAnisotropic 16
 	InitFastResize()
 	AntiAlias GetINIInt(OptionFile,"options","antialias")
 End Function
