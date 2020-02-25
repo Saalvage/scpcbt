@@ -61,6 +61,7 @@ Function AutoReleaseSounds()
 End Function
 
 Function PlaySound_Strict%(sndHandle%)
+	Local I_Opt.Options = First Options
 	Local snd.Sound = Object.Sound(sndHandle)
 	If snd <> Null Then
 		Local shouldPlay% = True
@@ -70,7 +71,7 @@ Function PlaySound_Strict%(sndHandle%)
 					If snd\internalHandle = 0 Then
 						If FileType(snd\name) <> 1 Then
 							CreateConsoleMsg("Sound " + Chr(34) + snd\name + Chr(34) + " not found.")
-							If ConsoleOpening
+							If I_Opt\ConsoleOnError
 								ConsoleOpen = True
 							EndIf
 						Else
@@ -78,7 +79,7 @@ Function PlaySound_Strict%(sndHandle%)
 						EndIf
 						If snd\internalHandle = 0 Then
 							CreateConsoleMsg("Failed to load Sound: " + Chr(34) + snd\name + Chr(34))
-							If ConsoleOpening
+							If I_Opt\ConsoleOnError
 								ConsoleOpen = True
 							EndIf
 						EndIf
@@ -96,7 +97,7 @@ Function PlaySound_Strict%(sndHandle%)
 				If snd\internalHandle = 0 Then
 					If FileType(snd\name) <> 1 Then
 						CreateConsoleMsg("Sound " + Chr(34) + snd\name + Chr(34) + " not found.")
-						If ConsoleOpening
+						If I_Opt\ConsoleOnError
 							ConsoleOpen = True
 						EndIf
 					Else
@@ -105,7 +106,7 @@ Function PlaySound_Strict%(sndHandle%)
 						
 					If snd\internalHandle = 0 Then
 						CreateConsoleMsg("Failed to load Sound: " + Chr(34) + snd\name + Chr(34))
-						If ConsoleOpening
+						If I_Opt\ConsoleOnError
 							ConsoleOpen = True
 						EndIf
 					EndIf
@@ -160,6 +161,8 @@ Type Stream
 End Type
 
 Function StreamSound_Strict(file$,volume#=1.0,custommode=2)
+	
+	Local I_Opt.Options = First Options
 	Local I_Loc.Loc = First Loc
 	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
@@ -168,7 +171,7 @@ Function StreamSound_Strict(file$,volume#=1.0,custommode=2)
 	
 	If FileType(file$)<>1
 		CreateConsoleMsg("Sound " + Chr(34) + file$ + Chr(34) + " not found.")
-		If ConsoleOpening
+		If I_Opt\ConsoleOnError
 			ConsoleOpen = True
 		EndIf
 		Return 0
@@ -180,7 +183,7 @@ Function StreamSound_Strict(file$,volume#=1.0,custommode=2)
 	
 	If st\chn = -1
 		CreateConsoleMsg("Failed to stream Sound (returned -1): " + Chr(34) + file$ + Chr(34))
-		If ConsoleOpening
+		If I_Opt\ConsoleOnError
 			ConsoleOpen = True
 		EndIf
 		Return -1

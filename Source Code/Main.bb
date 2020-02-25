@@ -30,6 +30,8 @@ Type Options
 	Field GraphicHeight%
 	Field GraphicMode%
 	Field ShowFPS%
+	Field ConsoleEnabled%
+	Field ConsoleOnError%
 	Field HalloweenTex%
 	Field DebugMode%
 End Type
@@ -40,6 +42,8 @@ I_Opt\LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
 I_Opt\GraphicWidth = GetINIInt(OptionFile, "options", "width")
 I_Opt\GraphicHeight = GetINIInt(OptionFile, "options", "height")
 I_Opt\ShowFPS = GetINIInt(OptionFile, "options", "show FPS")
+I_Opt\ConsoleEnabled = GetINIInt(OptionFile, "console", "enabled")
+I_Opt\ConsoleOnError = GetINIInt(OptionFile, "console", "auto opening")
 I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
 I_Opt\DebugMode = GetINIInt(OptionFile, "options", "debug mode")
 
@@ -152,7 +156,19 @@ Function LoadLocalFont(AA%, Font$, Size%)
 	
 End Function
 
-Include "Source Code\TextureCache.bb"
+
+Type LauncherOptions
+	Field TotalGFXModes%
+	Field GFXModes%
+	Field SelectedGFXMode%
+	Field GfxModeWidths%[64], GfxModeHeights%[64]
+End Type
+
+Local I_LOpt.LauncherOptions = New LauncherOptions
+
+I_LOpt\TotalGFXModes% = CountGfxModes3D()
+
+
 Include "Source Code\StrictLoads.bb"
 Include "Source Code\KeyName.bb"
 
@@ -176,22 +192,16 @@ Global ButtonSFX%, ButtonSFX2%
 Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
-Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
-
 Global ArrowIMG[4]
 
 Global Data294$ = "Data\SCP-294.ini"
 
 Global AchvIni$ = "Data\achievements.ini"
 
-Global SelectedGFXMode%
 Global SelectedGFXDriver% = Max(GetINIInt(OptionFile, "options", "gfx driver"), 1)
 
 Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
-
-Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
-Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
 
 Global SelectedLoc%
 Global LocsAmount% = GetFileAmount("Localization\", True)
@@ -231,7 +241,6 @@ Select TextureDetails%
 	Case 4
 		TextureFloat# = -0.8
 End Select
-Global ConsoleOpening% = GetINIInt(OptionFile, "console", "auto opening")
 Global SFXVolume# = GetINIFloat(OptionFile, "audio", "sound volume")
 
 Include "Source Code\AAText.bb"
@@ -246,24 +255,27 @@ If I_Opt\LauncherEnabled Then
 	
 	AppTitle GetLocalString("Menu", "titlelauncher")
 	
-	UpdateLauncher()
+	UpdateLauncher(I_LOpt)
 Else
-	For i% = 1 To TotalGFXModes
+	For i% = 1 To I_LOpt\TotalGFXModes
 		Local samefound% = False
-		For  n% = 0 To TotalGFXModes - 1
-			If GfxModeWidths(n) = GfxModeWidth(i) And GfxModeHeights(n) = GfxModeHeight(i) Then samefound = True : Exit
+		For  n% = 0 To I_LOpt\TotalGFXModes - 1
+			If I_LOpt\GfxModeWidths[n] = GfxModeWidth(i) And I_LOpt\GfxModeHeights[n] = GfxModeHeight(i) Then samefound = True : Exit
 		Next
-		If samefound = False Then
-			If I_Opt\GraphicWidth = GfxModeWidth(i) And I_Opt\GraphicHeight = GfxModeHeight(i) Then SelectedGFXMode = GFXModes
-			GfxModeWidths(GFXModes) = GfxModeWidth(i)
-			GfxModeHeights(GFXModes) = GfxModeHeight(i)
-			GFXModes=GFXModes+1
+		If Not samefound Then
+			If I_Opt\GraphicWidth = GfxModeWidth(i) And I_Opt\GraphicHeight = GfxModeHeight(i) Then I_LOpt\SelectedGFXMode = I_LOpt\GFXModes
+			I_LOpt\GfxModeWidths[I_LOpt\GFXModes] = GfxModeWidth(i)
+			I_LOpt\GfxModeHeights[I_LOpt\GFXModes] = GfxModeHeight(i)
+			I_LOpt\GFXModes=I_LOpt\GFXModes+1
 		EndIf
 	Next
 	
-	I_Opt\GraphicWidth = GfxModeWidths(SelectedGFXMode)
-	I_Opt\GraphicHeight = GfxModeHeights(SelectedGFXMode)
+	I_Opt\GraphicWidth = I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode]
+	I_Opt\GraphicHeight = I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode]
 EndIf
+
+Delete I_LOpt
+
 
 ;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, But it's an alliteration (and it's true)!! ~Salvage
 If I_Opt\GraphicMode = 1
@@ -2303,7 +2315,7 @@ Repeat
 		EndIf
 		
 		If KeyHit(KEY_CONSOLE) Then
-			If CanOpenConsole
+			If I_Opt\ConsoleEnabled
 				If ConsoleOpen Then
 					UsedConsole = True
 					ResumeSounds()
@@ -6497,7 +6509,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, GetLocalString("Options", "aconsole"))
-					CanOpenConsole = DrawTick(x +270 * MenuScale, y + MenuScale, CanOpenConsole)
+					I_Opt\ConsoleEnabled = DrawTick(x +270 * MenuScale, y + MenuScale, I_Opt\ConsoleEnabled)
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"consoleenable")
 					EndIf
@@ -6506,7 +6518,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, GetLocalString("Options", "errconsole"))
-					ConsoleOpening = DrawTick(x + 270 * MenuScale, y + MenuScale, ConsoleOpening)
+					I_Opt\ConsoleOnError = DrawTick(x + 270 * MenuScale, y + MenuScale, I_Opt\ConsoleOnError)
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"consoleerror")
 					EndIf
@@ -9522,8 +9534,8 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "mouse smoothing", MouseSmooth)
 	PutINIValue(OptionFile, "options", "fov", FOV)
 	PutINIValue(OptionFile, "options", "launcher enabled", I_Opt\LauncherEnabled%)
-	PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
-	PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
+	PutINIValue(OptionFile, "console", "enabled", I_Opt\ConsoleEnabled%)
+	PutINIValue(OptionFile, "console", "auto opening", I_Opt\ConsoleOnError%)
 	
 	PutINIValue(OptionFile, "audio", "music volume", MusicVolume)
 	PutINIValue(OptionFile, "audio", "sound volume", PrevSFXVolume)

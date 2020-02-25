@@ -931,7 +931,7 @@ Function UpdateMainMenu()
 						
 						Color 255,255,255
 						AAText(x + 20 * MenuScale, y, GetLocalString("Options", "aconsole"))
-						CanOpenConsole = DrawTick(x + 310 * MenuScale, y + MenuScale, CanOpenConsole)
+						I_Opt\ConsoleEnabled = DrawTick(x + 310 * MenuScale, y + MenuScale, I_Opt\ConsoleEnabled)
 						If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"consoleenable")
 						EndIf
@@ -940,7 +940,7 @@ Function UpdateMainMenu()
 						
 						Color 255,255,255
 						AAText(x + 20 * MenuScale, y, GetLocalString("Options", "errconsole"))
-						ConsoleOpening = DrawTick(x + 310 * MenuScale, y + MenuScale, ConsoleOpening)
+						I_Opt\ConsoleOnError = DrawTick(x + 310 * MenuScale, y + MenuScale, I_Opt\ConsoleOnError)
 						If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"consoleerror")
 						EndIf
@@ -1071,8 +1071,8 @@ Function UpdateMainMenu()
 							KEY_SAVE = 63
 							KEY_CONSOLE = 61
 							I_Opt\LauncherEnabled = 0
-							CanOpenConsole = 0
-							ConsoleOpening = 0
+							I_Opt\ConsoleEnabled = 0
+							I_Opt\ConsoleOnError = 0
 						EndIf
 					
 				End Select
@@ -1095,7 +1095,7 @@ End Function
 Const L_WIDTH = 640
 Const L_HEIGHT = 480
 
-Function UpdateLauncher()
+Function UpdateLauncher(I_LOpt.LauncherOptions)
 	
 	Local I_Opt.Options = First Options
 	
@@ -1126,16 +1126,16 @@ Function UpdateLauncher()
 		HandleImage(ArrowIMG[i], 0, 0)
 	Next
 	
-	For i% = 1 To TotalGFXModes
+	For i% = 1 To I_LOpt\TotalGFXModes
 		Local samefound% = False
-		For  n% = 0 To TotalGFXModes - 1
-			If GfxModeWidths(n) = GfxModeWidth(i) And GfxModeHeights(n) = GfxModeHeight(i) Then samefound = True : Exit
+		For  n% = 0 To I_LOpt\TotalGFXModes - 1
+			If I_LOpt\GfxModeWidths[n] = GfxModeWidth(i) And I_LOpt\GfxModeHeights[n] = GfxModeHeight(i) Then samefound = True : Exit
 		Next
 		If samefound = False Then
-			If I_Opt\GraphicWidth = GfxModeWidth(i) And I_Opt\GraphicHeight = GfxModeHeight(i) Then SelectedGFXMode = GFXModes
-			GfxModeWidths(GFXModes) = GfxModeWidth(i)
-			GfxModeHeights(GFXModes) = GfxModeHeight(i)
-			GFXModes=GFXModes+1 
+			If I_Opt\GraphicWidth = GfxModeWidth(i) And I_Opt\GraphicHeight = GfxModeHeight(i) Then I_LOpt\SelectedGFXMode = I_LOpt\GFXModes
+			I_LOpt\GfxModeWidths[I_LOpt\GFXModes] = GfxModeWidth(i)
+			I_LOpt\GfxModeHeights[I_LOpt\GFXModes] = GfxModeHeight(i)
+			I_LOpt\GFXModes=I_LOpt\GFXModes+1 
 		EndIf
 	Next
 	
@@ -1161,22 +1161,22 @@ Function UpdateLauncher()
 		
 		Select I_Opt\GraphicMode
 			Case 0
-				Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
+				Text(x, y, I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode] + "x" + I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
 			Case 1
-				Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
-				If GfxModeWidths(SelectedGFXMode)<DesktopWidth() Then
+				Text(x, y, I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode] + "x" + I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
+				If I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode]<DesktopWidth() Then
 					Text(x, y + 15, "(" + GetLocalString("Launcher", "upscale"))
 					Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
-				ElseIf GfxModeWidths(SelectedGFXMode)>DesktopWidth() Then
+				ElseIf I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode]>DesktopWidth() Then
 					Text(x, y + 15, "(" + GetLocalString("Launcher", "downscale"))
 					Text(x, y + 30, DesktopWidth() + "x" + DesktopHeight())
 				EndIf
 			Case 2
-				Text(x, y, GfxModeWidths(SelectedGFXMode) + "x" + GfxModeHeights(SelectedGFXMode))
+				Text(x, y, I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode] + "x" + I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
 		End Select
 		
-		If DrawButton(x, y + 50, 100, 30, "+", False, False, False) Then SelectedGFXMode = Min(SelectedGFXMode + 1, GFXModes - 1)
-		If DrawButton(x + 150, y + 50, 100, 30, "-", False, False, False) Then SelectedGFXMode = Max(SelectedGFXMode - 1, 0)
+		If DrawButton(x, y + 50, 100, 30, "+", False, False, False) Then I_LOpt\SelectedGFXMode = Min(I_LOpt\SelectedGFXMode + 1, I_LOpt\GFXModes - 1)
+		If DrawButton(x + 150, y + 50, 100, 30, "-", False, False, False) Then I_LOpt\SelectedGFXMode = Max(I_LOpt\SelectedGFXMode - 1, 0)
 		;-----------------------------------------------------------------
 		
 		y = y + 100
@@ -1219,8 +1219,8 @@ Function UpdateLauncher()
 		Text(40 + 430 + 15, 262 - 55 + 95 + 8, GetLocalString("Launcher", "uselauncher"))
 		
 		If DrawButton(L_WIDTH - 30 - 90, L_HEIGHT - 50 - 55, 100, 30, GetLocalString("Launcher", "launch"), False, False, False) Then
-			I_Opt\GraphicWidth = GfxModeWidths(SelectedGFXMode)
-			I_Opt\GraphicHeight = GfxModeHeights(SelectedGFXMode)
+			I_Opt\GraphicWidth = I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode]
+			I_Opt\GraphicHeight = I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode]
 			RealGraphicWidth = I_Opt\GraphicWidth
 			RealGraphicHeight = I_Opt\GraphicHeight
 			Exit
@@ -1232,8 +1232,8 @@ Function UpdateLauncher()
 	
 	FreeImage(IMG)
 	
-	PutINIValue(OptionFile, "options", "width", GfxModeWidths(SelectedGFXMode))
-	PutINIValue(OptionFile, "options", "height", GfxModeHeights(SelectedGFXMode))
+	PutINIValue(OptionFile, "options", "width", I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode])
+	PutINIValue(OptionFile, "options", "height", I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
 	PutINIValue(OptionFile, "options", "mode", I_Opt\GraphicMode)
 	PutINIValue(OptionFile, "options", "launcher enabled", I_Opt\LauncherEnabled)
 	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)

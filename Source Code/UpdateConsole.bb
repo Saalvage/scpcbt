@@ -5,7 +5,7 @@ Function UpdateConsole()
 	Local I_Opt.Options = First Options
 	Local I_Cheats.Cheats = First Cheats
 	
-	If CanOpenConsole = False Then
+	If I_Opt\ConsoleEnabled = False Then
 		ConsoleOpen = False
 		Return
 	EndIf

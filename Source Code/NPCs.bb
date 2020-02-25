@@ -7391,9 +7391,12 @@ Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)
 End Function
 
 Function ChangeNPCTextureID(n.NPCs,textureid%)
+
+	Local I_Opt.Options = First Options
+	
 	If (n=Null) Then
 		CreateConsoleMsg("Tried to change the texture of an invalid NPC")
-		If ConsoleOpening Then
+		If I_Opt\ConsoleOnError Then
 			ConsoleOpen = True
 		EndIf
 		Return
