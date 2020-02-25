@@ -1,6 +1,6 @@
 
 
-Dim ParticleTextures%(10)
+Global ParticleTextures%[10]
 
 Type Particles
 	Field obj%, pvt%
@@ -20,7 +20,7 @@ Function CreateParticle.Particles(x#, y#, z#, image%, size#, gravity# = 1.0, lif
 	
 	p\obj = CreateSprite()
 	PositionEntity(p\obj, x, y, z, True)
-	EntityTexture(p\obj, ParticleTextures(image))
+	EntityTexture(p\obj, ParticleTextures[image])
 	RotateEntity(p\obj, 0, 0, Rnd(360))
 	EntityFX(p\obj, 1 + 8)
 	

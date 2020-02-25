@@ -77,7 +77,7 @@ Function SaveGame(file$)
 	WriteFloat f, Infect
 	
 	For i = 0 To CUSTOM
-		If (SelectedDifficulty = difficulties(i)) Then
+		If (SelectedDifficulty = difficulties[i]) Then
 			WriteByte f, i
 			
 			If (i = CUSTOM) Then
@@ -126,7 +126,7 @@ Function SaveGame(file$)
 	WriteByte f, Contained106
 	
 	For i = 0 To MAXACHIEVEMENTS-1
-		WriteByte f, Achievements(i)
+		WriteByte f, Achievements[i]
 	Next
 	WriteInt f, RefinedItems
 	
@@ -542,7 +542,7 @@ Function LoadGame(file$)
 	Infect = ReadFloat(f)
 	
 	Local difficultyIndex = ReadByte(f)
-	SelectedDifficulty = difficulties(difficultyIndex)
+	SelectedDifficulty = difficulties[difficultyIndex]
 	If (difficultyIndex = CUSTOM) Then
 		SelectedDifficulty\aggressiveNPCs = ReadByte(f)
 		SelectedDifficulty\permaDeath = ReadByte(f)
@@ -582,7 +582,7 @@ Function LoadGame(file$)
 	Contained106 = ReadByte(f)	
 	
 	For i = 0 To MAXACHIEVEMENTS-1
-		Achievements(i)=ReadByte(f)
+		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
 	
@@ -1349,7 +1349,7 @@ Function LoadGameQuick(file$)
 	Infect = ReadFloat(f)
 	
 	Local difficultyIndex = ReadByte(f)
-	SelectedDifficulty = difficulties(difficultyIndex)
+	SelectedDifficulty = difficulties[difficultyIndex]
 	If (difficultyIndex = CUSTOM) Then
 		SelectedDifficulty\aggressiveNPCs = ReadByte(f)
 		SelectedDifficulty\permaDeath = ReadByte(f)
@@ -1389,7 +1389,7 @@ Function LoadGameQuick(file$)
 	Contained106 = ReadByte(f)	
 	
 	For i = 0 To MAXACHIEVEMENTS-1
-		Achievements(i)=ReadByte(f)
+		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
 	

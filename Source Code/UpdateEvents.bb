@@ -69,7 +69,7 @@ Function UpdateEvents()
 						CameraFogRange(Camera, CameraFogNear, CameraFogFar)
 						CameraFogMode(Camera, 1)
 						If SelectedDifficulty\saveType = SAVEANYWHERE Then
-							Msg = GetLocalStringR("Messages", "savepress", KeyName(KEY_SAVE))
+							Msg = GetLocalStringR("Messages", "savepress", KeyName[KEY_SAVE])
 							MsgTimer = 70*4
 						ElseIf SelectedDifficulty\saveType = SAVEONSCREENS Then
 							Msg = GetLocalString("Messages", "savemonitors")
@@ -231,7 +231,7 @@ Function UpdateEvents()
 												PositionEntity Curr173\Collider, 0,0,0
 											EndIf
 											ResetEntity Curr173\Collider
-											Msg = GetLocalStringR("Messages", "holdrun", KeyName(KEY_SPRINT))
+											Msg = GetLocalStringR("Messages", "holdrun", KeyName[KEY_SPRINT])
 											MsgTimer = 70*8
 										EndIf
 									EndIf
@@ -437,7 +437,7 @@ Function UpdateEvents()
 								
 							ElseIf e\EventState3 < 40
 								If Inventory(0)<>Null Then
-									Msg = GetLocalStringR("Messages", "openinv", KeyName(KEY_INV))
+									Msg = GetLocalStringR("Messages", "openinv", KeyName[KEY_INV])
 									MsgTimer=70*7
 									e\EventState3 = 40
 									Exit
@@ -994,7 +994,7 @@ Function UpdateEvents()
 							If IntroSFX(17)<>0 Then
 								If EntityVisible(Curr173\Collider, Collider) Then
 									If EntityInView(Curr173\obj, Camera) Then
-										Msg = GetLocalStringR("Messages", "pressblink", KeyName(KEY_BLINK))
+										Msg = GetLocalStringR("Messages", "pressblink", KeyName[KEY_BLINK])
 										MsgTimer = 70*4
 										PlaySound_Strict IntroSFX(17)
 										IntroSFX(17)=0

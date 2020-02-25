@@ -7795,7 +7795,7 @@ Function AddLightCones(room.Rooms)
 			If room\LightFlicker%[i] > 4
 				room\LightConeSpark[i] = CreateSprite()
 				ScaleSprite room\LightConeSpark[i],1.0,1.0
-				EntityTexture room\LightConeSpark[i],ParticleTextures(8)
+				EntityTexture room\LightConeSpark[i],ParticleTextures[8]
 				SpriteViewMode room\LightConeSpark[i],2
 				EntityFX room\LightConeSpark[i],1
 				RotateEntity room\LightConeSpark[i],-90,0,0

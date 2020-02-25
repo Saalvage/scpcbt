@@ -10,9 +10,9 @@ ResizeImage(MenuText, ImageWidth(MenuText) * MenuScale, ImageHeight(MenuText) * 
 ResizeImage(Menu173, ImageWidth(Menu173) * MenuScale, ImageHeight(Menu173) * MenuScale)
 
 For i = 0 To 3
-	ArrowIMG(i) = LoadImage_Strict("GFX\menu\arrow.png")
-	RotateImage(ArrowIMG(i), 90 * i)
-	HandleImage(ArrowIMG(i), 0, 0)
+	ArrowIMG[i] = LoadImage_Strict("GFX\menu\arrow.png")
+	RotateImage(ArrowIMG[i], 90 * i)
+	HandleImage(ArrowIMG[i], 0, 0)
 Next
 
 Global RandomSeed$
@@ -171,7 +171,7 @@ Function UpdateMainMenu()
 							EndIf
 						EndIf
 
-						SelectedDifficulty = difficulties(EUCLID)
+						SelectedDifficulty = difficulties[EUCLID]
 						
 						MainMenuTab = 1
 					EndIf
@@ -277,9 +277,9 @@ Function UpdateMainMenu()
 				;Local modeName$, modeDescription$, selectedDescription$
 				AAText (x + 20 * MenuScale, y + 150 * MenuScale, GetLocalString("Menu", "difficulty"))				
 				For i = SAFE To CUSTOM
-					If DrawTick(x + 20 * MenuScale, y + (180+30*i) * MenuScale, (SelectedDifficulty = difficulties(i)), (i = APOLLYON) And (Not ApolUnlocked)) Then SelectedDifficulty = difficulties(i)
-					Color(difficulties(i)\r,difficulties(i)\g,difficulties(i)\b)
-					AAText(x + 60 * MenuScale, y + (180+30*i) * MenuScale, difficulties(i)\name)
+					If DrawTick(x + 20 * MenuScale, y + (180+30*i) * MenuScale, (SelectedDifficulty = difficulties[i]), (i = APOLLYON) And (Not ApolUnlocked)) Then SelectedDifficulty = difficulties[i]
+					Color(difficulties[i]\r,difficulties[i]\g,difficulties[i]\b)
+					AAText(x + 60 * MenuScale, y + (180+30*i) * MenuScale, difficulties[i]\name)
 				Next
 				
 				Color(255, 255, 255)
@@ -303,11 +303,11 @@ Function UpdateMainMenu()
 					
 					;Items
 					Color 255,255,255
-					DrawImage ArrowIMG(3),x + 155 * MenuScale, y+251*MenuScale
-					DrawImage ArrowIMG(1),x + 405 * MenuScale, y+251*MenuScale
+					DrawImage ArrowIMG[3],x + 155 * MenuScale, y+251*MenuScale
+					DrawImage ArrowIMG[1],x + 405 * MenuScale, y+251*MenuScale
 					
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(3),x + 405 * MenuScale, y+251*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
+						If ImageRectOverlap(ArrowIMG[3],x + 405 * MenuScale, y+251*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
 							SelectedDifficulty\items = SelectedDifficulty\items + 2
 							If SelectedDifficulty\items = 3 Then
 								SelectedDifficulty\items = 2
@@ -315,7 +315,7 @@ Function UpdateMainMenu()
 								SelectedDifficulty\items = 1
 							EndIf
 							PlaySound_Strict(ButtonSFX)
-						ElseIf ImageRectOverlap(ArrowIMG(1),x + 155 * MenuScale, y+251*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
+						ElseIf ImageRectOverlap(ArrowIMG[1],x + 155 * MenuScale, y+251*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
 							SelectedDifficulty\items = SelectedDifficulty\items - 2
 							If SelectedDifficulty\items = 0 Then
 								SelectedDifficulty\items = 1
@@ -329,9 +329,9 @@ Function UpdateMainMenu()
 					AAText(x + 200 * MenuScale, y + 255 * MenuScale, GetLocalString("Menu", "items") + ": " + SelectedDifficulty\items)
 					
 					;Other factor's difficulty
-					DrawImage ArrowIMG(1),x + 155 * MenuScale, y+281*MenuScale
+					DrawImage ArrowIMG[1],x + 155 * MenuScale, y+281*MenuScale
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG(1),x + 155 * MenuScale, y+281*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
+						If ImageRectOverlap(ArrowIMG[1],x + 155 * MenuScale, y+281*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
 							SelectedDifficulty\otherFactors = (SelectedDifficulty\otherFactors + 1) Mod (3 + ApolUnlocked)
 							PlaySound_Strict(ButtonSFX)
 						EndIf
@@ -852,26 +852,26 @@ Function UpdateMainMenu()
 						y = y + 10*MenuScale
 						
 						AAText(x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Options", "forward"))
-						InputBox(x + 160 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)
+						InputBox(x + 160 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_UP,210)],5)
 						AAText(x + 20 * MenuScale, y + 40 * MenuScale, GetLocalString("Options", "left"))
-						InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)
+						InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_LEFT,210)],3)
 						AAText(x + 20 * MenuScale, y + 60 * MenuScale, GetLocalString("Options", "backward"))
-						InputBox(x + 160 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)
+						InputBox(x + 160 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_DOWN,210)],6)
 						AAText(x + 20 * MenuScale, y + 80 * MenuScale, GetLocalString("Options", "right"))
-						InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)
+						InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_RIGHT,210)],4)
 						AAText(x + 20 * MenuScale, y + 100 * MenuScale, GetLocalString("Options", "save"))
-						InputBox(x + 160 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)
+						InputBox(x + 160 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SAVE,210)],11)
 						
 						AAText(x + 280 * MenuScale, y + 20 * MenuScale, GetLocalString("Options", "blink"))
-						InputBox(x + 470 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+						InputBox(x + 470 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_BLINK,210)],7)				
 						AAText(x + 280 * MenuScale, y + 40 * MenuScale, GetLocalString("Options", "sprint"))
-						InputBox(x + 470 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+						InputBox(x + 470 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SPRINT,210)],8)
 						AAText(x + 280 * MenuScale, y + 60 * MenuScale, GetLocalString("Options", "inv"))
-						InputBox(x + 470 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+						InputBox(x + 470 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_INV,210)],9)
 						AAText(x + 280 * MenuScale, y + 80 * MenuScale, GetLocalString("Options", "crouch"))
-						InputBox(x + 470 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)	
+						InputBox(x + 470 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CROUCH,210)],10)	
 						AAText(x + 280 * MenuScale, y + 100 * MenuScale, GetLocalString("Options", "console"))
-						InputBox(x + 470 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
+						InputBox(x + 470 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CONSOLE,210)],12)
 						
 						If MouseOn(x+20*MenuScale,y,width-40*MenuScale,120*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"controls")
@@ -1121,9 +1121,9 @@ Function UpdateLauncher()
 	Local i%	
 	
 	For i = 0 To 3
-		ArrowIMG(i) = LoadImage_Strict("GFX\menu\arrow.png")
-		RotateImage(ArrowIMG(i), 90 * i)
-		HandleImage(ArrowIMG(i), 0, 0)
+		ArrowIMG[i] = LoadImage_Strict("GFX\menu\arrow.png")
+		RotateImage(ArrowIMG[i], 90 * i)
+		HandleImage(ArrowIMG[i], 0, 0)
 	Next
 	
 	For i% = 1 To TotalGFXModes
@@ -2013,7 +2013,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt2 = Replace(txt2, "%s", Int(value*100))
 		;Advanced options	
 		Case "consoleenable"
-			txt = Replace(txt, "%s", KeyName(KEY_CONSOLE))
+			txt = Replace(txt, "%s", KeyName[KEY_CONSOLE])
 		Case "framelimit"
 			If value > 0 And value < 60
 				R = 255

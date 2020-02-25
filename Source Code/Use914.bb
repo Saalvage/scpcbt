@@ -125,7 +125,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						Case 5	
 							Local CurrAchvAmount%=0
 							For i = 0 To MAXACHIEVEMENTS-1
-								If Achievements(i)=True
+								If Achievements[i]=True
 									CurrAchvAmount=CurrAchvAmount+1
 								EndIf
 							Next
@@ -160,7 +160,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					CurrAchvAmount%=0
 					For i = 0 To MAXACHIEVEMENTS-1
-						If Achievements(i)=True
+						If Achievements[i]=True
 							CurrAchvAmount=CurrAchvAmount+1
 						EndIf
 					Next

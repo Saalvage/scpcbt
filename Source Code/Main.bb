@@ -178,7 +178,7 @@ Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
 Global CanOpenConsole% = GetINIInt(OptionFile, "console", "enabled")
 
-Dim ArrowIMG(4)
+Global ArrowIMG[4]
 
 Global Data294$ = "Data\SCP-294.ini"
 
@@ -1527,7 +1527,7 @@ Function InitEvents()
 	Local e.Events
 	
 	MaxItemAmount = SelectedDifficulty\items
-	Dim Inventory.Items(MaxItemAmount + 1)
+	Dim Inventory.Items(MaxItemAmount)
 	
 	CreateEvent("173", "room173", 0)
 	CreateEvent("alarm", "start", 0)
@@ -2295,7 +2295,7 @@ Repeat
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Lor SelectedMonitor<>Null)
 			If (Msg<>GetLocalString("Messages", "saved") And Msg<>GetLocalString("Messages", "savecantloc") And Msg<>GetLocalString("Messages", "savecantmom")) Lor MsgTimer<=0 Then
-				Msg = Replace(GetLocalString("Messages", "savepress"), "%s", KeyName(KEY_SAVE))
+				Msg = Replace(GetLocalString("Messages", "savepress"), "%s", KeyName[KEY_SAVE])
 				MsgTimer = 70*4
 			EndIf
 			
@@ -2864,12 +2864,12 @@ Function DrawEnding()
 					
 					Local scpsEncountered=1
 					For i = 0 To 24
-						scpsEncountered = scpsEncountered+Achievements(i)
+						scpsEncountered = scpsEncountered+Achievements[i]
 					Next
 					
 					Local achievementsUnlocked =0
 					For i = 0 To MAXACHIEVEMENTS-1
-						achievementsUnlocked = achievementsUnlocked + Achievements(i)
+						achievementsUnlocked = achievementsUnlocked + Achievements[i]
 					Next
 					
 					AAText x, y, "SCPs encountered: " +scpsEncountered
@@ -3801,7 +3801,7 @@ Function DrawGUI()
 			DrawImage(HandIcon, x, y)
 			Color 0, 0, 0
 			Rect(x + 4, y + 4, 64 - 8, 64 - 8)
-			DrawImage(ArrowIMG(i), x + 21, y + 21)
+			DrawImage(ArrowIMG[i], x + 21, y + 21)
 			DrawArrowIcon(i) = False
 		EndIf
 	Next
@@ -6425,26 +6425,26 @@ Function DrawMenu()
 					y = y + 10*MenuScale
 					
 					AAText(x, y + 20 * MenuScale, GetLocalString("Options", "forward"))
-					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_UP,210)),5)		
+					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_UP,210)],5)		
 					AAText(x, y + 40 * MenuScale, GetLocalString("Options", "left"))
-					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_LEFT,210)),3)	
+					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_LEFT,210)],3)	
 					AAText(x, y + 60 * MenuScale, GetLocalString("Options", "backward"))
-					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_DOWN,210)),6)				
+					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_DOWN,210)],6)				
 					AAText(x, y + 80 * MenuScale, GetLocalString("Options", "right"))
-					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_RIGHT,210)),4)
+					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_RIGHT,210)],4)
 					
 					AAText(x, y + 100 * MenuScale, GetLocalString("Options", "blink"))
-					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_BLINK,210)),7)				
+					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_BLINK,210)],7)				
 					AAText(x, y + 120 * MenuScale, GetLocalString("Options", "sprint"))
-					InputBox(x + 200 * MenuScale, y + 120 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SPRINT,210)),8)
+					InputBox(x + 200 * MenuScale, y + 120 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SPRINT,210)],8)
 					AAText(x, y + 140 * MenuScale, GetLocalString("Options", "inv"))
-					InputBox(x + 200 * MenuScale, y + 140 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_INV,210)),9)
+					InputBox(x + 200 * MenuScale, y + 140 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_INV,210)],9)
 					AAText(x, y + 160 * MenuScale, GetLocalString("Options", "crouch"))
-					InputBox(x + 200 * MenuScale, y + 160 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CROUCH,210)),10)
+					InputBox(x + 200 * MenuScale, y + 160 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CROUCH,210)],10)
 					AAText(x, y + 180 * MenuScale, GetLocalString("Options", "save"))
-					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_SAVE,210)),11)	
+					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SAVE,210)],11)	
 					AAText(x, y + 200 * MenuScale, GetLocalString("Options", "console"))
-					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,KeyName(Min(KEY_CONSOLE,210)),12)
+					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CONSOLE,210)],12)
 					
 					If MouseOn(x,y,300*MenuScale,220*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"controls")
@@ -7226,15 +7226,15 @@ Function LoadEntities()
 	
 	InitItemTemplates()
 	
-	ParticleTextures(0) = LoadTexture_Strict("GFX\smoke.png", 1 + 2)
-	ParticleTextures(1) = LoadTexture_Strict("GFX\flash.jpg", 1 + 2)
-	ParticleTextures(2) = LoadTexture_Strict("GFX\dust.jpg", 1 + 2)
-	ParticleTextures(3) = LoadTexture_Strict("GFX\npcs\hg.pt", 1 + 2)
-	ParticleTextures(4) = LoadTexture_Strict("GFX\map\sun.jpg", 1 + 2)
-	ParticleTextures(5) = LoadTexture_Strict("GFX\bloodsprite.png", 1 + 2)
-	ParticleTextures(6) = LoadTexture_Strict("GFX\smoke2.png", 1 + 2)
-	ParticleTextures(7) = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
-	ParticleTextures(8) = LoadTexture_Strict("GFX\particle.png", 1 + 2)
+	ParticleTextures[0] = LoadTexture_Strict("GFX\smoke.png", 1 + 2)
+	ParticleTextures[1] = LoadTexture_Strict("GFX\flash.jpg", 1 + 2)
+	ParticleTextures[2] = LoadTexture_Strict("GFX\dust.jpg", 1 + 2)
+	ParticleTextures[3] = LoadTexture_Strict("GFX\npcs\hg.pt", 1 + 2)
+	ParticleTextures[4] = LoadTexture_Strict("GFX\map\sun.jpg", 1 + 2)
+	ParticleTextures[5] = LoadTexture_Strict("GFX\bloodsprite.png", 1 + 2)
+	ParticleTextures[6] = LoadTexture_Strict("GFX\smoke2.png", 1 + 2)
+	ParticleTextures[7] = LoadTexture_Strict("GFX\spark.jpg", 1 + 2)
+	ParticleTextures[8] = LoadTexture_Strict("GFX\particle.png", 1 + 2)
 	
 	SetChunkDataValues()
 	
@@ -7735,7 +7735,7 @@ Function NullGame(playbuttonsfx%=True)
 	Next
 	
 	For i = 0 To MAXACHIEVEMENTS-1
-		Achievements(i)=0
+		Achievements[i]=0
 	Next
 	RefinedItems = 0
 	
