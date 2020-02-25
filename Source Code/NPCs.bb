@@ -685,7 +685,7 @@ End Function
 
 
 Function UpdateNPCs()
-	CatchErrors("UpdateNPCs")
+	;CatchErrors("UpdateNPCs")
 	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
 	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
@@ -5051,7 +5051,7 @@ Function UpdateNPCs()
 			n\DropSpeed = 0
 		EndIf
 		
-		CatchErrors("Uncaught "+Chr(34)+n\NVName+Chr(34)+" NPC")
+		;CatchErrors("Uncaught "+Chr(34)+n\NVName+Chr(34)+" NPC")
 		
 	Next
 	

@@ -1,6 +1,6 @@
 
 Function SaveGame(file$)
-	CatchErrors("SaveGame")
+	;CatchErrors("SaveGame")
 	
 	Local I_Cheats.Cheats = First Cheats
 	Local I_Loc.Loc = First Loc
@@ -458,13 +458,13 @@ Function SaveGame(file$)
 		;SetSaveMSG("Game progress saved.")
 	EndIf
 	
-	CatchErrors("Uncaught SaveGame")
+	;CatchErrors("Uncaught SaveGame")
 End Function
 
 Function LoadGame(file$)
 	Local version$ = ""
 	
-	CatchErrors("LoadGame")
+	;CatchErrors("LoadGame")
 	DebugLog "---------------------------------------------------------------------------"
 	
 	Local I_Cheats.Cheats = First Cheats
@@ -1233,13 +1233,13 @@ Function LoadGame(file$)
 	
 	UpdateDoorsTimer = 0
 	
-	CatchErrors("Uncaught LoadGame")
+	;CatchErrors("Uncaught LoadGame")
 End Function
 
 Function LoadGameQuick(file$)
 	Local version$ = ""
 	
-	CatchErrors("LoadGameQuick")
+	;CatchErrors("LoadGameQuick")
 	DebugLog "---------------------------------------------------------------------------"
 	
 	Local I_Cheats.Cheats = First Cheats
@@ -1947,11 +1947,11 @@ Function LoadGameQuick(file$)
 	CameraFogMode(Camera, 1)
 	HideDistance# = 15.0
 	
-	CatchErrors("Uncaught LoadGameQuick")
+	;CatchErrors("Uncaught LoadGameQuick")
 End Function
 
 Function LoadSaveGames()
-	CatchErrors("LoadSaveGames")
+	;CatchErrors("LoadSaveGames")
 	SaveGameAmount = 0
 	If FileType(SavePath)=1 Then RuntimeError "Can't create dir "+Chr(34)+SavePath+Chr(34)
 	If FileType(SavePath)=0 Then CreateDir(SavePath)
@@ -2010,5 +2010,5 @@ Function LoadSaveGames()
 		CloseFile f
 	Next
 	
-	CatchErrors("Uncaught LoadSaveGames")
+	;CatchErrors("Uncaught LoadSaveGames")
 End Function

@@ -7,7 +7,7 @@ Type Materials
 End Type
 
 Function LoadMaterials(file$)
-	CatchErrors("LoadMaterials")
+	;CatchErrors("LoadMaterials")
 	;If Not BumpEnabled Then Return
 	
 	Local TemporaryString$
@@ -46,7 +46,7 @@ Function LoadMaterials(file$)
 	
 	CloseFile f
 	
-	CatchErrors("Uncaught LoadMaterials")
+	;CatchErrors("Uncaught LoadMaterials")
 End Function
 
 
@@ -130,7 +130,7 @@ Function FreeTextureCache()
 End Function
 
 Function LoadRMesh(file$,rt.RoomTemplates)
-	CatchErrors("LoadRMesh")
+	;CatchErrors("LoadRMesh")
 	;generate a texture made of white
 	Local blankTexture%
 	blankTexture=CreateTexture(4,4,1,1)
@@ -696,7 +696,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 	
 	CloseFile f
 	
-	CatchErrors("Uncaught LoadRMesh")
+	;CatchErrors("Uncaught LoadRMesh")
 	Return obj%
 	
 End Function
@@ -824,7 +824,7 @@ Function turn_if_deviating%(max_deviation_distance_%,pathx%,center_%,dir%,retval
 End Function
 
 Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
-	CatchErrors("PlaceForest")
+	;CatchErrors("PlaceForest")
 	;local variables
 	Local tx%,ty%
 	Local tile_size#=12.0
@@ -1089,11 +1089,11 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 		Next		
 	Next
 	
-	CatchErrors("Uncaught PlaceForest")
+	;CatchErrors("Uncaught PlaceForest")
 End Function
 
 Function DestroyForest(fr.Forest)
-	CatchErrors("DestroyForest")
+	;CatchErrors("DestroyForest")
 	Local tx%,ty%
 	For tx% = 0 To gridsize-1
 		For ty% = 0 To gridsize-1
@@ -1120,13 +1120,13 @@ Function DestroyForest(fr.Forest)
 		If fr\TileTexture[i]<>0 Then FreeEntity fr\TileTexture[i] : fr\TileTexture[i]=0
 	Next
 	
-	CatchErrors("Uncaught DestroyForest")
+	;CatchErrors("Uncaught DestroyForest")
 	;Delete fr
 End Function
 
 
 Function UpdateForest(fr.Forest,ent%)
-	CatchErrors("UpdateForest")
+	;CatchErrors("UpdateForest")
 	;local variables
 	Local tx%,ty%
 	If Abs(EntityY(ent,True)-EntityY(fr\Forest_Pivot,True))<12.0 Then
@@ -1146,7 +1146,7 @@ Function UpdateForest(fr.Forest,ent%)
 			Next
 		Next
 	EndIf
-	CatchErrors("Uncaught UpdateForest")
+	;CatchErrors("Uncaught UpdateForest")
 End Function
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1209,7 +1209,7 @@ End Function
 Function LoadRoomTemplates(file$)
 	Local I_Loc.Loc = First Loc
 	
-	CatchErrors("LoadRoomTemplates")
+	;CatchErrors("LoadRoomTemplates")
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file)=1 Then
 		file = I_Loc\LangPath + file
 	EndIf
@@ -1267,7 +1267,7 @@ Function LoadRoomTemplates(file$)
 	
 	CloseFile f
 	
-	CatchErrors("Uncaught LoadRoomTemplates")
+	;CatchErrors("Uncaught LoadRoomTemplates")
 End Function
 
 
@@ -1419,7 +1419,7 @@ Function UpdateGrid(grid.Grids)
 End Function
 
 Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
-	CatchErrors("CreateRoom")
+	;CatchErrors("CreateRoom")
 	Local r.Rooms = New Rooms
 	Local rt.RoomTemplates
 	
@@ -1494,11 +1494,11 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 		Next
 	Next
 	
-	CatchErrors("Uncaught CreateRoom")
+	;CatchErrors("Uncaught CreateRoom")
 End Function
 
 Function FillRoom(r.Rooms)
-	CatchErrors("FillRoom")
+	;CatchErrors("FillRoom")
 	Local d.Doors, d2.Doors, sc.SecurityCams, de.Decals, r2.Rooms, sc2.SecurityCams
 	Local it.Items, i%
 	Local xtemp%, ytemp%, ztemp%
@@ -4897,11 +4897,11 @@ Function FillRoom(r.Rooms)
 		EndIf
 	Next
 	
-	CatchErrors("Uncaught FillRoom ("+r\RoomTemplate\Name+")")
+	;CatchErrors("Uncaught FillRoom ("+r\RoomTemplate\Name+")")
 End Function
 
 Function UpdateRooms()
-	CatchErrors("UpdateRooms")
+	;CatchErrors("UpdateRooms")
 	Local dist#, i%, j%, r.Rooms
 	
 	Local x#,z#,hide%=True
@@ -5047,7 +5047,7 @@ Function UpdateRooms()
 		Next
 	EndIf
 	
-	CatchErrors("Uncaught UpdateErrors")
+	;CatchErrors("Uncaught UpdateErrors")
 End Function
 
 Function IsRoomAdjacent(this.Rooms,that.Rooms)
@@ -5701,7 +5701,7 @@ Function CreateSecurityCam.SecurityCams(x#, y#, z#, r.Rooms, screen% = False)
 End Function
 
 Function UpdateSecurityCams()
-	CatchErrors("UpdateSecurityCams")
+	;CatchErrors("UpdateSecurityCams")
 	Local sc.SecurityCams
 	
 	;coffineffect = 0, not affected by 895
@@ -5937,12 +5937,12 @@ Function UpdateSecurityCams()
 			
 			If sc<>Null Then
 				If sc\room<>Null Then
-					CatchErrors("Uncaught UpdateSecurityCameras ("+sc\room\RoomTemplate\Name+")")
+					;CatchErrors("Uncaught UpdateSecurityCameras ("+sc\room\RoomTemplate\Name+")")
 				Else
-					CatchErrors("Uncaught UpdateSecurityCameras (screen has no room)")
+					;CatchErrors("Uncaught UpdateSecurityCameras (screen has no room)")
 				EndIf
 			Else
-				CatchErrors("Uncaught UpdateSecurityCameras (screen doesn't exist anymore)")
+				;CatchErrors("Uncaught UpdateSecurityCameras (screen doesn't exist anymore)")
 			EndIf
 		EndIf
 	Next

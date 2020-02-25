@@ -320,7 +320,7 @@ Type Items
 End Type 
 
 Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#=1.0,invSlots%=0)
-	CatchErrors("CreateItem")
+	;CatchErrors("CreateItem")
 	
 	Local i.Items = New Items
 	Local it.ItemTemplates
@@ -391,12 +391,12 @@ Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#
 	i\ID=LastItemID+1
 	LastItemID=i\ID
 	
-	CatchErrors("Uncaught CreateItem")
+	;CatchErrors("Uncaught CreateItem")
 	Return i
 End Function
 
 Function RemoveItem(i.Items)
-	CatchErrors("RemoveItem")
+	;CatchErrors("RemoveItem")
 	Local n
 	FreeEntity(i\model) : FreeEntity(i\collider) : i\collider = 0
 	
@@ -434,12 +434,12 @@ Function RemoveItem(i.Items)
 	EndIf
 	Delete i
 	
-	CatchErrors("Uncaught RemoveItem")
+	;CatchErrors("Uncaught RemoveItem")
 End Function
 
 
 Function UpdateItems()
-	CatchErrors("UpdateItems")
+	;CatchErrors("UpdateItems")
 	Local n, i.Items, i2.Items
 	Local xtemp#, ytemp#, ztemp#
 	Local temp%, np.NPCs
@@ -540,7 +540,7 @@ Function UpdateItems()
 		EndIf
 		
 		If Not deletedItem Then
-			CatchErrors("Uncaught "+Chr(34)+i\itemtemplate\localname+Chr(34)+" item")
+			;CatchErrors("Uncaught "+Chr(34)+i\itemtemplate\localname+Chr(34)+" item")
 		EndIf
 		deletedItem = False
 	Next
@@ -575,7 +575,7 @@ Function PickItem(item.Items)
 		Return
 	EndIf
 	
-	CatchErrors("PickItem")
+	;CatchErrors("PickItem")
 	If (Not fullINV) Then
 		For n% = 0 To MaxItemAmount - 1
 			If Inventory(n) = Null Then
@@ -703,7 +703,7 @@ Function PickItem(item.Items)
 		Msg = GetLocalString("Messages", "cantcarrymore")
 		MsgTimer = 70 * 5
 	EndIf
-	CatchErrors("Uncaught PickItem")
+	;CatchErrors("Uncaught PickItem")
 End Function
 
 Function DropItem(item.Items,playdropsound%=True)
@@ -713,7 +713,7 @@ Function DropItem(item.Items,playdropsound%=True)
 		Return
 	EndIf
 	
-	CatchErrors("DropItem")
+	;CatchErrors("DropItem")
 	If playdropsound Then
 		If item\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(item\itemtemplate\sound))
 	EndIf
@@ -754,13 +754,13 @@ Function DropItem(item.Items,playdropsound%=True)
 			I_427\Using = 0
 	End Select
 	
-	CatchErrors("Uncaught DropItem")
+	;CatchErrors("Uncaught DropItem")
 	
 End Function
 
 ;Update any ailments inflicted by SCP-294 drinks.
 Function Update294()
-	CatchErrors("Update294")
+	;CatchErrors("Update294")
 	
 	If CameraShakeTimer > 0 Then
 		CameraShakeTimer = CameraShakeTimer - (FPSfactor/70)
@@ -841,5 +841,5 @@ Function Update294()
 		EndIf
 	EndIf
 	
-	CatchErrors("Uncaught Update294")
+	;CatchErrors("Uncaught Update294")
 End Function

@@ -2428,7 +2428,7 @@ Repeat
 	EntityBlend fresize_image,1
 	EntityAlpha fresize_image,1.0
 	
-	CatchErrors("Uncaught Main loop")
+	;CatchErrors("Uncaught Main loop")
 	
 	If Vsync = 0 Then
 		Flip 0
@@ -2442,7 +2442,7 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
 Function QuickLoadEvents()
-	CatchErrors("QuickLoadEvents")
+	;CatchErrors("QuickLoadEvents")
 	
 	Local e.Events = QuickLoad_CurrEvent
 	
@@ -2715,7 +2715,7 @@ Function QuickLoadEvents()
 
 	End Select
 	
-	CatchErrors("Uncaught QuickLoadEvents "+e\EventName)
+	;CatchErrors("Uncaught QuickLoadEvents "+e\EventName)
 	
 End Function
 
@@ -3055,7 +3055,7 @@ End Function
 ;--------------------------------------- player controls -------------------------------------------
 
 Function MovePlayer()
-	CatchErrors("MovePlayer")
+	;CatchErrors("MovePlayer")
 	Local Sprint# = 1.0, Speed# = 0.018, i%, angle#
 	Local I_Cheats.Cheats = First Cheats	
 	
@@ -3410,7 +3410,7 @@ Function MovePlayer()
 		HeartBeatVolume = Max(HeartBeatVolume - FPSfactor*0.05, 0)
 	EndIf
 	
-	CatchErrors("Uncaught MovePlayer")
+	;CatchErrors("Uncaught MovePlayer")
 End Function
 
 Function MouseLook()
@@ -3671,7 +3671,7 @@ End Function
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
 
 Function DrawGUI()
-	CatchErrors("DrawGUI")
+	;CatchErrors("DrawGUI")
 	
 	Local I_Opt.Options = First Options
 	Local I_Cheats.Cheats = First Cheats
@@ -6100,11 +6100,11 @@ Function DrawGUI()
 	
 	If PrevInvOpen And (Not InvOpen) Then MoveMouse viewport_center_x, viewport_center_y
 	
-	CatchErrors("Uncaught DrawGUI")
+	;CatchErrors("Uncaught DrawGUI")
 End Function
 
 Function DrawMenu()
-	CatchErrors("DrawMenu")
+	;CatchErrors("DrawMenu")
 	
 	Local I_Opt.Options = First Options
 	
@@ -6813,7 +6813,7 @@ Function DrawMenu()
 	
 	AASetFont Font1
 	
-	CatchErrors("Uncaught DrawMenu")
+	;CatchErrors("Uncaught DrawMenu")
 End Function
 
 Function MouseOn%(x%, y%, width%, height%)
@@ -6833,7 +6833,7 @@ Function LoadEntities()
 	
 	Local I_Opt.Options = First Options
 
-	CatchErrors("LoadEntities")
+	;CatchErrors("LoadEntities")
 	DrawLoading(0)
 	
 	Local i%
@@ -7378,11 +7378,11 @@ Function LoadEntities()
 	
 	;LoadRoomMeshes()
 	
-	CatchErrors("Uncaught LoadEntities")
+	;CatchErrors("Uncaught LoadEntities")
 End Function
 
 Function InitNewGame()
-	CatchErrors("InitNewGame")
+	;CatchErrors("InitNewGame")
 	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
 	DrawLoading(45)
@@ -7530,11 +7530,11 @@ Function InitNewGame()
 	DropSpeed = 0
 	
 	PrevTime = MilliSecs()
-	CatchErrors("Uncaught InitNewGame")
+	;CatchErrors("Uncaught InitNewGame")
 End Function
 
 Function InitLoadGame()
-	CatchErrors("InitLoadGame")
+	;CatchErrors("InitLoadGame")
 	Local d.Doors, sc.SecurityCams, rt.RoomTemplates, e.Events
 	
 	DrawLoading(80)
@@ -7618,7 +7618,7 @@ Function InitLoadGame()
 	
 	FreeTextureCache
 	
-	CatchErrors("Uncaught InitLoadGame")
+	;CatchErrors("Uncaught InitLoadGame")
 	DrawLoading(100)
 	
 	PrevTime = MilliSecs()
@@ -7628,7 +7628,7 @@ Function InitLoadGame()
 End Function
 
 Function NullGame(playbuttonsfx%=True)
-	CatchErrors("NullGame")
+	;CatchErrors("NullGame")
 	Local i%, x%, y%, lvl
 	Local itt.ItemTemplates, s.Screens, lt.LightTemplates, d.Doors, m.Materials
 	Local wp.WayPoints, twp.TempWayPoints, r.Rooms, it.Items
@@ -7898,7 +7898,7 @@ Function NullGame(playbuttonsfx%=True)
 	Sky = 0
 	InitFastResize()
 	
-	CatchErrors("Uncaught NullGame")
+	;CatchErrors("Uncaught NullGame")
 End Function
 
 Include "Source Code\save.bb"
@@ -10090,29 +10090,29 @@ Function ScaledMouseY%(I_Opt.Options)
 	Return Float(MouseY())*Float(I_Opt\GraphicHeight)/Float(RealGraphicHeight)
 End Function
 
-Function CatchErrors(location$)
-	Local e.Events
-	Local errtxt$
-	errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
-	errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
-	errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
-	errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
-	errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
-	errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
-	errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
-	If PlayerRoom <> Null Then
-		errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
-		
-		For ev.Events = Each Events
-			If ev\room = PlayerRoom Then
-				errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
-				Exit
-			EndIf
-		Next
-	EndIf
-	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
-	ErrorMessage errtxt
-End Function
+;Function CatchErrors(location$)
+;	Local e.Events
+;	Local errtxt$
+;	errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
+;	errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
+;	errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
+;	errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
+;	errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
+;	errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
+;	errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
+;	If PlayerRoom <> Null Then
+;		errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
+;		
+;		For ev.Events = Each Events
+;			If ev\room = PlayerRoom Then
+;				errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
+;				Exit
+;			EndIf
+;		Next
+;	EndIf
+;	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
+;	ErrorMessage errtxt
+;End Function
 
 Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
 	Local img% = CreateImage(width,height)
