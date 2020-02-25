@@ -279,11 +279,7 @@ Else
 	AspectRatioRatio = 1.0
 	RealGraphicWidth = I_Opt\GraphicWidth
 	RealGraphicHeight = I_Opt\GraphicHeight
-	If I_Opt\GraphicMode = 0 Then
-		Graphics3DExt(I_Opt\GraphicWidth, I_Opt\GraphicHeight, 0, 1)
-	Else
-		Graphics3DExt(I_Opt\GraphicWidth, I_Opt\GraphicHeight, 0, 2)
-	EndIf
+	Graphics3DExt(I_Opt\GraphicWidth, I_Opt\GraphicHeight, 0, (I_Opt\GraphicMode = 2) + 1)
 EndIf
 
 If FileType(I_Loc\LangPath + Data294) = 1 Then
@@ -10082,6 +10078,7 @@ Function CheckTriggers$()
 End Function
 
 Function ScaledMouseX%(I_Opt.Options)
+	DebugLog RealGraphicWidth
 	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(I_Opt\GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
 
@@ -10089,29 +10086,27 @@ Function ScaledMouseY%(I_Opt.Options)
 	Return Float(MouseY())*Float(I_Opt\GraphicHeight)/Float(RealGraphicHeight)
 End Function
 
-;Function CatchErrors(location$)
-;	Local e.Events
-;	Local errtxt$
-;	errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
-;	errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
-;	errtxt = errtxt+"CPU: "+GetEnv("PROCESSOR_IDENTIFIER")+" (Arch: "+GetEnv("PROCESSOR_ARCHITECTURE")+", "+GetEnv("NUMBER_OF_PROCESSORS")+" Threads)"+Chr(10)
-;	errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
-;	errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
-;	errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
-;	errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
-;	If PlayerRoom <> Null Then
-;		errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
-;		
-;		For ev.Events = Each Events
-;			If ev\room = PlayerRoom Then
-;				errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
-;				Exit
-;			EndIf
-;		Next
-;	EndIf
-;	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
-;	ErrorMessage errtxt
-;End Function
+Function CatchErrors(location$)
+	Local errtxt$
+	errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
+	errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
+	errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
+	errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
+	errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
+	errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
+	If PlayerRoom <> Null Then
+		errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
+		
+		For ev.Events = Each Events
+			If ev\room = PlayerRoom Then
+				errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
+				Exit
+			EndIf
+		Next
+	EndIf
+	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
+	ErrorMessage errtxt
+End Function
 
 Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
 	Local img% = CreateImage(width,height)
@@ -10237,7 +10232,7 @@ Function PlayStartupVideos()
 	Local Cam = CreateCamera() 
 	CameraClsMode Cam, 0, 1
 	Local Quad = CreateQuad()
-	Local Texture = CreateTexture(2048, 2048, 256 Or 16 Or 32)
+	Local Texture = CreateTexture(2048, 2048, 256 + 16 + 32)
 	EntityTexture Quad, Texture
 	EntityFX Quad, 1
 	CameraRange Cam, 0.01, 100

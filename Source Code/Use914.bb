@@ -404,7 +404,11 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1", "fine", "very fine"
-					remove = 0
+					If Rand(10) = 1 Then
+						it2 = CreateItem("key", x, y, z)
+					Else
+						remove = 0
+					EndIf
 			End Select
 		Case "scp1025"
 			Select setting
@@ -436,10 +440,10 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					If Rand(3) = 1 Then
 						it2 = CreateItem("scp1025", x, y, z)
 					Else
-						remove = False
+						remove = 0
 					EndIf
 				Case "fine","veryfine"
-					remove = False
+					remove = 0
 			End Select
 		;Case "scp1123" ;no idea
 		Case "bad1499"
@@ -681,10 +685,14 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1", "fine", "very fine"
-					If Rand(100) Then
-						CreateItem("badge", x, y, z, "oldbadge")
+					If item\itemtemplate\namespec = "" Then
+						If Rand(100) Then
+							it2 = CreateItem("badge", x, y, z, "oldbadge")
+						Else
+							remove = 0
+						EndIf
 					Else
-						remove = 0
+						it2 = CreateItem("badge", x, y, z)
 					EndIf
 			End Select
 		Case "badgasmask"
@@ -816,6 +824,125 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "1:1", "fine", "very fine"
 					remove = 0
 			End Select
+		Case "nav300", "nav"
+			Select setting
+				Case "rough", "coarse"
+					it2 = CreateItem("misc", x, y, z, "electronical")
+				Case "1:1"
+					If item\itemtemplate\tempname = "nav" Then
+						it2 = CreateItem("nav", x, y, z)
+					Else
+						it2 = CreateItem("nav300", x, y, z)
+					EndIf
+					it2\state = item\state
+				Case "fine"
+					it2 = CreateItem("nav310", x, y, z)
+					it2\state = Min(100, item\state * 2)
+				Case "very fine"
+					it2 = CreateItem("navulti", x, y, z)
+			End Select
+		Case "nav310"
+			Select setting
+				Case "rough"
+					it2 = CreateItem("misc", x, y, z, "electronical")
+				Case "coarse"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("nav", x, y, z)
+					Else
+						it2 = CreateItem("nav300", x, y, z)
+					EndIf
+					it2\state = Min(100, item\state * 2)
+				Case "1:1"
+					remove = 0
+				Case "fine", "veryfine"
+					it2 = CreateItem("navulti", x, y, z)
+			End Select
+		Case "navulti"
+			Select setting
+				Case "rough"
+					If Rand(2) = 1 Then
+						it2 = CreateItem("nav", x, y, z)
+					Else
+						it2 = CreateItem("nav300", x, y, z)
+					EndIf
+					it2\state = 0
+				Case "coarse"
+					it2 = CreateItem("nav310", x, y, z)
+					it2\state = 100
+				Case "1:1", "fine", "very fine"
+					remove = 0
+			End Select
+		Case "radio"
+			Select setting
+				Case "rough", "coarse"
+					it2 = CreateItem("misc", x, y, z, "electronical")
+				Case "1:1"
+					it2 = CreateItem("18vradio", x, y, z)
+					it2\state = item\state
+				Case "fine"
+					it2 = CreateItem("fineradio", x, y, z)
+					it2\state = 101
+				Case "very fine"
+					it2 = CreateItem("veryfineradio", x, y, z)
+					it2\state = 101
+			End Select
+		Case "fineradio"
+			Select setting
+				Case "rough"
+					it2 = CreateItem("misc", x, y, z, "electronical")
+				Case "coarse"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("18vradio", x, y, z)
+					Else
+						it2 = CreateItem("radio", x, y, z)
+					EndIf
+					it2\state = 100
+				Case "1:1"
+					remove = 0
+				Case "fine", "very fine"
+					it2 = CreateItem("veryfineradio", x, y, z)
+					it2\state = 101
+			End Select
+		Case "veryfineradio"
+			Select setting
+				Case "rough"
+					If Rand(2) = 1 Then
+						it2 = CreateItem("18vradio", x, y, z)
+					Else
+						it2 = CreateItem("radio", x, y, z)
+					EndIf
+					it2\state = 0
+				Case "coarse"
+					it2 = CreateItem("fineradio", x, y, z)
+					it2\state = 101
+				Case "1:1", "fine", "very fine"
+					remove = 0
+			End Select
+		Case "bat"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					remove = 0
+				Case "fine"
+					it2 = CreateItem("18vbat", x, y, z)
+				Case "very fine"
+					it2 = CreateItem("killbat", x, y, z)
+			End Select
+		Case "18vbat"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					it2 = CreateItem("bat", x, y, z)
+				Case "1:1"
+					remove = 0
+				Case "fine", "very fine"
+					it2 = CreateItem("killbat", x, y, z)
+			End Select
+		;Case "killbat" ;doesn't need refinements
 		Case "badvest"
 			Select setting
 				Case "rough", "coarse"
@@ -892,18 +1019,17 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					remove = 0
 			End Select
 		;Case "emptycup" ;no idea, fill it would cause issues with localization
-		;TODO am here
 		Case "firstaid", "firstaid2"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
-				If Rand(2)=1 Then
-					it2 = CreateItem("firstaid2", x, y, z)
-				Else
-					it2 = CreateItem("firstaid", x, y, z)
-				EndIf
+					If item\itemtemplate\tempname = "firstaid" Then
+						it2 = CreateItem("firstaid2", x, y, z)
+					Else
+						it2 = CreateItem("firstaid", x, y, z)
+					EndIf
 				Case "fine"
 					it2 = CreateItem("finefirstaid", x, y, z)
 				Case "very fine"
@@ -915,39 +1041,158 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "coarse"
-					it2 = CreateItem("firstaid", x, y, z)
+					If Rand(3) = 1 Then
+						it2 = CreateItem("firstaid", x, y, z)
+					Else
+						it2 = CreateItem("firstaid2", x, y, z)
+					EndIf
 				Case "1:1"
-					it2 = CreateItem("finefirstaid", x, y, z)
+					it2 = CreateItem("syringe", x, y, z)
 				Case "fine", "very fine"
 					it2 = CreateItem("veryfinefirstaid", x, y, z)
 			End Select
 		Case "veryfinefirstaid"
 			Select setting
 				Case "rough"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "coarse"
-					If Rand(3) = 1 Then
+					If Rand(2) = 1 Then
 						it2 = CreateItem("firstaid2", x, y, z)
 					Else
 						it2 = CreateItem("firstaid", x, y, z)
 					EndIf
-				Case "1:1"
-					If Rand(3)=1 Then
-						it2 = CreateItem("veryfinefirstaid", x, y, z)
+				Case "coarse"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("syringe", x, y, z)
 					Else
 						it2 = CreateItem("finefirstaid", x, y, z)
+					EndIf
+				Case "1:1", "fine", "very fine"
+					it2 = CreateItem("veryfinesyringe", x, y, z)
+			End Select
+		Case "eyedrops", "redeyedrops"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					If item\itemtemplate\namespec = "" Then
+						it2 = CreateItem("eyedrops", x, y, z, "redeyedrops")
+					Else
+						it2 = CreateIteM("eyedrops", x, y, z)
 					EndIf
 				Case "fine"
-					If Rand(3)=1 Then
-						it2 = CreateItem("finefirstaid", x, y, z)
-					Else
-						it2 = CreateItem("veryfinefirstaid", x, y, z)
-					EndIf
+					it2 = CreateItem("fineeyedrops", x,y,z)
 				Case "very fine"
-					it2 = CreateItem("veryfinefirstaid", x, y, z)
+					it2 = CreateItem("supereyedrops", x,y,z)
 			End Select
-		Case "clipboard"
+		Case "fineeyedrops"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
+					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("eyedrops", x, y, z, "redeyedrops")
+					Else
+						it2 = CreateIteM("eyedrops", x, y, z)
+					EndIf
+				Case "1:1"
+					remove = 0
+				Case "fine", "very fine"
+					it2 = CreateItem("supereyedrops", x,y,z)
+			End Select
+		Case "supereyedrops"
+			Select setting
+				Case "rough"
+					If Rand(2) = 1 Then
+						it2 = CreateItem("eyedrops", x, y, z, "redeyedrops")
+					Else
+						it2 = CreateIteM("eyedrops", x, y, z)
+					EndIf
+				Case "coarse"
+					it2 = CreateItem("fineeyedrops", x,y,z)
+				Case "1:1", "fine", "very fine"
+					remove = 0
+			End Select
+		Case "syringe"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					it2 = CreateItem("finefirstaid", x, y, z)	
+				Case "fine"
+					it2 = CreateItem("finesyringe", x, y, z)
+				Case "very fine"
+					it2 = CreateItem("veryfinesyringe", x, y, z)
+			End Select
+		Case "finesyringe"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					If Rand(3) = 1 Then
+						it2 = CreateItem("firstaid", x, y, z)
+					Else
+						it2 = CreateItem("syringe", x, y, z)
+					EndIf
+				Case "1:1"
+					it2 = CreateItem("firstaid2", x, y, z)	
+				Case "fine", "very fine"
+					it2 = CreateItem("veryfinesyringe", x, y, z)
+			End Select
+		Case "veryfinesyringe"
+			Select setting
+				Case "rough", "coarse", "1:1", "fine"
+					it2 = CreateItem("misc", x, y, z, "electronical")	
+				Case "very fine"
+					n.NPCs = CreateNPC(NPCtype008,x,y,z)
+					n\State = 2
+			End Select
+		Case "hand", "hand2"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(3, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1", "fine", "very fine"
+					If (item\itemtemplate\tempname = "hand")
+						it2 = CreateItem("hand2", x, y, z)
+					Else
+						it2 = CreateItem("hand", x, y, z)
+					EndIf
+			End Select
+			;I believe a "fine" open-all hand would be too OP
+		Case "key"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.1 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1", "fine", "very fine"
+					If Rand(10) Then
+						it2 = CreateItem("scp860", x, y, z)
+					Else
+						remove = 0
+					EndIf
+			End Select
+		Case "coin", "quarter"
+			Select setting
+				Case "rough", "coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					If item\itemtemplate\tempname = "coin" Then
+						it2 = CreateItem("quarter", x, y, z)
+					Else
+						If Rand(50) = 1 Then
+							it2 = CreateItem("coin", x, y, z)
+						Else
+							remove = 0
+						EndIf
+					EndIf
+				Case "fine", "very fine"
+					it2 = CreateItem("misc", x, y, z, "keymaster")
+			End Select
+		Case "clipboard", "wallet"
 			Select setting
 				Case "rough"
 					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
@@ -978,112 +1223,6 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "very fine"
 					item\invSlots = 20
 					remove = 0
-			End Select
-		Case "hand", "hand2"
-			Select setting
-				Case "rough", "coarse"
-					d.Decals = CreateDecal(3, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1", "fine", "very fine"
-					If (item\itemtemplate\tempname = "hand")
-						it2 = CreateItem("hand2", x, y, z)
-					Else
-						it2 = CreateItem("hand", x, y, z)
-					EndIf
-			End Select
-		Case "coin", "quarter"
-			Select setting
-				Case "rough", "coarse"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					it2 = CreateItem("key1", x, y, z)	
-				Case "fine", "very fine"
-					it2 = CreateItem("key2", x, y, z)
-			End Select
-		Case "nav300", "nav310", "nav", "navulti"
-			Select setting
-				Case "rough", "coarse"
-					it2 = CreateItem("misc", x, y, z, "electronical")
-				Case "1:1"
-					it2 = CreateItem("nav", x, y, z)
-					it2\state = 100
-				Case "fine"
-					it2 = CreateItem("nav310", x, y, z)
-					it2\state = 100
-				Case "very fine"
-					it2 = CreateItem("navulti", x, y, z)
-					it2\state = 101
-			End Select
-		Case "radio", "fineradio", "veryfineradio"
-			Select setting
-				Case "rough", "coarse"
-					it2 = CreateItem("misc", x, y, z, "electronical")
-				Case "1:1"
-					it2 = CreateItem("18vradio", x, y, z)
-					it2\state = 100
-				Case "fine"
-					it2 = CreateItem("fineradio", x, y, z)
-					it2\state = 101
-				Case "very fine"
-					it2 = CreateItem("veryfineradio", x, y, z)
-					it2\state = 101
-			End Select
-		Case "bat", "18vbat", "killbat"
-			Select setting
-				Case "rough", "coarse"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					it2 = CreateItem("18vbat", x, y, z)
-				Case "fine"
-					it2 = CreateItem("killbat", x, y, z)
-				Case "very fine"
-					it2 = CreateItem("killbat", x, y, z)
-			End Select
-		Case "eyedrops", "redeyedrops"
-			Select setting
-				Case "rough", "coarse"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					it2 = CreateItem("eyedrops", x,y,z, "redeyedrops")
-				Case "fine"
-					it2 = CreateItem("fineeyedrops", x,y,z)
-				Case "very fine"
-					it2 = CreateItem("supereyedrops", x,y,z)
-			End Select
-		Case "syringe"
-			Select setting
-				Case "rough", "coarse"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "1:1"
-					it2 = CreateItem("finefirstaid", x, y, z)	
-				Case "fine"
-					it2 = CreateItem("finesyringe", x, y, z)
-				Case "very fine"
-					it2 = CreateItem("veryfinesyringe", x, y, z)
-			End Select
-		Case "finesyringe"
-			Select setting
-				Case "rough"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.07 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "coarse"
-					it2 = CreateItem("firstaid", x, y, z)
-				Case "1:1"
-					it2 = CreateItem("firstaid2", x, y, z)	
-				Case "fine", "very fine"
-					it2 = CreateItem("veryfinesyringe", x, y, z)
-			End Select
-		Case "veryfinesyringe"
-			Select setting
-				Case "rough", "coarse", "1:1", "fine"
-					it2 = CreateItem("misc", x, y, z, "electronical")	
-				Case "very fine"
-					n.NPCs = CreateNPC(NPCtype008,x,y,z)
-					n\State = 2
 			End Select
 		Default
 			Select setting

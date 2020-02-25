@@ -155,7 +155,7 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
 	DebugLog "t" + I_Opt\AATextEnabled
-	DebugLog "lll" + font\isAA
+	DebugLog "lll" + font\isAA ;TODO font is sometimes null
 	
 	If (GraphicsBuffer()<>BackBuffer()) Lor (Not I_Opt\AATextEnabled) Lor (Not font\isAA) Then
 		SetFont font\lowResFont

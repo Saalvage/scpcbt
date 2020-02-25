@@ -230,6 +230,20 @@ Function InitItemTemplates()
 	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02, 2)
 	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02, 2)
 	
+	CreateItemTemplate("nav300", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("navulti", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("nav310", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	
+	CreateItemTemplate("radio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
+	CreateItemTemplate("fineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
+	CreateItemTemplate("veryfineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
+	CreateItemTemplate("18vradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.02, 1)
+	
+	CreateItemTemplate("bat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008, 1)
+	CreateItemTemplate("18vbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, 1, "", "GFX\items\Battery\Battery 18V.jpg")
+	CreateItemTemplate("killbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery22900.jpg", "", 0.01, 1, "","GFX\items\Battery\Strange Battery.jpg")
+	
 	CreateItemTemplate("badvest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.018, 2)
 	CreateItemTemplate("vest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.02, 2)
 	CreateItemTemplate("finevest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.022, 2)
@@ -241,24 +255,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("firstaid", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid.jpg", "", 0.05, 1)
 	CreateItemTemplate("finefirstaid", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid.jpg", "", 0.03, 1)
 	CreateItemTemplate("firstaid2", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid2.jpg", "", 0.03, 1, "", "GFX\items\firstaidkit2.jpg")
-	CreateItemTemplate("veryfinefirstaid", "GFX\items\eyedrops.b3d", "GFX\items\INVbottle.jpg", "", 0.002, 1, "", "GFX\items\bottle.jpg")	
-	
-	CreateItemTemplate("nav300", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	CreateItemTemplate("navulti", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	CreateItemTemplate("nav310", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	
-	CreateItemTemplate("radio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
-	CreateItemTemplate("fineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
-	CreateItemTemplate("veryfineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
-	CreateItemTemplate("18vradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.02, 1)
-	
-	CreateItemTemplate("hand", "GFX\items\severedhand.b3d", "GFX\items\INVhand.jpg", "", 0.04, 2)
-	CreateItemTemplate("hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.04, 2, "", "GFX\items\shand2.png")
-	
-	CreateItemTemplate("bat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008, 1)
-	CreateItemTemplate("18vbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, 1, "", "GFX\items\Battery\Battery 18V.jpg")
-	CreateItemTemplate("killbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery22900.jpg", "", 0.01, 1, "","GFX\items\Battery\Strange Battery.jpg")
+	CreateItemTemplate("veryfinefirstaid", "GFX\items\eyedrops.b3d", "GFX\items\INVbottle.jpg", "", 0.002, 1, "", "GFX\items\bottle.jpg")
 	
 	CreateItemTemplate("fineeyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
 	CreateItemTemplate("supereyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
@@ -268,6 +265,9 @@ Function InitItemTemplates()
 	CreateItemTemplate("syringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005, 2)
 	CreateItemTemplate("finesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005, 2)
 	CreateItemTemplate("veryfinesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005, 2)
+	
+	CreateItemTemplate("hand", "GFX\items\severedhand.b3d", "GFX\items\INVhand.jpg", "", 0.04, 2)
+	CreateItemTemplate("hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.04, 2, "", "GFX\items\shand2.png")
 	
 	CreateItemTemplate("key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, 3, "lkey", "GFX\items\key2.png","",0,1+2+8)
 	CreateItemTemplate("coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)

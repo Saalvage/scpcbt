@@ -8,7 +8,7 @@
 - Added anisotropic filtering.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
-- Added vehicle in the intro sequence (Made by Ultimate Edition Team).
+- Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
 - Added improved SCP-205 label that is more in line with other labels.
@@ -34,12 +34,12 @@
 	- Added SCP-1025 refinements.
 	- Added a very special book.
 	- Added ability to get electronics via Electronical Components.
-	- Added worse clipboards.
+	- Added worse clipboards and wallets.
 	- Added Bad Hazmat Suit.
 	- Added a weird vest.
 	- Added consistency.
 	- Fixed SCP-148's refinements.
-	- And some other minor stuff.
+	- And a lot of other improvements!
 - Geometry the player can't interact with no longer has collision, should result in a performance boost.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
