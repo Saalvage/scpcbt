@@ -130,12 +130,10 @@ Function SaveGame(file$)
 	Next
 	WriteInt f, RefinedItems
 	
-	For lvl = 0 To 2
-		For x = 0 To MapWidth
-			For y = 0 To MapHeight
-				WriteInt f, MapTemp(x, y)
-				WriteByte f, MapFound(x, y)
-			Next
+	For x = 0 To MapWidth
+		For y = 0 To MapHeight
+			WriteInt f, MapTemp(x, y)
+			WriteByte f, MapFound(x, y)
 		Next
 	Next
 	

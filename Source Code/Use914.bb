@@ -857,36 +857,39 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "cup"
 			Select setting
 				Case "rough"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.010, z, 90, Rand(360), 0)
-					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
+					If item\state > 0 Then
+						item\state = -3
+						remove = 0
+					EndIf
 				Case "coarse"
-					item\r = 0
-					item\g = 0
-					item\b = 0
-					remove = 0
+					If item\state > -3 Then
+						item\state = item\state - 1
+						item\r = item\r*0.9
+						item\g = item\r*0.9
+						item\b = item\r*0.9
+						remove = 0
+					EndIf
 				Case "1:1"
-					it2 = CreateItem("cup", x,y,z)
-					it2\localname = item\localname
-					it2\r = 255-item\r
-					it2\g = 255-item\g
-					it2\b = 255-item\b
+					item\state = -item\state
+					item\r = 255-item\r
+					item\g = 255-item\g
+					item\b = 255-item\b
+					remove = 0
 				Case "fine"
-					it2 = CreateItem("cup", x,y,z)
-					it2\localname = item\localname
-					it2\state = 1.0
-					it2\r = Min(item\r*Rnd(0.9,1.1),255)
-					it2\g = Min(item\g*Rnd(0.9,1.1),255)
-					it2\b = Min(item\b*Rnd(0.9,1.1),255)
+					item\state = Min(3, item\state + 1)
+					item\r = Min(item\r*1.1,255)
+					item\g = Min(item\g*1.1,255)
+					item\b = Min(item\b*1.1,255)
+					remove = 0
 				Case "very fine"
-					it2 = CreateItem("cup", x,y,z)
-					it2\localname = item\localname
-					it2\state = Min(it2\state*2.0,2.0)	
-					it2\r = Min(item\r*Rnd(0.5,1.5),255)
-					it2\g = Min(item\g*Rnd(0.5,1.5),255)
-					it2\b = Min(item\b*Rnd(0.5,1.5),255)
+					item\state = 3
+					item\r = Min(item\r*1.5,255)
+					item\g = Min(item\g*1.5,255)
+					item\b = Min(item\b*1.5,255)
 					If Rand(5)=1 Then
 						ExplosionTimer = 135
 					EndIf
+					remove = 0
 			End Select
 		;Case "emptycup" ;no idea, fill it would cause issues with localization
 		;TODO am here

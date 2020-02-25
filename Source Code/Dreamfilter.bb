@@ -1,7 +1,7 @@
 Global ark_blur_image%, ark_blur_texture%, ark_sw%, ark_sh%
 Global ark_blur_cam%
 
-Function CreateBlurImage()
+Function CreateBlurImage(I_Opt.Options)
 	;Create blur Camera
 	Local cam% = CreateCamera()
 	CameraProjMode cam,2
@@ -11,8 +11,8 @@ Function CreateBlurImage()
 	MoveEntity cam, 0, 0, 10000
 	ark_blur_cam = cam
 	
-	ark_sw = GraphicWidth;GraphicsWidth()
-	ark_sh = GraphicHeight;GraphicsHeight()
+	ark_sw = I_Opt\GraphicWidth;GraphicsWidth()
+	ark_sh = I_Opt\GraphicHeight;GraphicsHeight()
 	CameraViewport cam,0,0,ark_sw,ark_sh
 	
 	;Create sprite
@@ -25,21 +25,21 @@ Function CreateBlurImage()
 	AddTriangle sf, 0, 1, 2
 	AddTriangle sf, 3, 2, 1
 	EntityFX spr, 17
-	ScaleEntity spr, 4096.0 / Float(ark_sw), 4096.0 / Float(ark_sw), 1
+	ScaleEntity spr, 2048.0 / Float(ark_sw), 2048.0 / Float(ark_sw), 1
 	PositionEntity spr, 0, 0, 1.0001
 	EntityOrder spr, -100000
 	EntityBlend spr, 1
 	ark_blur_image = spr
 	
 	;Create blur texture
-	ark_blur_texture = CreateTexture(4096, 4096, 0)
+	ark_blur_texture = CreateTexture(2048, 2048, 0)
 	EntityTexture spr, ark_blur_texture
 End Function
 
-Function UpdateBlur(power#)
+Function UpdateBlur(power#, I_Opt.Options)
 	
 	EntityAlpha ark_blur_image, power#
 	
-	CopyRect 0, 0, GraphicWidth, GraphicHeight, 2048.0 - (GraphicWidth/2), 2048.0 - (GraphicHeight/2), BackBuffer(), TextureBuffer(ark_blur_texture)
+	CopyRect 0, 0, I_Opt\GraphicWidth, I_Opt\GraphicHeight, 1024.0 - (I_Opt\GraphicWidth/2), 1024.0 - (I_Opt\GraphicHeight/2), BackBuffer(), TextureBuffer(ark_blur_texture)
 	
 End Function

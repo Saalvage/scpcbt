@@ -367,7 +367,7 @@ Function UpdateEvents()
 								CurrMusicVolume = MusicVolume
 								
 								StopStream_Strict(MusicCHN)
-								MusicCHN = StreamSound_Strict("SFX\Music\"+Music(13)+".ogg",CurrMusicVolume,Mode)
+								MusicCHN = StreamSound_Strict("SFX\Music\"+Music[13]+".ogg",CurrMusicVolume,Mode)
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
@@ -4644,7 +4644,8 @@ Function UpdateEvents()
 									e\room\NPC[1]=Null
 								EndIf
 							Case 60
-								If (Not HalloweenTex) Then
+								Local I_Opt.Options = First Options
+								If (Not I_Opt\HalloweenTex) Then
 									Local tex970 = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
 									EntityTexture Curr173\obj, tex970, 0, 0
 									FreeTexture tex970

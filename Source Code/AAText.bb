@@ -28,7 +28,7 @@ Function InitAAFont()
 	If AATextEnable Then
 		;Create Camera
 		Local cam% = CreateCamera()
-		CameraViewport cam,0,0,10,10;GraphicWidth,GraphicHeight
+		CameraViewport cam,0,0,10,10;I_Opt\GraphicWidth,I_Opt\GraphicHeight
 		;CameraProjMode cam, 2
 		CameraZoom cam, 0.1
 		CameraClsMode cam, 0, 0
@@ -138,6 +138,9 @@ Function AAStringHeight%(txt$)
 End Function
 
 Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
+
+	Local I_Opt.Options = First Options
+	
 	If Len(txt)=0 Then Return
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
@@ -181,8 +184,8 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	
 	Local vx% = x : If vx<0 Then vx=0
 	Local vy% = y : If vy<0 Then vy=0
-	Local vw% = AACamViewW+(x-vx) : If vw+vx>GraphicWidth Then vw=GraphicWidth-vx
-	Local vh% = AACamViewH+(y-vy) : If vh+vy>GraphicHeight Then vh=GraphicHeight-vy
+	Local vw% = AACamViewW+(x-vx) : If vw+vx>I_Opt\GraphicWidth Then vw=I_Opt\GraphicWidth-vx
+	Local vh% = AACamViewH+(y-vy) : If vh+vy>I_Opt\GraphicHeight Then vh=I_Opt\GraphicHeight-vy
 	vw = vw-(vw Mod 2)
 	vh = vh-(vh Mod 2)
 	AACamViewH = AACamViewH+(AACamViewH Mod 2)

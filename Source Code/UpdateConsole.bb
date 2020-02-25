@@ -2,6 +2,7 @@ Function UpdateConsole()
 	
 	Local e.Events
 	
+	Local I_Opt.Options = First Options
 	Local I_Cheats.Cheats = First Cheats
 	
 	If CanOpenConsole = False Then
@@ -16,7 +17,7 @@ Function UpdateConsole()
 		
 		ConsoleR = 255 : ConsoleG = 255 : ConsoleB = 255
 		
-		Local x% = 0, y% = GraphicHeight-300*MenuScale, width% = GraphicWidth, height% = 300*MenuScale-30*MenuScale
+		Local x% = 0, y% = I_Opt\GraphicHeight-300*MenuScale, width% = I_Opt\GraphicWidth, height% = 300*MenuScale-30*MenuScale
 		Local StrTemp$, temp%,  i%
 		Local ev.Events, r.Rooms, it.Items
 		
@@ -46,17 +47,17 @@ Function UpdateConsole()
 		If Not MouseDown(1) Then
 			ConsoleScrollDragging=False
 		ElseIf ConsoleScrollDragging Then
-			ConsoleScroll = ConsoleScroll+((ScaledMouseY()-ConsoleMouseMem)*height/scrollbarHeight)
-			ConsoleMouseMem = ScaledMouseY()
+			ConsoleScroll = ConsoleScroll+((ScaledMouseY(I_Opt)-ConsoleMouseMem)*height/scrollbarHeight)
+			ConsoleMouseMem = ScaledMouseY(I_Opt)
 		EndIf
 		
 		If (Not ConsoleScrollDragging) Then
 			If MouseHit1 Then
 				If inBox Then
 					ConsoleScrollDragging=True
-					ConsoleMouseMem = ScaledMouseY()
+					ConsoleMouseMem = ScaledMouseY(I_Opt)
 				ElseIf inBar Then
-					ConsoleScroll = ConsoleScroll+((ScaledMouseY()-(y+height))*consoleHeight/height+(height/2))
+					ConsoleScroll = ConsoleScroll+((ScaledMouseY(I_Opt)-(y+height))*consoleHeight/height+(height/2))
 					ConsoleScroll = ConsoleScroll/2
 				EndIf
 			EndIf
@@ -563,8 +564,8 @@ Function UpdateConsole()
 
 				Case "halloween"
 
-					HalloweenTex = Not HalloweenTex
-					If HalloweenTex Then
+					I_Opt\HalloweenTex = Not I_Opt\HalloweenTex
+					If I_Opt\HalloweenTex Then
 						Local tex = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
 						EntityTexture Curr173\obj, tex, 0, 0
 						FreeTexture tex
@@ -1123,8 +1124,7 @@ Function UpdateConsole()
 		
 		Color 255,255,255
 		
-		Local I_Opt.Options = First Options
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	EndIf
 	
 	AASetFont Font1

@@ -13,6 +13,9 @@ Type DrawPortal
 End Type
 
 Function CreateDrawPortal.DrawPortal(x#,y#,z#,pitch#,yaw#,roll#,w#,h#,camx#=0.0,camy#=0.0,camz#=0.0,campitch#=0.0,camyaw#=0.0,camroll#=0.0,camZoom#=1.0,texw%=2048,texh%=2048)
+
+	Local I_Opt.Options = First Options
+	
 	Local ndp.DrawPortal = New DrawPortal
 	
 	ndp\w = w
@@ -21,7 +24,7 @@ Function CreateDrawPortal.DrawPortal(x#,y#,z#,pitch#,yaw#,roll#,w#,h#,camx#=0.0,
 	ndp\tex = CreateTexture(texw%,texh%,1+8+256+FE_RENDER+FE_ZRENDER) ;make a texture we can render to
 	TextureBlend ndp\tex, FE_PROJECT
 	PositionTexture ndp\tex,0.5,0.5
-	ScaleTexture ndp\tex,(Float(texw)/Float(GraphicWidth))*2,(Float(texh)/Float(GraphicHeight))*2
+	ScaleTexture ndp\tex,(Float(texw)/Float(I_Opt\GraphicWidth))*2,(Float(texh)/Float(I_Opt\GraphicHeight))*2
 	;RotateTexture ndp\tex,180
 	ndp\texw = texw
 	ndp\texh = texh
@@ -74,7 +77,7 @@ Function DestroyDrawPortal(ndp.DrawPortal)
 	Delete ndp
 End Function
 
-Function UpdateDrawPortal(ndp.DrawPortal);,passive%=True)
+Function UpdateDrawPortal(ndp.DrawPortal, I_Opt.Options);,passive%=True)
 	;ClsColor 255,255,255
 	
 	;If (Not passive) Then
@@ -92,7 +95,7 @@ Function UpdateDrawPortal(ndp.DrawPortal);,passive%=True)
 	CameraProjMode ndp\cam,1 ;enable the camera
 	
 	SetBuffer(TextureBuffer(ndp\tex))
-	CameraViewport ndp\cam,(ndp\texw/2)-(GraphicWidth/2),(ndp\texh/2)-(GraphicHeight/2),GraphicWidth,GraphicHeight ;0,0,ndp\texw,ndp\texh
+	CameraViewport ndp\cam,(ndp\texw/2)-(I_Opt\GraphicWidth/2),(ndp\texh/2)-(I_Opt\GraphicHeight/2),I_Opt\GraphicWidth,I_Opt\GraphicHeight ;0,0,ndp\texw,ndp\texh
 	Cls
 	RenderWorld ;requires FastExt to render to texture
 	;RotateTexture ndp\tex,180

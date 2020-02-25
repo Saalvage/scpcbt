@@ -71,6 +71,9 @@ Type NPCs
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
+
+	Local I_Opt.Options = First Options
+	
 	Local n.NPCs = New NPCs, n2.NPCs
 	Local temp#, i%, diff1, bump1, spec1
 	Local sf, b, t1
@@ -93,7 +96,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			;On Halloween set jack-o-latern texture.
 			If (Left(CurrentDate(), 7) = "31 Oct ") Then
-				HalloweenTex = True
+				I_Opt\HalloweenTex = True
 				Local texFestive = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
 				EntityTexture n\obj, texFestive, 0, 0
 				FreeTexture texFestive
@@ -1238,6 +1241,8 @@ Function UpdateNPCs()
 				EndIf
 
 			Case NPCtype096
+			
+				Local I_Opt.Options = First Options
 
 				dist = EntityDistance(Collider, n\Collider)
 				
@@ -1285,8 +1290,8 @@ Function UpdateNPCs()
 								If angle<90 Lor angle>270 Then
 									CameraProject Camera,EntityX(n\Collider), EntityY(n\Collider)+0.25, EntityZ(n\Collider)
 									
-									If ProjectedX()>0 And ProjectedX()<GraphicWidth Then
-										If ProjectedY()>0 And ProjectedY()<GraphicHeight Then
+									If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth Then
+										If ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight Then
 											If EntityVisible(Collider, n\Collider) Then
 												If (BlinkTimer < - 16 Lor BlinkTimer > - 6)
 													PlaySound_Strict LoadTempSound("SFX\SCP\096\Triggered.ogg")
@@ -1626,8 +1631,8 @@ Function UpdateNPCs()
 								If angle<55 Lor angle>360-55 Then
 									CameraProject Camera,EntityX(n\Collider), EntityY(Collider)+5.8*0.2-0.25, EntityZ(n\Collider)
 									
-									If ProjectedX()>0 And ProjectedX()<GraphicWidth Then
-										If ProjectedY()>0 And ProjectedY()<GraphicHeight Then
+									If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth Then
+										If ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight Then
 											If EntityVisible(Collider, n\Collider) Then
 												If (BlinkTimer < - 16 Lor BlinkTimer > - 6)
 													PlaySound_Strict LoadTempSound("SFX\SCP\096\Triggered.ogg")

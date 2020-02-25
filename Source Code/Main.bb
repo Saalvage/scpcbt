@@ -26,6 +26,23 @@ If FileType(OptionFile) <> 1 Then
 	DefaultOptionsINI()
 EndIf
 
+Type Options
+	Field LauncherEnabled%
+	Field GraphicWidth%
+	Field GraphicHeight%
+	Field GraphicMode%
+	Field HalloweenTex%
+	Field DebugMode%
+End Type
+
+Local I_Opt.Options = New Options
+
+I_Opt\LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
+I_Opt\GraphicWidth = GetINIInt(OptionFile, "options", "width")
+I_Opt\GraphicHeight = GetINIInt(OptionFile, "options", "height")
+I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
+I_Opt\DebugMode = GetINIInt(OptionFile, "options", "debug mode")
+
 Type Loc
 	Field Lang$
 	Field LangPath$
@@ -165,22 +182,6 @@ Global Data294$ = "Data\SCP-294.ini"
 
 Global AchvIni$ = "Data\achievements.ini"
 
-Type Options
-	Field LauncherEnabled
-	Field GraphicWidth
-	Field GraphicHeight
-	Field GraphicMode
-End Type
-
-Local I_Opt.Options = New Options
-
-I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
-
-Global LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
-
-Global GraphicWidth% = GetINIInt(OptionFile, "options", "width")
-Global GraphicHeight% = GetINIInt(OptionFile, "options", "height")
-
 Global SelectedGFXMode%
 Global SelectedGFXDriver% = Max(GetINIInt(OptionFile, "options", "gfx driver"), 1)
 
@@ -188,8 +189,6 @@ Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
 
 Global ShowFPS = GetINIInt(OptionFile, "options", "show FPS")
-
-Global HalloweenTex%
 
 Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
 Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
@@ -242,7 +241,7 @@ Global QuickLoad_CurrEvent.Events
 ButtonSFX% = LoadSound_Strict("SFX\Interact\Button.ogg")
 ButtonSFX2% = LoadSound_Strict("SFX\Interact\Button2.ogg")
 
-If LauncherEnabled Then 
+If I_Opt\LauncherEnabled Then 
 	AspectRatioRatio = 1.0
 	
 	AppTitle GetLocalString("Menu", "titlelauncher")
@@ -255,15 +254,15 @@ Else
 			If GfxModeWidths(n) = GfxModeWidth(i) And GfxModeHeights(n) = GfxModeHeight(i) Then samefound = True : Exit
 		Next
 		If samefound = False Then
-			If GraphicWidth = GfxModeWidth(i) And GraphicHeight = GfxModeHeight(i) Then SelectedGFXMode = GFXModes
+			If I_Opt\GraphicWidth = GfxModeWidth(i) And I_Opt\GraphicHeight = GfxModeHeight(i) Then SelectedGFXMode = GFXModes
 			GfxModeWidths(GFXModes) = GfxModeWidth(i)
 			GfxModeHeights(GFXModes) = GfxModeHeight(i)
 			GFXModes=GFXModes+1
 		EndIf
 	Next
 	
-	GraphicWidth = GfxModeWidths(SelectedGFXMode)
-	GraphicHeight = GfxModeHeights(SelectedGFXMode)
+	I_Opt\GraphicWidth = GfxModeWidths(SelectedGFXMode)
+	I_Opt\GraphicHeight = GfxModeHeights(SelectedGFXMode)
 EndIf
 
 ;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, But it's an alliteration (and it's true)!! ~Salvage
@@ -274,15 +273,15 @@ If I_Opt\GraphicMode = 1
 	RealGraphicWidth = DesktopWidth()
 	RealGraphicHeight = DesktopHeight()
 	
-	AspectRatioRatio = (Float(GraphicWidth)/Float(GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
+	AspectRatioRatio = (Float(I_Opt\GraphicWidth)/Float(I_Opt\GraphicHeight))/(Float(RealGraphicWidth)/Float(RealGraphicHeight))
 Else
 	AspectRatioRatio = 1.0
-	RealGraphicWidth = GraphicWidth
-	RealGraphicHeight = GraphicHeight
+	RealGraphicWidth = I_Opt\GraphicWidth
+	RealGraphicHeight = I_Opt\GraphicHeight
 	If I_Opt\GraphicMode = 0 Then
-		Graphics3DExt(GraphicWidth, GraphicHeight, 0, 1)
+		Graphics3DExt(I_Opt\GraphicWidth, I_Opt\GraphicHeight, 0, 1)
 	Else
-		Graphics3DExt(GraphicWidth, GraphicHeight, 0, 2)
+		Graphics3DExt(I_Opt\GraphicWidth, I_Opt\GraphicHeight, 0, 2)
 	EndIf
 EndIf
 
@@ -316,7 +315,7 @@ End Function
 Local I_Cheats.Cheats = New Cheats
 ClearCheats(I_Cheats)
 
-Global MenuScale# = (GraphicHeight / 1024.0)
+Global MenuScale# = (I_Opt\GraphicHeight / 1024.0)
 
 SetBuffer(BackBuffer())
 
@@ -360,15 +359,15 @@ InitAAFont()
 ;don't match their "internal name" (i.e. their display name in applications
 ;like Word and such). As a workaround, I moved the files and renamed them so they
 ;can load without FastText.
-Font1% = LoadLocalFont(True, "Font1", Int(18 * (GraphicHeight / 1024.0)))
-Font2% = LoadLocalFont(True, "Font2", Int(58 * (GraphicHeight / 1024.0)))
-Font3% = LoadLocalFont(True, "Font3", Int(22 * (GraphicHeight / 1024.0)))
-Font4% = LoadLocalFont(True, "Font4", Int(60 * (GraphicHeight / 1024.0)))
-Font5% = LoadLocalFont(True, "Font5", Int(58 * (GraphicHeight / 1024.0)))
+Font1% = LoadLocalFont(True, "Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
+Font2% = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+Font3% = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
+Font4% = LoadLocalFont(True, "Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
+Font5% = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 
 Global CreditsFont%,CreditsFont2%
 
-ConsoleFont% = AALoadFont("Blitz", Int(20 * (GraphicHeight / 1024.0)), 0,0,0,1)
+ConsoleFont% = AALoadFont("Blitz", Int(20 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
 
 AASetFont Font2
 
@@ -377,7 +376,7 @@ Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
 DrawLoading(0, True)
 
 ; - -Viewport.
-Global viewport_center_x% = GraphicWidth / 2, viewport_center_y% = GraphicHeight / 2
+Global viewport_center_x% = I_Opt\GraphicWidth / 2, viewport_center_y% = I_Opt\GraphicHeight / 2
 
 ; -- Mouselook.
 Global mouselook_x_inc# = 0.3 ; This sets both the sensitivity and direction (+/-) of the mouse on the X axis.
@@ -590,39 +589,39 @@ Global TempSoundCHN%
 Global TempSoundIndex% = 0
 
 ;The Music now has to be pre-defined, as the new system uses streaming instead of the usual sound loading system Blitz3D has
-Dim Music$(40)
-Music(0) = "The Dread"
-Music(1) = "HeavyContainment"
-Music(2) = "EntranceZone"
-Music(3) = "PD"
-Music(4) = "079"
-Music(5) = "GateB1"
-Music(6) = "GateB2"
-Music(7) = "Room3Storage"
-Music(8) = "Room049"
-Music(9) = "8601"
-Music(10) = "106"
-Music(11) = "Menu"
-Music(12) = "8601Cancer"
-Music(13) = "Intro"
-Music(14) = "178"
-Music(15) = "PDTrench"
-Music(16) = "205"
-Music(17) = "GateA"
-Music(18) = "1499"
-Music(19) = "1499Danger"
-Music(20) = "049Chase"
-Music(21) = "..\Ending\MenuBreath"
-Music(22) = "914"
-Music(23) = "Ending"
-Music(24) = "Credits"
-Music(25) = "SaveMeFrom"
+Global Music$[40]
+Music[0] = "The Dread"
+Music[1] = "HeavyContainment"
+Music[2] = "EntranceZone"
+Music[3] = "PD"
+Music[4] = "079"
+Music[5] = "GateB1"
+Music[6] = "GateB2"
+Music[7] = "Room3Storage"
+Music[8] = "Room049"
+Music[9] = "8601"
+Music[10] = "106"
+Music[11] = "Menu"
+Music[12] = "8601Cancer"
+Music[13] = "Intro"
+Music[14] = "178"
+Music[15] = "PDTrench"
+Music[16] = "205"
+Music[17] = "GateA"
+Music[18] = "1499"
+Music[19] = "1499Danger"
+Music[20] = "049Chase"
+Music[21] = "..\Ending\MenuBreath"
+Music[22] = "914"
+Music[23] = "Ending"
+Music[24] = "Credits"
+Music[25] = "SaveMeFrom"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
-;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg", MusicVolume, CurrMusicStream)
+;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music[2]+".ogg", MusicVolume, CurrMusicStream)
 
 Global CurrMusicStream, MusicCHN
-MusicCHN = StreamSound_Strict("SFX\Music\"+Music(2)+".ogg",MusicVolume,Mode)
+MusicCHN = StreamSound_Strict("SFX\Music\"+Music[2]+".ogg",MusicVolume,Mode)
 
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
@@ -813,7 +812,7 @@ For i = 0 To 3
 Next
 NavImages(4) = LoadImage_Strict("GFX\navigator\batterymeter.png")
 
-Global NavBG = CreateImage(GraphicWidth,GraphicHeight)
+Global NavBG = CreateImage(I_Opt\GraphicWidth,I_Opt\GraphicHeight)
 
 Global LightConeModel
 
@@ -1816,6 +1815,77 @@ Local I_427.SCP427 = New SCP427
 ; MAIN LOOP
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
+Type FixedTimesteps
+	Field tickDuration#
+	Field accumulator#
+	Field prevTime%
+	Field currTime%
+	Field fps#
+End Type
+
+Function SetTickrate(tickrate%)
+	Local ft.FixedTimesteps = New FixedTimesteps
+	
+	ft\tickDuration = 70.0/Float(tickrate)
+End Function
+
+Function AddToTimingAccumulator(milliseconds%)
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	If (milliseconds<1 Or milliseconds>500) Then
+		Return
+	EndIf
+	ft\accumulator = ft\accumulator+Max(0,Float(milliseconds)*70.0/1000.0)
+End Function
+
+Function ResetTimingAccumulator()
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	ft\accumulator = 0.0
+End Function
+
+Function SetCurrTime(time%)
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	ft\currTime = time%
+	
+End Function
+
+Function SetPrevTime(time%)
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	ft\prevTime = time%
+	
+End Function
+
+Function SetFPS(elapsedMilliseconds%)
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	Local instantFramerate# = 1000.0/Max(1,elapsedMilliseconds)
+	ft\fps = Max(0,ft\fps*0.99 + instantFramerate*0.01)
+	
+End Function
+
+Function GetCurrTime%()
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	Return ft\currTime
+End Function
+
+Function GetPrevTime%()
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	Return ft\prevTime
+End Function
+
+Function GetTickDuration#()
+	Local ft.FixedTimesteps = First FixedTimesteps
+	
+	Return ft\tickDuration
+End Function
+
+SetTickrate(60)
+
 Repeat
 	
 	Cls
@@ -2026,7 +2096,7 @@ Repeat
 			BlurTimer = Max(BlurTimer - FPSfactor, 0.0)
 		EndIf
 		
-		UpdateBlur(BlurVolume)
+		UpdateBlur(BlurVolume, I_Opt)
 		
 
 		
@@ -2284,20 +2354,20 @@ Repeat
 			
 			If (Not temp%)
 				Color 0,0,0
-				AAText((GraphicWidth / 2)+1, (GraphicHeight / 2) + 201, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
+				AAText((I_Opt\GraphicWidth / 2)+1, (I_Opt\GraphicHeight / 2) + 201, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 				Color 255,255,255;Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
 				If Left(Msg,14)="Blitz3D Error!" Then
 					Color 255,0,0
 				EndIf
-				AAText((GraphicWidth / 2), (GraphicHeight / 2) + 200, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
+				AAText((I_Opt\GraphicWidth / 2), (I_Opt\GraphicHeight / 2) + 200, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 			Else
 				Color 0,0,0
-				AAText((GraphicWidth / 2)+1, (GraphicHeight * 0.94) + 1, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
+				AAText((I_Opt\GraphicWidth / 2)+1, (I_Opt\GraphicHeight * 0.94) + 1, Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 				Color 255,255,255;Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255), Min(MsgTimer / 2, 255)
 				If Left(Msg,14)="Blitz3D Error!" Then
 					Color 255,0,0
 				EndIf
-				AAText((GraphicWidth / 2), (GraphicHeight * 0.94), Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
+				AAText((I_Opt\GraphicWidth / 2), (I_Opt\GraphicHeight * 0.94), Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 			EndIf
 			MsgTimer=MsgTimer-FPSfactor2 
 		EndIf
@@ -2313,14 +2383,14 @@ Repeat
 	EndIf
 	
 	If I_Opt\GraphicMode = 1 Then
-		If (RealGraphicWidth<>GraphicWidth) Lor (RealGraphicHeight<>GraphicHeight) Then
+		If (RealGraphicWidth<>I_Opt\GraphicWidth) Lor (RealGraphicHeight<>I_Opt\GraphicHeight) Then
 			SetBuffer TextureBuffer(fresize_texture)
 			ClsColor 0,0,0 : Cls
-			CopyRect 0,0,GraphicWidth,GraphicHeight,2048-GraphicWidth/2,2048-GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+			CopyRect 0,0,I_Opt\GraphicWidth,I_Opt\GraphicHeight,1024-I_Opt\GraphicWidth/2,1024-I_Opt\GraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 			SetBuffer BackBuffer()
 			ClsColor 0,0,0 : Cls
-			ScaleRender(0,0,4096.0 / Float(GraphicWidth) * AspectRatioRatio, 4096.0 / Float(GraphicWidth) * AspectRatioRatio)
-			;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
+			ScaleRender(0,0,2048.0 / Float(I_Opt\GraphicWidth) * AspectRatioRatio, 2048.0 / Float(I_Opt\GraphicWidth) * AspectRatioRatio)
+			;might want to replace Float(I_Opt\GraphicWidth) with Max(I_Opt\GraphicWidth,I_Opt\GraphicHeight) if portrait sizes cause issues
 			;everyone uses landscape so it's probably a non-issue
 		EndIf
 	EndIf
@@ -2328,19 +2398,19 @@ Repeat
 	;not by any means a perfect solution
 	;Not even proper gamma correction but it's a nice looking alternative that works in windowed mode
 	If ScreenGamma>1.0 Then
-		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,2048-RealGraphicWidth/2,2048-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 		EntityBlend fresize_image,1
 		ClsColor 0,0,0 : Cls
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 		EntityFX fresize_image,1+32
 		EntityBlend fresize_image,3
 		EntityAlpha fresize_image,ScreenGamma-1.0
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 	ElseIf ScreenGamma<1.0 Then
-		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,2048-RealGraphicWidth/2,2048-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
+		CopyRect 0,0,RealGraphicWidth,RealGraphicHeight,1024-RealGraphicWidth/2,1024-RealGraphicHeight/2,BackBuffer(),TextureBuffer(fresize_texture)
 		EntityBlend fresize_image,1
 		ClsColor 0,0,0 : Cls
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 		EntityFX fresize_image,1+32
 		EntityBlend fresize_image,2
 		EntityAlpha fresize_image,1.0
@@ -2348,7 +2418,7 @@ Repeat
 		ClsColor 255*ScreenGamma,255*ScreenGamma,255*ScreenGamma
 		Cls
 		SetBuffer BackBuffer()
-		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth),4096.0 / Float(RealGraphicWidth))
+		ScaleRender(-1.0/Float(RealGraphicWidth),1.0/Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth),2048.0 / Float(RealGraphicWidth))
 		SetBuffer(TextureBuffer(fresize_texture2))
 		ClsColor 0,0,0
 		Cls
@@ -2710,6 +2780,8 @@ Function DrawEnding()
 	Cls
 	
 	If EndingTimer<-200 Then
+	
+		Local I_Opt.Options = First Options
 		
 		If BreathCHN <> 0 Then
 			If ChannelPlaying(BreathCHN) Then StopChannel BreathCHN : Stamina = 100
@@ -2727,7 +2799,7 @@ Function DrawEnding()
 			
 			CurrMusicVolume = MusicVolume
 			StopStream_Strict(MusicCHN)
-			MusicCHN = StreamSound_Strict("SFX\Music\"+Music(23)+".ogg",CurrMusicVolume,0)
+			MusicCHN = StreamSound_Strict("SFX\Music\"+Music[23]+".ogg",CurrMusicVolume,0)
 			NowPlaying = ShouldPlay
 			
 			PlaySound_Strict LightSFX
@@ -2738,10 +2810,10 @@ Function DrawEnding()
 			;-200 -> -700
 			;Max(50 - (Abs(KillTimer)-200),0)	=	0->50
 			If Rand(1,150)<Min((Abs(EndingTimer)-200),155) Then
-				DrawImage EndingScreen, GraphicWidth/2-400, GraphicHeight/2-400
+				DrawImage EndingScreen, I_Opt\GraphicWidth/2-400, I_Opt\GraphicHeight/2-400
 			Else
 				Color 0,0,0
-				Rect 100,100,GraphicWidth-200,GraphicHeight-200
+				Rect 100,100,I_Opt\GraphicWidth-200,I_Opt\GraphicHeight-200
 				Color 255,255,255
 			EndIf
 			
@@ -2756,14 +2828,14 @@ Function DrawEnding()
 			
 		Else
 			
-			DrawImage EndingScreen, GraphicWidth/2-400, GraphicHeight/2-400
+			DrawImage EndingScreen, I_Opt\GraphicWidth/2-400, I_Opt\GraphicHeight/2-400
 			
 			If EndingTimer < -1000 And EndingTimer > -2000
 				
 				width = ImageWidth(PauseMenuIMG)
 				height = ImageHeight(PauseMenuIMG)
-				x = GraphicWidth / 2 - width / 2
-				y = GraphicHeight / 2 - height / 2
+				x = I_Opt\GraphicWidth / 2 - width / 2
+				y = I_Opt\GraphicHeight / 2 - height / 2
 				
 				DrawImage PauseMenuIMG, x, y
 				
@@ -2806,8 +2878,8 @@ Function DrawEnding()
 					AAText x, y+60*MenuScale, "Documents discovered: " +docsfound+"/"+docamount
 					AAText x, y+80*MenuScale, "Items refined in SCP-914: " +RefinedItems			
 					
-					x = GraphicWidth / 2 - width / 2
-					y = GraphicHeight / 2 - height / 2
+					x = I_Opt\GraphicWidth / 2 - width / 2
+					y = I_Opt\GraphicHeight / 2 - height / 2
 					x = x+width/2
 					y = y+height-100*MenuScale
 					
@@ -2822,7 +2894,7 @@ Function DrawEnding()
 							If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
 						Next
 						StopStream_Strict(MusicCHN)
-						MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
+						MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,Mode)
 						SetStreamVolume_Strict(MusicCHN,1.0*MusicVolume)
 						FlushKeys()
 						EndingTimer=-2000
@@ -2842,8 +2914,7 @@ Function DrawEnding()
 		
 	EndIf
 	
-	Local I_Opt.Options = First Options
-	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	
 	AASetFont Font1
 End Function
@@ -2858,12 +2929,15 @@ Global CreditsTimer# = 0.0
 Global CreditsScreen%
 
 Function InitCredits()
+
+	Local I_Opt.Options = First Options
+
 	Local cl.CreditsLine
 	Local file% = OpenFile("Credits.txt")
 	Local l$
 	
-	CreditsFont% = LoadLocalFont(False, "CreditsFont1", Int(21 * (GraphicHeight / 1024.0)))
-	CreditsFont2% = LoadLocalFont(False, "CreditsFont2", Int(35 * (GraphicHeight / 1024.0)))
+	CreditsFont% = LoadLocalFont(False, "CreditsFont1", Int(21 * (I_Opt\GraphicHeight / 1024.0)))
+	CreditsFont2% = LoadLocalFont(False, "CreditsFont2", Int(35 * (I_Opt\GraphicHeight / 1024.0)))
 	
 	If CreditsScreen = 0
 		CreditsScreen = LoadImage_Strict("GFX\creditsscreen.pt")
@@ -2881,7 +2955,10 @@ Function InitCredits()
 End Function
 
 Function DrawCredits()
-	Local credits_Y# = (EndingTimer+2000)/2+(GraphicHeight+10)
+	
+	Local I_Opt.Options = First Options
+	
+	Local credits_Y# = (EndingTimer+2000)/2+(I_Opt\GraphicHeight+10)
 	Local cl.CreditsLine
 	Local id%
 	Local endlinesamount%
@@ -2890,7 +2967,7 @@ Function DrawCredits()
 	Cls
 	
 	If Rand(1,300)>1
-		DrawImage CreditsScreen, GraphicWidth/2-400, GraphicHeight/2-400
+		DrawImage CreditsScreen, I_Opt\GraphicWidth/2-400, I_Opt\GraphicHeight/2-400
 	EndIf
 	
 	id = 0
@@ -2902,14 +2979,14 @@ Function DrawCredits()
 		If Left(cl\txt,1)="*"
 			SetFont CreditsFont2
 			If cl\stay=False
-				Text GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
+				Text I_Opt\GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
 			EndIf
 		ElseIf Left(cl\txt,1)="/"
 			LastCreditLine = Before(cl)
 		Else
 			SetFont CreditsFont
 			If cl\stay=False
-				Text GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),cl\txt,True
+				Text I_Opt\GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),cl\txt,True
 			EndIf
 		EndIf
 		If LastCreditLine<>Null
@@ -2944,9 +3021,9 @@ Function DrawCredits()
 			If cl\stay
 				SetFont CreditsFont
 				If Left(cl\txt,1)="/"
-					Text GraphicWidth/2,(GraphicHeight/2)+(endlinesamount/2)+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
+					Text I_Opt\GraphicWidth/2,(I_Opt\GraphicHeight/2)+(endlinesamount/2)+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
 				Else
-					Text GraphicWidth/2,(GraphicHeight/2)+(24*(cl\id-LastCreditLine\id)*MenuScale)-((endlinesamount/2)*24*MenuScale),cl\txt,True
+					Text I_Opt\GraphicWidth/2,(I_Opt\GraphicHeight/2)+(24*(cl\id-LastCreditLine\id)*MenuScale)-((endlinesamount/2)*24*MenuScale),cl\txt,True
 				EndIf
 			EndIf
 		Next
@@ -3596,15 +3673,15 @@ End Function
 Function DrawGUI()
 	CatchErrors("DrawGUI")
 	
+	Local I_Opt.Options = First Options
+	Local I_Cheats.Cheats = First Cheats
+	Local I_427.SCP427 = First SCP427
+	
 	Local temp%, x%, y%, z%, i%, yawvalue#, pitchvalue#
 	Local x2#,y2#,z2#
 	Local n%, xtemp, ytemp, strtemp$
 	
 	Local e.Events, it.Items
-	
-	Local I_Opt.Options = First Options
-	Local I_Cheats.Cheats = First Cheats
-	Local I_427.SCP427 = First SCP427
 	
 	If MenuOpen Lor ConsoleOpen Lor SelectedDoor <> Null Lor InvOpen Lor OtherOpen<>Null Lor EndingTimer < 0 Then
 		ShowPointer()
@@ -3624,7 +3701,7 @@ Function DrawGUI()
 									If e\img = 0 Then e\img = LoadImage_Strict("GFX\npcs\106face.jpg")
 								EndIf
 							Else
-								DrawImage e\img, GraphicWidth/2-Rand(390,310), GraphicHeight/2-Rand(290,310)
+								DrawImage e\img, I_Opt\GraphicWidth/2-Rand(390,310), I_Opt\GraphicHeight/2-Rand(290,310)
 							EndIf
 						Else
 							If e\img <> 0 Then FreeImage e\img : e\img = 0
@@ -3645,7 +3722,7 @@ Function DrawGUI()
 								EndIf
 							EndIf
 						Else
-							DrawImage e\img, GraphicWidth/2-Rand(390,310), GraphicHeight/2-Rand(290,310)
+							DrawImage e\img, I_Opt\GraphicWidth/2-Rand(390,310), I_Opt\GraphicHeight/2-Rand(290,310)
 						EndIf
 					Else
 						If e\img <> 0 Then FreeImage e\img : e\img = 0
@@ -3680,7 +3757,7 @@ Function DrawGUI()
 			
 			FreeEntity (temp)
 			
-			DrawImage(HandIcon, GraphicWidth / 2 + Sin(yawvalue) * (GraphicWidth / 3) - 32, GraphicHeight / 2 - Sin(pitchvalue) * (GraphicHeight / 3) - 32)
+			DrawImage(HandIcon, I_Opt\GraphicWidth / 2 + Sin(yawvalue) * (I_Opt\GraphicWidth / 3) - 32, I_Opt\GraphicHeight / 2 - Sin(pitchvalue) * (I_Opt\GraphicHeight / 3) - 32)
 		EndIf
 		
 		If MouseUp1 Then
@@ -3703,14 +3780,14 @@ Function DrawGUI()
 		pitchvalue# = -DeltaPitch(Camera, ClosestItem\collider)
 		If pitchvalue > 90 And pitchvalue <= 180 Then pitchvalue = 90
 		If pitchvalue > 180 And pitchvalue < 270 Then pitchvalue = 270
-		DrawImage(HandIcon2, GraphicWidth / 2 + Sin(yawvalue) * (GraphicWidth / 3) - 32, GraphicHeight / 2 - Sin(pitchvalue) * (GraphicHeight / 3) - 32)
+		DrawImage(HandIcon2, I_Opt\GraphicWidth / 2 + Sin(yawvalue) * (I_Opt\GraphicWidth / 3) - 32, I_Opt\GraphicHeight / 2 - Sin(pitchvalue) * (I_Opt\GraphicHeight / 3) - 32)
 	EndIf
 	
-	If (DrawHandIcon And SelectedDifficulty\otherFactors <> EXTREME) Then DrawImage(HandIcon, GraphicWidth / 2 - 32, GraphicHeight / 2 - 32)
+	If (DrawHandIcon And SelectedDifficulty\otherFactors <> EXTREME) Then DrawImage(HandIcon, I_Opt\GraphicWidth / 2 - 32, I_Opt\GraphicHeight / 2 - 32)
 	For i = 0 To 3
 		If DrawArrowIcon(i) Then
-			x = GraphicWidth / 2 - 32
-			y = GraphicHeight / 2 - 32		
+			x = I_Opt\GraphicWidth / 2 - 32
+			y = I_Opt\GraphicHeight / 2 - 32		
 			Select i
 				Case 0
 					y = y - 64 - 5
@@ -3735,7 +3812,7 @@ Function DrawGUI()
 		
 		Local width% = 204, height% = 20
 		x% = 80
-		y% = GraphicHeight - 95
+		y% = I_Opt\GraphicHeight - 95
 		
 		Color 255, 255, 255	
 		Rect (x, y, width, height, False)
@@ -3755,7 +3832,7 @@ Function DrawGUI()
 		
 		DrawImage BlinkIcon, x - 50, y
 		
-		y = GraphicHeight - 55
+		y = I_Opt\GraphicHeight - 55
 		Color 255, 255, 255
 		Rect (x, y, width, height, False)
 		For i = 1 To Int(((width - 2) * (Stamina / 100.0)) / 10)
@@ -3856,7 +3933,7 @@ Function DrawGUI()
 	EndIf
 	
 	If SelectedScreen <> Null Then
-		DrawImage SelectedScreen\img, GraphicWidth/2-ImageWidth(SelectedScreen\img)/2,GraphicHeight/2-ImageHeight(SelectedScreen\img)/2
+		DrawImage SelectedScreen\img, I_Opt\GraphicWidth/2-ImageWidth(SelectedScreen\img)/2,I_Opt\GraphicHeight/2-ImageHeight(SelectedScreen\img)/2
 		
 		If MouseUp1 Lor MouseHit2 Then
 			FreeImage SelectedScreen\img : SelectedScreen\img = 0
@@ -3886,23 +3963,23 @@ Function DrawGUI()
 			CameraProject(Camera, EntityX(ClosestButton,True),EntityY(ClosestButton,True)-MeshHeight(ButtonOBJ)*0.015,EntityZ(ClosestButton,True))
 			scale# = (ProjectedY()-projy)/462.0
 			
-			x = GraphicWidth/2-ImageWidth(KeypadHUD)*scale/2
-			y = GraphicHeight/2-ImageHeight(KeypadHUD)*scale/2		
+			x = I_Opt\GraphicWidth/2-ImageWidth(KeypadHUD)*scale/2
+			y = I_Opt\GraphicHeight/2-ImageHeight(KeypadHUD)*scale/2		
 			
 			AASetFont Font3
 			If KeypadMSG <> "" Then 
 				KeypadTimer = KeypadTimer-FPSfactor2
 				
-				If (KeypadTimer Mod 70) < 35 Then AAText GraphicWidth/2, y+124*scale, KeypadMSG, True,True
+				If (KeypadTimer Mod 70) < 35 Then AAText I_Opt\GraphicWidth/2, y+124*scale, KeypadMSG, True,True
 				If KeypadTimer =<0 Then
 					KeypadMSG = ""
 					SelectedDoor = Null
 					MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 				EndIf
 			Else
-				AAText GraphicWidth/2, y+70*scale, "ACCESS CODE: ",True,True	
+				AAText I_Opt\GraphicWidth/2, y+70*scale, "ACCESS CODE: ",True,True	
 				AASetFont Font4
-				AAText GraphicWidth/2, y+124*scale, KeypadInput,True,True	
+				AAText I_Opt\GraphicWidth/2, y+124*scale, KeypadInput,True,True	
 			EndIf
 			
 			x = x+44*scale
@@ -3961,7 +4038,7 @@ Function DrawGUI()
 				Next
 			Next
 			
-			If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+			If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 			
 			If MouseHit2 Then
 				SelectedDoor = Null
@@ -4052,14 +4129,14 @@ Function DrawGUI()
 		height = 70
 		spacing% = 35
 		
-		x = GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
-		y = GraphicHeight / 2 - (height * OtherSize /5 + spacing * (OtherSize / 5 - 1)) / 2;height
+		x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
+		y = I_Opt\GraphicHeight / 2 - (height * OtherSize /5 + spacing * (OtherSize / 5 - 1)) / 2;height
 		
 		ItemAmount = 0
 		For  n% = 0 To OtherSize - 1
 			isMouseOn% = False
-			If ScaledMouseX() > x And ScaledMouseX() < x + width Then
-				If ScaledMouseY() > y And ScaledMouseY() < y + height Then
+			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + width Then
+				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + height Then
 					isMouseOn = True
 				EndIf
 			EndIf
@@ -4117,16 +4194,16 @@ Function DrawGUI()
 			If tempX = 5 Then 
 				tempX=0
 				y = y + height*2 
-				x = GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
+				x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
 			EndIf
 		Next
 		
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
 				If MouseSlot = 66 Then
-					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				ElseIf SelectedItem <> PrevOtherOpen\SecondInv[MouseSlot]
-					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				EndIf
 			Else
 				If MouseSlot = 66 Then
@@ -4220,7 +4297,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG,ScaledMouseX(),ScaledMouseY()
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG,ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 		If (closedInv) And (Not InvOpen) Then 
 			ResumeSounds() 
 			OtherOpen=Null
@@ -4250,8 +4327,8 @@ Function DrawGUI()
 		height% = 70
 		spacing% = 35
 		
-		x = GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
-		y = GraphicHeight / 2 - height - spacing
+		x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
+		y = I_Opt\GraphicHeight / 2 - height - spacing
 		
 		If MaxItemAmount < 3 Then
 			y = y + height
@@ -4261,8 +4338,8 @@ Function DrawGUI()
 		ItemAmount = 0
 		For  n% = 0 To MaxItemAmount - 1
 			isMouseOn% = False
-			If ScaledMouseX() > x And ScaledMouseX() < x + width Then
-				If ScaledMouseY() > y And ScaledMouseY() < y + height Then
+			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + width Then
+				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + height Then
 					isMouseOn = True
 				EndIf
 			EndIf
@@ -4334,16 +4411,16 @@ Function DrawGUI()
 			x=x+width + spacing
 			If MaxItemAmount > 3 And n = MaxItemAmount/2 - 1 Then 
 				y = y + height*2 
-				x = GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
+				x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
 			EndIf
 		Next
 		
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
 				If MouseSlot = 66 Then
-					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				ElseIf SelectedItem <> Inventory(MouseSlot)
-					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				EndIf
 			Else
 				If MouseSlot = 66 Then
@@ -4546,7 +4623,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 		
 		If InvOpen = False Then 
 			ResumeSounds() 
@@ -4615,7 +4692,7 @@ Function DrawGUI()
 
 				Case "key1", "key2", "key3", "key4", "key5", "keyomni", "keyomni", "scp860", "hand", "hand2", "quarter"
 
-					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 
 				Case "scp513"
 
@@ -4715,12 +4792,12 @@ Function DrawGUI()
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
 							Crouch = True
 							
-							DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 							
 							width% = 300
 							height% = 20
-							x% = GraphicWidth / 2 - width / 2
-							y% = GraphicHeight / 2 + 80
+							x% = I_Opt\GraphicWidth / 2 - width / 2
+							y% = I_Opt\GraphicHeight / 2 + 80
 							Rect(x, y, width+4, height, False)
 							For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
 								DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
@@ -4886,7 +4963,7 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					DrawImage(SelectedItem\itemtemplate\img, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 
 				Case "scp1025"
 					GiveAchievement(Achv1025)
@@ -4913,7 +4990,7 @@ Function DrawGUI()
 						EndIf
 					EndIf
 					
-					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					DrawImage(SelectedItem\itemtemplate\img, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 
 				Case "book"
 					Msg = GetLocalString("Messages", "readbook")
@@ -4926,12 +5003,8 @@ Function DrawGUI()
 						If Left(SelectedItem\localname, Min(Len(GetLocalString("Items", "fullcup")),Len(SelectedItem\localname))) = Lower(GetLocalString("Items", "fullcup")) Then
 							SelectedItem\localname = Right(SelectedItem\localname, Len(SelectedItem\localname)-(Len(GetLocalString("Items", "fullcup"))+1))
 						EndIf
-						;the state of refined items is more than 1.0 (fine setting increases it by 1, very fine doubles it)
-						x2 = (SelectedItem\state+1.0)
 						
 						Local loc% = GetINISectionLocation(Data294, SelectedItem\localname)
-						
-						;Stop
 						
 						strtemp = GetINIString2(Data294, loc, "message")
 						If strtemp <> "" Then Msg = strtemp : MsgTimer = 70*6
@@ -4940,11 +5013,11 @@ Function DrawGUI()
 							DeathMSG = GetINIString2(Data294, loc, "deathmessage")
 							If GetINIInt2(Data294, loc, "lethal") Then Kill()
 						EndIf
-						BlurTimer = GetINIInt2(Data294, loc, "blur")*70;*temp
+						BlurTimer = GetINIInt2(Data294, loc, "blur")*70*SelectedItem\state
 						If VomitTimer = 0 Then VomitTimer = GetINIInt2(Data294, loc, "vomit")
 						CameraShakeTimer = GetINIString2(Data294, loc, "camerashake")
-						Injuries = Max(Injuries + GetINIInt2(Data294, loc, "damage"),0);*temp
-						Bloodloss = Max(Bloodloss + GetINIInt2(Data294, loc, "blood loss"),0);*temp
+						Injuries = Max(Injuries + GetINIInt2(Data294, loc, "damage"),0)*SelectedItem\state
+						Bloodloss = Max(Bloodloss + GetINIInt2(Data294, loc, "blood loss"),0)*SelectedItem\state
 						strtemp =  GetINIString2(Data294, loc, "sound")
 						If strtemp<>"" Then
 							PlaySound_Strict LoadTempSound(strtemp)
@@ -4953,11 +5026,11 @@ Function DrawGUI()
 						
 						DeathTimer=GetINIInt2(Data294, loc, "deathtimer")*70
 						
-						BlinkEffect = Float(GetINIString2(Data294, loc, "blink effect", 1.0))*x2
-						BlinkEffectTimer = Float(GetINIString2(Data294, loc, "blink effect timer", 1.0))*x2
+						BlinkEffect = Float(GetINIString2(Data294, loc, "blink effect", 1.0))*SelectedItem\state
+						BlinkEffectTimer = Float(GetINIString2(Data294, loc, "blink effect timer", 1.0))*SelectedItem\state
 						
-						StaminaEffect = Float(GetINIString2(Data294, loc, "stamina effect", 1.0))*x2
-						StaminaEffectTimer = Float(GetINIString2(Data294, loc, "stamina effect timer", 1.0))*x2
+						StaminaEffect = Float(GetINIString2(Data294, loc, "stamina effect", 1.0))*SelectedItem\state
+						StaminaEffectTimer = Float(GetINIString2(Data294, loc, "stamina effect timer", 1.0))*SelectedItem\state
 						
 						strtemp = GetINIString2(Data294, loc, "refusemessage")
 						If strtemp <> "" Then
@@ -5046,8 +5119,8 @@ Function DrawGUI()
 					
 					strtemp$ = ""
 					
-					x = GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img) ;+ 120
-					y = GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img) ;- 30
+					x = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img) ;+ 120
+					y = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img) ;- 30
 					
 					DrawImage(SelectedItem\itemtemplate\img, x, y)
 					
@@ -5417,12 +5490,12 @@ Function DrawGUI()
 					If WearingVest = 0 Then
 						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
 						
-						DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+						DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 						
 						width% = 300
 						height% = 20
-						x% = GraphicWidth / 2 - width / 2
-						y% = GraphicHeight / 2 + 80
+						x% = I_Opt\GraphicWidth / 2 - width / 2
+						y% = I_Opt\GraphicHeight / 2 + 80
 						Rect(x, y, width+4, height, False)
 						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
 							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
@@ -5462,12 +5535,12 @@ Function DrawGUI()
 
 					CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
 					
-					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 					
 					width% = 300
 					height% = 20
-					x% = GraphicWidth / 2 - width / 2
-					y% = GraphicHeight / 2 + 80
+					x% = I_Opt\GraphicWidth / 2 - width / 2
+					y% = I_Opt\GraphicHeight / 2 + 80
 					Rect(x, y, width+4, height, False)
 					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
 						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
@@ -5547,8 +5620,8 @@ Function DrawGUI()
 					
 					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.005)
 					
-					x = GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
-					y = GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
+					x = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
+					y = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
 					width = 287
 					height = 256
 					
@@ -5639,8 +5712,8 @@ Function DrawGUI()
 							If SelectedItem\itemtemplate\tempname = "nav" Then Color(100, 0, 0)
 							Rect xx+80,yy+70,270,230,False
 							
-							x = GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
-							y = GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
+							x = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
+							y = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
 							
 							If SelectedItem\itemtemplate\tempname = "nav" Then 
 								Color(100, 0, 0)
@@ -5746,12 +5819,12 @@ Function DrawGUI()
 						
 						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
 						
-						DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+						DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 						
 						width% = 300
 						height% = 20
-						x% = GraphicWidth / 2 - width / 2
-						y% = GraphicHeight / 2 + 80
+						x% = I_Opt\GraphicWidth / 2 - width / 2
+						y% = I_Opt\GraphicHeight / 2 + 80
 						Rect(x, y, width+4, height, False)
 						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
 							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
@@ -5848,7 +5921,7 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					DrawImage(SelectedItem\itemtemplate\img, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
+					DrawImage(SelectedItem\itemtemplate\img, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
 					
 					If SelectedItem\state = 0 Then
 						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
@@ -5882,7 +5955,7 @@ Function DrawGUI()
 					Msg = ""
 					
 					SelectedItem\state = 1
-					DrawImage(SelectedItem\itemtemplate\invimg, GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 
 				Case "scp427"
 					
@@ -6033,6 +6106,8 @@ End Function
 Function DrawMenu()
 	CatchErrors("DrawMenu")
 	
+	Local I_Opt.Options = First Options
+	
 	Local x%, y%, width%, height%
 	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
 		If (Not Using294) Then
@@ -6069,8 +6144,8 @@ Function DrawMenu()
 		
 		width = ImageWidth(PauseMenuIMG)
 		height = ImageHeight(PauseMenuIMG)
-		x = GraphicWidth / 2 - width / 2
-		y = GraphicHeight / 2 - height / 2
+		x = I_Opt\GraphicWidth / 2 - width / 2
+		y = I_Opt\GraphicHeight / 2 - height / 2
 		
 		DrawImage PauseMenuIMG, x, y
 		
@@ -6106,7 +6181,7 @@ Function DrawMenu()
 		EndIf		
 		
 		Local AchvXIMG% = (x + (22*MenuScale))
-		Local scale# = GraphicHeight/768.0
+		Local scale# = I_Opt\GraphicHeight/768.0
 		Local SeparationConst% = 76*scale
 		Local imgsize% = 64
 		
@@ -6143,7 +6218,7 @@ Function DrawMenu()
 			If DrawButton(x+215*MenuScale,y,100*MenuScale,30*MenuScale,GetLocalString("Options", "control"),False) Then OptionsMenu = 3
 			If DrawButton(x+325*MenuScale,y,100*MenuScale,30*MenuScale,GetLocalString("Options", "advanced"),False) Then OptionsMenu = 4
 			
-			Local tx# = (GraphicWidth/2)+(width/2)
+			Local tx# = (I_Opt\GraphicWidth/2)+(width/2)
 			Local ty# = y
 			Local tw# = 400*MenuScale
 			Local th# = 150*MenuScale
@@ -6500,12 +6575,12 @@ Function DrawMenu()
 							;Next
 						EndIf
 						InitAAFont()
-						Font1% = LoadLocalFont(True, "Font1", Int(20 * (GraphicHeight / 1024.0)))
-						Font2% = LoadLocalFont(True, "Font2", Int(58 * (GraphicHeight / 1024.0)))
-						Font3% = LoadLocalFont(True, "Font3", Int(22 * (GraphicHeight / 1024.0)))
-						Font4% = LoadLocalFont(True, "Font4", Int(60 * (GraphicHeight / 1024.0)))
-						Font5% = LoadLocalFont(True, "Font5", Int(58 * (GraphicHeight / 1024.0)))
-						ConsoleFont% = AALoadFont("Blitz", Int(22 * (GraphicHeight / 1024.0)), 0,0,0,1)
+						Font1% = LoadLocalFont(True, "Font1", Int(20 * (I_Opt\GraphicHeight / 1024.0)))
+						Font2% = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+						Font3% = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
+						Font4% = LoadLocalFont(True, "Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
+						Font5% = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+						ConsoleFont% = AALoadFont("Blitz", Int(22 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
 						;ReloadAAFont()
 						AATextEnable_Prev% = AATextEnable
 					EndIf
@@ -6731,9 +6806,8 @@ Function DrawMenu()
 			AASetFont Font1
 			If KillTimer < 0 Then RowText(DeathMSG$, x, y + 80*MenuScale, 390*MenuScale, 600*MenuScale)
 		EndIf
-		
-		Local I_Opt.Options = First Options
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 		
 	EndIf
 	
@@ -6743,8 +6817,9 @@ Function DrawMenu()
 End Function
 
 Function MouseOn%(x%, y%, width%, height%)
-	If ScaledMouseX() > x And ScaledMouseX() < x + width Then
-		If ScaledMouseY() > y And ScaledMouseY() < y + height Then
+	Local I_Opt.Options = First Options
+	If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + width Then
+		If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + height Then
 			Return True
 		EndIf
 	EndIf
@@ -6755,6 +6830,9 @@ End Function
 
 Include "Source Code\LoadAllSounds.bb"
 Function LoadEntities()
+	
+	Local I_Opt.Options = First Options
+
 	CatchErrors("LoadEntities")
 	DrawLoading(0)
 	
@@ -6801,7 +6879,7 @@ Function LoadEntities()
 	SoundEmitter = CreatePivot()
 	
 	Camera = CreateCamera()
-	CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
+	CameraViewport Camera,0,0,I_Opt\GraphicWidth,I_Opt\GraphicHeight
 	CameraRange(Camera, 0.05, CameraFogFar)
 	CameraFogMode (Camera, 1)
 	CameraFogRange (Camera, CameraFogNear, CameraFogFar)
@@ -6811,14 +6889,14 @@ Function LoadEntities()
 	ScreenTexs[0] = CreateTexture(512, 512, 1+256)
 	ScreenTexs[1] = CreateTexture(512, 512, 1+256)
 	
-	CreateBlurImage()
+	CreateBlurImage(I_Opt)
 	CameraProjMode ark_blur_cam,0
 	;Listener = CreateListener(Camera)
 	
 	FogTexture = LoadTexture_Strict("GFX\fog.jpg", 1)
 	
 	Fog = CreateSprite(ark_blur_cam)
-	ScaleSprite(Fog, Max(GraphicWidth / 1240.0, 1.0), Max(GraphicHeight / 960.0 * 0.8, 0.8))
+	ScaleSprite(Fog, Max(I_Opt\GraphicWidth / 1240.0, 1.0), Max(I_Opt\GraphicHeight / 960.0 * 0.8, 0.8))
 	EntityTexture(Fog, FogTexture)
 	EntityBlend (Fog, 2)
 	EntityOrder Fog, -1000
@@ -6826,7 +6904,7 @@ Function LoadEntities()
 	
 	GasMaskTexture = LoadTexture_Strict("GFX\GasmaskOverlay.jpg", 1)
 	GasMaskOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(GasMaskOverlay, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
+	ScaleSprite(GasMaskOverlay, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
 	EntityTexture(GasMaskOverlay, GasMaskTexture)
 	EntityBlend (GasMaskOverlay, 2)
 	EntityFX(GasMaskOverlay, 1)
@@ -6836,7 +6914,7 @@ Function LoadEntities()
 	
 	InfectTexture = LoadTexture_Strict("GFX\InfectOverlay.jpg", 1)
 	InfectOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(InfectOverlay, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
+	ScaleSprite(InfectOverlay, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
 	EntityTexture(InfectOverlay, InfectTexture)
 	EntityBlend (InfectOverlay, 3)
 	EntityFX(InfectOverlay, 1)
@@ -6847,7 +6925,7 @@ Function LoadEntities()
 	
 	NVTexture = LoadTexture_Strict("GFX\NightVisionOverlay.jpg", 1)
 	NVOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(NVOverlay, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
+	ScaleSprite(NVOverlay, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
 	EntityTexture(NVOverlay, NVTexture)
 	EntityBlend (NVOverlay, 2)
 	EntityFX(NVOverlay, 1)
@@ -6855,7 +6933,7 @@ Function LoadEntities()
 	MoveEntity(NVOverlay, 0, 0, 1.0)
 	HideEntity(NVOverlay)
 	NVBlink = CreateSprite(ark_blur_cam)
-	ScaleSprite(NVBlink, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
+	ScaleSprite(NVBlink, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
 	EntityColor(NVBlink,0,0,0)
 	EntityFX(NVBlink, 1)
 	EntityOrder NVBlink, -1005
@@ -6872,7 +6950,7 @@ Function LoadEntities()
 	SetBuffer BackBuffer()
 	
 	Dark = CreateSprite(ark_blur_cam)
-	ScaleSprite(Dark, Max(GraphicWidth / 1240.0, 1.0), Max(GraphicHeight / 960.0 * 0.8, 0.8))
+	ScaleSprite(Dark, Max(I_Opt\GraphicWidth / 1240.0, 1.0), Max(I_Opt\GraphicHeight / 960.0 * 0.8, 0.8))
 	EntityTexture(Dark, DarkTexture)
 	EntityBlend (Dark, 1)
 	EntityOrder Dark, -1002
@@ -6889,7 +6967,7 @@ Function LoadEntities()
 	TeslaTexture = LoadTexture_Strict("GFX\map\tesla.jpg", 1+2)
 	
 	Light = CreateSprite(ark_blur_cam)
-	ScaleSprite(Light, Max(GraphicWidth / 1240.0, 1.0), Max(GraphicHeight / 960.0 * 0.8, 0.8))
+	ScaleSprite(Light, Max(I_Opt\GraphicWidth / 1240.0, 1.0), Max(I_Opt\GraphicHeight / 960.0 * 0.8, 0.8))
 	EntityTexture(Light, LightTexture)
 	EntityBlend (Light, 1)
 	EntityOrder Light, -1002
@@ -7917,7 +7995,7 @@ Function UpdateMusic()
 		
 		If NowPlaying < 66
 			If CurrMusic = 0
-				MusicCHN = StreamSound_Strict("SFX\Music\"+Music(NowPlaying)+".ogg",0.0,Mode)
+				MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,Mode)
 				CurrMusic = 1
 			EndIf
 			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
@@ -8325,15 +8403,18 @@ Function Animate2#(entity%, curr#, start%, quit%, speed#, loop=True)
 End Function
 
 Function Use294()
+	
+	Local I_Opt.Options = First Options
+	
 	Local x#,y#, xtemp%,ytemp%, strtemp$, temp%
 	
 	ShowPointer()
 	
-	x = GraphicWidth/2 - (ImageWidth(Panel294)/2)
-	y = GraphicHeight/2 - (ImageHeight(Panel294)/2)
+	x = I_Opt\GraphicWidth/2 - (ImageWidth(Panel294)/2)
+	y = I_Opt\GraphicHeight/2 - (ImageHeight(Panel294)/2)
 	DrawImage Panel294, x, y
-	Local I_Opt.Options = First Options
-	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
+	
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	
 	temp = True
 	If PlayerRoom\SoundCHN<>0 Then temp = False
@@ -8342,8 +8423,8 @@ Function Use294()
 	
 	If temp Then
 		If MouseHit1 Then
-			xtemp = Floor((ScaledMouseX()-x-228) / 35.5)
-			ytemp = Floor((ScaledMouseY()-y-342) / 36.5)
+			xtemp = Floor((ScaledMouseX(I_Opt)-x-228) / 35.5)
+			ytemp = Floor((ScaledMouseY(I_Opt)-y-342) / 36.5)
 			
 			If ytemp => 0 And ytemp < 5 Then
 				If xtemp => 0 And xtemp < 10 Then PlaySound_Strict ButtonSFX
@@ -9420,6 +9501,8 @@ End Function
 
 ;Save options to .ini.
 Function SaveOptionsINI()
+
+	Local I_Opt.Options = First Options
 	
 	PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
 	PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
@@ -9438,7 +9521,7 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "enable vram", EnableVRam)
 	PutINIValue(OptionFile, "options", "mouse smoothing", MouseSmooth)
 	PutINIValue(OptionFile, "options", "fov", FOV)
-	PutINIValue(OptionFile, "options", "launcher enabled", LauncherEnabled%)
+	PutINIValue(OptionFile, "options", "launcher enabled", I_Opt\LauncherEnabled%)
 	PutINIValue(OptionFile, "console", "enabled", CanOpenConsole%)
 	PutINIValue(OptionFile, "console", "auto opening", ConsoleOpening%)
 	
@@ -9581,10 +9664,10 @@ Function ResizeImage2(image%,width%,height%)
 	
 	oldWidth% = ImageWidth(image)
 	oldHeight% = ImageHeight(image)
-	CopyRect 0,0,oldWidth,oldHeight,2048-oldWidth/2,2048-oldHeight/2,ImageBuffer(image),TextureBuffer(fresize_texture)
+	CopyRect 0,0,oldWidth,oldHeight,1024-oldWidth/2,1024-oldHeight/2,ImageBuffer(image),TextureBuffer(fresize_texture)
 	SetBuffer BackBuffer()
-	ScaleRender(0,0,4096.0 / Float(RealGraphicWidth) * Float(width) / Float(oldWidth), 4096.0 / Float(RealGraphicWidth) * Float(height) / Float(oldHeight))
-	;might want to replace Float(GraphicWidth) with Max(GraphicWidth,GraphicHeight) if portrait sizes cause issues
+	ScaleRender(0,0,2048.0 / Float(RealGraphicWidth) * Float(width) / Float(oldWidth), 2048.0 / Float(RealGraphicWidth) * Float(height) / Float(oldHeight))
+	;might want to replace Float(I_Opt\GraphicWidth) with Max(I_Opt\GraphicWidth,I_Opt\GraphicHeight) if portrait sizes cause issues
 	;everyone uses landscape so it's probably a non-issue
 	CopyRect RealGraphicWidth/2-width/2,RealGraphicHeight/2-height/2,width,height,0,0,BackBuffer(),ImageBuffer(img)
 	
@@ -9594,6 +9677,9 @@ End Function
 
 
 Function RenderWorld2()
+	
+	Local I_Opt.Options = First Options
+	
 	CameraProjMode ark_blur_cam,0
 	CameraProjMode Camera,1
 	
@@ -9610,7 +9696,7 @@ Function RenderWorld2()
 	IsNVGBlinking% = False
 	HideEntity NVBlink
 	
-	CameraViewport Camera,0,0,GraphicWidth,GraphicHeight
+	CameraViewport Camera,0,0,I_Opt\GraphicWidth,I_Opt\GraphicHeight
 	
 	Local hasBattery% = 2
 	Local power% = 0
@@ -9671,10 +9757,10 @@ Function RenderWorld2()
 			Local plusY% = 0
 			If hasBattery=1 Then plusY% = 40
 			
-			AAText GraphicWidth/2,(20+plusY)*MenuScale,"REFRESHING DATA IN",True,False
+			AAText I_Opt\GraphicWidth/2,(20+plusY)*MenuScale,"REFRESHING DATA IN",True,False
 			
-			AAText GraphicWidth/2,(60+plusY)*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
-			AAText GraphicWidth/2,(100+plusY)*MenuScale,"SECONDS",True,False
+			AAText I_Opt\GraphicWidth/2,(60+plusY)*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
+			AAText I_Opt\GraphicWidth/2,(100+plusY)*MenuScale,"SECONDS",True,False
 			
 			temp% = CreatePivot() : temp2% = CreatePivot()
 			PositionEntity temp, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
@@ -9707,8 +9793,8 @@ Function RenderWorld2()
 						EndIf
 						
 						If (Not IsNVGBlinking%)
-						AAText GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2),np\NVName,True,True
-						AAText GraphicWidth / 2 + xvalue * (GraphicWidth / 2),GraphicHeight / 2 - yvalue * (GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
+						AAText I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2),np\NVName,True,True
+						AAText I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
 					EndIf
 				EndIf
 				EndIf
@@ -9718,25 +9804,25 @@ Function RenderWorld2()
 			
 			Color 0,0,55
 			For k=0 To 10
-				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
+				Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
 			Next
 			Color 0,0,255
 			For l=0 To Floor((power%+50)*0.01)
-				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
+				Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
 			Next
-			DrawImage NVGImages,40,GraphicHeight*0.5+30,1
+			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,1
 			
 			Color 255,255,255
 		ElseIf WearingNightVision=1 And hasBattery<>0
 			Color 0,55,0
 			For k=0 To 10
-				Rect 45,GraphicHeight*0.5-(k*20),54,10,True
+				Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
 			Next
 			Color 0,255,0
 			For l=0 To Floor((power%+50)*0.01)
-				Rect 45,GraphicHeight*0.5-(l*20),54,10,True
+				Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
 			Next
-			DrawImage NVGImages,40,GraphicHeight*0.5+30,0
+			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,0
 		EndIf
 	EndIf
 	
@@ -9751,7 +9837,7 @@ Function RenderWorld2()
 			Color 255,0,0
 			AASetFont Font3
 			
-			AAText GraphicWidth/2,20*MenuScale,"WARNING: LOW BATTERY",True,False
+			AAText I_Opt\GraphicWidth/2,20*MenuScale,"WARNING: LOW BATTERY",True,False
 			Color 255,255,255
 		EndIf
 	EndIf
@@ -9804,8 +9890,8 @@ Function InitFastResize()
 	fresize_image = spr
 	
 	;Create texture
-	fresize_texture = CreateTexture(4096, 4096, 1+256)
-	fresize_texture2 = CreateTexture(4096, 4096, 1+256)
+	fresize_texture = CreateTexture(2048, 2048, 1+256)
+	fresize_texture2 = CreateTexture(2048, 2048, 1+256)
 	TextureBlend fresize_texture2,3
 	SetBuffer(TextureBuffer(fresize_texture2))
 	ClsColor 0,0,0
@@ -9996,12 +10082,12 @@ Function CheckTriggers$()
 	
 End Function
 
-Function ScaledMouseX%()
-	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
+Function ScaledMouseX%(I_Opt.Options)
+	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(I_Opt\GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
 
-Function ScaledMouseY%()
-	Return Float(MouseY())*Float(GraphicHeight)/Float(RealGraphicHeight)
+Function ScaledMouseY%(I_Opt.Options)
+	Return Float(MouseY())*Float(I_Opt\GraphicHeight)/Float(RealGraphicHeight)
 End Function
 
 Function CatchErrors(location$)

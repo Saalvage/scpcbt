@@ -118,11 +118,11 @@ Function InitItemTemplates()
 	Local it.ItemTemplates,it2.ItemTemplates
 	
 	For i = 1 To 5
-		CreateItemTemplate("key", "GFX\items\keycard.x", "GFX\items\INVkey" + i + ".jpg", "", 0.0004, 1, "!" + i, "GFX\items\keycard" + i + ".jpg")
+		CreateItemTemplate("key", "GFX\items\keycard.b3d", "GFX\items\INVkey" + i + ".jpg", "", 0.0004, 1, "!" + i, "GFX\items\keycard" + i + ".jpg")
 	Next
-	CreateItemTemplate("keyomni", "GFX\items\keycard.x", "GFX\items\INVkeyomni.jpg", "", 0.0004, 1, "", "GFX\items\keycardomni.jpg")
-	CreateItemTemplate("misc", "GFX\items\keycard.x", "GFX\items\INVcard.jpg", "", 0.0004, 1, "keyplay", "GFX\items\card.jpg")
-	CreateItemTemplate("misc", "GFX\items\keycard.x", "GFX\items\INVmastercard.jpg", "", 0.0004, 1, "keymaster", "GFX\items\mastercard.jpg")
+	CreateItemTemplate("keyomni", "GFX\items\keycard.b3d", "GFX\items\INVkeyomni.jpg", "", 0.0004, 1, "", "GFX\items\keycardomni.jpg")
+	CreateItemTemplate("misc", "GFX\items\keycard.b3d", "GFX\items\INVcard.jpg", "", 0.0004, 1, "keyplay", "GFX\items\card.jpg")
+	CreateItemTemplate("misc", "GFX\items\keycard.b3d", "GFX\items\INVmastercard.jpg", "", 0.0004, 1, "keymaster", "GFX\items\mastercard.jpg")
 	
 	CreateItemTemplate("scp148", "GFX\items\metalpanel.b3d", "GFX\items\INVmetalpanel.jpg", "", RoomScale, 2)
 	CreateItemTemplate("scp148ingot", "GFX\items\scp148.b3d", "GFX\items\INVscp148.jpg", "", RoomScale * 1.5, 2)
@@ -201,10 +201,10 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\f6.jpg", 0.004, 0, "log3", "GFX\items\f4.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVnote.jpg", "GFX\items\docStrange.jpg", 0.0025, 0, "strange", "GFX\items\notetexture.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVnote.jpg", "GFX\items\sn.it", 0.003, 0, "mysterious", "GFX\items\notetexture.jpg")	
-	CreateItemTemplate("paper", "GFX\items\note.x", "GFX\items\INVnote2.jpg", "GFX\items\docdan.jpg", 0.0025, 0, "daniel")
+	CreateItemTemplate("paper", "GFX\items\note.b3d", "GFX\items\INVnote2.jpg", "GFX\items\docdan.jpg", 0.0025, 0, "daniel")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVnote.jpg", "GFX\items\docRAND1.jpg", 0.003, 0, "notification", "GFX\items\notetexture.jpg")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\dh.s", 0.003, 0, "hearing")
-	CreateItemTemplate("paper", "GFX\items\note.x", "GFX\items\INVnote2.jpg", "GFX\items\note682.jpg", 0.0025, 0, "sticky")
+	CreateItemTemplate("paper", "GFX\items\note.b3d", "GFX\items\INVnote2.jpg", "GFX\items\note682.jpg", 0.0025, 0, "sticky")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003, 0, "drawing")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\leaflet.jpg", 0.003, 0, "leaflet", "GFX\items\notetexture.jpg")
 	
@@ -214,7 +214,7 @@ Function InitItemTemplates()
 	
 	CreateItemTemplate("misc", "GFX\items\electronics.b3d", "GFX\items\INVelectronics.jpg", "", 0.0015, 1, "electronical")
 	
-	CreateItemTemplate("badge", "GFX\items\badge.x", "GFX\items\INVbadge.jpg", "GFX\items\badge1.jpg", 0.0001, 1, "", "GFX\items\badge1_tex.jpg")
+	CreateItemTemplate("badge", "GFX\items\badge.b3d", "GFX\items\INVbadge.jpg", "GFX\items\badge1.jpg", 0.0001, 1, "", "GFX\items\badge1_tex.jpg")
 	
 	CreateItemTemplate("badgasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.019, 2)
 	CreateItemTemplate("gasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.02, 2)
@@ -230,23 +230,23 @@ Function InitItemTemplates()
 	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02, 2)
 	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02, 2)
 	
-	CreateItemTemplate("badvest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.018, 2)
-	CreateItemTemplate("vest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.02, 2)
-	CreateItemTemplate("finevest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.022, 2)
-	CreateItemTemplate("veryfinevest", "GFX\items\vest.x", "GFX\items\INVvest.jpg", "", 0.025, 2)
+	CreateItemTemplate("badvest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.018, 2)
+	CreateItemTemplate("vest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.02, 2)
+	CreateItemTemplate("finevest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.022, 2)
+	CreateItemTemplate("veryfinevest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.025, 2)
 	
 	CreateItemTemplate("cup", "GFX\items\cup.b3d", "GFX\items\INVcup.jpg", "", 0.04, 2)
 	CreateItemTemplate("emptycup", "GFX\items\cup.b3d", "GFX\items\INVcup.jpg", "", 0.04, 2)
 	
-	CreateItemTemplate("firstaid", "GFX\items\firstaid.x", "GFX\items\INVfirstaid.jpg", "", 0.05, 1)
-	CreateItemTemplate("finefirstaid", "GFX\items\firstaid.x", "GFX\items\INVfirstaid.jpg", "", 0.03, 1)
-	CreateItemTemplate("firstaid2", "GFX\items\firstaid.x", "GFX\items\INVfirstaid2.jpg", "", 0.03, 1, "", "GFX\items\firstaidkit2.jpg")
+	CreateItemTemplate("firstaid", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid.jpg", "", 0.05, 1)
+	CreateItemTemplate("finefirstaid", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid.jpg", "", 0.03, 1)
+	CreateItemTemplate("firstaid2", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid2.jpg", "", 0.03, 1, "", "GFX\items\firstaidkit2.jpg")
 	CreateItemTemplate("veryfinefirstaid", "GFX\items\eyedrops.b3d", "GFX\items\INVbottle.jpg", "", 0.002, 1, "", "GFX\items\bottle.jpg")	
 	
-	CreateItemTemplate("nav300", "GFX\items\navigator.x", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	CreateItemTemplate("nav", "GFX\items\navigator.x", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	CreateItemTemplate("navulti", "GFX\items\navigator.x", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
-	CreateItemTemplate("nav310", "GFX\items\navigator.x", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("nav300", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("navulti", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+	CreateItemTemplate("nav310", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	
 	CreateItemTemplate("radio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
 	CreateItemTemplate("fineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
@@ -256,9 +256,9 @@ Function InitItemTemplates()
 	CreateItemTemplate("hand", "GFX\items\severedhand.b3d", "GFX\items\INVhand.jpg", "", 0.04, 2)
 	CreateItemTemplate("hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.04, 2, "", "GFX\items\shand2.png")
 	
-	CreateItemTemplate("bat", "GFX\items\Battery\Battery.x", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008, 1)
-	CreateItemTemplate("18vbat", "GFX\items\Battery\Battery.x", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, 1, "", "GFX\items\Battery\Battery 18V.jpg")
-	CreateItemTemplate("killbat", "GFX\items\Battery\Battery.x", "GFX\items\Battery\INVbattery22900.jpg", "", 0.01, 1, "","GFX\items\Battery\Strange Battery.jpg")
+	CreateItemTemplate("bat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008, 1)
+	CreateItemTemplate("18vbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, 1, "", "GFX\items\Battery\Battery 18V.jpg")
+	CreateItemTemplate("killbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery22900.jpg", "", 0.01, 1, "","GFX\items\Battery\Strange Battery.jpg")
 	
 	CreateItemTemplate("fineeyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
 	CreateItemTemplate("supereyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
@@ -272,7 +272,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, 3, "lkey", "GFX\items\key2.png","",0,1+2+8)
 	CreateItemTemplate("coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
 	CreateItemTemplate("ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, 0, "", "GFX\items\tickettexture.png","",0,1+2+8)
-	CreateItemTemplate("badge", "GFX\items\badge.x", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, 1, "oldbadge", "GFX\items\badge2_tex.png","",0,1+2+8)
+	CreateItemTemplate("badge", "GFX\items\badge.b3d", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, 1, "oldbadge", "GFX\items\badge2_tex.png","",0,1+2+8)
 	
 	CreateItemTemplate("quarter", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
 	CreateItemTemplate("wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005, 2, "","","",1)
@@ -679,6 +679,11 @@ Function PickItem(item.Items)
 						Else
 							;TakeOffStuff(2)
 							SelectedItem = item
+						EndIf
+					Case "cup"
+						If item\state2 = 0 Then
+							item\state = 1
+							item\state2 = 1
 						EndIf
 				End Select
 				

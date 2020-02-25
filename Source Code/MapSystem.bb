@@ -3685,8 +3685,8 @@ Function FillRoom(r.Rooms)
 			PositionEntity (r\RoomDoors[2]\buttons[0], r\x - 496.0 * RoomScale, r\y + 0.7, r\z - 272.0 * RoomScale, True)
 			TurnEntity(r\RoomDoors[2]\buttons[0], 0, 90, 0)
 			
-			r\Objects[0] = LoadMesh_Strict("GFX\map\914key.x")
-			r\Objects[1] = LoadMesh_Strict("GFX\map\914knob.x")
+			r\Objects[0] = LoadMesh_Strict("GFX\map\914key.b3d")
+			r\Objects[1] = LoadMesh_Strict("GFX\map\914knob.b3d")
 			
 			For  i% = 0 To 1
 				ScaleEntity(r\Objects[i], RoomScale, RoomScale, RoomScale)
@@ -6861,7 +6861,9 @@ Function CreateMap()
 			PreventRoomOverlap(r)
 		Next
 		
-		If GetINIInt(OptionFile, "options", "debug mode") Then 
+		Local I_Opt.Options = First Options
+		
+		If I_Opt\DebugMode Then 
 			Repeat
 				Cls
 				i = MapWidth - 1

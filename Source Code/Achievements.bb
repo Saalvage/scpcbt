@@ -28,11 +28,11 @@ For i = 0 To MAXACHIEVEMENTS-1
 	Local image$ = GetINIString2(AchvIni, loc2, "image")
 	
 	AchvIMG(i) = LoadImage_Strict("GFX\menu\achievements\"+image+".jpg")
-	AchvIMG(i) = ResizeImage2(AchvIMG(i),ImageWidth(AchvIMG(i))*GraphicHeight/768.0,ImageHeight(AchvIMG(i))*GraphicHeight/768.0)
+	AchvIMG(i) = ResizeImage2(AchvIMG(i),ImageWidth(AchvIMG(i))*I_Opt\GraphicHeight/768.0,ImageHeight(AchvIMG(i))*I_Opt\GraphicHeight/768.0)
 Next
 
 Global AchvLocked = LoadImage_Strict("GFX\menu\achievements\achvlocked.jpg")
-AchvLocked = ResizeImage2(AchvLocked,ImageWidth(AchvLocked)*GraphicHeight/768.0,ImageHeight(AchvLocked)*GraphicHeight/768.0)
+AchvLocked = ResizeImage2(AchvLocked,ImageWidth(AchvLocked)*I_Opt\GraphicHeight/768.0,ImageHeight(AchvLocked)*I_Opt\GraphicHeight/768.0)
 
 Function GiveAchievement(achvname%, showMessage%=True)
 	If Achievements(achvname)<>True Then
@@ -46,7 +46,10 @@ Function GiveAchievement(achvname%, showMessage%=True)
 End Function
 
 Function AchievementTooltip(achvno%)
-	Local scale# = GraphicHeight/768.0
+	
+	Local I_Opt.Options = First Options
+
+	Local scale# = I_Opt\GraphicHeight/768.0
 	
 	AASetFont Font3
 	Local width = AAStringWidth(AchievementStrings(achvno))
@@ -59,18 +62,21 @@ Function AchievementTooltip(achvno%)
 	Local height = 38*scale
 	
 	Color 25,25,25
-	Rect(ScaledMouseX()+(20*MenuScale),ScaledMouseY()+(20*MenuScale),width,height,True)
+	Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height,True)
 	Color 150,150,150
-	Rect(ScaledMouseX()+(20*MenuScale),ScaledMouseY()+(20*MenuScale),width,height,False)
+	Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height,False)
 	AASetFont Font3
-	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(35*MenuScale), AchievementStrings(achvno), True, True)
+	AAText(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(35*MenuScale), AchievementStrings(achvno), True, True)
 	AASetFont Font1
-	AAText(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(55*MenuScale), AchievementDescs(achvno), True, True)
+	AAText(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(55*MenuScale), AchievementDescs(achvno), True, True)
 End Function
 
 Function DrawAchvIMG(x%, y%, achvno%)
+
+	Local I_Opt.Options = First Options
+	
 	Local row%
-	Local scale# = GraphicHeight/768.0
+	Local scale# = I_Opt\GraphicHeight/768.0
 	Local SeparationConst2 = 76 * scale
 	row = achvno Mod 4
 	Color 0,0,0
@@ -109,16 +115,19 @@ Function CreateAchievementMsg.AchievementMsg(id%,txt$)
 End Function
 
 Function UpdateAchievementMsg()
+	
+	Local I_Opt.Options = First Options
+
 	Local amsg.AchievementMsg,amsg2.AchievementMsg
-	Local scale# = GraphicHeight/768.0
+	Local scale# = I_Opt\GraphicHeight/768.0
 	Local width% = 264*scale
 	Local height% = 84*scale
 	Local x%,y%
 	
 	For amsg = Each AchievementMsg
 		If amsg\msgtime <> 0
-			x=GraphicWidth+amsg\msgx
-			y=(GraphicHeight-height)
+			x=I_Opt\GraphicWidth+amsg\msgx
+			y=(I_Opt\GraphicHeight-height)
 			For amsg2 = Each AchievementMsg
 				If amsg2 <> amsg
 					If amsg2\msgID > amsg\msgID
