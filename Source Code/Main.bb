@@ -29,11 +29,14 @@ Type Options
 	Field GraphicWidth%
 	Field GraphicHeight%
 	Field GraphicMode%
+	Field AATextEnabled%
+	Field AATextEnabled_Prev%
 	Field ShowFPS%
 	Field ConsoleEnabled%
 	Field ConsoleOnError%
-	Field HalloweenTex%
 	Field DebugMode%
+	
+	Field HalloweenTex%
 End Type
 
 Local I_Opt.Options = New Options
@@ -41,10 +44,12 @@ Local I_Opt.Options = New Options
 I_Opt\LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
 I_Opt\GraphicWidth = GetINIInt(OptionFile, "options", "width")
 I_Opt\GraphicHeight = GetINIInt(OptionFile, "options", "height")
+I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
+I_Opt\AATextEnabled = GetINIInt(OptionFile, "options", "antialiased text")
+I_Opt\AATextEnabled_Prev = I_Opt\AATextEnabled
 I_Opt\ShowFPS = GetINIInt(OptionFile, "options", "show FPS")
 I_Opt\ConsoleEnabled = GetINIInt(OptionFile, "console", "enabled")
 I_Opt\ConsoleOnError = GetINIInt(OptionFile, "console", "auto opening")
-I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
 I_Opt\DebugMode = GetINIInt(OptionFile, "options", "debug mode")
 
 
@@ -256,22 +261,6 @@ If I_Opt\LauncherEnabled Then
 	AppTitle GetLocalString("Menu", "titlelauncher")
 	
 	UpdateLauncher(I_LOpt)
-Else
-	For i% = 1 To I_LOpt\TotalGFXModes
-		Local samefound% = False
-		For  n% = 0 To I_LOpt\TotalGFXModes - 1
-			If I_LOpt\GfxModeWidths[n] = GfxModeWidth(i) And I_LOpt\GfxModeHeights[n] = GfxModeHeight(i) Then samefound = True : Exit
-		Next
-		If Not samefound Then
-			If I_Opt\GraphicWidth = GfxModeWidth(i) And I_Opt\GraphicHeight = GfxModeHeight(i) Then I_LOpt\SelectedGFXMode = I_LOpt\GFXModes
-			I_LOpt\GfxModeWidths[I_LOpt\GFXModes] = GfxModeWidth(i)
-			I_LOpt\GfxModeHeights[I_LOpt\GFXModes] = GfxModeHeight(i)
-			I_LOpt\GFXModes=I_LOpt\GFXModes+1
-		EndIf
-	Next
-	
-	I_Opt\GraphicWidth = I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode]
-	I_Opt\GraphicHeight = I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode]
 EndIf
 
 Delete I_LOpt
@@ -366,7 +355,7 @@ Global SelectedLoadingScreen.LoadingScreens, LoadingScreenAmount%, LoadingScreen
 Global LoadingBack% = LoadImage_Strict("Loadingscreens\loadingback.jpg")
 InitLoadingScreens("Loadingscreens\loadingscreens.ini")
 
-InitAAFont()
+InitAAFont(I_Opt)
 ;For some reason, Blitz3D doesn't load fonts that have filenames that
 ;don't match their "internal name" (i.e. their display name in applications
 ;like Word and such). As a workaround, I moved the files and renamed them so they
@@ -3595,7 +3584,7 @@ Function MouseLook()
 	
 	Local I_427.SCP427 = First SCP427
 	
-	Local factor1025# = FPSfactor *  SCP1025state[7]
+	Local factor1025# = FPSfactor * SCP1025state[7]
 	For i = 0 To 6
 		If SCP1025state[i]>0 Then
 			Select i
@@ -3669,7 +3658,7 @@ Function MouseLook()
 						SCP1025state[i]=SCP1025state[i]+0.00025*factor1025*(100/SCP1025state[i])
 					EndIf
 					Stamina = Min(100, Stamina + (90.0-Stamina)*SCP1025state[i]*factor1025*0.00008)
-					If SCP1025state[i]>15 And SCP1025state[i]-factor1025<=15 Then
+					If SCP1025state[i]>15 And SCP1025state[i]-FPSFactor<=15 Then
 						Msg = GetLocalString("Messages", "1025breathe")
 						MsgTimer = 70*4
 					EndIf
@@ -6570,23 +6559,23 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, GetLocalString("Options", "textantialias"))
-					AATextEnable% = DrawTick(x + 270 * MenuScale, y + MenuScale, AATextEnable%)
-					If AATextEnable_Prev% <> AATextEnable
+					I_Opt\AATextEnabled% = DrawTick(x + 270 * MenuScale, y + MenuScale, I_Opt\AATextEnabled%)
+					If AATextEnable_Prev% <> I_Opt\AATextEnabled
 						For font.AAFont = Each AAFont
 							FreeFont font\lowResFont%
-							If (Not AATextEnable)
+							If (Not I_Opt\AATextEnabled)
 								FreeTexture font\texture
 								FreeImage font\backup
 							EndIf
 							Delete font
 						Next
-						If (Not AATextEnable) Then
+						If (Not I_Opt\AATextEnabled) Then
 							FreeEntity AATextCam
 							;For i%=0 To 149
 							;	FreeEntity AATextSprite[i]
 							;Next
 						EndIf
-						InitAAFont()
+						InitAAFont(I_Opt)
 						Font1% = LoadLocalFont(True, "Font1", Int(20 * (I_Opt\GraphicHeight / 1024.0)))
 						Font2% = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 						Font3% = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
@@ -6594,7 +6583,7 @@ Function DrawMenu()
 						Font5% = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 						ConsoleFont% = AALoadFont("Blitz", Int(22 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
 						;ReloadAAFont()
-						AATextEnable_Prev% = AATextEnable
+						I_Opt\AATextEnabled_Prev = I_Opt\AATextEnabled
 					EndIf
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"antialiastext")
@@ -9528,7 +9517,7 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 	PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)
 	PutINIValue(OptionFile, "options", "texture details", TextureDetails%)
-	PutINIValue(OptionFile, "options", "antialiased text", AATextEnable)
+	PutINIValue(OptionFile, "options", "antialiased text", I_Opt\AATextEnabled)
 	PutINIValue(OptionFile, "options", "particle amount", ParticleAmount)
 	PutINIValue(OptionFile, "options", "enable vram", EnableVRam)
 	PutINIValue(OptionFile, "options", "mouse smoothing", MouseSmooth)

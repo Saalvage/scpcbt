@@ -991,20 +991,20 @@ Function UpdateMainMenu()
 						
 						Color 255,255,255
 						AAText(x + 20 * MenuScale, y, GetLocalString("Options", "textantialias"))
-						AATextEnable% = DrawTick(x + 310 * MenuScale, y + MenuScale, AATextEnable%)
-						If AATextEnable_Prev% <> AATextEnable
+						I_Opt\AATextEnabled% = DrawTick(x + 310 * MenuScale, y + MenuScale, I_Opt\AATextEnabled%)
+						If AATextEnable_Prev% <> I_Opt\AATextEnabled
 							For font.AAFont = Each AAFont
 								FreeFont font\lowResFont%
-								If (Not AATextEnable)
+								If (Not I_Opt\AATextEnabled)
 									FreeTexture font\texture
 									FreeImage font\backup
 								EndIf
 								Delete font
 							Next
-							If (Not AATextEnable) Then
+							If (Not I_Opt\AATextEnabled) Then
 								FreeEntity AATextCam
 							EndIf
-							InitAAFont()
+							InitAAFont(I_Opt)
 							Font1% = LoadLocalFont(True, "Font1", Int(20 * (I_Opt\GraphicHeight / 1024.0)))
 							Font2% = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 							Font3% = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
@@ -1012,7 +1012,7 @@ Function UpdateMainMenu()
 							Font5% = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 							ConsoleFont% = AALoadFont("Blitz", Int(22 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
 							;ReloadAAFont()
-							AATextEnable_Prev% = AATextEnable
+							I_Opt\AATextEnabled_Prev = I_Opt\AATextEnabled
 						EndIf
 						If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"antialiastext")
@@ -1051,7 +1051,7 @@ Function UpdateMainMenu()
 							EnableRoomLights = 1
 							TextureDetails = 3
 							TextureFloat# = -0.4 ;If default TextureDetails changes, this must too
-							AATextEnable = 0
+							I_Opt\AATextEnabled = 0
 							ParticleAmount = 2
 							FOV = 60
 							EnableVRam = 0

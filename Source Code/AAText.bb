@@ -1,8 +1,6 @@
-Global AATextEnable% = GetINIInt(OptionFile, "options", "antialiased text")
 Global AASelectedFont%
 Global AATextCam%,AATextSprite%[150]
 Global AACharW%,AACharH%
-Global AATextEnable_Prev% = AATextEnable
 
 Global AACamViewW%,AACamViewH%
 
@@ -24,8 +22,8 @@ Type AAFont
 	Field isAA%
 End Type
 
-Function InitAAFont()
-	If AATextEnable Then
+Function InitAAFont(I_Opt.Options)
+	If I_Opt\AATextEnabled Then
 		;Create Camera
 		Local cam% = CreateCamera()
 		CameraViewport cam,0,0,10,10;I_Opt\GraphicWidth,I_Opt\GraphicHeight
@@ -80,8 +78,11 @@ Function AASpriteScale(ind%,w%,h%)
 End Function
 
 Function ReloadAAFont() ;CALL ONLY AFTER CLEARWORLD
-	If AATextEnable Then
-		InitAAFont()
+
+	Local I_Opt.Options = First Options ;TODO check if this can be made a parameter
+
+	If I_Opt\AATextEnabled Then
+		InitAAFont(I_Opt)
 		For font.AAFont = Each AAFont
 			If font\isAA Then
 				font\texture = CreateTexture(1024,1024,3)
@@ -101,9 +102,12 @@ Function ReloadAAFont() ;CALL ONLY AFTER CLEARWORLD
 End Function
 
 Function AASetFont(fnt%)
+
+	Local I_Opt.Options = First Options
+
 	AASelectedFont = fnt
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	If AATextEnable And font\isAA Then
+	If I_Opt\AATextEnabled And font\isAA Then
 		For i%=0 To 149
 			EntityTexture AATextSprite[i],font\texture
 		Next
@@ -111,8 +115,11 @@ Function AASetFont(fnt%)
 End Function
 
 Function AAStringWidth%(txt$)
+	
+	Local I_Opt.Options = First Options
+	
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	If (AATextEnable) And (font\isAA) Then
+	If (I_Opt\AATextEnabled) And (font\isAA) Then
 		Local retVal%=0
 		For i=1 To Len(txt)
 			Local char% = Asc(Mid(txt,i,1))
@@ -128,8 +135,11 @@ Function AAStringWidth%(txt$)
 End Function
 
 Function AAStringHeight%(txt$)
+
+	Local I_Opt.Options = First Options
+
 	Local font.AAFont = Object.AAFont(AASelectedFont)
-	If (AATextEnable) And (font\isAA) Then
+	If (I_Opt\AATextEnabled) And (font\isAA) Then
 		Return font\mH
 	Else
 		SetFont font\lowResFont
@@ -144,7 +154,10 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	If Len(txt)=0 Then Return
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
-	If (GraphicsBuffer()<>BackBuffer()) Lor (Not AATextEnable) Lor (Not font\isAA) Then
+	DebugLog "t" + I_Opt\AATextEnabled
+	DebugLog "lll" + font\isAA
+	
+	If (GraphicsBuffer()<>BackBuffer()) Lor (Not I_Opt\AATextEnabled) Lor (Not font\isAA) Then
 		SetFont font\lowResFont
 		Local oldr% = ColorRed() : Local oldg% = ColorGreen() : Local oldb% = ColorBlue()
 		Color oldr*a,oldg*a,oldb*a
@@ -220,6 +233,9 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 End Function
 
 Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, AATextScaleFactor%=2)
+
+	Local I_Opt.Options = First Options
+	
 	Local newFont.AAFont = New AAFont
 	
 	newFont\lowResFont = LoadFont(file,height,bold,italic,underline)
@@ -228,7 +244,7 @@ Function AALoadFont%(file$="Tahoma", height=13, bold=0, italic=0, underline=0, A
 	newFont\mW = FontWidth()
 	newFont\mH = FontHeight()
 	
-	If AATextEnable And AATextScaleFactor>1 Then
+	If I_Opt\AATextEnabled And AATextScaleFactor>1 Then
 		Local hResFont% = LoadFont(file,height*AATextScaleFactor,bold,italic,underline)
 		Local tImage% = CreateTexture(1024,1024,3)
 		Local tX% = 0 : Local tY% = 1
