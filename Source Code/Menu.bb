@@ -958,7 +958,7 @@ Function UpdateMainMenu()
 						
 						Color 255,255,255
 						AAText(x + 20 * MenuScale, y, GetLocalString("Options", "fps"))
-						ShowFPS% = DrawTick(x + 310 * MenuScale, y + MenuScale, ShowFPS)
+						I_Opt\ShowFPS% = DrawTick(x + 310 * MenuScale, y + MenuScale, I_Opt\ShowFPS)
 						If MouseOn(x+310*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"showfps")
 						EndIf
@@ -1034,7 +1034,7 @@ Function UpdateMainMenu()
 							DefaultOptionsINI()
 							Brightness = 0
 							ScreenGamma = 1.0
-							ShowFPS = 0
+							I_Opt\ShowFPS = 0
 							Framelimit = 0
 							Vsync = 1
 							MouseSens = 0.0

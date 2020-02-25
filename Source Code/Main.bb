@@ -11,8 +11,6 @@ Global DO_DA_ZONE = 1
 
 Local InitErrorStr$ = ""
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
-If FileSize("d3dim.dll")=0 Then InitErrorStr=InitErrorStr+ "d3dim.dll"+Chr(13)+Chr(10)
-If FileSize("d3dim700.dll")=0 Then InitErrorStr=InitErrorStr+ "d3dim700.dll"+Chr(13)+Chr(10)
 
 If Len(InitErrorStr)>0 Then
 	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
@@ -31,6 +29,7 @@ Type Options
 	Field GraphicWidth%
 	Field GraphicHeight%
 	Field GraphicMode%
+	Field ShowFPS%
 	Field HalloweenTex%
 	Field DebugMode%
 End Type
@@ -40,8 +39,10 @@ Local I_Opt.Options = New Options
 I_Opt\LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
 I_Opt\GraphicWidth = GetINIInt(OptionFile, "options", "width")
 I_Opt\GraphicHeight = GetINIInt(OptionFile, "options", "height")
+I_Opt\ShowFPS = GetINIInt(OptionFile, "options", "show FPS")
 I_Opt\GraphicMode = GetINIInt(OptionFile, "options", "mode")
 I_Opt\DebugMode = GetINIInt(OptionFile, "options", "debug mode")
+
 
 Type Loc
 	Field Lang$
@@ -151,6 +152,7 @@ Function LoadLocalFont(AA%, Font$, Size%)
 	
 End Function
 
+Include "Source Code\TextureCache.bb"
 Include "Source Code\StrictLoads.bb"
 Include "Source Code\KeyName.bb"
 
@@ -187,8 +189,6 @@ Global SelectedGFXDriver% = Max(GetINIInt(OptionFile, "options", "gfx driver"), 
 
 Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
-
-Global ShowFPS = GetINIInt(OptionFile, "options", "show FPS")
 
 Global TotalGFXModes% = CountGfxModes3D(), GFXModes%
 Dim GfxModeWidths%(TotalGFXModes), GfxModeHeights%(TotalGFXModes)
@@ -2373,7 +2373,7 @@ Repeat
 		EndIf
 		
 		Color 255, 255, 255
-		If ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
+		If I_Opt\ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
 		
 		If QuickLoad_CurrEvent <> Null
 			QuickLoadEvents()
@@ -6524,7 +6524,7 @@ Function DrawMenu()
 					
 					Color 255,255,255
 					AAText(x, y, GetLocalString("Options", "fps"))
-					ShowFPS% = DrawTick(x + 270 * MenuScale, y, ShowFPS%)
+					I_Opt\ShowFPS% = DrawTick(x + 270 * MenuScale, y, I_Opt\ShowFPS%)
 					If MouseOn(x+270*MenuScale,y+MenuScale,20*MenuScale,20*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"showfps")
 					EndIf
@@ -9511,7 +9511,7 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "options", "screengamma", ScreenGamma)
 	PutINIValue(OptionFile, "options", "antialias", Opt_AntiAlias)
 	PutINIValue(OptionFile, "options", "vsync", Vsync)
-	PutINIValue(OptionFile, "options", "show FPS", ShowFPS)
+	PutINIValue(OptionFile, "options", "show FPS", I_Opt\ShowFPS)
 	PutINIValue(OptionFile, "options", "framelimit", Framelimit%)
 	PutINIValue(OptionFile, "options", "achievement popup enabled", AchvMSGenabled%)
 	PutINIValue(OptionFile, "options", "room lights enabled", EnableRoomLights%)

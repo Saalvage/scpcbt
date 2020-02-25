@@ -700,8 +700,8 @@ Function UpdateConsole()
 
 				Case "showfps"
 
-					ShowFPS = Not ShowFPS
-					CreateConsoleMsg("ShowFPS: "+Str(ShowFPS))
+					I_Opt\ShowFPS = Not I_Opt\ShowFPS
+					CreateConsoleMsg("ShowFPS: "+Str(I_Opt\ShowFPS))
 
 				Case "096state"
 
