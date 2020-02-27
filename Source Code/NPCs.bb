@@ -4967,9 +4967,13 @@ Function UpdateNPCs()
 
 			Case NPCtypeDemon
 			
+				CreateConsoleMsg(n\PathLocation + "    " + n\State2 + "    " + n\PathTimer)
+			
 				Select n\State
 					Case 0 ;Chasing
-						If EntityVisible(n\Collider,Collider) Then
+						If EntityVisible(n\Collider,Collider) Lor n\State2 > 0 Then
+							If EntityVisible(n\Collider, Collider) Then n\State2 = 150
+							n\State2 = Max(0, n\State2 - FPSfactor)
 							RotateEntity n\Collider, 0, -ATan2(EntityX(Collider)-EntityX(n\Collider), EntityZ(Collider)-EntityZ(n\Collider)), 0
 							
 							MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
@@ -4979,9 +4983,8 @@ Function UpdateNPCs()
 								n\Frame = 0
 							EndIf
 							
-							n\PathTimer = 0
 							n\PathStatus = 0
-							n\PathLocation = 0
+							n\PathTimer = 0
 						Else
 							If n\PathStatus = 1 Then
 								
@@ -4998,15 +5001,19 @@ Function UpdateNPCs()
 									RotateEntity n\Collider, 0, EntityYaw(n\obj), 0
 									
 									MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
+									
+									If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
+										n\PathLocation = n\PathLocation + 1
+									EndIf
 								EndIf
 								
 							Else
-								
 								n\PathTimer = Max(0, n\PathTimer-FPSfactor)
 								If n\PathTimer=<0 Then
-									n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))	
+									n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider),EntityZ(Collider))	
 									n\PathTimer = 70*5
 								EndIf
+								
 							EndIf
 						EndIf
 					
@@ -5023,6 +5030,9 @@ Function UpdateNPCs()
 						EndIf
 						
 				End Select
+				
+				PositionEntity n\obj, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider)
+				RotateEntity n\obj, 0, ENtityYaw(n\Collider), 0
 				
 		End Select
 		
