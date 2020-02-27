@@ -586,12 +586,10 @@ Function LoadGame(file$)
 	Next
 	RefinedItems = ReadInt(f)
 	
-	For lvl = 0 To 2
-		For x = 0 To MapWidth 
-			For y = 0 To MapHeight
-				MapTemp(x, y) = ReadInt(f)
-				MapFound(x, y) = ReadByte(f)
-			Next
+	For x = 0 To MapWidth 
+		For y = 0 To MapHeight
+			MapTemp(x, y) = ReadInt(f)
+			MapFound(x, y) = ReadByte(f)
 		Next
 	Next
 	
@@ -1393,12 +1391,10 @@ Function LoadGameQuick(file$)
 	Next
 	RefinedItems = ReadInt(f)
 	
-	For lvl = 0 To 2
-		For x = 0 To MapWidth
-			For y = 0 To MapHeight
-				MapTemp(x, y) = ReadInt(f)
-				MapFound(x, y) = ReadByte(f)
-			Next
+	For x = 0 To MapWidth
+		For y = 0 To MapHeight
+			MapTemp(x, y) = ReadInt(f)
+			MapFound(x, y) = ReadByte(f)
 		Next
 	Next
 	

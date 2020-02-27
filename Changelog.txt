@@ -34,6 +34,7 @@
 	- Added SCP-1025 refinements.
 	- Added a very special book.
 	- Added ability to get electronics via Electronical Components.
+	- Added Not Vision Goggles
 	- Added worse clipboards and wallets.
 	- Added Bad Hazmat Suit.
 	- Added a weird vest.

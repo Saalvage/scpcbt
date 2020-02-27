@@ -78,6 +78,7 @@ Function UpdateLang(I_Loc.Loc, Lang$)
 	SetLocalString("Messages", "savecantmom")
 	SetLocalString("Messages", "saved")
 	SetLocalString("Messages", "savepress")
+	SetLocalString("Messages", "nvglowbat")
 	SetLocalString("Menu", "paused")
 	SetLocalString("Menu", "difficulty")
 	SetLocalString("Menu", "save")
@@ -2167,7 +2168,7 @@ Repeat
 			
 			If Using294 Then darkA=1.0
 			
-			If (Not WearingNightVision) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
+			If (WearingNightVision > 0) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
 			
 			If KillTimer < 0 Then
 				InvOpen = False
@@ -3559,7 +3560,7 @@ Function MouseLook()
 		HideEntity(GasMaskOverlay)
 	EndIf
 	
-	If (Not WearingNightVision=0) Then
+	If (WearingNightVision<>0) Then
 		ShowEntity(NVOverlay)
 		If WearingNightVision=2 Then
 			EntityColor(NVOverlay, 0,100,255)
@@ -3567,6 +3568,8 @@ Function MouseLook()
 		ElseIf WearingNightVision=3 Then
 			EntityColor(NVOverlay, 255,0,0)
 			AmbientLightRooms(15)
+		ElseIf WearingNightVision=-1
+			EntityColor(NVOverlay, 128,128,128)
 		Else
 			EntityColor(NVOverlay, 0,255,0)
 			AmbientLightRooms(15)
@@ -4565,7 +4568,7 @@ Function DrawGUI()
 									Case "18vradio"
 										Msg = GetLocalString("Messages", "batradiofit")
 										MsgTimer = 70 * 5
-									Case "nvg", "supernvg"
+									Case "badnvg", "nvg", "supernvg"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 										RemoveItem(SelectedItem)
 										SelectedItem = Null
@@ -4630,7 +4633,7 @@ Function DrawGUI()
 		
 		If SelectedItem <> Null Then
 			Select SelectedItem\itemtemplate\tempname
-				Case "nvg","supernvg","finenvg"
+				Case "badnvg","nvg","supernvg","finenvg"
 
 					If Wearing1499 = 0 And WearingHazmat=0 Then
 						If SelectedItem\Picked = 2 Then
@@ -4642,6 +4645,8 @@ Function DrawGUI()
 							Msg = GetLocalString("Messages", "nvgon")
 							WearingGasMask = 0
 							Select SelectedItem\itemtemplate\tempname
+								Case "badnvg"
+									WearingNightVision = -1
 								Case "nvg"
 									WearingNightVision = 1
 								Case "supernvg"
@@ -4649,8 +4654,10 @@ Function DrawGUI()
 								Case "finenvg"
 									WearingNightVision = 3
 							End Select
-							StoredCameraFogFar = CameraFogFar
-							CameraFogFar = 30
+							If WearingNightVision<>-1 Then
+								StoredCameraFogFar = CameraFogFar
+								CameraFogFar = 30
+							EndIf
 							SelectedItem\Picked = 2
 						Else
 							Msg = GetLocalString("Messages", "nvgdouble")
@@ -4965,26 +4972,23 @@ Function DrawGUI()
 				Case "scp1025"
 					GiveAchievement(Achv1025)
 					If SelectedItem\itemtemplate\img=0 Then
+						SelectedItem\itemtemplate\img=LoadImage_Strict("GFX\items\1025\1025_"+Int(SelectedItem\state)+".jpg")	
+						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 						
-						CreateConsoleMsg SelectedItem\state2
+						If (Not Wearing714) Then
+							If (SelectedItem\state = 7) Then
+								If Infect = 0 Then Infect = 1
+							Else
+								SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
+								SCP1025state[7] = 1 + (SelectedItem\state2 = 2)*2 ;3x as fast if "very fine"
+							EndIf
+						EndIf
 						If Rand(3-(SelectedItem\state2<>2)*SelectedItem\state2) = 1 Then ;higher chance for good illness if "fine", lower change for good illness if "coarse"
 							SelectedItem\state = 6
 						Else
 							SelectedItem\state = Rand(0,7)
 						EndIf
-						SelectedItem\itemtemplate\img=LoadImage_Strict("GFX\items\1025\1025_"+Int(SelectedItem\state)+".jpg")	
-						SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
-						
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
-					EndIf
-					
-					If (Not Wearing714) Then
-						If (SelectedItem\state = 7) Then
-							If Infect = 0 Then Infect = 1
-						Else
-							SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
-							SCP1025state[7] = 1 + (SelectedItem\state2 = 2)*2 ;3x as fast if "very fine"
-						EndIf
 					EndIf
 					
 					DrawImage(SelectedItem\itemtemplate\img, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\img) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\img) / 2)
@@ -7702,7 +7706,7 @@ Function NullGame(playbuttonsfx%=True)
 	WearingHazmat = 0
 	WearingVest = 0
 	Wearing714 = 0
-	If WearingNightVision Then
+	If WearingNightVision<>0 Then
 		CameraFogFar = StoredCameraFogFar
 		WearingNightVision = 0
 	EndIf
@@ -8980,18 +8984,8 @@ Function CurveAngle#(val#, old#, smooth#)
    Return WrapAngle(old + diff * (1.0 / smooth * FPSfactor))
 End Function
 
-
-
-
-Function WrapAngle#(angle#)
-	If angle = INFINITY Then Return 0.0
-	While angle < 0
-		angle = angle + 360
-	Wend 
-	While angle >= 360
-		angle = angle - 360
-	Wend
-	Return angle
+Function WrapAngle#(angle#) ;lmao who did this
+	Return angle Mod 360
 End Function
 
 Function GetAngle#(x1#, y1#, x2#, y2#)
@@ -9695,41 +9689,48 @@ Function RenderWorld2()
 	
 	Local hasBattery% = 2
 	Local power% = 0
-	If (WearingNightVision=1) Lor (WearingNightVision=2)
+	If WearingNightVision<>0 And WearingNightVision<>3
 		For i% = 0 To MaxItemAmount - 1
-			If (Inventory(i)<>Null) Then
-				If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvg") Lor (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernvg") Then
-					Inventory(i)\state = Inventory(i)\state - (FPSfactor * (0.02 * WearingNightVision))
-					power%=Int(Inventory(i)\state)
-					If Inventory(i)\state<=0.0 Then ;this nvg can't be used
-						hasBattery = 0
-						Msg = GetLocalString("Messages", "nvgempty")
+			If Inventory(i)<>Null And Inventory(i)\picked = 2 And (Inventory(i)\itemtemplate\tempname = "badnvg" Lor Inventory(i)\itemtemplate\tempname = "nvg" Lor Inventory(i)\itemtemplate\tempname = "supernvg") Then
+				Inventory(i)\state = Max(0, Inventory(i)\state - (FPSfactor * (0.02 * Abs(WearingNightVision))))
+				power%=Int(Inventory(i)\state)
+				If Inventory(i)\state<=0.0 Then ;this nvg can't be used
+					hasBattery = 0
+					Msg = GetLocalString("Messages", "nvgempty")
+					MsgTimer = 350
+					If WearingNightVision<>-1
 						BlinkTimer = -1.0
-						MsgTimer = 350
-						Exit
-					ElseIf Inventory(i)\state<=100.0 Then
-						hasBattery = 1
 					EndIf
+				ElseIf Inventory(i)\state<=100.0 Then
+					hasBattery = 1
 				EndIf
+				Exit
 			EndIf
 		Next
 		
-		If (hasBattery) Then
-			RenderWorld()
+		If WearingNightVision=-1 Then
+			If hasBattery > 0 Then
+				Msg = GetLocalString("Messages", "novg")
+				MsgTimer = 350
+			Else
+				RenderWorld()
+			EndIf
+		Else
+			If hasBattery > 0 Then
+				RenderWorld()
+			Else
+				IsNVGBlinking% = True
+				ShowEntity NVBlink%
+			EndIf
 		EndIf
 	Else
 		RenderWorld()
 	EndIf
 	
 	CurrTrisAmount = TrisRendered()
-
-	If hasBattery=0 And WearingNightVision<>3
-		IsNVGBlinking% = True
-		ShowEntity NVBlink%
-	EndIf
 	
-	If BlinkTimer < - 16 Lor BlinkTimer > - 6
-		If WearingNightVision=2 And hasBattery<>0 Then ;show a HUD
+	If BlinkTimer < - 16 Lor BlinkTimer > - 6 And hasBattery<>0
+		If WearingNightVision=2 Then ;show a HUD
 			NVTimer=NVTimer-FPSfactor
 			
 			If NVTimer<=0.0 Then
@@ -9808,7 +9809,7 @@ Function RenderWorld2()
 			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,1
 			
 			Color 255,255,255
-		ElseIf WearingNightVision=1 And hasBattery<>0
+		ElseIf WearingNightVision=1
 			Color 0,55,0
 			For k=0 To 10
 				Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
@@ -9818,6 +9819,14 @@ Function RenderWorld2()
 				Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
 			Next
 			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,0
+			Color 255,255,255
+		EndIf
+		If hasBattery = 1 And ((MilliSecs() Mod 800) < 400) Then
+			Color 255,0,0
+			AASetFont Font3
+			
+			AAText I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "nvglowbat"),True,False
+			Color 255,255,255
 		EndIf
 	EndIf
 	
@@ -9827,15 +9836,6 @@ Function RenderWorld2()
 	RenderWorld()
 	CameraProjMode ark_blur_cam,0
 	
-	If BlinkTimer < - 16 Lor BlinkTimer > - 6
-		If (WearingNightVision=1 Lor WearingNightVision=2) And (hasBattery=1) And ((MilliSecs() Mod 800) < 400) Then
-			Color 255,0,0
-			AASetFont Font3
-			
-			AAText I_Opt\GraphicWidth/2,20*MenuScale,"WARNING: LOW BATTERY",True,False
-			Color 255,255,255
-		EndIf
-	EndIf
 End Function
 
 
@@ -9990,7 +9990,7 @@ Function IsItemGoodFor1162(itt.ItemTemplates)
 			Return True
 		Case "radio","18vradio"
 			Return True
-		Case "clipboard","eyedrops","nvg"
+		Case "clipboard","eyedrops","badnvg","nvg","finenvg","supernvg" ;TODO add here
 			Return True
 		Default
 			If itt\tempname <> "paper" Then

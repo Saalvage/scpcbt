@@ -1638,11 +1638,11 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 					
-					If WearingNightVision > 0 Then
+					If WearingNightVision <> 0 Then
 						Local hasBatteryFor895% = 0
 						For i% = 0 To MaxItemAmount - 1
 							If (Inventory(i) <> Null) Then
-								If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvg") Lor (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernvg") Lor (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvg") Then
+								If Inventory(i)\picked = 2 And (Inventory(i)\itemtemplate\tempname = "badnvg" Lor Inventory(i)\itemtemplate\tempname = "nvg" Lor Inventory(i)\itemtemplate\tempname = "supernvg" Lor Inventory(i)\itemtemplate\tempname = "finenvg") Then
 									If Inventory(i)\state > 0.0 Lor WearingNightVision=3 Then
 										hasBatteryFor895 = 1
 										Exit
@@ -1659,7 +1659,7 @@ Function UpdateEvents()
 							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
 							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
 							
-							Sanity = Sanity-(FPSfactor*1.1/WearingNightVision)
+							Sanity = Sanity-(FPSfactor*1.1/Abs(WearingNightVision))
 							RestoreSanity = False
 							BlurTimer = Sin(MilliSecs()/10)*Abs(Sanity)
 							
@@ -1671,8 +1671,10 @@ Function UpdateEvents()
 							If Sanity < -1000 Then
 								If WearingNightVision > 1
 									DeathMSG = GetLocalString("Deaths", "895snv")
-								Else
+								ElseIf WearingNightVision = 1
 									DeathMSG = GetLocalString("Deaths", "895nv")
+								Else
+									DeathMSG = GetLocalString("Deaths", "895nov")
 								EndIf
 								EntityTexture(NVOverlay, NVTexture)
 								If VomitTimer < -10 Then
@@ -1684,7 +1686,7 @@ Function UpdateEvents()
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
 									For i% = 0 To MaxItemAmount - 1
 										If (Inventory(i) <> Null) Then
-											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvg") Or (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernvg") Or (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvg") Then
+											If WearingNightVision <> 0 And Inventory(i)\picked = 2 And (Inventory(i)\itemtemplate\tempname = "badnvg" Lor Inventory(i)\itemtemplate\tempname = "nvg" Lor Inventory(i)\itemtemplate\tempname = "supernvg" Lor Inventory(i)\itemtemplate\tempname = "finenvg") Then
 												If Inventory(i)\state2 = 1 Then PlaySound_Strict(HorrorSFX(1))
 												Inventory(i)\state2 = 2
 												Exit
@@ -1702,7 +1704,7 @@ Function UpdateEvents()
 									EntityTexture(NVOverlay, GorePics(Rand(0, 5)))
 									For i% = 0 To MaxItemAmount - 1
 										If (Inventory(i) <> Null) Then
-											If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvg") Lor (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernvg") Lor (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvg") Then
+											If WearingNightVision <> 0 And Inventory(i)\picked = 2 And (Inventory(i)\itemtemplate\tempname = "badnvg" Lor Inventory(i)\itemtemplate\tempname = "nvg" Lor Inventory(i)\itemtemplate\tempname = "supernvg" Lor Inventory(i)\itemtemplate\tempname = "finenvg") Then
 												If Inventory(i)\state2 = 0 Then PlaySound_Strict(HorrorSFX(0))
 												Inventory(i)\state2 = 1
 												Exit
@@ -1714,7 +1716,7 @@ Function UpdateEvents()
 								EntityTexture(NVOverlay, NVTexture)
 								For i% = 0 To MaxItemAmount - 1
 									If (Inventory(i) <> Null) Then
-										If (WearingNightVision = 1 And Inventory(i)\itemtemplate\tempname = "nvg") Lor (WearingNightVision = 2 And Inventory(i)\itemtemplate\tempname = "supernvg") Lor (WearingNightVision = 3 And Inventory(i)\itemtemplate\tempname = "finenvg") Then
+										If WearingNightVision <> 0 And Inventory(i)\picked = 2 And (Inventory(i)\itemtemplate\tempname = "badnvg" Lor Inventory(i)\itemtemplate\tempname = "nvg" Lor Inventory(i)\itemtemplate\tempname = "supernvg" Lor Inventory(i)\itemtemplate\tempname = "finenvg") Then
 											Inventory(i)\state2 = 0
 										EndIf
 									EndIf

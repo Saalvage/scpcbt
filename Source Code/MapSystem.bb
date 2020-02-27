@@ -3524,7 +3524,9 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("key3", r\x - 975.0 * RoomScale, r\y, r\z + 731.0 * RoomScale)
 			EntityParent(it\collider, r\obj)	
 			
-			de.Decals = CreateDecal(17, r\x - 888.0 * RoomScale, r\y - 126.0 * RoomScale, r\z + 720.0 * RoomScale, 90, 290, 0)
+			de.Decals = CreateDecal(17, r\x - 865.0 * RoomScale, r\y - 126.0 * RoomScale, r\z + 800.0 * RoomScale, 90, Rand(360), 0)
+			de\Size = 0.2
+			ScaleSprite(de\obj,de\Size,de\Size)
 			EntityParent de\obj, r\obj
 			
 

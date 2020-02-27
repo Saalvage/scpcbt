@@ -438,7 +438,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "1:1"
 					If Rand(3) = 1 Then
-						it2 = CreateItem("scp1025", x, y, z)
+						it2 = CreateItem("scp1025", x, y, z) ; I know that this can be exploited to get a 1025 reset, but this effort makes it seem fair to me
 					Else
 						remove = 0
 					EndIf
@@ -787,11 +787,27 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 						remove = 0
 					EndIf
 			End Select
-		Case "nvg"
+		Case "badnvg"
 			Select setting
 				Case "rough", "coarse"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "1:1"
+					remove = 0
+				Case "fine"
+					it2 = CreateItem("nvg", x, y, z)
+					it2\state = item\state
+				Case "very fine"
+					it2 = CreateItem("finenvg", x, y, z)
+			End Select
+		Case "nvg"
+			Select setting
+				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
+					it2 = CreateItem("badnvg", x, y, z)
+					it2\state = item\state
 				Case "1:1"
 					remove = 0
 				Case "fine"
@@ -803,16 +819,16 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "finenvg"
 			Select setting
 				Case "rough"
-					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
-					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
+					it2 = CreateItem("badnvg", x, y, z)
+					it2\state = 1000
 				Case "coarse"
 					it2 = CreateItem("nvg", x, y, z)
-					it2\state = 100
+					it2\state = 1000
 				Case "1:1"
 					remove = 0
 				Case "fine", "very fine"
 					it2 = CreateItem("supernvg", x, y, z)
-					it2\state = 100
+					it2\state = 1000
 			End Select
 		Case "supernvg"
 			Select setting

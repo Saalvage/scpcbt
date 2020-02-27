@@ -4,7 +4,7 @@ Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtypePdPlane% = 17
-Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22
+Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22, NPCtypeDemon% = 23
 
 
 Type NPCs
@@ -619,6 +619,22 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(ClerkOBJ), -MeshHeight(ClerkOBJ), -MeshDepth(ClerkOBJ), MeshWidth(ClerkOBJ)*2, MeshHeight(ClerkOBJ)*2, MeshDepth(ClerkOBJ)*2)
 			
 			n\CollRadius = 0.32
+
+		Case NPCtypeDemon
+		
+			n\NVName = "Unidentified"
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider, 0.1
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
+			
+			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
+			ScaleEntity n\obj, temp,temp,temp
+			
+			;EntityParent n\obj, n\Collider
+			
+			n\Speed = 2.0/100
 
 	End Select
 	
@@ -4087,7 +4103,7 @@ Function UpdateNPCs()
 					PositionEntity n\obj,EntityX(n\Collider,True),EntityY(n\Collider,True)-0.2,EntityZ(n\Collider,True)
 					RotateEntity n\obj,-90.0,EntityYaw(n\Collider),0.0
 					
-					If (WearingNightVision=0) Then
+					If (WearingNightVision<=0) Then
 						HideEntity n\obj
 						If dist<1 And n\Reload <= 0 And MsgTimer <= 0 Then
 							Msg = GetLocalString("Messages", "966" + Rand(6))
@@ -4949,6 +4965,65 @@ Function UpdateNPCs()
 				RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
 				PositionEntity n\obj,EntityX(n\Collider),EntityY(n\Collider)-0.2,EntityZ(n\Collider)
 
+			Case NPCtypeDemon
+			
+				Select n\State
+					Case 0 ;Chasing
+						If EntityVisible(n\Collider,Collider) Then
+							RotateEntity n\Collider, 0, -ATan2(EntityX(Collider)-EntityX(n\Collider), EntityZ(Collider)-EntityZ(n\Collider)), 0
+							
+							MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
+							
+							If EntityDistanceSquared(n\Collider,Collider)<1.0
+								n\State = 1
+								n\Frame = 0
+							EndIf
+							
+							n\PathTimer = 0
+							n\PathStatus = 0
+							n\PathLocation = 0
+						Else
+							If n\PathStatus = 1 Then
+								
+								If n\Path[n\PathLocation]=Null Then 
+									If n\PathLocation > 19 Then 
+										n\PathLocation = 0 : n\PathStatus = 0
+									Else
+										n\PathLocation = n\PathLocation + 1
+									EndIf
+								Else
+									;RotateEntity n\Collider, 0, -ATan2(EntityX(n\Path[n\PathLocation]\obj)-EntityX(n\Collider), EntityZ(n\Path[n\PathLocation]\obj)-EntityZ(n\Collider)), 0 ;This should work, it doesn't, maybe one day it will
+									
+									PointEntity n\obj, n\Path[n\PathLocation]\obj
+									RotateEntity n\Collider, 0, EntityYaw(n\obj), 0
+									
+									MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
+								EndIf
+								
+							Else
+								
+								n\PathTimer = Max(0, n\PathTimer-FPSfactor)
+								If n\PathTimer=<0 Then
+									n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider)+0.2,EntityZ(Collider))	
+									n\PathTimer = 70*5
+								EndIf
+							EndIf
+						EndIf
+					
+					Case 1 ;Attacking
+						prevFrame = n\Frame
+						n\Frame = n\Frame + FPSfactor
+						If n\Frame > 100 And prevFrame < 100 Then
+							If (Not I_Cheats\GodMode) And EntityDistanceSquared(n\Collider,Collider)<1.21 Then;1.1
+								PlaySound_Strict DamageSFX(Rand(5,8))
+								Injuries = Injuries+Rnd(0.4,1.0)
+								DeathMSG = GetLocalString("Deaths", "008zombie")
+							EndIf
+							n\State = 0
+						EndIf
+						
+				End Select
+				
 		End Select
 		
 		If n\IsDead
@@ -5195,48 +5270,7 @@ Function UpdateMTFUnit(n.NPCs)
 
 	
 	If n\NPCtype<>NPCtypeMTF Then
-		Local realType$ = ""
-		Select n\NPCtype
-			Case NPCtype173
-				realType = "173"
-			Case NPCtypeOldMan
-				realType = "106"
-			Case NPCtypeGuard
-				realType = "guard"
-			Case NPCtypeD
-				realType = "d"
-			Case NPCtype372
-				realType = "372"
-			Case NPCtypeVehicle
-				realType = "Vehicle"
-			Case NPCtypeApache
-				realType = "apache"
-			Case NPCtype096
-				realType = "096"
-			Case NPCtype049
-				realType = "049"
-			Case NPCtypeZombie
-				realType = "zombie"
-			Case NPCtype5131
-				realType = "513-1"
-			Case NPCtypeTentacle
-				realType = "tentacle"
-			Case NPCtype860
-				realType = "860"
-			Case NPCtype939
-				realType = "939"
-			Case NPCtype066
-				realType = "066"
-			Case NPCtypePdPlane
-				realType = "PDPlane"
-			Case NPCtype966
-				realType = "966"
-			Case NPCtype1048a
-				realType = "1048-A"
-			Case NPCtype1499
-				realType = "1499-1"
-		End Select
-		RuntimeError "Called UpdateMTFUnit on "+realType
+		RuntimeError "Called UpdateMTFUnit on "+n\NPCtype
 	EndIf
 
 	
@@ -7117,7 +7151,10 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "clerk"
 			n.NPCs = CreateNPC(NPCtypeClerk, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "Clerk spawned."
-			
+		
+		Case "demon"
+			n.NPCs = CreateNPC(NPCtypeDemon, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "Demon spawned."
 		Default 
 			CreateConsoleMsg("NPC type not found.", 255, 0, 0) : Return
 	End Select
@@ -7239,7 +7276,7 @@ End Function
 Function NPCSpeedChange(n.NPCs)
 	
 	Select n\NPCtype
-		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049,NPCtype939,NPCtypeMTF
+		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049,NPCtype939,NPCtypeMTF,NPCtypeDemon
 			Select SelectedDifficulty\otherFactors
 				Case NORMAL
 					n\Speed = n\Speed * 1.1

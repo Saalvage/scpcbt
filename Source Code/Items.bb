@@ -139,6 +139,8 @@ Function InitItemTemplates()
 	CreateItemTemplate("scp714", "GFX\items\scp714.b3d", "GFX\items\INV714.jpg", "", 0.3, 3)
 	CreateItemTemplate("scp860", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, 3)
 	CreateItemTemplate("scp1025", "GFX\items\scp1025.b3d", "GFX\items\INV1025.jpg", "", 0.1, 0)
+							; state1: Next illness
+							; state2: Refinement: (Coarse -1 (lower good chance)), (Fine 1 (higher good chance)), (Very Fine 2 (3x faster effect))
 	CreateItemTemplate("book", "GFX\items\scp1025.b3d", "GFX\items\INVbook.jpg", "", 0.07, 0, "", "GFX\items\book_diff.png")
 	CreateItemTemplate("scp1123", "GFX\items\HGIB_Skull1.b3d", "GFX\items\inv1123.jpg", "", 0.015, 2)
 	CreateItemTemplate("bad1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.022, 2)
@@ -226,10 +228,13 @@ Function InitItemTemplates()
 	CreateItemTemplate("hazmat2", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.014, 2)
 	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.015, 2)
 	
+	CreateItemTemplate("badnvg", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.02, 2)
 	CreateItemTemplate("nvg", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02, 2)
 	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02, 2)
 	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02, 2)
-	
+						; state1: Battery level (0 - 1000)
+						; state2: Used for interaction with SCP-895
+						
 	CreateItemTemplate("nav300", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("navulti", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
@@ -386,6 +391,14 @@ Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#
 		SetAnimTime i\model,0.0
 	EndIf
 	
+	If tempname = "scp1025" Then
+		If Rand(3-(state2<>2)*state2) = 1 Then ;higher chance for good illness if "fine", lower change for good illness if "coarse"
+			state = 6
+		Else
+			state = Rand(0,7)
+		EndIf
+	EndIf
+	
 	i\invSlots=invSlots
 	
 	i\ID=LastItemID+1
@@ -409,7 +422,7 @@ Function RemoveItem(i.Items)
 	Next
 	If SelectedItem = i Then
 		Select SelectedItem\itemtemplate\tempname
-			Case "nvg", "supernvg"
+			Case "badnvg", "nvg", "finenvg", "supernvg"
 				WearingNightVision = False
 			Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 				WearingGasMask = False
@@ -739,6 +752,8 @@ Function DropItem(item.Items,playdropsound%=True)
 			WearingHazmat = False
 		Case "badvest", "vest", "finevest"
 			WearingVest = False
+		Case "badnvg"
+			If WearingNightVision = -1 Then WearingNightVision = False
 		Case "nvg"
 			If WearingNightVision = 1 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
 		Case "supernvg"
