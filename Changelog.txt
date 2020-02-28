@@ -66,6 +66,7 @@
 - Removed scene in which Guard Ulgrin provides D-9341 with classified information (the document will now be found just after the initial intro).
 - Removed 16-Bit mode.
 - Removed and renamed a few commands.
+- Removed Graphics Driver Selection, which did not change anything anyways.
 - Removed unused and duplicate files.
 
 

@@ -53,7 +53,6 @@ I_Opt\ConsoleEnabled = GetINIInt(OptionFile, "console", "enabled")
 I_Opt\ConsoleOnError = GetINIInt(OptionFile, "console", "auto opening")
 I_Opt\DebugMode = GetINIInt(OptionFile, "options", "debug mode")
 
-
 Type Loc
 	Field Lang$
 	Field LangPath$
@@ -169,15 +168,18 @@ Type LauncherOptions
 	Field GFXModes%
 	Field SelectedGFXMode%
 	Field GfxModeWidths%[64], GfxModeHeights%[64]
+	Field TotalLocs%
+	Field SelectedLoc%
+	Field Locs$[2048]
 End Type
 
 Local I_LOpt.LauncherOptions = New LauncherOptions
 
-I_LOpt\TotalGFXModes% = CountGfxModes3D()
-
+I_LOpt\TotalGFXModes = CountGfxModes3D()
+I_LOpt\TotalLocs = GetFileAmount("Localization\", True)
 
 Include "Source Code\StrictLoads.bb"
-Include "Source Code\KeyName.bb"
+Include "Source Code\Keys.bb"
 
 Const ErrorDir$ = "Logs\"
 Global ErrorFile$ = ErrorDir + "error_log_"
@@ -207,25 +209,6 @@ Global AchvIni$ = "Data\achievements.ini"
 
 Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
-
-Global SelectedLoc%
-Global LocsAmount% = GetFileAmount("Localization\", True)
-Dim Locs$(LocsAmount)
-Local Dir% = ReadDir("Localization\")
-Local File$
-NextFile$(Dir) : NextFile$(Dir)
-Repeat
-	File = NextFile$(Dir)
-	If File = "" Then Exit
-	If FileType("Localization\" + File) = 2 Then
-		If "Localization\" + File + "\" = I_Loc\LangPath Then
-			SelectedLoc = j
-		EndIf
-		Locs(j) = File
-		j = j + 1
-	EndIf
-Forever
-CloseDir Dir
 
 Global RealGraphicWidth%,RealGraphicHeight%
 Global AspectRatioRatio#
@@ -382,18 +365,6 @@ Global mouselook_y_inc# = 0.3 ; This sets both the sensitivity and direction (+/
 Global mouse_left_limit% = 250, mouse_right_limit% = GraphicsWidth () - 250
 Global mouse_top_limit% = 150, mouse_bottom_limit% = GraphicsHeight () - 150 ; As above.
 Global mouse_x_speed_1#, mouse_y_speed_1#
-
-Global KEY_RIGHT = GetINIInt(OptionFile, "binds", "Right key")
-Global KEY_LEFT = GetINIInt(OptionFile, "binds", "Left key")
-Global KEY_UP = GetINIInt(OptionFile, "binds", "Up key")
-Global KEY_DOWN = GetINIInt(OptionFile, "binds", "Down key")
-
-Global KEY_BLINK = GetINIInt(OptionFile, "binds", "Blink key")
-Global KEY_SPRINT = GetINIInt(OptionFile, "binds", "Sprint key")
-Global KEY_INV = GetINIInt(OptionFile, "binds", "Inventory key")
-Global KEY_CROUCH = GetINIInt(OptionFile, "binds", "Crouch key")
-Global KEY_SAVE = GetINIInt(OptionFile, "binds", "Save key")
-Global KEY_CONSOLE = GetINIInt(OptionFile, "binds", "Console key")
 
 Global MouseSmooth# = GetINIFloat(OptionFile,"options", "mouse smoothing", 1.0)
 
@@ -2221,7 +2192,7 @@ Repeat
 		
 
 		
-		If KeyHit(KEY_INV) And VomitTimer >= 0 Then
+		If KeyHit(I_Keys\INV) And VomitTimer >= 0 Then
 			If (Not UnableToMove) And (Not IsZombie) And (Not Using294) Then
 				Local W$ = ""
 				Local V# = 0
@@ -2247,7 +2218,7 @@ Repeat
 			EndIf
 		EndIf
 		
-		If KeyHit(KEY_SAVE) Then
+		If KeyHit(I_Keys\SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
 				If RN$ = "room173" Lor RN$ = "gatea" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale)
@@ -2292,14 +2263,14 @@ Repeat
 			EndIf
 		Else If SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Lor SelectedMonitor<>Null)
 			If (Msg<>GetLocalString("Messages", "saved") And Msg<>GetLocalString("Messages", "savecantloc") And Msg<>GetLocalString("Messages", "savecantmom")) Lor MsgTimer<=0 Then
-				Msg = Replace(GetLocalString("Messages", "savepress"), "%s", KeyName[KEY_SAVE])
+				Msg = Replace(GetLocalString("Messages", "savepress"), "%s", I_Keys\KeyName[I_Keys\SAVE])
 				MsgTimer = 70*4
 			EndIf
 			
 			If MouseHit2 Then SelectedMonitor = Null
 		EndIf
 		
-		If KeyHit(KEY_CONSOLE) Then
+		If KeyHit(I_Keys\CONSOLE) Then
 			If I_Opt\ConsoleEnabled
 				If ConsoleOpen Then
 					UsedConsole = True
@@ -3053,8 +3024,11 @@ End Function
 
 Function MovePlayer()
 	;CatchErrors("MovePlayer")
+	
+	Local I_Cheats.Cheats = First Cheats
+	Local I_Keys.Keys = First Keys
+	
 	Local Sprint# = 1.0, Speed# = 0.018, i%, angle#
-	Local I_Cheats.Cheats = First Cheats	
 	
 	If I_Cheats\SuperMan Then
 		Speed = Speed * 3
@@ -3095,7 +3069,7 @@ Function MovePlayer()
 	Local temp#
 	
 	If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then 
-		If KeyDown(KEY_SPRINT) Then
+		If KeyDown(I_Keys\SPRINT) Then
 			If Stamina < 5 Then
 				temp = 0
 				If WearingGasMask<>0 Lor Wearing1499<>0 Then temp=1
@@ -3138,9 +3112,9 @@ Function MovePlayer()
 	EndIf
 	
 	If (Not I_Cheats\NoClip) Then 
-		If (Playable And ((KeyDown(KEY_DOWN) Xor KeyDown(KEY_UP)) Lor (KeyDown(KEY_RIGHT) Xor KeyDown(KEY_LEFT)))) Lor ForceMove>0 Then
+		If (Playable And ((KeyDown(I_Keys\DOWN) Xor KeyDown(I_Keys\UP)) Lor (KeyDown(I_Keys\RIGHT) Xor KeyDown(I_Keys\LEFT)))) Lor ForceMove>0 Then
 			
-			If Crouch = 0 And (KeyDown(KEY_SPRINT)) And Stamina > 0.0 And (Not IsZombie) Then
+			If Crouch = 0 And (KeyDown(I_Keys\SPRINT)) And Stamina > 0.0 And (Not IsZombie) Then
 				Sprint = 2.5
 				Stamina = Stamina - FPSfactor * 0.4 * StaminaEffect
 				If Stamina <= 0 Then Stamina = -20.0
@@ -3199,14 +3173,14 @@ Function MovePlayer()
 			EndIf	
 		EndIf
 	Else ;noclip on
-		If (KeyDown(KEY_SPRINT)) Then 
+		If (KeyDown(I_Keys\SPRINT)) Then 
 			Sprint = 2.5
-		ElseIf KeyDown(KEY_CROUCH)
+		ElseIf KeyDown(I_Keys\CROUCH)
 			Sprint = 0.5
 		EndIf
 	EndIf
 	
-	If KeyHit(KEY_CROUCH) And Playable Then Crouch = (Not Crouch)
+	If KeyHit(I_Keys\CROUCH) And Playable Then Crouch = (Not Crouch)
 	
 	Local temp2# = (Speed * Sprint) / (1.0+CrouchState)
 	
@@ -3220,11 +3194,11 @@ Function MovePlayer()
 		
 		temp2 = temp2 * I_Cheats\NoClipSpeed
 		
-		If KeyDown(KEY_DOWN) Then MoveEntity Collider, 0, 0, -temp2*FPSfactor
-		If KeyDown(KEY_UP) Then MoveEntity Collider, 0, 0, temp2*FPSfactor
+		If KeyDown(I_Keys\DOWN) Then MoveEntity Collider, 0, 0, -temp2*FPSfactor
+		If KeyDown(I_Keys\UP) Then MoveEntity Collider, 0, 0, temp2*FPSfactor
 		
-		If KeyDown(KEY_LEFT) Then MoveEntity Collider, -temp2*FPSfactor, 0, 0
-		If KeyDown(KEY_RIGHT) Then MoveEntity Collider, temp2*FPSfactor, 0, 0	
+		If KeyDown(I_Keys\LEFT) Then MoveEntity Collider, -temp2*FPSfactor, 0, 0
+		If KeyDown(I_Keys\RIGHT) Then MoveEntity Collider, temp2*FPSfactor, 0, 0	
 		
 		ResetEntity Collider
 	Else
@@ -3235,48 +3209,48 @@ Function MovePlayer()
 		
 		temp = False
 		If (Not IsZombie%)
-			If KeyDown(KEY_DOWN) And Playable Then
-				If Not KeyDown(KEY_UP) Then
+			If KeyDown(I_Keys\DOWN) And Playable Then
+				If Not KeyDown(I_Keys\UP) Then
 					temp = True
 					angle = 180
-					If KeyDown(KEY_LEFT) Then
-						If Not KeyDown(KEY_RIGHT) Then
+					If KeyDown(I_Keys\LEFT) Then
+						If Not KeyDown(I_Keys\RIGHT) Then
 							angle = 135
 						EndIf
-					Else If KeyDown(KEY_RIGHT) Then
+					Else If KeyDown(I_Keys\RIGHT) Then
 						angle = -135
 					EndIf
 				Else
-					If KeyDown(KEY_LEFT) Then
-						If Not KeyDown(KEY_RIGHT) Then
+					If KeyDown(I_Keys\LEFT) Then
+						If Not KeyDown(I_Keys\RIGHT) Then
 							temp = True
 							angle = 90
 						EndIf
-					Else If KeyDown(KEY_RIGHT) Then
+					Else If KeyDown(I_Keys\RIGHT) Then
 						temp = True
 						angle = -90
 					EndIf
 				EndIf
-			ElseIf KeyDown(KEY_UP) And Playable Then
+			ElseIf KeyDown(I_Keys\UP) And Playable Then
 				temp = True
 				angle = 0
-				If KeyDown(KEY_LEFT) Then
-					If Not KeyDown(KEY_RIGHT) Then
+				If KeyDown(I_Keys\LEFT) Then
+					If Not KeyDown(I_Keys\RIGHT) Then
 						angle = 45
 					EndIf
-				Else If KeyDown(KEY_RIGHT) Then
+				Else If KeyDown(I_Keys\RIGHT) Then
 					angle = -45 
 				EndIf
 			ElseIf ForceMove>0 Then
 				temp=True
 				angle = ForceAngle
 			Else If Playable Then
-				If KeyDown(KEY_LEFT) Then
-					If Not KeyDown(KEY_RIGHT) Then
+				If KeyDown(I_Keys\LEFT) Then
+					If Not KeyDown(I_Keys\RIGHT) Then
 						temp = True
 						angle = 90
 					EndIf
-				Else If KeyDown(KEY_RIGHT) Then
+				Else If KeyDown(I_Keys\RIGHT) Then
 					temp = True
 					angle = -90
 				EndIf
@@ -3389,8 +3363,8 @@ Function MovePlayer()
 	EndIf
 		
 	If Playable Lor CanBlinkDespitePlayable Then
-		If KeyHit(KEY_BLINK) Then BlinkTimer = 0
-		If KeyDown(KEY_BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10
+		If KeyHit(I_Keys\BLINK) Then BlinkTimer = 0
+		If KeyDown(I_Keys\BLINK) And BlinkTimer < - 10 Then BlinkTimer = -10
 	EndIf
 	
 	
@@ -6107,6 +6081,7 @@ Function DrawMenu()
 	;CatchErrors("DrawMenu")
 	
 	Local I_Opt.Options = First Options
+	Local I_Keys.Keys = First Keys
 	
 	Local x%, y%, width%, height%
 	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
@@ -6425,26 +6400,26 @@ Function DrawMenu()
 					y = y + 10*MenuScale
 					
 					AAText(x, y + 20 * MenuScale, GetLocalString("Options", "forward"))
-					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_UP,210)],5)		
+					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\UP,210)],5)		
 					AAText(x, y + 40 * MenuScale, GetLocalString("Options", "left"))
-					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_LEFT,210)],3)	
+					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\LEFT,210)],3)	
 					AAText(x, y + 60 * MenuScale, GetLocalString("Options", "backward"))
-					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_DOWN,210)],6)				
+					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\DOWN,210)],6)				
 					AAText(x, y + 80 * MenuScale, GetLocalString("Options", "right"))
-					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_RIGHT,210)],4)
+					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\RIGHT,210)],4)
 					
 					AAText(x, y + 100 * MenuScale, GetLocalString("Options", "blink"))
-					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_BLINK,210)],7)				
+					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\BLINK,210)],7)				
 					AAText(x, y + 120 * MenuScale, GetLocalString("Options", "sprint"))
-					InputBox(x + 200 * MenuScale, y + 120 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SPRINT,210)],8)
+					InputBox(x + 200 * MenuScale, y + 120 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\SPRINT,210)],8)
 					AAText(x, y + 140 * MenuScale, GetLocalString("Options", "inv"))
-					InputBox(x + 200 * MenuScale, y + 140 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_INV,210)],9)
+					InputBox(x + 200 * MenuScale, y + 140 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\INV,210)],9)
 					AAText(x, y + 160 * MenuScale, GetLocalString("Options", "crouch"))
-					InputBox(x + 200 * MenuScale, y + 160 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CROUCH,210)],10)
+					InputBox(x + 200 * MenuScale, y + 160 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\CROUCH,210)],10)
 					AAText(x, y + 180 * MenuScale, GetLocalString("Options", "save"))
-					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SAVE,210)],11)	
+					InputBox(x + 200 * MenuScale, y + 180 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\SAVE,210)],11)	
 					AAText(x, y + 200 * MenuScale, GetLocalString("Options", "console"))
-					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CONSOLE,210)],12)
+					InputBox(x + 200 * MenuScale, y + 200 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\CONSOLE,210)],12)
 					
 					If MouseOn(x,y,300*MenuScale,220*MenuScale)
 						DrawOptionsTooltip(tx,ty,tw,th,"controls")
@@ -6456,25 +6431,25 @@ Function DrawMenu()
 					If key <> 0 Then
 						Select SelectedInputBox
 							Case 3
-								KEY_LEFT = key
+								I_Keys\LEFT = key
 							Case 4
-								KEY_RIGHT = key
+								I_Keys\RIGHT = key
 							Case 5
-								KEY_UP = key
+								I_Keys\UP = key
 							Case 6
-								KEY_DOWN = key
+								I_Keys\DOWN = key
 							Case 7
-								KEY_BLINK = key
+								I_Keys\BLINK = key
 							Case 8
-								KEY_SPRINT = key
+								I_Keys\SPRINT = key
 							Case 9
-								KEY_INV = key
+								I_Keys\INV = key
 							Case 10
-								KEY_CROUCH = key
+								I_Keys\CROUCH = key
 							Case 11
-								KEY_SAVE = key
+								I_Keys\SAVE = key
 							Case 12
-								KEY_CONSOLE = key
+								I_Keys\CONSOLE = key
 						End Select
 						SelectedInputBox = 0
 					EndIf
@@ -9352,6 +9327,7 @@ End Function
 Function SaveOptionsINI()
 
 	Local I_Opt.Options = First Options
+	Local I_Keys.Keys = First Keys
 	
 	PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
 	PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
@@ -9380,16 +9356,16 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
 	PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
 	
-	PutINIValue(OptionFile, "binds", "Right key", KEY_RIGHT)
-	PutINIValue(OptionFile, "binds", "Left key", KEY_LEFT)
-	PutINIValue(OptionFile, "binds", "Up key", KEY_UP)
-	PutINIValue(OptionFile, "binds", "Down key", KEY_DOWN)
-	PutINIValue(OptionFile, "binds", "Blink key", KEY_BLINK)
-	PutINIValue(OptionFile, "binds", "Sprint key", KEY_SPRINT)
-	PutINIValue(OptionFile, "binds", "Inventory key", KEY_INV)
-	PutINIValue(OptionFile, "binds", "Crouch key", KEY_CROUCH)
-	PutINIValue(OptionFile, "binds", "Save key", KEY_SAVE)
-	PutINIValue(OptionFile, "binds", "Console key", KEY_CONSOLE)
+	PutINIValue(OptionFile, "binds", "Right key", I_Keys\RIGHT)
+	PutINIValue(OptionFile, "binds", "Left key", I_Keys\LEFT)
+	PutINIValue(OptionFile, "binds", "Up key", I_Keys\UP)
+	PutINIValue(OptionFile, "binds", "Down key", I_Keys\DOWN)
+	PutINIValue(OptionFile, "binds", "Blink key", I_Keys\BLINK)
+	PutINIValue(OptionFile, "binds", "Sprint key", I_Keys\SPRINT)
+	PutINIValue(OptionFile, "binds", "Inventory key", I_Keys\INV)
+	PutINIValue(OptionFile, "binds", "Crouch key", I_Keys\CROUCH)
+	PutINIValue(OptionFile, "binds", "Save key", I_Keys\SAVE)
+	PutINIValue(OptionFile, "binds", "Console key", I_Keys\CONSOLE)
 	
 End Function
 
@@ -9501,6 +9477,8 @@ End Function
 
 Function Graphics3DExt%(width%,height%,depth%=32,mode%=2)
 	Graphics3D width,height,depth,mode
+	TextureFilter "", 8192 ;This turns on Anisotropic filtering for textures. Use TextureAnisotropic to change anisotropic level.
+	TextureAnisotropic 16 ;TODO prob make this an option
 	InitFastResize()
 	AntiAlias GetINIInt(OptionFile,"options","antialias")
 End Function

@@ -61,6 +61,7 @@ Global CurrLoadGamePage% = 0
 Function UpdateMainMenu()
 
 	Local I_Opt.Options = First Options
+	Local I_Keys.Keys = First Keys
 	
 	Local x%, y%, width%, height%, temp%
 	
@@ -852,26 +853,26 @@ Function UpdateMainMenu()
 						y = y + 10*MenuScale
 						
 						AAText(x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Options", "forward"))
-						InputBox(x + 160 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_UP,210)],5)
+						InputBox(x + 160 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\UP,210)],5)
 						AAText(x + 20 * MenuScale, y + 40 * MenuScale, GetLocalString("Options", "left"))
-						InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_LEFT,210)],3)
+						InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\LEFT,210)],3)
 						AAText(x + 20 * MenuScale, y + 60 * MenuScale, GetLocalString("Options", "backward"))
-						InputBox(x + 160 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_DOWN,210)],6)
+						InputBox(x + 160 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\DOWN,210)],6)
 						AAText(x + 20 * MenuScale, y + 80 * MenuScale, GetLocalString("Options", "right"))
-						InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_RIGHT,210)],4)
+						InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\RIGHT,210)],4)
 						AAText(x + 20 * MenuScale, y + 100 * MenuScale, GetLocalString("Options", "save"))
-						InputBox(x + 160 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SAVE,210)],11)
+						InputBox(x + 160 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\SAVE,210)],11)
 						
 						AAText(x + 280 * MenuScale, y + 20 * MenuScale, GetLocalString("Options", "blink"))
-						InputBox(x + 470 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_BLINK,210)],7)				
+						InputBox(x + 470 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\BLINK,210)],7)				
 						AAText(x + 280 * MenuScale, y + 40 * MenuScale, GetLocalString("Options", "sprint"))
-						InputBox(x + 470 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_SPRINT,210)],8)
+						InputBox(x + 470 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\SPRINT,210)],8)
 						AAText(x + 280 * MenuScale, y + 60 * MenuScale, GetLocalString("Options", "inv"))
-						InputBox(x + 470 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_INV,210)],9)
+						InputBox(x + 470 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\INV,210)],9)
 						AAText(x + 280 * MenuScale, y + 80 * MenuScale, GetLocalString("Options", "crouch"))
-						InputBox(x + 470 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CROUCH,210)],10)	
+						InputBox(x + 470 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\CROUCH,210)],10)	
 						AAText(x + 280 * MenuScale, y + 100 * MenuScale, GetLocalString("Options", "console"))
-						InputBox(x + 470 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,KeyName[Min(KEY_CONSOLE,210)],12)
+						InputBox(x + 470 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\CONSOLE,210)],12)
 						
 						If MouseOn(x+20*MenuScale,y,width-40*MenuScale,120*MenuScale)
 							DrawOptionsTooltip(tx,ty,tw,th,"controls")
@@ -883,25 +884,25 @@ Function UpdateMainMenu()
 						If key<>0 Then
 							Select SelectedInputBox
 								Case 3
-									KEY_LEFT = key
+									I_Keys\LEFT = key
 								Case 4
-									KEY_RIGHT = key
+									I_Keys\RIGHT = key
 								Case 5
-									KEY_UP = key
+									I_Keys\UP = key
 								Case 6
-									KEY_DOWN = key
+									I_Keys\DOWN = key
 								Case 7
-									KEY_BLINK = key
+									I_Keys\BLINK = key
 								Case 8
-									KEY_SPRINT = key
+									I_Keys\SPRINT = key
 								Case 9
-									KEY_INV = key
+									I_Keys\INV = key
 								Case 10
-									KEY_CROUCH = key
+									I_Keys\CROUCH = key
 								Case 11
-									KEY_SAVE = key
+									I_Keys\SAVE = key
 								Case 12
-									KEY_CONSOLE = key
+									I_Keys\CONSOLE = key
 							End Select
 							SelectedInputBox = 0
 						EndIf
@@ -1060,16 +1061,16 @@ Function UpdateMainMenu()
 							EnableUserTracks = 1
 							UserTrackMode = 1
 							EnableSFXRelease = 1
-							KEY_RIGHT = 32
-							KEY_LEFT = 30
-							KEY_UP = 17
-							KEY_DOWN = 31
-							KEY_BLINK = 57
-							KEY_SPRINT = 42
-							KEY_INV = 15
-							KEY_CROUCH = 29
-							KEY_SAVE = 63
-							KEY_CONSOLE = 61
+							I_Keys\RIGHT = 32
+							I_Keys\LEFT = 30
+							I_Keys\UP = 17
+							I_Keys\DOWN = 31
+							I_Keys\BLINK = 57
+							I_Keys\SPRINT = 42
+							I_Keys\INV = 15
+							I_Keys\CROUCH = 29
+							I_Keys\SAVE = 63
+							I_Keys\CONSOLE = 61
 							I_Opt\LauncherEnabled = 0
 							I_Opt\ConsoleEnabled = 0
 							I_Opt\ConsoleOnError = 0
@@ -1139,6 +1140,23 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 		EndIf
 	Next
 	
+	Local Dir% = ReadDir("Localization\")
+	Local File$
+	NextFile$(Dir) : NextFile$(Dir)
+	Repeat
+		DebugLog File
+		File = NextFile$(Dir)
+		If File = "" Then Exit
+		If FileType("Localization\" + File) = 2 Then
+			If "Localization\" + File + "\" = I_Loc\LangPath Then
+				I_LOpt\SelectedLoc = j
+			EndIf
+			I_LOpt\Locs[j] = File
+			j = j + 1
+		EndIf
+	Forever
+	CloseDir Dir
+	
 	BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
 	
 	Local quit% = False
@@ -1189,7 +1207,6 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 		Text(x, y + 5, Locs(SelectedLoc))
 		
 		;-----------------------------------------------------------------
-		Text(20, 369 - 25, GetLocalString("Launcher", "graphics"))
 		
 		I_Opt\LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 95 + 8, I_Opt\LauncherEnabled)
 		
@@ -1997,7 +2014,8 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt2 = Replace(txt2, "%s", Int(value*100))
 		;Advanced options	
 		Case "consoleenable"
-			txt = Replace(txt, "%s", KeyName[KEY_CONSOLE])
+			Local I_Keys.Keys = First Keys
+			txt = Replace(txt, "%s", I_Keys\KeyName[I_Keys\CONSOLE])
 		Case "framelimit"
 			If value > 0 And value < 60
 				R = 255

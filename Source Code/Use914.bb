@@ -807,7 +807,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 				Case "coarse"
 					it2 = CreateItem("badnvg", x, y, z)
-					it2\state = item\state
+					it2\state = item\state/2
 				Case "1:1"
 					remove = 0
 				Case "fine"
@@ -820,7 +820,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			Select setting
 				Case "rough"
 					it2 = CreateItem("badnvg", x, y, z)
-					it2\state = 1000
+					it2\state = 0
 				Case "coarse"
 					it2 = CreateItem("nvg", x, y, z)
 					it2\state = 1000
