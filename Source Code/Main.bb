@@ -205,8 +205,6 @@ Global Data294$ = "Data\SCP-294.ini"
 
 Global AchvIni$ = "Data\achievements.ini"
 
-Global SelectedGFXDriver% = Max(GetINIInt(OptionFile, "options", "gfx driver"), 1)
-
 Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
 
@@ -9400,7 +9398,6 @@ Function DefaultOptionsINI()
 	PutINIValue(OptionFile, "options", "width", DesktopWidth())
 	PutINIValue(OptionFile, "options", "height", DesktopHeight())
 	PutINIValue(OptionFile, "options", "mode", 0)
-	PutINIValue(OptionFile, "options", "gfx driver", 2)
 	PutINIValue(OptionFile, "options", "audio driver", 0)
 	PutINIValue(OptionFile, "options", "brightness", 50)
 	PutINIValue(OptionFile, "options", "screengamma", 1.0)

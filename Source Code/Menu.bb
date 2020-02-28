@@ -1189,22 +1189,7 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 		Text(x, y + 5, Locs(SelectedLoc))
 		
 		;-----------------------------------------------------------------
-		x = 30
-		y = 369
-		Text(x - 10, y - 25, GetLocalString("Launcher", "graphics"))
-		
-		y=y+10
-		For i = 1 To CountGfxDrivers()
-			If SelectedGFXDriver = i Then Rect(x - 1, y - 1, 290, 20, False)
-			LimitText(GfxDriverName(i), x, y, 290, False)
-			If MouseOn(x - 1, y - 1, 290, 20) Then
-				Color 100, 100, 100
-				Rect(x - 1, y - 1, 290, 20, False)
-				If MouseHit1 Then SelectedGFXDriver = i
-			EndIf
-			
-			y=y+20
-		Next
+		Text(20, 369 - 25, GetLocalString("Launcher", "graphics"))
 		
 		I_Opt\LauncherEnabled = DrawTick(40 + 430 - 15, 260 - 55 + 95 + 8, I_Opt\LauncherEnabled)
 		
@@ -1236,7 +1221,6 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 	PutINIValue(OptionFile, "options", "height", I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
 	PutINIValue(OptionFile, "options", "mode", I_Opt\GraphicMode)
 	PutINIValue(OptionFile, "options", "launcher enabled", I_Opt\LauncherEnabled)
-	PutINIValue(OptionFile, "options", "gfx driver", SelectedGFXDriver)
 	PutINIValue(OptionFile, "options", "pack", Locs(SelectedLoc))
 	
 	If quit Then End
