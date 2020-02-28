@@ -243,7 +243,7 @@ If I_Opt\LauncherEnabled Then
 	
 	AppTitle GetLocalString("Menu", "titlelauncher")
 	
-	UpdateLauncher(I_LOpt)
+	UpdateLauncher(I_LOpt, I_Loc)
 EndIf
 
 Delete I_LOpt

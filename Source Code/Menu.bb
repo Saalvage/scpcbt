@@ -1096,7 +1096,7 @@ End Function
 Const L_WIDTH = 640
 Const L_HEIGHT = 480
 
-Function UpdateLauncher(I_LOpt.LauncherOptions)
+Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 	
 	Local I_Opt.Options = First Options
 	
@@ -1144,7 +1144,6 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 	Local File$
 	NextFile$(Dir) : NextFile$(Dir)
 	Repeat
-		DebugLog File
 		File = NextFile$(Dir)
 		If File = "" Then Exit
 		If FileType("Localization\" + File) = 2 Then
@@ -1200,11 +1199,11 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 		y = y + 100
 		
 		If DrawButton(x + 100, y, 150, 30, GetLocalString("Launcher", "cycle"), False, False, False) Then
-			SelectedLoc = (SelectedLoc + 1) Mod LocsAmount
-			UpdateLang(First Loc, Locs(SelectedLoc))
+			I_LOpt\SelectedLoc = (I_LOpt\SelectedLoc + 1) Mod I_LOpt\TotalLocs
+			UpdateLang(First Loc, I_LOpt\Locs[I_LOpt\SelectedLoc])
 		EndIf
 		
-		Text(x, y + 5, Locs(SelectedLoc))
+		Text(x, y + 5, I_LOpt\Locs[I_LOpt\SelectedLoc])
 		
 		;-----------------------------------------------------------------
 		
@@ -1238,7 +1237,7 @@ Function UpdateLauncher(I_LOpt.LauncherOptions)
 	PutINIValue(OptionFile, "options", "height", I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
 	PutINIValue(OptionFile, "options", "mode", I_Opt\GraphicMode)
 	PutINIValue(OptionFile, "options", "launcher enabled", I_Opt\LauncherEnabled)
-	PutINIValue(OptionFile, "options", "pack", Locs(SelectedLoc))
+	PutINIValue(OptionFile, "options", "pack", I_LOpt\Locs[I_LOpt\SelectedLoc])
 	
 	If quit Then End
 	
