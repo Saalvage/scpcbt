@@ -2267,7 +2267,7 @@ Function UpdateNPCs()
 											
 											If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
 												n\PathLocation = n\PathLocation + 1
-											EndIf 
+											EndIf
 										EndIf
 									Else ;no path to the player, stands still
 										n\CurrSpeed = 0
@@ -4971,9 +4971,7 @@ Function UpdateNPCs()
 			
 				Select n\State
 					Case 0 ;Chasing
-						If EntityVisible(n\Collider,Collider) Lor n\State2 > 0 Then
-							If EntityVisible(n\Collider, Collider) Then n\State2 = 150
-							n\State2 = Max(0, n\State2 - FPSfactor)
+						If EntityVisible(n\Collider,Collider) Then
 							RotateEntity n\Collider, 0, -ATan2(EntityX(Collider)-EntityX(n\Collider), EntityZ(Collider)-EntityZ(n\Collider)), 0
 							
 							MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
@@ -4984,11 +4982,13 @@ Function UpdateNPCs()
 							EndIf
 							
 							n\PathStatus = 0
+							n\PathLocation = 0
 							n\PathTimer = 0
 						Else
+							
 							If n\PathStatus = 1 Then
 								
-								If n\Path[n\PathLocation]=Null Then 
+								If n\Path[n\PathLocation]=Null Then
 									If n\PathLocation > 19 Then 
 										n\PathLocation = 0 : n\PathStatus = 0
 									Else

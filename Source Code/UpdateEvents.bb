@@ -389,6 +389,7 @@ Function UpdateEvents()
 								z = EntityZ(e\room\obj)+8.0*RoomScale	
 								
 								If e\EventState3 < 14 Then
+									CreateConsoleMsg Playable
 									mouse_x_speed_1#=0
 									mouse_y_speed_1#=0
 									
