@@ -124,7 +124,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							End Select
 						Case 5	
 							Local CurrAchvAmount%=0
-							For i = 0 To MAXACHIEVEMENTS-1
+							For i = 0 To MAXACHIEVEMENTS
 								If Achievements[i]=True
 									CurrAchvAmount=CurrAchvAmount+1
 								EndIf
@@ -132,25 +132,25 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							
 							Select SelectedDifficulty\otherFactors
 								Case EASY
-									If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS)*3)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									EndIf
 								Case NORMAL
-									If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS)*4)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									EndIf
 								Case HARD
-									If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS)*5)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									EndIf
 								Case EXTREME
-									If Rand(0,((MAXACHIEVEMENTS-1)*6)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS)*6)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
@@ -159,7 +159,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					End Select
 				Case "very fine"
 					CurrAchvAmount%=0
-					For i = 0 To MAXACHIEVEMENTS-1
+					For i = 0 To MAXACHIEVEMENTS
 						If Achievements[i]=True
 							CurrAchvAmount=CurrAchvAmount+1
 						EndIf
@@ -167,25 +167,25 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS)*3)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
 							EndIf
 						Case NORMAL
-							If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS)*4)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
 							EndIf
 						Case HARD
-							If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS)*5)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
 							EndIf
 						Case EXTREME
-							If Rand(0,((MAXACHIEVEMENTS-1)*6)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS)*6)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
@@ -257,6 +257,20 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 					If it2 = Null Then
 						it2 = CreateItem("scp148", x, y, z)
 					EndIf
+			End Select
+		Case "scp178"
+			Select setting
+				Case "rough,coarse"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
+					For n.NPCs = Each NPCs
+						If n\NPCtype = NPCtype178 Then RemoveNPC(n)
+					Next
+				Case "1:1","fine"
+					remove = 0
+				Case "very fine"
+					n.NPCs = CreateNPC(NPCtype178,x,y,z)
+					n\State3 = 1 ;I don't think they should be aggressive right away, this way it doesn't force the player to reset, resulting in a higher propability of accepting the loss of SCP-178, which is preferable.
 			End Select
 		Case "scp420j"
 			Select setting
@@ -389,7 +403,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "rough","coarse"
 					PlaySound_Strict LoadTempSound("SFX\SCP\513\914Refine.ogg")
 					For n.npcs = Each NPCs
-						If n\npctype = NPCtype5131 Then RemoveNPC(n)
+						If item\state <> 0 And item\state = n\ID Then RemoveNPC(n)
 					Next
 					d.Decals = CreateDecal(0, x, 8*RoomScale+0.010, z, 90, Rand(360), 0)
 					d\Size = 0.2 : EntityAlpha(d\obj, 0.8) : ScaleSprite(d\obj, d\Size, d\Size)
@@ -517,31 +531,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 		Case "paper"
 			Select setting
 				Case "rough"
+					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
+					d\Size = 0.2 : ScaleSprite(d\obj, d\Size, d\Size)
+				Case "coarse"
 					d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
-				Case "coarse"
-					it2 = CreateItem("paper", x, y, z, "dblank")
 				Case "1:1"
-					If Rand(100) = 1 Then
-						it2 = CreateItem("paper", x, y, z, "burnt")
-					Else
-						Select Rand(6)
-							Case 1
-								it2 = CreateItem("paper", x, y, z, "d106")
-							Case 2
-								it2 = CreateItem("paper", x, y, z, "d079")
-							Case 3
-								it2 = CreateItem("paper", x, y, z, "d173")
-							Case 4
-								it2 = CreateItem("paper", x, y, z, "d895")
-							Case 5
-								it2 = CreateItem("paper", x, y, z, "d682")
-							Case 6
-								it2 = CreateItem("paper", x, y, z, "d860") ;TODO maybe add more
-						End Select
-					EndIf
+					it2 = CreateItem("paper", x, y, z, GetPaper(item))
 				Case "fine", "very fine"
 					it2 = CreateItem("misc", x,	y, z, "origami")
+					If item\itemtemplate\namespec = "dblank" Then
+						EntityTexture(it2\model, LoadTexture_Strict("GFX\items\docBlank.jpg"))
+						it2\State = 1
+					EndIf
 			End Select
 		Case "misc"
 			Local temp%
@@ -611,24 +613,7 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 							d.Decals = CreateDecal(7, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 							d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 						Case "coarse"
-							If Rand(75) = 1 Then
-								it2 = CreateItem("paper", x, y, z, "burnt")
-							Else
-								Select Rand(6)
-									Case 1
-										it2 = CreateItem("paper", x, y, z, "d106")
-									Case 2
-										it2 = CreateItem("paper", x, y, z, "d079")
-									Case 3
-										it2 = CreateItem("paper", x, y, z, "d173")
-									Case 4
-										it2 = CreateItem("paper", x, y, z, "d895")
-									Case 5
-										it2 = CreateItem("paper", x, y, z, "d682")
-									Case 6
-										it2 = CreateItem("paper", x, y, z, "d860") ;TODO maybe add more
-								End Select
-							EndIf
+							it2 = CreateItem("paper", x, y, z, GetPaper(item))
 						Case "1:1", "fine", "very fine"
 							remove = 0
 					End Select
@@ -1265,4 +1250,66 @@ Function ClearClipboard(item.Items, from%)
 		If item\SecondInv[i]<>Null Then RemoveItem(item\SecondInv[i])
 		item\SecondInv[i]=Null
 	Next
+End Function
+
+Function GetPaper$(item.Items)
+	If item <> Null Then
+		If item\itemtemplate\namespec = "dblank" Lor item\State = 1 Lor Rand(3) = 1 Then
+			Return "dblank"
+		ElseIf Rand(100) = 1
+			Return "burnt"
+		EndIf
+	EndIf
+	Select Rand(25)
+		Case 1
+			Return "d008"
+		Case 2
+			Return "d012"
+		Case 3
+			Return "d035"
+		Case 4
+			Return "d049"
+		Case 5
+			Return "d079"
+		Case 6
+			Return "d096"
+		Case 7
+			Return "d106"
+		Case 8
+			Return "d173"
+		Case 9
+			Return "d205"
+		Case 10
+			Return "d372"
+		Case 11
+			Return "d427"
+		Case 12
+			Return "d500"
+		Case 13
+			Return "d513"
+		Case 14
+			Return "d682"
+		Case 15
+			Return "d714"
+		Case 16
+			Return "d860"
+		Case 17
+			Return "d8601"
+		Case 18
+			Return "d895"
+		Case 19
+			Return "d939"
+		Case 20
+			Return "d966"
+		Case 21
+			Return "d970"
+		Case 22
+			Return "d1048"
+		Case 23
+			Return "d1123"
+		Case 24
+			Return "d1162"
+		Case 25
+			Return "d1499"
+	End Select
 End Function

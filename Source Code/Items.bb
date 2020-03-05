@@ -126,6 +126,7 @@ Function InitItemTemplates()
 	
 	CreateItemTemplate("scp148", "GFX\items\metalpanel.b3d", "GFX\items\INVmetalpanel.jpg", "", RoomScale, 2)
 	CreateItemTemplate("scp148ingot", "GFX\items\scp148.b3d", "GFX\items\INVscp148.jpg", "", RoomScale * 1.5, 2)
+	CreateItemTemplate("scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02, 1, "", "", "", 1)
 	CreateItemTemplate("scp420j", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0005, 2)
 	CreateItemTemplate("cigarette", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2)
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "joint")
@@ -156,6 +157,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc096.jpg", 0.003, 0, "d096")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc106.jpg", 0.003, 0, "d106")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc173.jpg", 0.003, 0, "d173")
+	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc205.jpg", 0.003, 0, "d205")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc372.jpg", 0.003, 0, "d372")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc427.jpg", 0.003, 0, "d427")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc500.png", 0.003, 0, "d500")
@@ -169,6 +171,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc966.jpg", 0.003, 0, "d966")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc970.jpg", 0.003, 0, "d970")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003, 0, "d1048")
+	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048a.jpg", 0.003, 0, "ir1048a")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1123.jpg", 0.003, 0, "d1123")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1162.jpg", 0.003, 0, "d1162")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1499.png", 0.003, 0, "d1499")
@@ -178,7 +181,6 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\docIR106.jpg", 0.003, 0, "ir1060204") 
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\docRP.jpg", 0.0025, 0, "rp106")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\docRAND2.jpg", 0.003, 0, "test") 
-	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048a.jpg", 0.003, 0, "ir1048a")
 	
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\docORI.jpg", 0.003, 0, "classd")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\docSC.jpg", 0.003, 0, "levels")
@@ -210,7 +212,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003, 0, "drawing")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\leaflet.jpg", 0.003, 0, "leaflet", "GFX\items\notetexture.jpg")
 	
-	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaperblank.jpg", "GFX\items\docBlank.png", 0.003, 0, "dblank", "GFX\items\paperblanktexture.jpg")
+	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaperblank.jpg", "GFX\items\docBlank.jpg", 0.003, 0, "dblank", "GFX\items\paperblanktexture.jpg")
 	
 	CreateItemTemplate("misc", "GFX\items\origami.b3d", "GFX\items\INVorigami.jpg", "", 0.003, 0, "origami")
 	
@@ -593,6 +595,8 @@ Function PickItem(item.Items)
 		For n% = 0 To MaxItemAmount - 1
 			If Inventory(n) = Null Then
 				Select item\itemtemplate\tempname
+					Case "scp178"
+						SetAnimTime item\model,19.0
 					Case "scp1123"
 						If Not (Wearing714 = 1) Then
 							If PlayerRoom\RoomTemplate\Name <> "room1123" Then
@@ -760,13 +764,15 @@ Function DropItem(item.Items,playdropsound%=True)
 			If WearingNightVision = 2 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
 		Case "finenvg"
 			If WearingNightVision = 3 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
+		Case "scp178"
+			Wearing178 = 0
+		Case "scp427", "super427"
+			Local I_427.SCP427 = First SCP427
+			I_427\Using = 0
 		Case "scp714"
 			Wearing714 = False
 		Case "bad1499","scp1499","super1499","fine1499"
 			Wearing1499 = False
-		Case "scp427", "super427"
-			Local I_427.SCP427 = First SCP427
-			I_427\Using = 0
 	End Select
 	
 	;CatchErrors("Uncaught DropItem")

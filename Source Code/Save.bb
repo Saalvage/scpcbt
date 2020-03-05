@@ -98,6 +98,7 @@ Function SaveGame(file$)
 	WriteByte f, WearingHazmat
 	
 	WriteByte f, WearingNightVision
+	WriteByte f, Wearing178
 	WriteByte f, Wearing1499
 	WriteFloat f,NTF_1499PrevX#
 	WriteFloat f,NTF_1499PrevY#
@@ -125,7 +126,7 @@ Function SaveGame(file$)
 	WriteByte f, SoundTransmission
 	WriteByte f, Contained106
 	
-	For i = 0 To MAXACHIEVEMENTS-1
+	For i = 0 To MAXACHIEVEMENTS
 		WriteByte f, Achievements[i]
 	Next
 	WriteInt f, RefinedItems
@@ -559,6 +560,7 @@ Function LoadGame(file$)
 	WearingHazmat = ReadByte(f)
 	
 	WearingNightVision = ReadByte(f)
+	Wearing178 = ReadByte(f)
 	Wearing1499 = ReadByte(f)
 	NTF_1499PrevX# = ReadFloat(f)
 	NTF_1499PrevY# = ReadFloat(f)
@@ -581,7 +583,7 @@ Function LoadGame(file$)
 	SoundTransmission = ReadByte(f)	
 	Contained106 = ReadByte(f)	
 	
-	For i = 0 To MAXACHIEVEMENTS-1
+	For i = 0 To MAXACHIEVEMENTS
 		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
@@ -610,8 +612,6 @@ Function LoadGame(file$)
 				Curr106 = n
 			Case NPCtype096
 				Curr096 = n
-			Case NPCtype5131
-				Curr5131 = n
 		End Select
 		
 		x = ReadFloat(f)
@@ -1364,6 +1364,7 @@ Function LoadGameQuick(file$)
 	WearingHazmat = ReadByte(f)
 	
 	WearingNightVision = ReadByte(f)
+	Wearing178 = ReadByte(f)
 	Wearing1499 = ReadByte(f)
 	NTF_1499PrevX# = ReadFloat(f)
 	NTF_1499PrevY# = ReadFloat(f)
@@ -1386,7 +1387,7 @@ Function LoadGameQuick(file$)
 	SoundTransmission = ReadByte(f)	
 	Contained106 = ReadByte(f)	
 	
-	For i = 0 To MAXACHIEVEMENTS-1
+	For i = 0 To MAXACHIEVEMENTS
 		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
@@ -1419,8 +1420,6 @@ Function LoadGameQuick(file$)
 				Curr106 = n
 			Case NPCtype096
 				Curr096 = n
-			Case NPCtype5131
-				Curr5131 = n
 		End Select
 		
 		x = ReadFloat(f)
@@ -1429,8 +1428,8 @@ Function LoadGameQuick(file$)
 		RotateEntity(n\Collider, x, y, z)
 		
 		n\State = ReadFloat(f)
-		n\State2 = ReadFloat(f)	
-		n\State3 = ReadFloat(f)			
+		n\State2 = ReadFloat(f)
+		n\State3 = ReadFloat(f)
 		n\PrevState = ReadInt(f)
 		
 		n\Idle = ReadByte(f)

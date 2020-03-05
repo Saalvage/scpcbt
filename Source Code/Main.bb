@@ -38,6 +38,8 @@ Type Options
 	Field DebugMode%
 	
 	Field HalloweenTex%
+	
+	Field Fonts%[8]
 End Type
 
 Local I_Opt.Options = New Options
@@ -162,6 +164,23 @@ Function LoadLocalFont(AA%, Font$, Size%)
 	
 End Function
 
+Function ReloadFonts(I_Opt.Options)
+	InitAAFont(I_Opt)
+	;For some reason, Blitz3D doesn't load fonts that have filenames that
+	;don't match their "internal name" (i.e. their display name in applications
+	;like Word and such). As a workaround, I moved the files and renamed them so they
+	;can load without FastText.
+	
+	;0: Console
+	;1 - 5: 1 - 5
+	;6 + 7: Credit 1 + 2
+	I_Opt\Fonts[0] = AALoadFont("Blitz", Int(20 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
+	I_Opt\Fonts[1] = LoadLocalFont(True, "Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[2] = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[3] = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[4] = LoadLocalFont(True, "Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[4] = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+End Function
 
 Type LauncherOptions
 	Field TotalGFXModes%
@@ -189,9 +208,6 @@ While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
-Global Font1%, Font2%, Font3%, Font4%, Font5%
-Global ConsoleFont%
-
 Const VersionNumber$ = "2.0.0"
 Const CompatibleNumber$ = "2.0.0" ;Lowest version with compatible saves
 
@@ -201,7 +217,7 @@ Global ButtonSFX%, ButtonSFX2%
 Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
-Global ArrowIMG[4]
+Global ArrowIMG[3]
 
 Global Data294$ = "Data\SCP-294.ini"
 
@@ -326,30 +342,14 @@ PlayStartupVideos()
 
 ;---------------------------------------------------------------------------------------------------------------------
 
-
+ReloadFonts(I_Opt)
+AASetFont I_Opt\Fonts[2]
 
 Global CursorIMG% = LoadImage_Strict("GFX\cursor.png")
 
 Global SelectedLoadingScreen.LoadingScreens, LoadingScreenAmount%, LoadingScreenText%
 Global LoadingBack% = LoadImage_Strict("Loadingscreens\loadingback.jpg")
 InitLoadingScreens("Loadingscreens\loadingscreens.ini")
-
-InitAAFont(I_Opt)
-;For some reason, Blitz3D doesn't load fonts that have filenames that
-;don't match their "internal name" (i.e. their display name in applications
-;like Word and such). As a workaround, I moved the files and renamed them so they
-;can load without FastText.
-Font1% = LoadLocalFont(True, "Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
-Font2% = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
-Font3% = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
-Font4% = LoadLocalFont(True, "Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
-Font5% = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
-
-Global CreditsFont%,CreditsFont2%
-
-ConsoleFont% = AALoadFont("Blitz", Int(20 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
-
-AASetFont Font2
 
 Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
 
@@ -393,7 +393,7 @@ Global SCP1025state#[7]
 
 Global HeartBeatRate#, HeartBeatTimer#, HeartBeatVolume#
 
-Global WearingGasMask%, WearingHazmat%, WearingVest%, Wearing714%, WearingNightVision%
+Global WearingGasMask%, WearingHazmat%, WearingVest%, Wearing178%, Wearing714%, WearingNightVision%
 Global NVTimer#
 
 Global Injuries#, Bloodloss#, Infect#, HealTimer#
@@ -441,20 +441,20 @@ Global MsgTimer#, Msg$, DeathMSG$
 Global AccessCode%, KeypadInput$, KeypadTimer#, KeypadMSG$
 
 Global DrawHandIcon%
-Dim DrawArrowIcon%(4)
+Global DrawArrowIcon%[3]
 
 ;misc ---------------------------------------------------------------------------------------------------------------
 
 Include "Source Code\Difficulty.bb"
 
-Global MTFtimer#, MTFrooms.Rooms[10], MTFroomState%[10]
+Global MTFtimer#, MTFrooms.Rooms[6], MTFroomState%[6]
 
-Dim RadioState#(10)
-Dim RadioState3%(10)
-Dim RadioState4%(9)
-Dim RadioCHN%(8)
+Global RadioState#[8]
+Global RadioState3%[6]
+Global RadioState4%[9]
+Global RadioCHN%[6]
 
-Dim OldAiPics%(5)
+Global OldAiPics%[1]
 
 Global PlayTime%
 Global ConsoleFlush%
@@ -552,12 +552,12 @@ Dim LightSpriteTex(10)
 
 
 Global SoundEmitter%
-Global TempSounds%[10]
+Global TempSounds%[9]
 Global TempSoundCHN%
 Global TempSoundIndex% = 0
 
 ;The Music now has to be pre-defined, as the new system uses streaming instead of the usual sound loading system Blitz3D has
-Global Music$[40]
+Global Music$[25]
 Music[0] = "The Dread"
 Music[1] = "HeavyContainment"
 Music[2] = "EntranceZone"
@@ -784,17 +784,16 @@ Global NavBG = CreateImage(I_Opt\GraphicWidth,I_Opt\GraphicHeight)
 
 Global LightConeModel
 
-Global ParticleEffect[10]
+Global ParticleEffect%[2]
 
-Const MaxDTextures=8
-Global DTextures[MaxDTextures]
+Global DTextures[7]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
 
 Global IntercomStreamCHN%
 
-Global ForestNPC,ForestNPCTex,ForestNPCData#[3]
+Global ForestNPC,ForestNPCTex,ForestNPCData#[2]
 
 
 
@@ -951,8 +950,8 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	Next
 	
 	If big=1 Then
-		PositionEntity d\buttons[0], x - 432.0 * RoomScale, y + 0.7, z + 192.0 * RoomScale
-		PositionEntity d\buttons[1], x + 432.0 * RoomScale, y + 0.7, z - 192.0 * RoomScale
+		PositionEntity d\buttons[0], x - 432.0 * RoomScale, y + 0.7, z + 192.0 * RoomScale ; 179.2 * RoomScale
+		PositionEntity d\buttons[1], x + 432.0 * RoomScale, y + 0.7, z - 192.0 * RoomScale ; 179.2 * RoomScale
 		RotateEntity d\buttons[0], 0, 90, 0
 		RotateEntity d\buttons[1], 0, 270, 0
 	Else
@@ -1703,6 +1702,8 @@ Global InfectTexture%, InfectOverlay%
 Global DarkTexture%, Dark%
 Global Collider%, Head%
 
+Global GlassesTexture%, GlassesOverlay%
+
 Global FogNVTexture%
 Global NVTexture%, NVOverlay%
 
@@ -1800,7 +1801,7 @@ End Function
 Function AddToTimingAccumulator(milliseconds%)
 	Local ft.FixedTimesteps = First FixedTimesteps
 	
-	If (milliseconds<1 Or milliseconds>500) Then
+	If (milliseconds<1 Lor milliseconds>500) Then
 		Return
 	EndIf
 	ft\accumulator = ft\accumulator+Max(0,Float(milliseconds)*70.0/1000.0)
@@ -2341,7 +2342,7 @@ Repeat
 		EndIf
 		
 		Color 255, 255, 255
-		If I_Opt\ShowFPS Then AASetFont ConsoleFont : AAText 20, 20, "FPS: " + FPS : AASetFont Font1
+		If I_Opt\ShowFPS Then AASetFont I_Opt\Fonts[0] : AAText 20, 20, "FPS: " + FPS : AASetFont I_Opt\Fonts[1]
 		
 		If QuickLoad_CurrEvent <> Null
 			QuickLoadEvents()
@@ -2808,9 +2809,9 @@ Function DrawEnding()
 				DrawImage PauseMenuIMG, x, y
 				
 				Color(255, 255, 255)
-				AASetFont Font2
+				AASetFont I_Opt\Fonts[2]
 				AAText(x + width / 2 + 40*MenuScale, y + 20*MenuScale, GetLocalString("Menu", "end"), True)
-				AASetFont Font1
+				AASetFont I_Opt\Fonts[1]
 				
 				If AchievementsMenu=0 Then 
 					x = x+132*MenuScale
@@ -2836,12 +2837,12 @@ Function DrawEnding()
 					Next
 					
 					Local achievementsUnlocked =0
-					For i = 0 To MAXACHIEVEMENTS-1
+					For i = 0 To MAXACHIEVEMENTS
 						achievementsUnlocked = achievementsUnlocked + Achievements[i]
 					Next
 					
 					AAText x, y, "SCPs encountered: " +scpsEncountered
-					AAText x, y+20*MenuScale, "Achievements unlocked: " + achievementsUnlocked+"/"+(MAXACHIEVEMENTS)
+					AAText x, y+20*MenuScale, "Achievements unlocked: " + achievementsUnlocked+"/"+(MAXACHIEVEMENTS+1)
 					AAText x, y+40*MenuScale, "Rooms found: " + roomsfound+"/"+roomamount
 					AAText x, y+60*MenuScale, "Documents discovered: " +docsfound+"/"+docamount
 					AAText x, y+80*MenuScale, "Items refined in SCP-914: " +RefinedItems			
@@ -2884,7 +2885,7 @@ Function DrawEnding()
 	
 	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	
-	AASetFont Font1
+	AASetFont I_Opt\Fonts[1]
 End Function
 
 Type CreditsLine
@@ -2904,8 +2905,8 @@ Function InitCredits()
 	Local file% = OpenFile("Credits.txt")
 	Local l$
 	
-	CreditsFont% = LoadLocalFont(False, "CreditsFont1", Int(21 * (I_Opt\GraphicHeight / 1024.0)))
-	CreditsFont2% = LoadLocalFont(False, "CreditsFont2", Int(35 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[6] = LoadLocalFont(False, "CreditsFont1", Int(21 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[7] = LoadLocalFont(False, "CreditsFont2", Int(35 * (I_Opt\GraphicHeight / 1024.0)))
 	
 	If CreditsScreen = 0
 		CreditsScreen = LoadImage_Strict("GFX\creditsscreen.pt")
@@ -2945,14 +2946,14 @@ Function DrawCredits()
 	For cl = Each CreditsLine
 		cl\id = id
 		If Left(cl\txt,1)="*"
-			SetFont CreditsFont2
+			SetFont I_Opt\Fonts[7]
 			If cl\stay=False
 				Text I_Opt\GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
 			EndIf
 		ElseIf Left(cl\txt,1)="/"
 			LastCreditLine = Before(cl)
 		Else
-			SetFont CreditsFont
+			SetFont I_Opt\Fonts[6]
 			If cl\stay=False
 				Text I_Opt\GraphicWidth/2,credits_Y+(24*cl\id*MenuScale),cl\txt,True
 			EndIf
@@ -2987,7 +2988,7 @@ Function DrawCredits()
 	If CreditsTimer<>0.0
 		For cl = Each CreditsLine
 			If cl\stay
-				SetFont CreditsFont
+				SetFont I_Opt\Fonts[6]
 				If Left(cl\txt,1)="/"
 					Text I_Opt\GraphicWidth/2,(I_Opt\GraphicHeight/2)+(endlinesamount/2)+(24*cl\id*MenuScale),Right(cl\txt,Len(cl\txt)-1),True
 				Else
@@ -3000,8 +3001,8 @@ Function DrawCredits()
 	If GetKey() Then CreditsTimer=-1
 	
 	If CreditsTimer=-1
-		FreeFont CreditsFont
-		FreeFont CreditsFont2
+		FreeFont I_Opt\Fonts[6]
+		FreeFont I_Opt\Fonts[7]
 		FreeImage CreditsScreen
 		CreditsScreen = 0
 		FreeImage EndingScreen
@@ -3554,6 +3555,59 @@ Function MouseLook()
 		EntityTexture(Fog, FogTexture)
 	EndIf
 	
+	If Wearing178<>0 Then
+		ShouldPlay = 14
+		ShowEntity(GlassesOverlay)
+	Else
+		HideEntity(GlassesOverlay)
+	EndIf
+	
+	Local canSpawn178%=0
+	
+	If Wearing178=0 Then
+		For n.NPCs = Each NPCs
+			If (n\NPCtype = NPCtype178) Then
+				If n\State3>0 Then canSpawn178=1
+				If (n\State<=0) And (n\State3=0) Lor EntityDistance(Collider,n\Collider)>HideDistance*1.5 Then
+					RemoveNPC(n)
+				EndIf
+			EndIf
+		Next
+	EndIf
+	
+	If (canSpawn178=1) Lor (Wearing178=1) Then
+		tempint%=0
+		For n.NPCs = Each NPCs
+			If (n\NPCtype = NPCtype178) Then
+				tempint=tempint+1
+				If EntityDistance(Collider,n\Collider)>HideDistance*1.5 Then
+					RemoveNPC(n)
+				EndIf
+				;If n\State<=0 Then RemoveNPC(n)
+			EndIf
+		Next
+		If tempint<10 Then ;create the npcs
+			For w.WayPoints = Each WayPoints
+				Local dist#
+				dist=EntityDistance(Collider,w\obj)
+				If (dist<HideDistance*1.5) And (dist>1.2) And (w\door = Null) And (Rand(0,1)=1) Then
+					tempint2=True
+					For n.NPCs = Each NPCs
+						If n\NPCtype=NPCtype178 Then
+							If EntityDistance(n\Collider,w\obj)<0.5
+								tempint2=False
+								Exit
+							EndIf
+						EndIf
+					Next
+					If tempint2 Then
+						CreateNPC(NPCtype178, EntityX(w\obj,True),EntityY(w\obj,True)+0.15,EntityZ(w\obj,True))
+					EndIf	
+				EndIf
+			Next
+		EndIf
+	EndIf
+	
 	Local I_427.SCP427 = First SCP427
 	
 	Local factor1025# = FPSfactor * SCP1025state[7]
@@ -3758,7 +3812,7 @@ Function DrawGUI()
 	
 	If (DrawHandIcon And SelectedDifficulty\otherFactors <> EXTREME) Then DrawImage(HandIcon, I_Opt\GraphicWidth / 2 - 32, I_Opt\GraphicHeight / 2 - 32)
 	For i = 0 To 3
-		If DrawArrowIcon(i) Then
+		If DrawArrowIcon[i] Then
 			x = I_Opt\GraphicWidth / 2 - 32
 			y = I_Opt\GraphicHeight / 2 - 32		
 			Select i
@@ -3775,7 +3829,7 @@ Function DrawGUI()
 			Color 0, 0, 0
 			Rect(x + 4, y + 4, 64 - 8, 64 - 8)
 			DrawImage(ArrowIMG[i], x + 21, y + 21)
-			DrawArrowIcon(i) = False
+			DrawArrowIcon[i] = False
 		EndIf
 	Next
 	
@@ -3825,7 +3879,7 @@ Function DrawGUI()
 		
 		If DebugHUD Then
 			Color 255, 255, 255
-			AASetFont ConsoleFont
+			AASetFont I_Opt\Fonts[0]
 			
 			;Text x + 250, 50, "Zone: " + (EntityZ(Collider)/8.0)
 			AAText x - 50, 50, "Player Position: (" + f2s(EntityX(Collider), 3) + ", " + f2s(EntityY(Collider), 3) + ", " + f2s(EntityZ(Collider), 3) + ")"
@@ -3900,7 +3954,7 @@ Function DrawGUI()
 				AAText x + 350, 350, "Current monitor: NULL"
 			EndIf
 			
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 		EndIf
 		
 	EndIf
@@ -3939,7 +3993,7 @@ Function DrawGUI()
 			x = I_Opt\GraphicWidth/2-ImageWidth(KeypadHUD)*scale/2
 			y = I_Opt\GraphicHeight/2-ImageHeight(KeypadHUD)*scale/2		
 			
-			AASetFont Font3
+			AASetFont I_Opt\Fonts[3]
 			If KeypadMSG <> "" Then 
 				KeypadTimer = KeypadTimer-FPSfactor2
 				
@@ -3951,7 +4005,7 @@ Function DrawGUI()
 				EndIf
 			Else
 				AAText I_Opt\GraphicWidth/2, y+70*scale, "ACCESS CODE: ",True,True	
-				AASetFont Font4
+				AASetFont I_Opt\Fonts[4]
 				AAText I_Opt\GraphicWidth/2, y+124*scale, KeypadInput,True,True	
 			EndIf
 			
@@ -4361,7 +4415,7 @@ Function DrawGUI()
 							
 						EndIf
 						
-						AASetFont Font1
+						AASetFont I_Opt\Fonts[1]
 						Color 0,0,0
 						AAText(x + width / 2 + 1, y + height + spacing - 15 + 1, Inventory(n)\localname, True)							
 						Color 255, 255, 255	
@@ -4672,11 +4726,14 @@ Function DrawGUI()
 					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 
 				Case "scp513"
+				
+					Local npc513.NPCs
 
 					PlaySound_Strict LoadTempSound("SFX\SCP\513\Bell1.ogg")
 					
-					If Curr5131 = Null
-						Curr5131 = CreateNPC(NPCtype5131, 0,0,0)
+					If SelectedItem\state = 0 Then
+						npc513 = CreateNPC(NPCtype5131, 0,0,0)
+						SelectedItem\state = npc513\ID
 					EndIf	
 					SelectedItem = Null
 
@@ -4900,7 +4957,7 @@ Function DrawGUI()
 								
 								SetBuffer ImageBuffer(SelectedItem\itemtemplate\img)
 								Color 37,45,137
-								AASetFont Font5
+								AASetFont I_Opt\Fonts[5]
 								temp = ((Int(AccessCode)*3) Mod 10000)
 								If temp < 1000 Then temp = temp+1000
 								AAText 383*MenuScale, 734*MenuScale, temp, True, True
@@ -5080,15 +5137,15 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					;radiostate(5) = has the "use the number keys" -message been shown yet (true/false)
-					;radiostate(6) = a timer for the "code channel"
-					;RadioState(7) = another timer for the "code channel"
+					;RadioState[5] = has the "use the number keys" -message been shown yet (true/false)
+					;RadioState[6] = a timer for the "code channel"
+					;RadioState[7] = another timer for the "code channel"
 					
-					If RadioState(5) = 0 Then 
+					If RadioState[5] = 0 Then 
 						Msg = GetLocalString("Messages", "radiohelp")
 						MsgTimer = 70 * 5
-						RadioState(5) = 1
-						RadioState(0) = -1
+						RadioState[5] = 1
+						RadioState[0] = -1
 					EndIf
 					
 					strtemp$ = ""
@@ -5100,40 +5157,40 @@ Function DrawGUI()
 					
 					If SelectedItem\state > 0 Then
 						If CoffinDistance < 4.0 Lor PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
-							ResumeChannel(RadioCHN(5))
-							If ChannelPlaying(RadioCHN(5)) = False Then RadioCHN(5) = PlaySound_Strict(RadioStatic)	
+							ResumeChannel(RadioCHN[5])
+							If ChannelPlaying(RadioCHN[5]) = False Then RadioCHN[5] = PlaySound_Strict(RadioStatic)	
 						Else
 							Select Int(SelectedItem\state2)
 								Case 0 ;randomkanava
-									ResumeChannel(RadioCHN(0))
+									ResumeChannel(RadioCHN[0])
 									strtemp = "		USER TRACK PLAYER - "
 									If (Not EnableUserTracks)
-										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+										If ChannelPlaying(RadioCHN[0]) = False Then RadioCHN[0] = PlaySound_Strict(RadioStatic)
 										strtemp = strtemp + "NOT ENABLED	 "
 									ElseIf UserTrackMusicAmount<1
-										If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+										If ChannelPlaying(RadioCHN[0]) = False Then RadioCHN[0] = PlaySound_Strict(RadioStatic)
 										strtemp = strtemp + "NO TRACKS FOUND	 "
 									Else
-										If (Not ChannelPlaying(RadioCHN(0)))
+										If (Not ChannelPlaying(RadioCHN[0]))
 											If (Not UserTrackFlag%)
 												If UserTrackMode
-													If RadioState(0)<(UserTrackMusicAmount-1)
-														RadioState(0) = RadioState(0) + 1
+													If RadioState[0]<(UserTrackMusicAmount-1)
+														RadioState[0] = RadioState[0] + 1
 													Else
-														RadioState(0) = 0
+														RadioState[0] = 0
 													EndIf
 													UserTrackFlag = True
 												Else
-													RadioState(0) = Rand(0,UserTrackMusicAmount-1)
+													RadioState[0] = Rand(0,UserTrackMusicAmount-1)
 												EndIf
 											EndIf
 											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
-											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
-											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
-											DebugLog "CurrTrack: "+RadioState(0)
-											DebugLog UserTrackName$(RadioState(0))
+											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState[0]))
+											RadioCHN[0] = PlaySound_Strict(CurrUserTrack%)
+											DebugLog "CurrTrack: "+RadioState[0]
+											DebugLog UserTrackName$(RadioState[0])
 										Else
-											strtemp = strtemp + Upper(UserTrackName$(RadioState(0))) + "		  "
+											strtemp = strtemp + Upper(UserTrackName$(RadioState[0])) + "		  "
 											UserTrackFlag = False
 										EndIf
 										
@@ -5141,178 +5198,178 @@ Function DrawGUI()
 											PlaySound_Strict RadioSquelch
 											If (Not UserTrackFlag%)
 												If UserTrackMode
-													If RadioState(0)<(UserTrackMusicAmount-1)
-														RadioState(0) = RadioState(0) + 1
+													If RadioState[0]<(UserTrackMusicAmount-1)
+														RadioState[0] = RadioState[0] + 1
 													Else
-														RadioState(0) = 0
+														RadioState[0] = 0
 													EndIf
 													UserTrackFlag = True
 												Else
-													RadioState(0) = Rand(0,UserTrackMusicAmount-1)
+													RadioState[0] = Rand(0,UserTrackMusicAmount-1)
 												EndIf
 											EndIf
 											If CurrUserTrack%<>0 Then FreeSound_Strict(CurrUserTrack%) : CurrUserTrack% = 0
-											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState(0)))
-											RadioCHN(0) = PlaySound_Strict(CurrUserTrack%)
-											DebugLog "CurrTrack: "+RadioState(0)
-											DebugLog UserTrackName$(RadioState(0))
+											CurrUserTrack% = LoadSound_Strict("SFX\Radio\UserTracks\"+UserTrackName$(RadioState[0]))
+											RadioCHN[0] = PlaySound_Strict(CurrUserTrack%)
+											DebugLog "CurrTrack: "+RadioState[0]
+											DebugLog UserTrackName$(RadioState[0])
 										EndIf
 									EndIf
 								Case 1 ;hälytyskanava
-									DebugLog RadioState(1) 
+									DebugLog RadioState[1] 
 									
-									ResumeChannel(RadioCHN(1))
+									ResumeChannel(RadioCHN[1])
 									strtemp = "		WARNING - CONTAINMENT BREACH		  "
-									If ChannelPlaying(RadioCHN(1)) = False Then
+									If ChannelPlaying(RadioCHN[1]) = False Then
 										
-										If RadioState(1) => 5 Then
-											RadioCHN(1) = PlaySound_Strict(RadioSFX(1,1))	
-											RadioState(1) = 0
+										If RadioState[1] => 5 Then
+											RadioCHN[1] = PlaySound_Strict(RadioSFX(1,1))	
+											RadioState[1] = 0
 										Else
-											RadioState(1)=RadioState(1)+1	
-											RadioCHN(1) = PlaySound_Strict(RadioSFX(1,0))	
+											RadioState[1]=RadioState[1]+1	
+											RadioCHN[1] = PlaySound_Strict(RadioSFX(1,0))	
 										EndIf
 										
 									EndIf
 									
 								Case 2 ;scp-radio
-									ResumeChannel(RadioCHN(2))
+									ResumeChannel(RadioCHN[2])
 									strtemp = "		SCP Foundation On-Site Radio		  "
-									If ChannelPlaying(RadioCHN(2)) = False Then
-										RadioState(2)=RadioState(2)+1
-										If RadioState(2) = 17 Then RadioState(2) = 1
-										If Floor(RadioState(2)/2)=Ceil(RadioState(2)/2) Then ;parillinen, soitetaan normiviesti
-											RadioCHN(2) = PlaySound_Strict(RadioSFX(2,Int(RadioState(2)/2)))	
+									If ChannelPlaying(RadioCHN[2]) = False Then
+										RadioState[2]=RadioState[2]+1
+										If RadioState[2] = 17 Then RadioState[2] = 1
+										If Floor(RadioState[2]/2)=Ceil(RadioState[2]/2) Then ;parillinen, soitetaan normiviesti
+											RadioCHN[2] = PlaySound_Strict(RadioSFX(2,Int(RadioState[2]/2)))	
 										Else ;pariton, soitetaan musiikkia
-											RadioCHN(2) = PlaySound_Strict(RadioSFX(2,0))
+											RadioCHN[2] = PlaySound_Strict(RadioSFX(2,0))
 										EndIf
 									EndIf 
 								Case 3
-									ResumeChannel(RadioCHN(3))
+									ResumeChannel(RadioCHN[3])
 									strtemp = "			 EMERGENCY CHANNEL - RESERVED FOR COMMUNICATION IN THE EVENT OF A CONTAINMENT BREACH		 "
-									If ChannelPlaying(RadioCHN(3)) = False Then RadioCHN(3) = PlaySound_Strict(RadioStatic)
+									If ChannelPlaying(RadioCHN[3]) = False Then RadioCHN[3] = PlaySound_Strict(RadioStatic)
 									
 									If MTFtimer > 0 Then 
-										RadioState(3)=RadioState(3)+Max(Rand(-10,1),0)
-										Select RadioState(3)
+										RadioState[3]=RadioState[3]+Max(Rand(-10,1),0)
+										Select RadioState[3]
 											Case 40
-												If Not RadioState3(0) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random1.ogg"))
-													RadioState(3) = RadioState(3)+1	
-													RadioState3(0) = True	
+												If Not RadioState3[0] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random1.ogg"))
+													RadioState[3] = RadioState[3]+1	
+													RadioState3[0] = True	
 												EndIf											
 											Case 400
-												If Not RadioState3(1) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random2.ogg"))
-													RadioState(3) = RadioState(3)+1	
-													RadioState3(1) = True	
+												If Not RadioState3[1] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random2.ogg"))
+													RadioState[3] = RadioState[3]+1	
+													RadioState3[1] = True	
 												EndIf	
 											Case 800
-												If Not RadioState3(2) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random3.ogg"))
-													RadioState(3) = RadioState(3)+1	
-													RadioState3(2) = True
+												If Not RadioState3[2] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random3.ogg"))
+													RadioState[3] = RadioState[3]+1	
+													RadioState3[2] = True
 												EndIf													
 											Case 1200
-												If Not RadioState3(3) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random4.ogg"))	
-													RadioState(3) = RadioState(3)+1	
-													RadioState3(3) = True
+												If Not RadioState3[3] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random4.ogg"))	
+													RadioState[3] = RadioState[3]+1	
+													RadioState3[3] = True
 												EndIf
 											Case 1600
-												If Not RadioState3(4) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random5.ogg"))	
-													RadioState(3) = RadioState(3)+1
-													RadioState3(4) = True
+												If Not RadioState3[4] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random5.ogg"))	
+													RadioState[3] = RadioState[3]+1
+													RadioState3[4] = True
 												EndIf
 											Case 2000
-												If Not RadioState3(5) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random6.ogg"))	
-													RadioState(3) = RadioState(3)+1
-													RadioState3(5) = True
+												If Not RadioState3[5] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random6.ogg"))	
+													RadioState[3] = RadioState[3]+1
+													RadioState3[5] = True
 												EndIf
 											Case 2400
-												If Not RadioState3(6) Then
-													RadioCHN(3) = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random7.ogg"))	
-													RadioState(3) = RadioState(3)+1
-													RadioState3(6) = True
+												If Not RadioState3[6] Then
+													RadioCHN[3] = PlaySound_Strict(LoadTempSound("SFX\Character\MTF\Random7.ogg"))	
+													RadioState[3] = RadioState[3]+1
+													RadioState3[6] = True
 												EndIf
 										End Select
 									EndIf
 								Case 4
-									ResumeChannel(RadioCHN(6)) ;taustalle kohinaa
-									If ChannelPlaying(RadioCHN(6)) = False Then RadioCHN(6) = PlaySound_Strict(RadioStatic)									
+									ResumeChannel(RadioCHN[6]) ;taustalle kohinaa
+									If ChannelPlaying(RadioCHN[6]) = False Then RadioCHN[6] = PlaySound_Strict(RadioStatic)									
 									
-									ResumeChannel(RadioCHN(4))
-									If ChannelPlaying(RadioCHN(4)) = False Then 
-										If RemoteDoorOn = False And RadioState(8) = False Then
-											RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter3.ogg"))	
-											RadioState(8) = True
+									ResumeChannel(RadioCHN[4])
+									If ChannelPlaying(RadioCHN[4]) = False Then 
+										If RemoteDoorOn = False And RadioState[8] = False Then
+											RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter3.ogg"))	
+											RadioState[8] = True
 										Else
-											RadioState(4)=RadioState(4)+Max(Rand(-10,1),0)
+											RadioState[4]=RadioState[4]+Max(Rand(-10,1),0)
 											
-											Select RadioState(4)
+											Select RadioState[4]
 												Case 10
 													If (Not Contained106)
-														If Not RadioState4(0) Then
-															RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\OhGod.ogg"))
-															RadioState(4) = RadioState(4)+1
-															RadioState4(0) = True
+														If Not RadioState4[0] Then
+															RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\OhGod.ogg"))
+															RadioState[4] = RadioState[4]+1
+															RadioState4[0] = True
 														EndIf
 													EndIf
 												Case 100
-													If Not RadioState4(1) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter2.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState4(1) = True
+													If Not RadioState4[1] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter2.ogg"))
+														RadioState[4] = RadioState[4]+1
+														RadioState4[1] = True
 													EndIf		
 												Case 158
-													If MTFtimer = 0 And (Not RadioState4(2)) Then 
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin1.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState(2) = True
+													If MTFtimer = 0 And (Not RadioState4[2]) Then 
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\franklin1.ogg"))
+														RadioState[4] = RadioState[4]+1
+														RadioState[2] = True
 													EndIf
 												Case 200
-													If Not RadioState4(3) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter4.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState4(3) = True
+													If Not RadioState4[3] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter4.ogg"))
+														RadioState[4] = RadioState[4]+1
+														RadioState4[3] = True
 													EndIf		
 												Case 260
-													If Not RadioState4(4) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp1.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState4(4) = True
+													If Not RadioState4[4] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp1.ogg"))
+														RadioState[4] = RadioState[4]+1
+														RadioState4[4] = True
 													EndIf		
 												Case 300
-													If Not RadioState4(5) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter1.ogg"))	
-														RadioState(4) = RadioState(4)+1	
-														RadioState4(5) = True
+													If Not RadioState4[5] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\Chatter1.ogg"))	
+														RadioState[4] = RadioState[4]+1	
+														RadioState4[5] = True
 													EndIf		
 												Case 350
-													If Not RadioState4(6) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin2.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState4(6) = True
+													If Not RadioState4[6] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\franklin2.ogg"))
+														RadioState[4] = RadioState[4]+1
+														RadioState4[6] = True
 													EndIf		
 												Case 400
-													If Not RadioState4(7) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp2.ogg"))
-														RadioState(4) = RadioState(4)+1
-														RadioState4(7) = True
+													If Not RadioState4[7] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\SCP\035\RadioHelp2.ogg"))
+														RadioState[4] = RadioState[4]+1
+														RadioState4[7] = True
 													EndIf		
 												Case 450
-													If Not RadioState4(8) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin3.ogg"))	
-														RadioState(4) = RadioState(4)+1		
-														RadioState4(8) = True
+													If Not RadioState4[8] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\franklin3.ogg"))	
+														RadioState[4] = RadioState[4]+1		
+														RadioState4[8] = True
 													EndIf		
 												Case 600
-													If Not RadioState4(9) Then
-														RadioCHN(4) = PlaySound_Strict(LoadTempSound("SFX\radio\franklin4.ogg"))	
-														RadioState(4) = RadioState(4)+1	
-														RadioState4(9) = True
+													If Not RadioState4[9] Then
+														RadioCHN[4] = PlaySound_Strict(LoadTempSound("SFX\radio\franklin4.ogg"))	
+														RadioState[4] = RadioState[4]+1	
+														RadioState4[9] = True
 													EndIf		
 											End Select
 										EndIf
@@ -5320,8 +5377,8 @@ Function DrawGUI()
 									
 									
 								Case 5
-									ResumeChannel(RadioCHN(5))
-									If ChannelPlaying(RadioCHN(5)) = False Then RadioCHN(5) = PlaySound_Strict(RadioStatic)
+									ResumeChannel(RadioCHN[5])
+									If ChannelPlaying(RadioCHN[5]) = False Then RadioCHN[5] = PlaySound_Strict(RadioStatic)
 							End Select 
 							
 							x=x+66
@@ -5336,25 +5393,25 @@ Function DrawGUI()
 								Next
 							EndIf	
 							
-							AASetFont Font3
+							AASetFont I_Opt\Fonts[3]
 							AAText(x+60, y, "CHN")						
 							
 							If SelectedItem\itemtemplate\tempname = "veryfineradio" Then ;"KOODIKANAVA"
-								ResumeChannel(RadioCHN(0))
-								If ChannelPlaying(RadioCHN(0)) = False Then RadioCHN(0) = PlaySound_Strict(RadioStatic)
+								ResumeChannel(RadioCHN[0])
+								If ChannelPlaying(RadioCHN[0]) = False Then RadioCHN[0] = PlaySound_Strict(RadioStatic)
 								
-								;radiostate(7)=kuinka mones piippaus menossa
-								;radiostate(8)=kuinka mones access coden numero menossa
-								RadioState(6)=RadioState(6) + FPSfactor
-								temp = Mid(Str(AccessCode),RadioState(8)+1,1)
-								If RadioState(6)-FPSfactor =< RadioState(7)*50 And RadioState(6)>RadioState(7)*50 Then
+								;RadioState[7]=kuinka mones piippaus menossa
+								;RadioState[8]=kuinka mones access coden numero menossa
+								RadioState[6]=RadioState[6] + FPSfactor
+								temp = Mid(Str(AccessCode),RadioState[8]+1,1)
+								If RadioState[6]-FPSfactor =< RadioState[7]*50 And RadioState[6]>RadioState[7]*50 Then
 									PlaySound_Strict(RadioBuzz)
-									RadioState(7)=RadioState(7)+1
-									If RadioState(7)=>temp Then
-										RadioState(7)=0
-										RadioState(6)=-100
-										RadioState(8)=RadioState(8)+1
-										If RadioState(8)=4 Then RadioState(8)=0 : RadioState(6)=-200
+									RadioState[7]=RadioState[7]+1
+									If RadioState[7]=>temp Then
+										RadioState[7]=0
+										RadioState[6]=-100
+										RadioState[8]=RadioState[8]+1
+										If RadioState[8]=4 Then RadioState[8]=0 : RadioState[6]=-200
 									EndIf
 								EndIf
 								
@@ -5363,7 +5420,7 @@ Function DrawGUI()
 									strtemp = strtemp + Chr(Rand(1,100))
 								Next
 								
-								AASetFont Font4
+								AASetFont I_Opt\Fonts[4]
 								AAText(x+97, y+16, Rand(0,9),True,True)
 								
 							Else
@@ -5371,25 +5428,25 @@ Function DrawGUI()
 									If KeyHit(i) Then
 										If SelectedItem\state2 <> i-2 Then ;pausetetaan nykyinen radiokanava
 											PlaySound_Strict RadioSquelch
-											If RadioCHN(Int(SelectedItem\state2)) <> 0 Then PauseChannel(RadioCHN(Int(SelectedItem\state2)))
+											If RadioCHN[Int(SelectedItem\state2)] <> 0 Then PauseChannel(RadioCHN[Int(SelectedItem\state2)])
 										EndIf
 										SelectedItem\state2 = i-2
 										;jos nykyistä kanavaa ollaan soitettu, laitetaan jatketaan toistoa samasta kohdasta
-										If RadioCHN(SelectedItem\state2)<>0 Then ResumeChannel(RadioCHN(SelectedItem\state2))
+										If RadioCHN[SelectedItem\state2]<>0 Then ResumeChannel(RadioCHN[SelectedItem\state2])
 									EndIf
 								Next
 								
-								AASetFont Font4
+								AASetFont I_Opt\Fonts[4]
 								AAText(x+97, y+16, Int(SelectedItem\state2+1),True,True)
 							EndIf
 							
-							AASetFont Font3
+							AASetFont I_Opt\Fonts[3]
 							If strtemp <> "" Then
 								strtemp = Right(Left(strtemp, (Int(MilliSecs()/300) Mod Len(strtemp))),10)
 								AAText(x+32, y+33, strtemp)
 							EndIf
 							
-							AASetFont Font1
+							AASetFont I_Opt\Fonts[1]
 							
 						EndIf
 						
@@ -5441,6 +5498,24 @@ Function DrawGUI()
 						MsgTimer = 70 * 6
 						RemoveItem(SelectedItem)
 					EndIf
+					
+				Case "scp178"
+					
+					If SelectedItem\Picked = 2 Then
+						Msg = GetLocalString("Messages", "178remove")
+						Msg = "You removed the glasses."
+						Wearing178 = 0
+						SelectedItem\Picked = 1
+					ElseIf Wearing178 = False
+						GiveAchievement(Achv178)
+						Msg = GetLocalString("Messages", "178puton")
+						Wearing178 = 1
+						SelectedItem\Picked = 2
+					Else
+						Msg = GetLocalString("Messages", "178double")
+					EndIf
+					MsgTimer = 70 * 5
+					SelectedItem = Null
 
 				Case "scp714"
 
@@ -5603,7 +5678,7 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\img, x - ImageWidth(SelectedItem\itemtemplate\img) / 2, y - ImageHeight(SelectedItem\itemtemplate\img) / 2 + 85)
 					
-					AASetFont Font3
+					AASetFont I_Opt\Fonts[3]
 					
 					Local NavWorks% = True
 					If PlayerRoom\RoomTemplate\Name$ = "pocketdimension" Lor PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then
@@ -5774,7 +5849,7 @@ Function DrawGUI()
 									DrawImage NavImages(4),xtemp+i*8-6,ytemp+4
 								Next
 								
-								AASetFont Font3
+								AASetFont I_Opt\Fonts[3]
 							EndIf
 						EndIf
 						
@@ -6057,8 +6132,8 @@ Function DrawGUI()
 	
 	If SelectedItem = Null Then
 		For i = 0 To 6
-			If RadioCHN(i) <> 0 Then 
-				If ChannelPlaying(RadioCHN(i)) Then PauseChannel(RadioCHN(i))
+			If RadioCHN[i] <> 0 Then 
+				If ChannelPlaying(RadioCHN[i]) Then PauseChannel(RadioCHN[i])
 			EndIf
 		Next
 	EndIf
@@ -6134,25 +6209,25 @@ Function DrawMenu()
 		EndIf
 		
 		If AchievementsMenu > 0 Then
-			AASetFont Font2
+			AASetFont I_Opt\Fonts[2]
 			AAText(x, y-(122-45)*MenuScale, Upper(GetLocalString("Menu", "ach")),False,True)
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 		ElseIf OptionsMenu > 0 Then
-			AASetFont Font2
+			AASetFont I_Opt\Fonts[2]
 			AAText(x, y-(122-45)*MenuScale, Upper(GetLocalString("Menu", "options")),False,True)
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 		ElseIf QuitMSG > 0 Then
-			AASetFont Font2
+			AASetFont I_Opt\Fonts[2]
 			AAText(x, y-(122-45)*MenuScale, Upper(GetLocalString("Menu", "quit")) + "?",False,True)
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 		ElseIf KillTimer >= 0 Then
-			AASetFont Font2
+			AASetFont I_Opt\Fonts[2]
 			AAText(x, y-(122-45)*MenuScale, GetLocalString("Menu", "paused"),False,True)
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 		Else
-			AASetFont Font2
+			AASetFont I_Opt\Fonts[2]
 			AAText(x, y-(122-45)*MenuScale, GetLocalString("Menu", "died"),False,True)
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 		EndIf		
 		
 		Local AchvXIMG% = (x + (22*MenuScale))
@@ -6161,7 +6236,7 @@ Function DrawMenu()
 		Local imgsize% = 64
 		
 		If AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG <= 0
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 			AAText x, y, GetLocalString("Menu", "difficulty")+": "+SelectedDifficulty\name
 			AAText x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+CurrSave
 			AAText x, y+40*MenuScale, GetLocalString("Menu", "seed")+": "+RandomSeed
@@ -6201,7 +6276,7 @@ Function DrawMenu()
 			Color 255,255,255
 			Select OptionsMenu
 				Case 1 ;Graphics
-					AASetFont Font1
+					AASetFont I_Opt\Fonts[1]
 
 					y=y+50*MenuScale
 					
@@ -6305,7 +6380,7 @@ Function DrawMenu()
 					CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan(Float(FOV)/2)*RealGraphicWidth/RealGraphicHeight))/2.0))					
 
 				Case 2 ;Audio
-					AASetFont Font1
+					AASetFont I_Opt\Fonts[1]
 
 					y = y + 50*MenuScale
 					
@@ -6364,7 +6439,7 @@ Function DrawMenu()
 					EndIf
 
 				Case 3 ;Controls
-					AASetFont Font1
+					AASetFont I_Opt\Fonts[1]
 
 					y = y + 50*MenuScale
 					
@@ -6455,7 +6530,7 @@ Function DrawMenu()
 					EndIf
 
 				Case 4 ;Advanced
-					AASetFont Font1
+					AASetFont I_Opt\Fonts[1]
 					
 					Local PrevFramelimit% = Framelimit
 
@@ -6549,13 +6624,7 @@ Function DrawMenu()
 							;	FreeEntity AATextSprite[i]
 							;Next
 						EndIf
-						InitAAFont(I_Opt)
-						Font1% = LoadLocalFont(True, "Font1", Int(20 * (I_Opt\GraphicHeight / 1024.0)))
-						Font2% = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
-						Font3% = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
-						Font4% = LoadLocalFont(True, "Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
-						Font5% = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
-						ConsoleFont% = AALoadFont("Blitz", Int(22 * (I_Opt\GraphicHeight / 1024.0)), 0,0,0,1)
+						ReloadFonts(I_Opt)
 						;ReloadAAFont()
 						I_Opt\AATextEnabled_Prev = I_Opt\AATextEnabled
 					EndIf
@@ -6611,7 +6680,7 @@ Function DrawMenu()
 			
 			If AchievementsMenu>0 Then
 				;DebugLog AchievementsMenu
-				If AchievementsMenu <= Floor(Float(MAXACHIEVEMENTS-1)/12.0) Then 
+				If AchievementsMenu <= Floor(Float(MAXACHIEVEMENTS)/12.0) Then 
 					If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
 						AchievementsMenu = AchievementsMenu+1
 					EndIf
@@ -6623,7 +6692,7 @@ Function DrawMenu()
 				EndIf
 				
 				For i=0 To 11
-					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS Then
+					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS+1 Then
 						DrawAchvIMG(AchvXIMG,y+((i/4)*120*MenuScale),i+((AchievementsMenu-1)*12))
 					Else
 						Exit
@@ -6631,7 +6700,7 @@ Function DrawMenu()
 				Next
 				
 				For i=0 To 11
-					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS Then
+					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS+1 Then
 						If MouseOn(AchvXIMG+((i Mod 4)*SeparationConst),y+((i/4)*120*MenuScale),64*scale,64*scale) Then
 							AchievementTooltip(i+((AchievementsMenu-1)*12))
 							Exit
@@ -6667,7 +6736,7 @@ Function DrawMenu()
 							LoadGameQuick(SavePath + CurrSave + "\")
 							
 							MoveMouse viewport_center_x,viewport_center_y
-							AASetFont Font1
+							AASetFont I_Opt\Fonts[1]
 							HidePointer ()
 							
 							FlushKeys()
@@ -6703,7 +6772,7 @@ Function DrawMenu()
 					Else
 						DrawFrame(x,y,390*MenuScale, 60*MenuScale)
 						Color (100, 100, 100)
-						AASetFont Font2
+						AASetFont I_Opt\Fonts[2]
 						AAText(x + (390*MenuScale) / 2, y + (60*MenuScale) / 2, GetLocalString("Menu", "loadgame"), True, True)
 					EndIf
 					y = y + 75*MenuScale
@@ -6723,7 +6792,7 @@ Function DrawMenu()
 						LoadGameQuick(SavePath + CurrSave + "\")
 						
 						MoveMouse viewport_center_x,viewport_center_y
-						AASetFont Font1
+						AASetFont I_Opt\Fonts[1]
 						HidePointer ()
 						
 						FlushKeys()
@@ -6778,7 +6847,7 @@ Function DrawMenu()
 				EndIf
 			EndIf
 			
-			AASetFont Font1
+			AASetFont I_Opt\Fonts[1]
 			If KillTimer < 0 Then RowText(DeathMSG$, x, y + 80*MenuScale, 390*MenuScale, 600*MenuScale)
 		EndIf
 
@@ -6786,7 +6855,7 @@ Function DrawMenu()
 		
 	EndIf
 	
-	AASetFont Font1
+	AASetFont I_Opt\Fonts[1]
 	
 	;CatchErrors("Uncaught DrawMenu")
 End Function
@@ -6914,6 +6983,16 @@ Function LoadEntities()
 	EntityOrder NVBlink, -1005
 	MoveEntity(NVBlink, 0, 0, 1.0)
 	HideEntity(NVBlink)
+	
+	GlassesTexture = LoadTexture_Strict("GFX\GlassesOverlay.jpg",1)
+	GlassesOverlay = CreateSprite(ark_blur_cam)
+	ScaleSprite(GlassesOverlay, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
+	EntityTexture(GlassesOverlay, GlassesTexture)
+	EntityBlend (GlassesOverlay, 2)
+	EntityFX(GlassesOverlay, 1)
+	EntityOrder GlassesOverlay, -1003
+	MoveEntity(GlassesOverlay, 0, 0, 1.0)
+	HideEntity(GlassesOverlay)
 	
 	FogNVTexture = LoadTexture_Strict("GFX\fogNV.jpg", 1)
 	
@@ -7093,8 +7172,8 @@ Function LoadEntities()
 	
 	CloseDir(Dir)
 	
-	OldAiPics(0) = LoadTexture_Strict("GFX\AIface.jpg")
-	OldAiPics(1) = LoadTexture_Strict("GFX\AIface2.jpg")	
+	OldAiPics[0] = LoadTexture_Strict("GFX\AIface.jpg")
+	OldAiPics[1] = LoadTexture_Strict("GFX\AIface2.jpg")	
 	
 	DrawLoading(20)
 	
@@ -7215,41 +7294,41 @@ Function LoadEntities()
 	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
 
-	For i=1 To MaxDTextures
+	For i=0 To 7
 		DTextures[i] = CopyEntity(ClassDObj)
 		HideEntity DTextures[i]
 	Next
 	;Gonzales
 	tex = LoadTexture_Strict("GFX\npcs\gonzales.jpg")
-	EntityTexture DTextures[1],tex
+	EntityTexture DTextures[0],tex
 	FreeTexture tex
 	;SCP-970 corpse
 	tex = LoadTexture_Strict("GFX\npcs\corpse.jpg")
-	EntityTexture DTextures[2],tex
+	EntityTexture DTextures[1],tex
 	FreeTexture tex
 	;scientist 1
 	tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
-	EntityTexture DTextures[3],tex
+	EntityTexture DTextures[2],tex
 	FreeTexture tex
 	;scientist 2
 	tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-	EntityTexture DTextures[4],tex
+	EntityTexture DTextures[3],tex
 	FreeTexture tex
 	;janitor
 	tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
-	EntityTexture DTextures[5],tex
+	EntityTexture DTextures[4],tex
 	FreeTexture tex
 	;106 Victim
 	tex = LoadTexture_Strict("GFX\npcs\106victim.jpg")
-	EntityTexture DTextures[6],tex
+	EntityTexture DTextures[5],tex
 	FreeTexture tex
 	;2nd ClassD
 	tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
-	EntityTexture DTextures[7],tex
+	EntityTexture DTextures[6],tex
 	FreeTexture tex
 	;035 victim
 	tex = LoadTexture_Strict("GFX\npcs\035victim.jpg")
-	EntityTexture DTextures[8],tex
+	EntityTexture DTextures[7],tex
 	FreeTexture tex
 	
 
@@ -7356,7 +7435,7 @@ Function LoadEntities()
 	;CatchErrors("Uncaught LoadEntities")
 End Function
 
-Function InitNewGame()
+Function InitNewGame(I_Opt.Options)
 	;CatchErrors("InitNewGame")
 	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
@@ -7475,7 +7554,7 @@ Function InitNewGame()
 	
 	MoveMouse viewport_center_x,viewport_center_y;320, 240
 	
-	AASetFont Font1
+	AASetFont I_Opt\Fonts[1]
 	
 	HidePointer()
 	
@@ -7508,7 +7587,7 @@ Function InitNewGame()
 	;CatchErrors("Uncaught InitNewGame")
 End Function
 
-Function InitLoadGame()
+Function InitLoadGame(I_Opt.Options)
 	;CatchErrors("InitLoadGame")
 	Local d.Doors, sc.SecurityCams, rt.RoomTemplates, e.Events
 	
@@ -7536,7 +7615,7 @@ Function InitLoadGame()
 	
 	MoveMouse viewport_center_x,viewport_center_y
 	
-	AASetFont Font1
+	AASetFont I_Opt\Fonts[1]
 	
 	HidePointer()
 	
@@ -7679,6 +7758,7 @@ Function NullGame(playbuttonsfx%=True)
 	WearingGasMask = 0
 	WearingHazmat = 0
 	WearingVest = 0
+	Wearing178 = 0
 	Wearing714 = 0
 	If WearingNightVision<>0 Then
 		CameraFogFar = StoredCameraFogFar
@@ -7699,7 +7779,7 @@ Function NullGame(playbuttonsfx%=True)
 	If Curr173 <> Null Then Curr173\Idle = False
 	
 	MTFtimer = 0
-	For i = 0 To 9
+	For i = 0 To 6
 		MTFrooms[i]=Null
 		MTFroomState[i]=0
 	Next
@@ -7709,7 +7789,7 @@ Function NullGame(playbuttonsfx%=True)
 		Delete s
 	Next
 	
-	For i = 0 To MAXACHIEVEMENTS-1
+	For i = 0 To MAXACHIEVEMENTS
 		Achievements[i]=0
 	Next
 	RefinedItems = 0
@@ -7830,7 +7910,7 @@ Function NullGame(playbuttonsfx%=True)
 	Next
 	
 	For i = 0 To 5
-		If ChannelPlaying(RadioCHN(i)) Then StopChannel(RadioCHN(i))
+		If ChannelPlaying(RadioCHN[i]) Then StopChannel(RadioCHN[i])
 	Next
 	
 	NTF_1499PrevX# = 0.0
@@ -9583,7 +9663,7 @@ Function RenderWorld2()
 			
 			Color 255,255,255
 			
-			AASetFont Font3
+			AASetFont I_Opt\Fonts[3]
 			
 			Local plusY% = 0
 			If hasBattery=1 Then plusY% = 40
@@ -9658,7 +9738,7 @@ Function RenderWorld2()
 		EndIf
 		If hasBattery = 1 And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
-			AASetFont Font3
+			AASetFont I_Opt\Fonts[3]
 			
 			AAText I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "nvglowbat"),True,False
 			Color 255,255,255
@@ -9825,13 +9905,13 @@ Function IsItemGoodFor1162(itt.ItemTemplates)
 			Return True
 		Case "radio","18vradio"
 			Return True
-		Case "clipboard","eyedrops","badnvg","nvg","finenvg","supernvg" ;TODO add here
+		Case "clipboard","eyedrops","badnvg","nvg","finenvg","supernvg"
 			Return True
 		Default
 			If itt\tempname <> "paper" Then
 				Return False
 			ElseIf itt\namespec = "drawing" Then
-				If itt\img<>0 Then FreeImage itt\img	
+				If itt\img<>0 Then FreeImage itt\img
 				itt\img = LoadImage_Strict("GFX\items\1048\1048_"+Rand(1,20)+".jpg") ;Gives a random drawing.
 				Return True
 			Else If itt\namespec = "leaflet"
@@ -10182,7 +10262,7 @@ Function CanUseItem(canUseWithHazmat%, canUseWithGasMask%, canUseWithEyewear%)
 		Msg = GetLocalString("Messages", "cantgas")
 		MsgTimer = 70*5
 		Return False
-	Else If (canUseWithEyewear = False And (WearingNightVision <> 0))
+	Else If (canUseWithEyewear = False And (WearingNightVision <> 0 Lor Wearing178 <> 0))
 		Msg = GetLocalString("Messages", "canthead")
 	EndIf
 	

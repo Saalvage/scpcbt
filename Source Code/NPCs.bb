@@ -1,10 +1,11 @@
 
-Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs, Curr5131.NPCs
+Global Curr173.NPCs, Curr106.NPCs, Curr096.NPCs
 Const NPCtype173% = 1, NPCtypeOldMan% = 2, NPCtypeGuard% = 3, NPCtypeD% = 4
 Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtypePdPlane% = 17
-Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22, NPCtypeDemon% = 23
+Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22
+Const NPCtype178% = 23
 
 
 Type NPCs
@@ -508,6 +509,35 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			;EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-066", "speed") / 100.0)
+			
+		Case NPCtype178
+			
+			n\NVName = "Unidentified"
+			
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider,0.2
+			
+			For n2.NPCs = Each NPCs
+				If (n\NPCtype = n2\NPCtype) And (n<>n2) Then
+					n\obj = CopyEntity (n2\obj)
+					Exit
+				EndIf
+			Next
+			
+			If n\obj = 0 Then 
+				n\obj = LoadAnimMesh_Strict("GFX\npcs\npc178.b3d")
+			EndIf
+			
+			EntityFX n\obj,1
+			
+			temp# = (Rnd(0.85,1.15) * GetINIFloat("DATA\NPCs.ini", "SCP-178", "scale")) / MeshWidth(n\obj)
+			ScaleEntity n\obj, temp, temp, temp
+			
+			SetAnimTime n\obj,15.0
+			
+			EntityType n\Collider,HIT_178
+			
+			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-178", "speed") / 100.0)
 
 		Case NPCtype966
 
@@ -619,23 +649,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			MeshCullBox (n\obj, -MeshWidth(ClerkOBJ), -MeshHeight(ClerkOBJ), -MeshDepth(ClerkOBJ), MeshWidth(ClerkOBJ)*2, MeshHeight(ClerkOBJ)*2, MeshDepth(ClerkOBJ)*2)
 			
 			n\CollRadius = 0.32
-
-		Case NPCtypeDemon
-		
-			n\NVName = "Unidentified"
-			n\Collider = CreatePivot()
-			EntityRadius n\Collider, 0.1
-			EntityType n\Collider, HIT_PLAYER
 			
-			n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
-			
-			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
-			ScaleEntity n\obj, temp,temp,temp
-			
-			;EntityParent n\obj, n\Collider
-			
-			n\Speed = 2.0/100
-
 	End Select
 	
 	PositionEntity(n\Collider, x, y, z, True)
@@ -4080,6 +4094,182 @@ Function UpdateNPCs()
 				
 				RotateEntity n\obj, EntityPitch(n\Collider)-90, EntityYaw(n\Collider), 0
 
+			Case NPCtype178
+				
+				dist = EntityDistanceSquared(n\Collider,Collider)
+				
+				For nnn.NPCs = Each NPCs
+					If nnn\NPCtype = NPCtype178 Then
+						CreateConsoleMsg(EntityDistance(nnn\Collider, Collider) + "   " + nnn\State3)
+						Exit
+					EndIf
+				Next
+				
+				If n\Sound > 0 Then
+					temp = 0.5
+					;the ambient sound gets louder when the npcs are attacking
+					If n\State > 0 Then temp = 1.0	
+					
+					n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, Camera, 10.0,temp)
+				EndIf
+				
+				temp = Rnd(-1.0,1.0)
+				PositionEntity n\obj,EntityX(n\Collider,True)+n\PrevX*temp,EntityY(n\Collider,True)-0.2,EntityZ(n\Collider,True)+n\PrevZ*temp
+				RotateEntity n\obj,0.0,EntityYaw(n\Collider)-180,0.0
+				
+				;use the prev-values to do a "twitching" effect
+				n\PrevX = CurveValue(0.0, n\PrevX, 10.0)
+				n\PrevZ = CurveValue(0.0, n\PrevZ, 10.0)
+				
+				If Rand(200)=1 Then
+					If Rand(5)=1 Then
+						n\PrevX = (EntityX(Collider)-EntityX(n\Collider))*0.9
+						n\PrevZ = (EntityZ(Collider)-EntityZ(n\Collider))*0.9
+					Else
+						n\PrevX = Rnd(0.1,0.5)
+						n\PrevZ = Rnd(0.1,0.5)						
+					EndIf
+					
+				EndIf
+				
+				If (Wearing178=0) And (n\State3=0.0) Then
+					If n\State>0 Then
+						EntityAlpha n\obj,0.0
+						n\State=Max(n\State-FPSfactor,0.0)
+					EndIf
+				Else
+					If n\State3=0.0 Then
+						EntityAlpha n\obj,0.5+(Float(Rand(0,1))/2.0)
+					Else
+						EntityAlpha n\obj,0.5+(Sin(n\Frame*6.0)/2.0)
+					EndIf
+				EndIf
+				
+				If n\State = 0 Then
+					If n\Reload = 0 Then
+						AnimateNPC(n, 206, 240, 0.1)
+						If n\Frame>=240 Then n\Reload = 1
+						
+						;Animate2(n\obj, AnimTime(n\obj), 206, 240, 0.1)
+						;If AnimTime(n\obj)>=240 Then n\Reload = 1
+					Else
+						AnimateNPC(n, 206, 240, -0.1)
+						If n\Frame<=206 Then n\Reload = 0					
+						
+						;Animate2(n\obj, AnimTime(n\obj), 206, 240, -0.1)
+						;If AnimTime(n\obj)<=206 Then n\Reload = 0
+					EndIf
+					
+					angle = VectorYaw(EntityX(Collider)-EntityX(n\Collider),0,EntityZ(Collider)-EntityZ(n\Collider))
+					RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),20.0),0.0
+					
+					For n2.NPCs = Each NPCs
+						If (n2\NPCtype=n\NPCtype) And (n<>n2) Then
+							If n2\State>0.0 Then n\State=1.0
+							If n2\State3>0.0 Then n\State3=1.0
+							;if one of the npcs is hostile, make all of them hostile
+						EndIf
+						If n\State<>0 Then Exit
+					Next
+					If dist<1.0 And EntityInView(n\obj,Camera) Then ;1.0
+						n\State2=n\State2+FPSfactor
+					ElseIf EntityCollided(n\Collider,HIT_PLAYER)=Collider Then
+						n\State2=50.0
+					Else
+						n\State2=Max(n\State2-FPSfactor,0.0)
+					EndIf
+					If n\State2>=50.0 Then
+						n\State=1.0
+					EndIf
+				EndIf
+				If n\State>0 Then
+					If n\State3=0 Then
+						For n2.NPCs = Each NPCs
+							If (n2\NPCtype=n\NPCtype) And (n<>n2) Then
+								If n2\State3>0.0 Then n\State3=1.0
+							EndIf
+							If n\State3<>0 Then Exit
+						Next
+					EndIf
+					
+					If (Wearing178=1) Lor (n\State3>0) Then
+						n\State=Min(n\State+FPSfactor,300.0)
+					Else
+						n\State=Max(n\State-FPSfactor,0.0)
+					EndIf
+					If n\PathTimer <= 0 Then
+						n\PathStatus = FindPath (n, EntityX(Collider,True), EntityY(Collider,True), EntityZ(Collider,True))
+						n\PathTimer = 40*10
+						n\CurrSpeed = 0
+					EndIf
+					n\PathTimer = Max(n\PathTimer-FPSfactor,0)
+					
+					If (Not EntityVisible(n\Collider,Collider)) Then
+						If n\PathStatus = 2 Then
+							n\CurrSpeed = 0
+							n\Frame = 15
+							;SetAnimTime n\obj,15
+						ElseIf n\PathStatus = 1
+							If n\Path[n\PathLocation]=Null Then 
+								If n\PathLocation > 19 Then 
+									n\PathLocation = 0 : n\PathStatus = 0
+								Else
+									n\PathLocation = n\PathLocation + 1
+								EndIf
+							Else
+								angle = VectorYaw(EntityX(n\Path[n\PathLocation]\obj,True)-EntityX(n\Collider),0,EntityZ(n\Path[n\PathLocation]\obj,True)-EntityZ(n\Collider))
+								RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),10.0),0.0
+								
+								n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
+								
+								If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+									n\PathLocation = n\PathLocation + 1
+								EndIf 
+							EndIf
+						ElseIf n\PathStatus = 0
+							;SetAnimTime(n\obj,64)
+							n\CurrSpeed = CurveValue(0,n\CurrSpeed,10.0)
+						EndIf
+					Else
+						angle = VectorYaw(EntityX(Collider)-EntityX(n\Collider),0,EntityZ(Collider)-EntityZ(n\Collider))
+						RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),10.0),0.0
+						
+						n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
+					EndIf
+					
+					If dist>0.09 Then ;0.3
+						MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
+						AnimateNPC(n, 64, 91, n\CurrSpeed*10.0)
+						;Animate2(n\obj, AnimTime(n\obj), 64, 91, n\CurrSpeed*10.0)
+						
+						For d.Doors = Each Doors
+							If (EntityDistance(n\Collider,d\obj)<1.25) And (d\Code<>"GEAR") And (EntityCollided(n\Collider,HIT_178)=0) Then
+								n\DropSpeed=0
+								ResetEntity n\Collider
+							EndIf
+						Next
+					EndIf
+					If dist<0.16 Then ;0.4
+						;Animate2(n\obj, AnimTime(n\obj), 122, 172, 0.2, False)		
+						If (n\State2>=65.0) And (KillTimer>=0) Then
+							Injuries=Injuries+Rnd(0.4,0.8)
+							If Injuries>=4.0 Then
+								If n\State3=0.0 Then
+									DeathMSG = GetLocalString("Deaths", "178reg")
+								Else
+									DeathMSG = GetLocalString("Deaths", "178spec")
+								EndIf
+								Kill()
+							EndIf
+							PlaySound_Strict DamageSFX(Rand(2,3))
+							n\State2=0.0
+						Else
+							n\State2=n\State2+FPSfactor
+						EndIf
+					EndIf
+					
+				EndIf
+
 			Case NPCtype966
 
 				dist = EntityDistance(n\Collider,Collider)
@@ -4964,75 +5154,6 @@ Function UpdateNPCs()
 				
 				RotateEntity n\obj,0,EntityYaw(n\Collider)-180,0
 				PositionEntity n\obj,EntityX(n\Collider),EntityY(n\Collider)-0.2,EntityZ(n\Collider)
-
-			Case NPCtypeDemon
-			
-				CreateConsoleMsg(n\PathLocation + "    " + n\State2 + "    " + n\PathTimer)
-			
-				Select n\State
-					Case 0 ;Chasing
-						If EntityVisible(n\Collider,Collider) Then
-							RotateEntity n\Collider, 0, -ATan2(EntityX(Collider)-EntityX(n\Collider), EntityZ(Collider)-EntityZ(n\Collider)), 0
-							
-							MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
-							
-							If EntityDistanceSquared(n\Collider,Collider)<1.0
-								n\State = 1
-								n\Frame = 0
-							EndIf
-							
-							n\PathStatus = 0
-							n\PathLocation = 0
-							n\PathTimer = 0
-						Else
-							
-							If n\PathStatus = 1 Then
-								
-								If n\Path[n\PathLocation]=Null Then
-									If n\PathLocation > 19 Then 
-										n\PathLocation = 0 : n\PathStatus = 0
-									Else
-										n\PathLocation = n\PathLocation + 1
-									EndIf
-								Else
-									;RotateEntity n\Collider, 0, -ATan2(EntityX(n\Path[n\PathLocation]\obj)-EntityX(n\Collider), EntityZ(n\Path[n\PathLocation]\obj)-EntityZ(n\Collider)), 0 ;This should work, it doesn't, maybe one day it will
-									
-									PointEntity n\obj, n\Path[n\PathLocation]\obj
-									RotateEntity n\Collider, 0, EntityYaw(n\obj), 0
-									
-									MoveEntity n\Collider, 0, 0, n\Speed * FPSfactor
-									
-									If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
-										n\PathLocation = n\PathLocation + 1
-									EndIf
-								EndIf
-								
-							Else
-								n\PathTimer = Max(0, n\PathTimer-FPSfactor)
-								If n\PathTimer=<0 Then
-									n\PathStatus = FindPath(n, EntityX(Collider),EntityY(Collider),EntityZ(Collider))	
-									n\PathTimer = 70*5
-								EndIf
-								
-							EndIf
-						EndIf
-					
-					Case 1 ;Attacking
-						prevFrame = n\Frame
-						n\Frame = n\Frame + FPSfactor
-						If n\Frame > 100 And prevFrame < 100 Then
-							If (Not I_Cheats\GodMode) And EntityDistanceSquared(n\Collider,Collider)<1.21 Then;1.1
-								PlaySound_Strict DamageSFX(Rand(5,8))
-								Injuries = Injuries+Rnd(0.4,1.0)
-								DeathMSG = GetLocalString("Deaths", "008zombie")
-							EndIf
-							n\State = 0
-						EndIf
-						
-				End Select
-				
-				PositionEntity n\obj, EntityX(n\Collider), EntityY(n\Collider), EntityZ(n\Collider)
-				RotateEntity n\obj, 0, ENtityYaw(n\Collider), 0
 				
 		End Select
 		
@@ -6974,9 +7095,9 @@ Function PlayMTFSound(sound%, n.NPCs)
 		If SelectedItem\state2 = 3 And SelectedItem\state > 0 Then 
 			Select SelectedItem\itemtemplate\tempname 
 				Case "radio","fineradio","18vradio"
-					If sound<>MTFSFX(5) Lor (Not ChannelPlaying(RadioCHN(3)))
-						If RadioCHN(3)<> 0 Then StopChannel RadioCHN(3)
-						RadioCHN(3) = PlaySound_Strict (sound)
+					If sound<>MTFSFX(5) Lor (Not ChannelPlaying(RadioCHN[3]))
+						If RadioCHN[3]<> 0 Then StopChannel RadioCHN[3]
+						RadioCHN[3] = PlaySound_Strict (sound)
 					EndIf
 			End Select
 		EndIf
@@ -7109,6 +7230,12 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			Curr173 = n
 			If (Curr173\Idle = 3) Then Curr173\Idle = False
 			consoleMSG = "SCP-173 spawned."
+			
+		Case "178-1", "1781", "scp-178-1", "scp178-1"
+			n.NPCs = CreateNPC(NPCtype178, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
+			consoleMSG = "SCP-178-1 instance spawned."
+			CreateConsoleMsg("SCP-178-1 instances will be invisible unless you equip SCP-178.", 255, 255, 0)
+			
 		Case "372", "scp372", "scp-372"
 			n.NPCs = CreateNPC(NPCtype372, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-372 spawned."
@@ -7162,9 +7289,6 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			n.NPCs = CreateNPC(NPCtypeClerk, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "Clerk spawned."
 		
-		Case "demon"
-			n.NPCs = CreateNPC(NPCtypeDemon, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
-			consoleMSG = "Demon spawned."
 		Default 
 			CreateConsoleMsg("NPC type not found.", 255, 0, 0) : Return
 	End Select
@@ -7286,7 +7410,7 @@ End Function
 Function NPCSpeedChange(n.NPCs)
 	
 	Select n\NPCtype
-		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049,NPCtype939,NPCtypeMTF,NPCtypeDemon
+		Case NPCtype173,NPCtypeOldMan,NPCtype096,NPCtype049,NPCtype939,NPCtypeMTF
 			Select SelectedDifficulty\otherFactors
 				Case NORMAL
 					n\Speed = n\Speed * 1.1
@@ -7451,7 +7575,7 @@ Function ChangeNPCTextureID(n.NPCs,textureid%)
 	
 	n\TextureID = textureid%+1
 	FreeEntity n\obj
-	n\obj = CopyEntity(DTextures[textureid%+1])
+	n\obj = CopyEntity(DTextures[textureid])
 	
 	temp# = 0.5 / MeshWidth(n\obj)
 	ScaleEntity n\obj, temp, temp, temp

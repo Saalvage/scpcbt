@@ -802,8 +802,8 @@ Function UpdateEvents()
 								e\room\NPC[2] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[2], True), 0.5, EntityZ(e\room\Objects[2], True))
 								PointEntity(e\room\NPC[2]\Collider, e\room\Objects[5])
 								ChangeNPCTextureID(e\room\NPC[2],6)
-								;EntityTexture e\room\NPC[2]\obj, DTextures[7]
-								;FreeTexture DTextures[7]
+								;EntityTexture e\room\NPC[2]\obj, DTextures[6]
+								;FreeTexture DTextures[6]
 								e\room\NPC[3]\State = 9
 								e\room\NPC[4]\State = 9
 								
@@ -934,13 +934,13 @@ Function UpdateEvents()
 								e\room\NPC[5]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\PlayerEscape.ogg")
 								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
 								;tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-								;EntityTexture e\room\NPC[6]\obj, DTextures[4]
+								;EntityTexture e\room\NPC[6]\obj, DTextures[3]
 								;FreeTexture tex
 								ChangeNPCTextureID(e\room\NPC[6],3)
 								e\room\NPC[7] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
 								;tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
 								e\room\NPC[7]\Sound = LoadSound_Strict("SFX\Room\Intro\Scientist\Conversation.ogg")
-								;EntityTexture e\room\NPC[7]\obj, DTextures[3]
+								;EntityTexture e\room\NPC[7]\obj, DTextures[2]
 								;FreeTexture tex
 								ChangeNPCTextureID(e\room\NPC[7],2)
 								pvt = CreatePivot()
@@ -2747,7 +2747,7 @@ Function UpdateEvents()
 					e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True), 0.5, EntityZ(e\room\Objects[0],True))
 					ChangeNPCTextureID(e\room\NPC[0],0)
 					
-					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\obj)-80,0, True	
+					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\obj)-80,0, True
 					
 					SetNPCFrame e\room\NPC[0], 19
 					e\room\NPC[0]\State=8
@@ -2763,7 +2763,7 @@ Function UpdateEvents()
 				If PlayerRoom = e\room Then
 					TurnEntity (e\room\Objects[0], e\EventState3*FPSfactor, 0, 0)
 					If e\EventState3 > 0.01 Then
-						e\room\SoundCHN = LoopSound2 (RoomAmbience[9], e\room\SoundCHN, Camera, e\room\Objects[0], 5.0, (e\EventState3/4.0))
+						e\room\SoundCHN = LoopSound2 (RoomAmbience[8], e\room\SoundCHN, Camera, e\room\Objects[0], 5.0, (e\EventState3/4.0))
 					EndIf
 					e\EventState3 = CurveValue(e\EventState2*5, e\EventState3, 150.0)			
 				EndIf
@@ -4427,7 +4427,7 @@ Function UpdateEvents()
 						e\EventState3 = Max(0, e\EventState3-FPSfactor/450)
 					EndIf
 					
-					If e\EventState2>0 Then e\SoundCHN=LoopSound2(RoomAmbience[8], e\SoundCHN, Camera, e\room\Objects[3], 5.0, e\EventState2*0.8)
+					If e\EventState2>0 Then e\SoundCHN=LoopSound2(RoomAmbience[7], e\SoundCHN, Camera, e\room\Objects[3], 5.0, e\EventState2*0.8)
 					If e\EventState3>0 Then e\SoundCHN2=LoopSound2(e\Sound2, e\SoundCHN2, Camera, e\room\Objects[5], 6.0, e\EventState3)
 					
 					If temp=0 And x And z Then
@@ -5784,7 +5784,7 @@ Function UpdateEvents()
 							;If ChannelPlaying(e\SoundCHN) Then
 							If IsStreamPlaying_Strict(e\SoundCHN)
 								If Rand(3) = 1 Then
-									EntityTexture(e\room\Objects[1], OldAiPics(0))
+									EntityTexture(e\room\Objects[1], OldAiPics[0])
 									ShowEntity (e\room\Objects[1])
 								ElseIf Rand(10) = 1 
 									HideEntity (e\room\Objects[1])							
@@ -5794,7 +5794,7 @@ Function UpdateEvents()
 								If e\SoundCHN<>0
 									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 								EndIf
-								EntityTexture(e\room\Objects[1], OldAiPics(1))
+								EntityTexture(e\room\Objects[1], OldAiPics[1])
 								ShowEntity (e\room\Objects[1])
 								e\EventState = e\EventState + FPSfactor
 							EndIf
@@ -5808,7 +5808,7 @@ Function UpdateEvents()
 									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 								EndIf
 								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Refuse.ogg",SFXVolume,0)
-								;EntityTexture(e\room\Objects[1], OldAiPics(1))
+								;EntityTexture(e\room\Objects[1], OldAiPics[1])
 								;ShowEntity (e\room\Objects[1])
 							EndIf
 						EndIf
@@ -5816,11 +5816,11 @@ Function UpdateEvents()
 						If e\SoundCHN<>0
 							If (Not IsStreamPlaying_Strict(e\SoundCHN))
 								e\SoundCHN = 0
-								EntityTexture(e\room\Objects[1], OldAiPics(1))
+								EntityTexture(e\room\Objects[1], OldAiPics[1])
 								ShowEntity (e\room\Objects[1])
 							Else
 								If Rand(3) = 1 Then
-									EntityTexture(e\room\Objects[1], OldAiPics(0))
+									EntityTexture(e\room\Objects[1], OldAiPics[0])
 									ShowEntity (e\room\Objects[1])
 								ElseIf Rand(10) = 1 
 									HideEntity (e\room\Objects[1])							
@@ -6071,7 +6071,7 @@ Function UpdateEvents()
 							HideEntity(e\room\Objects[6])
 						EndIf
 						
-						If e\room\RoomDoors[1]\open = True
+						If e\room\RoomDoors[1]\open Lor e\room\RoomDoors[2]\open
 							e\EventState = 1
 							GiveAchievement(Achv205)
 						EndIf
@@ -7023,7 +7023,7 @@ Function UpdateEvents()
 									DrawHandIcon = True
 									
 									If MouseDown1 Then
-										DrawArrowIcon(2) = True
+										DrawArrowIcon[2] = True
 										RotateEntity(e\room\Levers[0], Max(Min(EntityPitch(e\room\Levers[0])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
 									EndIf
 								EndIf
@@ -7223,8 +7223,8 @@ Function UpdateEvents()
 									TurnEntity(GrabbedEntity, 0, 0, -mouse_x_speed_1 * 2.5)
 									
 									angle = WrapAngle(EntityRoll(e\room\Objects[0]))
-									If angle > 181 Then DrawArrowIcon(3) = True
-									DrawArrowIcon(1) = True
+									If angle > 181 Then DrawArrowIcon[3] = True
+									DrawArrowIcon[1] = True
 									
 									If angle < 90 Then
 										RotateEntity(GrabbedEntity, 0, 0, 361.0)
@@ -7253,8 +7253,8 @@ Function UpdateEvents()
 									TurnEntity(GrabbedEntity, 0, 0, -mouse_x_speed_1 * 2.5)
 									
 									angle# = WrapAngle(EntityRoll(e\room\Objects[1]))
-									DrawArrowIcon(3) = True
-									DrawArrowIcon(1) = True
+									DrawArrowIcon[3] = True
+									DrawArrowIcon[1] = True
 									
 									If angle > 90 Then
 										If angle < 180 Then
@@ -7723,7 +7723,7 @@ Function UpdateEvents()
 								Exit
 							EndIf
 						Next
-					;trade not sucessful (player got in return to injuries a new item)
+					;trade not sucessful (player got a new item in return for injuries)
 					ElseIf e\EventState3 = 2.0
 						Injuries = Injuries + 5.0
 						pvt = CreatePivot()
@@ -9010,7 +9010,6 @@ Function UpdateEndings()
 							Curr173 = Null
 							Curr106 = Null
 							Curr096 = Null
-							Curr5131 = Null
 							
 							CameraFogMode(Camera, 0)
 							SecondaryLightOn = True
@@ -9442,7 +9441,6 @@ Function UpdateEndings()
 						Next
 						Curr173\Idle = True
 						Curr096 = Null
-						Curr5131 = Null
 						
 						CameraFogMode(Camera, 0)
 						SecondaryLightOn = True

@@ -1256,7 +1256,7 @@ Function LoadRoomTemplates(file$)
 		EndIf
 	Wend
 	
-	i = 1
+	i = 0
 	Repeat
 		StrTemp = GetINIString(file, "room ambience", "ambience"+i)
 		If StrTemp = "" Then Exit
@@ -1317,7 +1317,7 @@ Const MapWidth% = 12, MapHeight% = 12
 Dim MapTemp%(MapWidth+1, MapHeight+1)
 Dim MapFound%(MapWidth+1, MapHeight+1)
 
-Global RoomAmbience%[20]
+Global RoomAmbience%[9]
 
 Global Sky
 
@@ -1903,18 +1903,18 @@ Function FillRoom(r.Rooms)
 			d = CreateDoor(r\zone, r\x, r\y+-448.0*RoomScale, r\z + 1136.0 * RoomScale, 0, r, False,True, 4)
 			d\dir = 1 : d\AutoClose = False : d\open = False
 			PositionEntity(d\buttons[1], r\x + 224.0 * RoomScale, r\y-250*RoomScale, r\z + 918.0 * RoomScale, True)
-			;TurnEntity(d\buttons[0],0,-90,0,True)
 			PositionEntity(d\buttons[0], r\x - 240.0 * RoomScale, r\y-250*RoomScale, r\z + 1366.0 * RoomScale, True)
-			;TurnEntity(d\buttons[1],0, 90,0,True)	
 			
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 1456.0*RoomScale, r\y-448.0*RoomScale, r\z + 976.0 * RoomScale, 0, r, False, True, 3)
 			r\RoomDoors[0]\dir = 1 : r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
-			PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 1760.0 * RoomScale, r\y-250*RoomScale, r\z + 1236.0 * RoomScale, True)
+			PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 1760.0 * RoomScale, r\y-268.8*RoomScale, r\z + 1236.0 * RoomScale, True)
 			TurnEntity(r\RoomDoors[0]\buttons[0],0,-90-90,0,True)
-			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 1760.0 * RoomScale, r\y-240*RoomScale, r\z + 740.0 * RoomScale, True)
+			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 1752.0 * RoomScale, r\y-268.8*RoomScale, r\z + 740.0 * RoomScale, True)
 			TurnEntity(r\RoomDoors[0]\buttons[1],0, 90-90,0,True)
 			
-			CreateDoor(0, r\x + 1144.0*RoomScale, r\y-448.0*RoomScale, r\z + 704.0 * RoomScale, 90, r, False, False, -1)
+			d = CreateDoor(r\zone, r\x + 1144.0*RoomScale, r\y-448.0*RoomScale, r\z + 704.0 * RoomScale, 90, r, False, False, -1)
+			MoveEntity(d\buttons[0], 0, 0, 8)
+			MoveEntity(d\buttons[1], 0, 0, 8)
 			
 			r\Objects[0] = LoadAnimMesh_Strict("GFX\map\079.b3d")
 			ScaleEntity(r\Objects[0], 1.3, 1.3, 1.3, True)
@@ -1928,7 +1928,7 @@ Function FillRoom(r.Rooms)
 			ScaleSprite(r\Objects[1],0.18*0.5,0.145*0.5)
 			TurnEntity(r\Objects[1],0,13.0,0)
 			MoveEntity r\Objects[1], 0,0,-0.022
-			EntityTexture (r\Objects[1],OldAiPics(0))
+			EntityTexture (r\Objects[1],OldAiPics[0])
 			
 			HideEntity r\Objects[1]
 			
@@ -2486,7 +2486,9 @@ Function FillRoom(r.Rooms)
 			
 			;door to the storage room
 			r\RoomDoors[3] = CreateDoor(0, r\x + 768.0 * RoomScale, r\y, r\z +512.0 * RoomScale, 90, r, False, 0, 0, "5731")
-			r\RoomDoors[3]\AutoClose = False			
+			r\RoomDoors[3]\AutoClose = False
+			MoveEntity(r\RoomDoors[3]\buttons[0], 0.0, 0.0, -6.5)
+			MoveEntity(r\RoomDoors[3]\buttons[1], 0.0, 0.0, -6.5)
 			
 			d\LinkedDoor = d2 : d2\LinkedDoor = d
 			
@@ -3164,8 +3166,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj)
 			
 			it = CreateItem("paper",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -480.0 * RoomScale, "ir1048a")
-			;clipboard\SecondInv[0] = it
-			HideEntity(it\collider)
+			EntityParent(it\collider, r\obj)
 			
 			r\Objects[0]=CreatePivot(r\obj)
 			PositionEntity r\Objects[0], r\x-1120*RoomScale, r\y-256*RoomScale, r\z+896*RoomScale, True
@@ -3483,17 +3484,19 @@ Function FillRoom(r.Rooms)
 
 		Case "room205"
 
-			;d.Doors = CreateDoor(r\zone, r\x + 128.0 * RoomScale, r\y, r\z + 640.0 *RoomScale, 90, r, True, False, 3)
-			;d\AutoClose = False : d\open = False
-			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 128.0 * RoomScale, r\y, r\z + 640.0 *RoomScale, 90, r, True, False, 2)
+			r\RoomDoors[1] = CreateDoor(r\zone, r\x + 192.0 * RoomScale, r\y, r\z + 640.0 *RoomScale, 90, r, True, False, 2)
 			r\RoomDoors[1]\AutoClose = False : r\RoomDoors[1]\open = False
-			;PositionEntity(d\buttons[0], r\x + 320.0 * RoomScale, EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
-			;PositionEntity(d\buttons[1], r\x + 224.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
 			
-			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 1392.0 * RoomScale, r\y-128.0 * RoomScale, r\z - 384*RoomScale, 0, r, True, False, 3, "", True)
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 1392.0 * RoomScale, r\y-128.0 * RoomScale, r\z - 384*RoomScale, 0, r, True, False, 0, "", True)
 			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
 			FreeEntity(r\RoomDoors[0]\buttons[0]) : r\RoomDoors[0]\buttons[0]=0
 			FreeEntity(r\RoomDoors[0]\buttons[1]) : r\RoomDoors[0]\buttons[1]=0
+			
+			r\RoomDoors[2] = CreateDoor(r\zone, r\x - 96.0 * RoomScale, r\y, r\z - 384.0 *RoomScale, 0, r, True, False, 2)
+			r\RoomDoors[2]\AutoClose = False : r\RoomDoors[2]\open = False
+			
+			r\RoomDoors[3] = CreateDoor(r\zone, r\x + 448.0 * RoomScale, r\y, r\z - 384.0 *RoomScale, 0, r, True, False, 1)
+			r\RoomDoors[3]\AutoClose = False : r\RoomDoors[3]\open = False
 			
 			sc.SecurityCams = CreateSecurityCam(r\x - 1152.0 * RoomScale, r\y + 900.0 * RoomScale, r\z + 176.0 * RoomScale, r, True)
 			sc\angle = 90 : sc\turn = 0
@@ -3522,13 +3525,18 @@ Function FillRoom(r.Rooms)
 			r\Objects[1] = sc\ScrObj
 			
 			it = CreateItem("key3", r\x - 975.0 * RoomScale, r\y, r\z + 731.0 * RoomScale)
-			EntityParent(it\collider, r\obj)	
+			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("paper", r\x + 609.0 * RoomScale, r\y + 245.0 * RoomScale, r\z + -48.0 * RoomScale, "d205")
+			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("bat", r\x + 617.0 * RoomScale, r\y + 149.0 * RoomScale, r\z + 464.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
 			
 			de.Decals = CreateDecal(17, r\x - 865.0 * RoomScale, r\y - 126.0 * RoomScale, r\z + 800.0 * RoomScale, 90, Rand(360), 0)
 			de\Size = 0.2
 			ScaleSprite(de\obj,de\Size,de\Size)
 			EntityParent de\obj, r\obj
-			
 
 		Case "endroom"
 
@@ -4005,72 +4013,47 @@ Function FillRoom(r.Rooms)
 
 		Case "room1archive"
 
+			Local tempstr$, tempstr2$, chance%
+
 			For xtemp = 0 To 1
 				For ytemp = 0 To 2
 					For ztemp = 0 To 2
 						
-						tempstr$ = "d079" : tempstr2$ = "bat"
-						chance% = Rand(-10,100)
-						Select True
-							Case (chance<0)
-								Exit
-							Case (chance<40) ;40% chance for a document
-								tempstr="d"
-								Select Rand(1,6)
-									Case 1
-										tempstr=tempstr+"1123"
-									Case 2
-										tempstr=tempstr+"1048"
-									Case 3
-										tempstr=tempstr+"939"
-									Case 4
-										tempstr=tempstr+"682"
-									Case 5
-										tempstr=tempstr+"079"
-									Case 6
-										tempstr=tempstr+"096"
-									Case 6
-										tempstr=tempstr+"966"
-								End Select
-								tempstr2="paper"
-							Case (chance>=40) And (chance<45) ;5% chance for a key card
-								temp3%=Rand(1,2)
-								tempstr=""
-								tempstr2="key"+Str(temp3)
-							Case (chance>=45) And (chance<50) ;5% chance for a medkit
-								tempstr=""
-								tempstr2="firstaid"
-							Case (chance>=50) And (chance<60) ;10% chance for a battery
-								tempstr=""
-								tempstr2="bat"
-							Case (chance>=60) And (chance<70) ;10% chance for an SNAV
-								tempstr=""
-								tempstr2="nav300"
-							Case (chance>=70) And (chance<85) ;15% chance for a radio
-								tempstr=""
-								tempstr2="radio"
-							Case (chance>=85) And (chance<95) ;10% chance for a clipboard
-								tempstr=""
-								tempstr2="clipboard"
-							Case (chance>=95) And (chance=<100) ;5% chance for misc
-								temp3%=Rand(1,3)
-								Select temp3
-									Case 1 ;playing card
-										tempstr="keyplay"
-									Case 2 ;Mastercard
-										tempstr="keymaster"
-									Case 3 ;origami
-										tempstr="origami"
-								End Select
-								tempstr2="misc"
-						End Select
+						tempstr$ = "" : tempstr2$ = ""
+						chance% = Rand(0,100)
+						If (chance<40) ;40% chance for a document
+							tempstr=GetPaper(Null)
+							tempstr2="paper"
+						ElseIf (chance<45) ;5% chance for a key card
+							tempstr2="key"+Str(Rand(1,2))
+						ElseIf (chance<50) ;5% chance for a medkit
+							tempstr2="firstaid"
+						ElseIf (chance<60) ;10% chance for a battery
+							tempstr2="bat"
+						ElseIf (chance<70) ;10% chance for an SNAV
+							tempstr2="nav300"
+						ElseIf (chance<85) ;15% chance for a radio
+							tempstr2="radio"
+						ElseIf (chance<95) ;10% chance for a clipboard
+							tempstr2="clipboard"
+						Else ;5% chance for misc
+							Select Rand(1,3)
+								Case 1 ;playing card
+									tempstr="keyplay"
+								Case 2 ;Mastercard
+									tempstr="keymaster"
+								Case 3 ;origami
+									tempstr="origami"
+							End Select
+							tempstr2="misc"
+						EndIf
 						
 						x# = (-672.0 + 864.0 * xtemp)* RoomScale
 						y# = (96.0  + 96.0 * ytemp) * RoomScale
 						z# = (480.0 - 352.0*ztemp + Rnd(-96.0,96.0)) * RoomScale
 						
 						it = CreateItem(tempstr2,r\x+x,r\y+y,r\z+z,tempstr)
-						EntityParent it\collider,r\obj	
+						EntityParent it\collider, r\obj
 					Next
 				Next
 			Next
@@ -4081,49 +4064,6 @@ Function FillRoom(r.Rooms)
 			sc\angle = 180
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
-
-		Case "room2test1074"
-
-			r\RoomDoors[0] = CreateDoor(r\zone,r\x,r\y,r\z,0,r,False,False,False,"")
-			r\RoomDoors[0]\locked = True
-			r\RoomDoors[1] = CreateDoor(r\zone,r\x + 336.0 * RoomScale,r\y,r\z + 671.0 * RoomScale,90,r,True,False,3)
-			r\RoomDoors[1]\AutoClose = False
-			r\RoomDoors[2] = CreateDoor(r\zone,r\x + 336.0 * RoomScale,r\y,r\z - 800.0 * RoomScale,90,r,True,False,3)
-			r\RoomDoors[2]\AutoClose = False
-			r\RoomDoors[3] = CreateDoor(r\zone,r\x + 672.0 * RoomScale,r\y,r\z,0,r,False,False)
-			
-			r\Textures[0] = LoadTexture("GFX\map\1074tex0.jpg") ;blank texture (ripped from official article), seen when you put on 714
-			r\Textures[1] = LoadTexture("GFX\map\1074tex1.jpg") ;texture depicting subject D-9341 (the player)
-			TextureBlend r\Textures[0], 5 ;texture
-			TextureBlend r\Textures[1], 5 ;blends
-			
-			it = CreateItem("paper",r\x + 300.0 * RoomScale,r\y+20.0*RoomScale,r\z + 671.0*RoomScale, "d1074")
-			EntityParent(it\collider, r\obj)
-			
-			r\Objects[0] = CreatePivot() ;painting pivot: the player will be attracted when it sees this.
-			PositionEntity r\Objects[0],r\x + 835.0 * RoomScale,r\y + 165.0 * RoomScale,r\z + 540.0 * RoomScale, True
-			EntityParent r\Objects[0],r\obj
-			r\Objects[1] = CreatePivot() ;floor pivot: the player will walk to this point when it sees the painting pivot.
-			PositionEntity r\Objects[1],r\x + 835.0 * RoomScale,r\y + 10.0 * RoomScale,r\z + 300.0 * RoomScale, True
-			EntityParent r\Objects[1],r\obj
-			;Local sf,b,t,msh
-			msh% = GetChild(r\obj,2) ;the second child is the rendered mesh
-			r\NonFreeAble[0] = GetSurface(msh,1) ;a failsafe if the correct surface isn't found
-			For tempint = 1 To CountSurfaces(msh)
-				sf% = GetSurface(msh,tempint)
-				b% = GetSurfaceBrush( sf )
-				t% = GetBrushTexture(b, 1)
-				texname$ = StripPath(TextureName(t))
-				DebugLog "texname: "+texname
-				If Lower(texname) = "1074tex1.jpg" Then
-					r\NonFreeAble[0] = sf ;the surface holding 1074's texture
-					FreeTexture t
-					FreeBrush b
-					Exit
-				EndIf
-				If texname<>"" Then FreeTexture t
-				FreeBrush b
-			Next
 
 		Case "room1123"
 
@@ -4954,12 +4894,12 @@ Function UpdateRooms()
 		r\dist = Max(x,z)
 		
 		
-		If x<16 And z < 16 Then
+		If x < 16 And z < 16 Then
 			For i = 0 To MaxRoomEmitters-1
 				If r\SoundEmitter[i]<>0 Then 
 					dist# = EntityDistance(r\SoundEmitterObj[i],Collider)
 					If dist < r\SoundEmitterRange[i] Then
-						r\SoundEmitterCHN[i] = LoopSound2(RoomAmbience[r\SoundEmitter[i]],r\SoundEmitterCHN[i], Camera, r\SoundEmitterObj[i],r\SoundEmitterRange[i])
+						r\SoundEmitterCHN[i] = LoopSound2(RoomAmbience[r\SoundEmitter[i]-1],r\SoundEmitterCHN[i], Camera, r\SoundEmitterObj[i],r\SoundEmitterRange[i])
 					EndIf
 				EndIf
 			Next
@@ -5341,7 +5281,7 @@ Function FindPath(n.NPCs, x#, y#, z#)
 	Local temp%, dist#, dist2#
 	Local xtemp#, ytemp#, ztemp#
 	
-	Local w.WayPoints, StartPoint.WayPoints, EndPoint.WayPoints   
+	Local w.WayPoints, StartPoint.WayPoints, EndPoint.WayPoints
 	
 	Local StartX% = Floor(EntityX(n\Collider,True) / 8.0 + 0.5), StartZ% = Floor(EntityZ(n\Collider,True) / 8.0 + 0.5)
 	
@@ -5646,7 +5586,7 @@ Type SecurityCams
 	Field MinAngle#, MaxAngle#, dir%
 End Type
 
-Global ScreenTexs%[2]
+Global ScreenTexs%[1]
 
 Global CurrRoom2slRenderCam%
 Global Room2slCam%
@@ -5912,7 +5852,7 @@ Function UpdateSecurityCams()
 						EndIf
 						
 						If Rand(500) = 1 Then
-							EntityTexture(sc\ScrOverlay, OldAiPics(0))
+							EntityTexture(sc\ScrOverlay, OldAiPics[0])
 						EndIf
 						
 						If (MilliSecs() Mod sc\PlayerState) >= Rand(600) Then
@@ -5925,7 +5865,7 @@ Function UpdateSecurityCams()
 								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,3)+".ogg"))
 								If sc\CoffinEffect=2 Then sc\CoffinEffect=3 : sc\PlayerState = 0
 							EndIf
-							EntityTexture(sc\ScrOverlay, OldAiPics(0))
+							EntityTexture(sc\ScrOverlay, OldAiPics[0])
 						EndIf
 						
 					EndIf
@@ -6022,8 +5962,8 @@ Function UpdateLever(obj, locked=False)
 							;TurnEntity(obj, , 0, 0)
 							RotateEntity(GrabbedEntity, Max(Min(EntityPitch(obj)+Max(Min(mouse_y_speed_1 * 8,30.0),-30), 80), -80), EntityYaw(obj), 0)
 							
-							DrawArrowIcon(0) = True
-							DrawArrowIcon(2) = True
+							DrawArrowIcon[0] = True
+							DrawArrowIcon[2] = True
 							
 						EndIf
 					EndIf

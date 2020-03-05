@@ -1,6 +1,6 @@
 
 
-Global ParticleTextures%[10]
+Global ParticleTextures%[8]
 
 Type Particles
 	Field obj%, pvt%

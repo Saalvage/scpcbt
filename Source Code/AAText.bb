@@ -1,5 +1,5 @@
 Global AASelectedFont%
-Global AATextCam%,AATextSprite%[150]
+Global AATextCam%,AATextSprite%[149]
 Global AACharW%,AACharH%
 
 Global AACamViewW%,AACamViewH%
@@ -79,7 +79,7 @@ End Function
 
 Function ReloadAAFont() ;CALL ONLY AFTER CLEARWORLD
 
-	Local I_Opt.Options = First Options ;TODO check if this can be made a parameter
+	Local I_Opt.Options = First Options
 
 	If I_Opt\AATextEnabled Then
 		InitAAFont(I_Opt)
@@ -155,7 +155,7 @@ Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
 	DebugLog "t" + I_Opt\AATextEnabled
-	DebugLog "lll" + font\isAA ;TODO font is sometimes null
+	DebugLog "lll" + font\isAA ;font is sometimes null
 	
 	If (GraphicsBuffer()<>BackBuffer()) Lor (Not I_Opt\AATextEnabled) Lor (Not font\isAA) Then
 		SetFont font\lowResFont

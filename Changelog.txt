@@ -1,5 +1,7 @@
 ﻿v2.0.0
 
+- (Re-)Added SCP-178 with improved mechanics.
+	- It now increases blinking time.
 - Added localization/mod support with built in support for Englisch (due), German, Spanish (South America),
 - Added FOV option (Made by TheHappyJammer).
 	- Decreased default FOV to 60.
@@ -11,7 +13,6 @@
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
-- Added improved SCP-205 label that is more in line with other labels.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added new achievment image for SCP-1048.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
@@ -20,7 +21,7 @@
 - Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A and the radio.
 - Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the render size will be the screen size.
 - Added button to restore all settings to standard values.
-- Added a sound when clicking on disabled checkboxes in the menu.
+- Added a sound when clicking on disabled checkboxes in the menus.
 - Added option to (re)enable/disable the launcher in-game.
 - Many changes to SCP-914:
 	- Added Bad Gas Mask.
@@ -41,14 +42,15 @@
 	- Added consistency.
 	- Fixed SCP-148's refinements.
 	- And a lot of other improvements!
-- Geometry the player can't interact with no longer has collision, should result in a performance boost.
+- Added EZ lockroom version.
+- Much improved SCP-205 chamber and attack.
+- Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
 - Added some space between the page indicator and the next/previous page buttons on the load game screen.
 - Added a tooltip that tells the user what is causing a save to be invalid.
 - SCP-1123 can now be picked up using SCP-714.
 - Updated SCP-294's loading screen units to metric (as per wiki page).
-- Changed SCP-049's loading screen image (Made by Ultimate Edition Team).
 - Changed the name of the Custom difficulty to "Esoteric" (suggested by /u/05-69).
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
@@ -87,6 +89,7 @@ Bug Fixes:
 	- Fixed launcher options not saving when quitting instead of launching.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
+	- Fixed button positions in SCP-079 and SCP-035's room.
 	- Fixed z-fighting on monitor model.
 	- Fixed and reworked the "revive" command.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.
