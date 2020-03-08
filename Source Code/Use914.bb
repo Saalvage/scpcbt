@@ -260,13 +260,19 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 			End Select
 		Case "scp178"
 			Select setting
-				Case "rough,coarse"
+				Case "rough"
 					d.Decals = CreateDecal(0, x, 8 * RoomScale + 0.005, z, 90, Rand(360), 0)
 					d\Size = 0.12 : ScaleSprite(d\obj, d\Size, d\Size)
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype178 Then RemoveNPC(n)
 					Next
-				Case "1:1","fine"
+				Case "coarse"
+					item\State = -2
+					remove = 0
+				Case "1:1"
+					remove = 0
+				Case "fine"
+					item\State = 1
 					remove = 0
 				Case "very fine"
 					n.NPCs = CreateNPC(NPCtype178,x,y,z)

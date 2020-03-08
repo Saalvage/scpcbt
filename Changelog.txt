@@ -2,6 +2,7 @@
 
 - (Re-)Added SCP-178 with improved mechanics.
 	- It now increases blinking time.
+	- Better refinements.
 - Added localization/mod support with built in support for Englisch (due), German, Spanish (South America),
 - Added FOV option (Made by TheHappyJammer).
 	- Decreased default FOV to 60.
@@ -12,11 +13,13 @@
 	- Also overhauled the design of its pages.
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
+- Added EZ-style endroom.
 - Added improved Pizza Day poster.
+- (Re-)Added SCP-173's head rotating.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added new achievment image for SCP-1048.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
-- Added Apollyon difficulty; can be unlocked by beating the game on Keter. (Inspired by Ultimate Edition).
+- Added Apollyon difficulty; can be unlocked by beating the game on Keter.
 - Added inventory size as a difficulty factor.
 - Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A and the radio.
 - Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the render size will be the screen size.
@@ -41,6 +44,7 @@
 	- Added a weird vest.
 	- Added consistency.
 	- Fixed SCP-148's refinements.
+	- Improved player view inversion.
 	- And a lot of other improvements!
 - Added EZ lockroom version.
 - Much improved SCP-205 chamber and attack.
@@ -74,6 +78,7 @@
 
 Bug Fixes:
 	- Fixed button sound not working when not using launcher.
+	- Fixed room lights not working most of the time.
 	- Fixed input boxes displaying too many characters for a frame, if too many characters are entered.
 	- Fixed inventory not being fully centered.
 	- Fixed an exploit allowing the player to avoid SCP-1025 resetting by opening the inventory.
@@ -89,6 +94,8 @@ Bug Fixes:
 	- Fixed launcher options not saving when quitting instead of launching.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
+	- Fixed the items glitching in the storage chamber in SCP-035's room.
+	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
 	- Fixed z-fighting on monitor model.
 	- Fixed and reworked the "revive" command.

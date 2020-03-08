@@ -81,7 +81,7 @@ Function UpdateMainMenu()
 		MenuBlinkDuration(0) = Rand(200, 500)
 	EndIf
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	
 	MenuBlinkTimer(1)=MenuBlinkTimer(1)-FPSfactor
 	If MenuBlinkTimer(1) < MenuBlinkDuration(1) Then
@@ -126,7 +126,7 @@ Function UpdateMainMenu()
 		EndIf
 	EndIf
 	
-	AASetFont I_Opt\Fonts[2]
+	AASetFont 2
 	
 	DrawImage(MenuText, I_Opt\GraphicWidth / 2 - ImageWidth(MenuText) / 2, I_Opt\GraphicHeight - 20 * MenuScale - ImageHeight(MenuText))
 	
@@ -241,7 +241,7 @@ Function UpdateMainMenu()
 				height = 70 * MenuScale
 				
 				Color(255, 255, 255)
-				AASetFont I_Opt\Fonts[2]
+				AASetFont 2
 				AAText(x + width / 2, y + height / 2, GetLocalString("Menu", "newgame"), True, True)
 				
 				x = 160 * MenuScale
@@ -251,7 +251,7 @@ Function UpdateMainMenu()
 				
 				DrawFrame(x, y, width, height)				
 				
-				AASetFont I_Opt\Fonts[1]
+				AASetFont 1
 				
 				AAText (x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Menu", "name")+":")
 				CurrSave = InputBox(x + 150 * MenuScale, y + 15 * MenuScale, 200 * MenuScale, 30 * MenuScale, CurrSave, 1, 15)
@@ -343,7 +343,7 @@ Function UpdateMainMenu()
 					RowText(SelectedDifficulty\description, x+160*MenuScale, y+160*MenuScale, (410-20)*MenuScale, 200)					
 				EndIf
 				
-				AASetFont I_Opt\Fonts[2]
+				AASetFont 2
 				
 				If DrawButton(x + 420 * MenuScale, y + height + 20 * MenuScale, 160 * MenuScale, 70 * MenuScale, GetLocalString("Menu", "start"), False) Then
 					If CurrSave = "" Then CurrSave = GetLocalString("Menu", "untitled")
@@ -392,7 +392,7 @@ Function UpdateMainMenu()
 				height = 70 * MenuScale
 				
 				Color(255, 255, 255)
-				AASetFont I_Opt\Fonts[2]
+				AASetFont 2
 				AAText(x + width / 2, y + height / 2, Upper(GetLocalString("Menu", "loadgame")), True, True)
 				
 				x = 160 * MenuScale
@@ -400,7 +400,7 @@ Function UpdateMainMenu()
 				width = 580 * MenuScale
 				height = 296 * MenuScale	
 				
-				AASetFont I_Opt\Fonts[2]
+				AASetFont 2
 				
 				If CurrLoadGamePage < Ceil(Float(SaveGameAmount)/6.0)-1 And SaveMSG = "" Then 
 					If DrawButton(x+530*MenuScale, y + 520*MenuScale, 50*MenuScale, 55*MenuScale, ">") Then
@@ -425,7 +425,7 @@ Function UpdateMainMenu()
 				
 				AAText(x+(width/2.0),y+546*MenuScale,GetLocalString("Menu", "page")+" "+Int(Max((CurrLoadGamePage+1),1))+"/"+Int(Max((Int(Ceil(Float(SaveGameAmount)/6.0))),1)),True,True)
 				
-				AASetFont I_Opt\Fonts[1]
+				AASetFont 1
 				
 				If CurrLoadGamePage > Ceil(Float(SaveGameAmount)/6.0)-1 Then
 					CurrLoadGamePage = CurrLoadGamePage - 1
@@ -551,7 +551,7 @@ Function UpdateMainMenu()
 				height = 70 * MenuScale
 				
 				Color(255, 255, 255)
-				AASetFont I_Opt\Fonts[2]
+				AASetFont 2
 				AAText(x + width / 2, y + height / 2, Upper(GetLocalString("Menu", "options")), True, True)
 				
 				x = 160 * MenuScale
@@ -578,7 +578,7 @@ Function UpdateMainMenu()
 				If DrawButton(x+300*MenuScale,y+15*MenuScale,width/5,height/2, GetLocalString("Options", "control"), False) Then MainMenuTab = 6
 				If DrawButton(x+440*MenuScale,y+15*MenuScale,width/5,height/2, GetLocalString("Options", "advanced"), False) Then MainMenuTab = 7
 				
-				AASetFont I_Opt\Fonts[1]
+				AASetFont 1
 				y = y + 70 * MenuScale
 				
 				If MainMenuTab <> 5
@@ -993,7 +993,7 @@ Function UpdateMainMenu()
 						Color 255,255,255
 						AAText(x + 20 * MenuScale, y, GetLocalString("Options", "textantialias"))
 						I_Opt\AATextEnabled% = DrawTick(x + 310 * MenuScale, y + MenuScale, I_Opt\AATextEnabled%)
-						If AATextEnable_Prev% <> I_Opt\AATextEnabled
+						If I_Opt\AATextEnabled_Prev <> I_Opt\AATextEnabled
 							For font.AAFont = Each AAFont
 								FreeFont font\lowResFont%
 								If (Not I_Opt\AATextEnabled)
@@ -1077,14 +1077,14 @@ Function UpdateMainMenu()
 	EndIf
 	
 	Color 255,255,255
-	AASetFont I_Opt\Fonts[0]
+	AASetFont 0
 	AAText 20,I_Opt\GraphicHeight-30,"v"+VersionNumber
 	
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
 	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 End Function
 
 Const L_WIDTH = 640
@@ -1405,7 +1405,7 @@ Function DrawLoading(percent%, shortloading=False)
 				EndIf
 			EndIf
 			
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			strtemp$ = ""
 			temp = Rand(2,9)
 			For i = 0 To temp
@@ -1456,20 +1456,20 @@ Function DrawLoading(percent%, shortloading=False)
 			For i = 0 To Rand(10,15);temp
 				strtemp$ = Replace(SelectedLoadingScreen\txt[0],Mid(SelectedLoadingScreen\txt[0],Rand(1,Len(strtemp)-1),1),Chr(Rand(130,250)))
 			Next		
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 			RowText(strtemp, I_Opt\GraphicWidth / 2-200, I_Opt\GraphicHeight / 2 +120,400,300,True)		
 		Else
 			
 			Color 0,0,0
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(I_Opt\GraphicWidth / 2 + 1, I_Opt\GraphicHeight / 2 + 80 + 1, SelectedLoadingScreen\title, True, True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 			RowText(SelectedLoadingScreen\txt[LoadingScreenText], I_Opt\GraphicWidth / 2-200+1, I_Opt\GraphicHeight / 2 +120+1,400,300,True)
 			
 			Color 255,255,255
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(I_Opt\GraphicWidth / 2, I_Opt\GraphicHeight / 2 +80, SelectedLoadingScreen\title, True, True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 			RowText(SelectedLoadingScreen\txt[LoadingScreenText], I_Opt\GraphicWidth / 2-200, I_Opt\GraphicHeight / 2 +120,400,300,True)
 			
 		EndIf
@@ -1618,7 +1618,7 @@ Function DrawButton%(x%, y%, width%, height%, txt$, bigfont% = True, waitForMous
 	
 	Color (255, 255, 255)
 	If usingAA Then
-		If bigfont Then AASetFont I_Opt\Fonts[2] Else AASetFont I_Opt\Fonts[1]
+		If bigfont Then AASetFont 2 Else AASetFont 1
 		AAText(x + width / 2, y + height / 2, txt, True, True)
 	Else
 		If bigfont Then SetFont I_Opt\Fonts[2] Else SetFont I_Opt\Fonts[1]
@@ -1929,7 +1929,7 @@ Function DrawTooltip(message$)
 	Rect(ScaledMouseX(I_Opt)+20,ScaledMouseY(I_Opt),width,19*scale,True)
 	Color 150,150,150
 	Rect(ScaledMouseX(I_Opt)+20,ScaledMouseY(I_Opt),width,19*scale,False)
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	AAText(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(12*MenuScale), message$, True, True)
 End Function
 
@@ -1948,7 +1948,7 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 	Local R% = 0, G% = 0, B% = 0
 	Local usetestimg% = False, extraspace% = 0
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	Color 255,255,255
 	Select option
 		;Graphic options

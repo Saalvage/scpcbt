@@ -125,7 +125,7 @@ End Function
 
 Function SetTemplateTexture(template, path$, mode = 0, blend = 1)
 tmp.Template = Object.Template(template)
-tmp\tex = LoadTexture(path$, mode)
+tmp\tex = LoadTexture_Strict(path$, mode)
 TextureBlend tmp\tex, blend
 End Function
 

@@ -42,6 +42,8 @@ Function SaveGame(file$)
 	
 	WriteString f, I_Loc\Lang
 	
+	WriteByte f, InvertMouseComplete
+	
 	WriteFloat f, BlinkTimer
 	WriteFloat f, BlinkEffect
 	WriteFloat f, BlinkEffectTimer
@@ -507,6 +509,8 @@ Function LoadGame(file$)
 	version = strtemp
 	
 	If I_Loc\Lang <> ReadString(f) Then RuntimeError("Savegame has different localization, couldn't load")
+	
+	InvertMouseComplete = ReadByte(f)
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
@@ -1311,6 +1315,8 @@ Function LoadGameQuick(file$)
 	version = strtemp
 	
 	If I_Loc\Lang <> ReadString(f) Then RuntimeError("Savegame has different localization, couldn't load")
+	
+	InvertMouseComplete = ReadByte(f)
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	

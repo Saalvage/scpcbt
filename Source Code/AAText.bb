@@ -1,5 +1,5 @@
 Global AASelectedFont%
-Global AATextCam%,AATextSprite%[149]
+Global AATextCam%,AATextSprite%[255]
 Global AACharW%,AACharH%
 
 Global AACamViewW%,AACamViewH%
@@ -105,7 +105,7 @@ Function AASetFont(fnt%)
 
 	Local I_Opt.Options = First Options
 
-	AASelectedFont = fnt
+	AASelectedFont = I_Opt\Fonts[fnt]
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	If I_Opt\AATextEnabled And font\isAA Then
 		For i%=0 To 149
@@ -148,14 +148,13 @@ Function AAStringHeight%(txt$)
 End Function
 
 Function AAText(x%,y%,txt$,cx%=False,cy%=False,a#=1.0)
+	If Len(txt)=0 Then Return
 
 	Local I_Opt.Options = First Options
 	
-	If Len(txt)=0 Then Return
 	Local font.AAFont = Object.AAFont(AASelectedFont)
 	
-	DebugLog "t" + I_Opt\AATextEnabled
-	DebugLog "lll" + font\isAA ;font is sometimes null
+	DebugLog "t" + txt
 	
 	If (GraphicsBuffer()<>BackBuffer()) Lor (Not I_Opt\AATextEnabled) Lor (Not font\isAA) Then
 		SetFont font\lowResFont

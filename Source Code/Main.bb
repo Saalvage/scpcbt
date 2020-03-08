@@ -179,7 +179,9 @@ Function ReloadFonts(I_Opt.Options)
 	I_Opt\Fonts[2] = LoadLocalFont(True, "Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 	I_Opt\Fonts[3] = LoadLocalFont(True, "Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
 	I_Opt\Fonts[4] = LoadLocalFont(True, "Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[4] = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[5] = LoadLocalFont(True, "Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+	
+	AASetFont(1)
 End Function
 
 Type LauncherOptions
@@ -343,7 +345,7 @@ PlayStartupVideos()
 ;---------------------------------------------------------------------------------------------------------------------
 
 ReloadFonts(I_Opt)
-AASetFont I_Opt\Fonts[2]
+AASetFont 2
 
 Global CursorIMG% = LoadImage_Strict("GFX\cursor.png")
 
@@ -415,6 +417,7 @@ Global PlayerZone%, PlayerRoom.Rooms, CurrentZone% = 0
 Global GrabbedEntity%
 
 Global InvertMouse% = GetINIInt(OptionFile, "options", "invert mouse y")
+Global InvertMouseComplete%
 Global MouseHit1%, MouseDown1%, MouseHit2%, DoubleClick%, LastMouseHit1%, MouseUp1%
 
 Global CoffinDistance# = 100.0
@@ -2049,7 +2052,7 @@ Repeat
 			EndIf
 		EndIf
 		
-		If InfiniteStamina% Then Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
+		If InfiniteStamina% Then Stamina = 100
 		
 		If FPSfactor=0
 			UpdateWorld(0)
@@ -2120,7 +2123,11 @@ Repeat
 				
 				BlinkTimer = BlinkTimer - FPSfactor
 			Else
-				BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
+				If Wearing178 > 0
+					BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect / (Wearing178+1)
+				Else
+					BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
+				EndIf
 				If EyeIrritation > 0 Then BlinkTimer=BlinkTimer-Min(EyeIrritation / 100.0 + 1.0, 4.0) * FPSfactor
 				
 				darkA = Max(darkA, 0.0)
@@ -2342,7 +2349,7 @@ Repeat
 		EndIf
 		
 		Color 255, 255, 255
-		If I_Opt\ShowFPS Then AASetFont I_Opt\Fonts[0] : AAText 20, 20, "FPS: " + FPS : AASetFont I_Opt\Fonts[1]
+		If I_Opt\ShowFPS Then AASetFont 0 : AAText 20, 20, "FPS: " + FPS : AASetFont 1
 		
 		If QuickLoad_CurrEvent <> Null
 			QuickLoadEvents()
@@ -2809,9 +2816,9 @@ Function DrawEnding()
 				DrawImage PauseMenuIMG, x, y
 				
 				Color(255, 255, 255)
-				AASetFont I_Opt\Fonts[2]
+				AASetFont 2
 				AAText(x + width / 2 + 40*MenuScale, y + 20*MenuScale, GetLocalString("Menu", "end"), True)
-				AASetFont I_Opt\Fonts[1]
+				AASetFont 1
 				
 				If AchievementsMenu=0 Then 
 					x = x+132*MenuScale
@@ -2885,7 +2892,7 @@ Function DrawEnding()
 	
 	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 End Function
 
 Type CreditsLine
@@ -3433,14 +3440,19 @@ Function MouseLook()
 			EndIf
 		EndIf
 		If InvertMouse Then
-			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
+			mouse_y_speed_1# = CurveValue(-MouseYSpeed() * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth)
 		Else
-			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth) 
+			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth)
 		EndIf
 		If Int(mouse_y_speed_1) = Int(Nan1) Then mouse_y_speed_1 = 0
 		
 		Local the_yaw# = ((mouse_x_speed_1#)) * mouselook_x_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
 		Local the_pitch# = ((mouse_y_speed_1#)) * mouselook_y_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
+		
+		If InvertMouseComplete Then
+			the_yaw = -the_yaw
+			the_pitch = -the_pitch
+		EndIf
 		
 		TurnEntity Collider, 0.0, -the_yaw#, 0.0 ; Turn the user on the Y (yaw) axis.
 		user_camera_pitch# = user_camera_pitch# + the_pitch#
@@ -3575,7 +3587,7 @@ Function MouseLook()
 		Next
 	EndIf
 	
-	If (canSpawn178=1) Lor (Wearing178=1) Then
+	If (canSpawn178=1) Lor (Wearing178<>0) Then
 		tempint%=0
 		For n.NPCs = Each NPCs
 			If (n\NPCtype = NPCtype178) Then
@@ -3590,7 +3602,7 @@ Function MouseLook()
 			For w.WayPoints = Each WayPoints
 				Local dist#
 				dist=EntityDistance(Collider,w\obj)
-				If (dist<HideDistance*1.5) And (dist>1.2) And (w\door = Null) And (Rand(0,1)=1) Then
+				If (dist<HideDistance*1.5) And (dist>1.2) And (w\door = Null) And (Rand(Wearing178=2,1)=1) Then
 					tempint2=True
 					For n.NPCs = Each NPCs
 						If n\NPCtype=NPCtype178 Then
@@ -3696,6 +3708,12 @@ Function MouseLook()
 End Function
 
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
+
+Const INVENTORY_GFX_SIZE = 70
+Const INVENTORY_GFX_SPACING = 35
+
+Const NAV_WIDTH = 287
+Const NAV_HEIGHT = 256
 
 Function DrawGUI()
 	;CatchErrors("DrawGUI")
@@ -3837,13 +3855,14 @@ Function DrawGUI()
 	
 	If HUDenabled And SelectedDifficulty\otherFactors <> EXTREME Then 
 		
-		Local width% = 204, height% = 20
+		;width = 204
+		;height = 20
 		x% = 80
 		y% = I_Opt\GraphicHeight - 95
 		
 		Color 255, 255, 255	
-		Rect (x, y, width, height, False)
-		For i = 1 To Int(((width - 2) * (BlinkTimer / (BLINKFREQ))) / 10)
+		Rect (x, y, 204, 20, False)
+		For i = 1 To Int(((204 - 2) * (BlinkTimer / (BLINKFREQ))) / 10)
 			DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
 		Next	
 		Color 0, 0, 0
@@ -3861,8 +3880,8 @@ Function DrawGUI()
 		
 		y = I_Opt\GraphicHeight - 55
 		Color 255, 255, 255
-		Rect (x, y, width, height, False)
-		For i = 1 To Int(((width - 2) * (Stamina / 100.0)) / 10)
+		Rect (x, y, 204, 20, False)
+		For i = 1 To Int(((204 - 2) * (Stamina / 100.0)) / 10)
 			DrawImage(StaminaMeterIMG, x + 3 + 10 * (i - 1), y + 3)
 		Next	
 		
@@ -3879,7 +3898,7 @@ Function DrawGUI()
 		
 		If DebugHUD Then
 			Color 255, 255, 255
-			AASetFont I_Opt\Fonts[0]
+			AASetFont 0
 			
 			;Text x + 250, 50, "Zone: " + (EntityZ(Collider)/8.0)
 			AAText x - 50, 50, "Player Position: (" + f2s(EntityX(Collider), 3) + ", " + f2s(EntityY(Collider), 3) + ", " + f2s(EntityZ(Collider), 3) + ")"
@@ -3954,7 +3973,7 @@ Function DrawGUI()
 				AAText x + 350, 350, "Current monitor: NULL"
 			EndIf
 			
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 		EndIf
 		
 	EndIf
@@ -3993,7 +4012,7 @@ Function DrawGUI()
 			x = I_Opt\GraphicWidth/2-ImageWidth(KeypadHUD)*scale/2
 			y = I_Opt\GraphicHeight/2-ImageHeight(KeypadHUD)*scale/2		
 			
-			AASetFont I_Opt\Fonts[3]
+			AASetFont 3
 			If KeypadMSG <> "" Then 
 				KeypadTimer = KeypadTimer-FPSfactor2
 				
@@ -4005,7 +4024,7 @@ Function DrawGUI()
 				EndIf
 			Else
 				AAText I_Opt\GraphicWidth/2, y+70*scale, "ACCESS CODE: ",True,True	
-				AASetFont I_Opt\Fonts[4]
+				AASetFont 4
 				AAText I_Opt\GraphicWidth/2, y+124*scale, KeypadInput,True,True	
 			EndIf
 			
@@ -4107,7 +4126,6 @@ Function DrawGUI()
 		EndIf
 	EndIf
 	
-	Local spacing%
 	Local PrevOtherOpen.Items
 	
 	Local OtherSize%,OtherAmount%
@@ -4152,18 +4170,16 @@ Function DrawGUI()
 		SelectedDoor = Null
 		Local tempX% = 0
 		
-		width = 70
-		height = 70
-		spacing% = 35
+		x = I_Opt\GraphicWidth / 2 - (INVENTORY_GFX_SIZE * 10 /2 + INVENTORY_GFX_SPACING * (10 / 2 - 1)) / 2
+		y = I_Opt\GraphicHeight / 2 - INVENTORY_GFX_SIZE * (Float(OtherSize) / 10 * 2 - 1) - INVENTORY_GFX_SPACING
 		
-		x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
-		y = I_Opt\GraphicHeight / 2 - (height * OtherSize /5 + spacing * (OtherSize / 5 - 1)) / 2;height
+		CreateConsoleMsg OtherSize / 10 * 2 - 1
 		
 		ItemAmount = 0
 		For  n% = 0 To OtherSize - 1
 			isMouseOn% = False
-			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + width Then
-				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + height Then
+			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + INVENTORY_GFX_SIZE Then
+				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + INVENTORY_GFX_SIZE Then
 					isMouseOn = True
 				EndIf
 			EndIf
@@ -4171,21 +4187,21 @@ Function DrawGUI()
 			If isMouseOn Then
 				MouseSlot = n
 				Color 255, 0, 0
-				Rect(x - 1, y - 1, width + 2, height + 2)
+				Rect(x - 1, y - 1, INVENTORY_GFX_SIZE + 2, INVENTORY_GFX_SIZE + 2)
 			EndIf
 			
-			DrawFrame(x, y, width, height, (x Mod 64), (x Mod 64))
+			DrawFrame(x, y, INVENTORY_GFX_SIZE, INVENTORY_GFX_SIZE, (x Mod 64), (x Mod 64))
 			
 			If OtherOpen = Null Then Exit
 			
 			If OtherOpen\SecondInv[n] <> Null Then
-				If (SelectedItem <> OtherOpen\SecondInv[n] Lor isMouseOn) Then DrawImage(OtherOpen\SecondInv[n]\invimg, x + width / 2 - 32, y + height / 2 - 32)
+				If (SelectedItem <> OtherOpen\SecondInv[n] Lor isMouseOn) Then DrawImage(OtherOpen\SecondInv[n]\invimg, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
 			EndIf
 			DebugLog "otheropen: "+(OtherOpen<>Null)
 			If OtherOpen\SecondInv[n] <> Null And SelectedItem <> OtherOpen\SecondInv[n] Then
 				If isMouseOn Then
 					Color 255, 255, 255	
-					AAText(x + width / 2, y + height + spacing - 15, OtherOpen\SecondInv[n]\itemtemplate\localname, True)				
+					AAText(x + INVENTORY_GFX_SIZE / 2, y + INVENTORY_GFX_SIZE + INVENTORY_GFX_SPACING - 15, OtherOpen\SecondInv[n]\itemtemplate\localname, True)				
 					If SelectedItem = Null Then
 						If MouseHit1 Then
 							SelectedItem = OtherOpen\SecondInv[n]
@@ -4216,12 +4232,12 @@ Function DrawGUI()
 				
 			EndIf					
 			
-			x=x+width + spacing
+			x=x+INVENTORY_GFX_SIZE + INVENTORY_GFX_SPACING
 			tempX=tempX + 1
 			If tempX = 5 Then 
 				tempX=0
-				y = y + height*2 
-				x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
+				y = y + INVENTORY_GFX_SIZE*2 
+				x = I_Opt\GraphicWidth / 2 - (INVENTORY_GFX_SIZE * 10 /2 + INVENTORY_GFX_SPACING * (10 / 2 - 1)) / 2
 			EndIf
 		Next
 		
@@ -4241,7 +4257,7 @@ Function DrawGUI()
 					RotateEntity(SelectedItem\collider, EntityPitch(Camera), EntityYaw(Camera), 0)
 					MoveEntity(SelectedItem\collider, 0, -0.1, 0.1)
 					RotateEntity(SelectedItem\collider, 0, Rand(360), 0)
-					ResetEntity (SelectedItem\collider)
+					ResetEntity(SelectedItem\collider)
 					;move the item so that it doesn't overlap with other items
 					;For it.Items = Each Items
 					;	If it <> SelectedItem And it\Picked = False Then
@@ -4350,23 +4366,19 @@ Function DrawGUI()
 		
 		SelectedDoor = Null
 		
-		width% = 70
-		height% = 70
-		spacing% = 35
-		
-		x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
-		y = I_Opt\GraphicHeight / 2 - height - spacing
+		x = I_Opt\GraphicWidth / 2 - (INVENTORY_GFX_SIZE * MaxItemAmount /2 + INVENTORY_GFX_SPACING * (MaxItemAmount / 2 - 1)) / 2
+		y = I_Opt\GraphicHeight / 2 - INVENTORY_GFX_SIZE - INVENTORY_GFX_SPACING
 		
 		If MaxItemAmount < 3 Then
-			y = y + height
-			x = x - (width * MaxItemAmount /2 + spacing) / 2
+			y = y + INVENTORY_GFX_SIZE
+			x = x - (INVENTORY_GFX_SIZE * MaxItemAmount /2 + INVENTORY_GFX_SPACING) / 2
 		EndIf
 		
 		ItemAmount = 0
 		For  n% = 0 To MaxItemAmount - 1
 			isMouseOn% = False
-			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + width Then
-				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + height Then
+			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + INVENTORY_GFX_SIZE Then
+				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + INVENTORY_GFX_SIZE Then
 					isMouseOn = True
 				EndIf
 			EndIf
@@ -4374,27 +4386,27 @@ Function DrawGUI()
 			If Inventory(n) <> Null Then
 				Color 200, 200, 200
 				If Inventory(n)\Picked = 2 Then
-					Rect(x - 3, y - 3, width + 6, height + 6)
+					Rect(x - 3, y - 3, INVENTORY_GFX_SIZE + 6, INVENTORY_GFX_SIZE + 6)
 				EndIf
 			EndIf
 			
 			If isMouseOn Then
 				MouseSlot = n
 				Color 255, 0, 0
-				Rect(x - 1, y - 1, width + 2, height + 2)
+				Rect(x - 1, y - 1, INVENTORY_GFX_SIZE + 2, INVENTORY_GFX_SIZE + 2)
 			EndIf
 			
 			Color 255, 255, 255
-			DrawFrame(x, y, width, height, (x Mod 64), (x Mod 64))
+			DrawFrame(x, y, INVENTORY_GFX_SIZE, INVENTORY_GFX_SIZE, (x Mod 64), (x Mod 64))
 			
 			If Inventory(n) <> Null Then
 				If (isMouseOn Lor SelectedItem <> Inventory(n)) Then 
-					DrawImage(Inventory(n)\invimg, x + width / 2 - 32, y + height / 2 - 32)
+					DrawImage(Inventory(n)\invimg, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
 				EndIf
 			EndIf
 			
 			If Inventory(n) <> Null And SelectedItem <> Inventory(n) Then
-				;drawimage(Inventory(n).InvIMG, x + width / 2 - 32, y + height / 2 - 32)
+				;drawimage(Inventory(n).InvIMG, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
 				If isMouseOn Then
 					If SelectedItem = Null Then
 						If MouseHit1 Then
@@ -4415,11 +4427,11 @@ Function DrawGUI()
 							
 						EndIf
 						
-						AASetFont I_Opt\Fonts[1]
+						AASetFont 1
 						Color 0,0,0
-						AAText(x + width / 2 + 1, y + height + spacing - 15 + 1, Inventory(n)\localname, True)							
+						AAText(x + INVENTORY_GFX_SIZE / 2 + 1, y + INVENTORY_GFX_SIZE + INVENTORY_GFX_SPACING - 15 + 1, Inventory(n)\localname, True)							
 						Color 255, 255, 255	
-						AAText(x + width / 2, y + height + spacing - 15, Inventory(n)\localname, True)	
+						AAText(x + INVENTORY_GFX_SIZE / 2, y + INVENTORY_GFX_SIZE + INVENTORY_GFX_SPACING - 15, Inventory(n)\localname, True)	
 						
 					EndIf
 				EndIf
@@ -4435,10 +4447,10 @@ Function DrawGUI()
 				
 			EndIf					
 			
-			x=x+width + spacing
+			x=x+INVENTORY_GFX_SIZE + INVENTORY_GFX_SPACING
 			If MaxItemAmount > 3 And n = MaxItemAmount/2 - 1 Then 
-				y = y + height*2 
-				x = I_Opt\GraphicWidth / 2 - (width * MaxItemAmount /2 + spacing * (MaxItemAmount / 2 - 1)) / 2
+				y = y + INVENTORY_GFX_SIZE*2 
+				x = I_Opt\GraphicWidth / 2 - (INVENTORY_GFX_SIZE * MaxItemAmount /2 + INVENTORY_GFX_SPACING * (MaxItemAmount / 2 - 1)) / 2
 			EndIf
 		Next
 		
@@ -4828,12 +4840,12 @@ Function DrawGUI()
 							
 							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 							
-							width% = 300
-							height% = 20
-							x% = I_Opt\GraphicWidth / 2 - width / 2
+							;width = 300
+							;height = 20
+							x% = I_Opt\GraphicWidth / 2 - 300 / 2
 							y% = I_Opt\GraphicHeight / 2 + 80
-							Rect(x, y, width+4, height, False)
-							For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+							Rect(x, y, 300+4, 20, False)
+							For  i% = 1 To Int((300 - 2) * (SelectedItem\state / 100.0) / 10)
 								DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
 							Next
 							
@@ -4880,7 +4892,7 @@ Function DrawGUI()
 												I_Cheats\SuperMan = True
 												Msg = GetLocalString("Messagse", "faidwoo")
 											Case 2
-												InvertMouse = (Not InvertMouse)
+												InvertMouseComplete = (Not InvertMouseComplete)
 												Msg = GetLocalString("Messagse", "faidturn")
 											Case 3
 												BlurTimer = 5000
@@ -4957,7 +4969,7 @@ Function DrawGUI()
 								
 								SetBuffer ImageBuffer(SelectedItem\itemtemplate\img)
 								Color 37,45,137
-								AASetFont I_Opt\Fonts[5]
+								AASetFont 5
 								temp = ((Int(AccessCode)*3) Mod 10000)
 								If temp < 1000 Then temp = temp+1000
 								AAText 383*MenuScale, 734*MenuScale, temp, True, True
@@ -5393,7 +5405,7 @@ Function DrawGUI()
 								Next
 							EndIf	
 							
-							AASetFont I_Opt\Fonts[3]
+							AASetFont 3
 							AAText(x+60, y, "CHN")						
 							
 							If SelectedItem\itemtemplate\tempname = "veryfineradio" Then ;"KOODIKANAVA"
@@ -5420,7 +5432,7 @@ Function DrawGUI()
 									strtemp = strtemp + Chr(Rand(1,100))
 								Next
 								
-								AASetFont I_Opt\Fonts[4]
+								AASetFont 4
 								AAText(x+97, y+16, Rand(0,9),True,True)
 								
 							Else
@@ -5436,17 +5448,17 @@ Function DrawGUI()
 									EndIf
 								Next
 								
-								AASetFont I_Opt\Fonts[4]
+								AASetFont 4
 								AAText(x+97, y+16, Int(SelectedItem\state2+1),True,True)
 							EndIf
 							
-							AASetFont I_Opt\Fonts[3]
+							AASetFont 3
 							If strtemp <> "" Then
 								strtemp = Right(Left(strtemp, (Int(MilliSecs()/300) Mod Len(strtemp))),10)
 								AAText(x+32, y+33, strtemp)
 							EndIf
 							
-							AASetFont I_Opt\Fonts[1]
+							AASetFont 1
 							
 						EndIf
 						
@@ -5499,17 +5511,16 @@ Function DrawGUI()
 						RemoveItem(SelectedItem)
 					EndIf
 					
-				Case "scp178"
-					
+				Case "scp178"		
 					If SelectedItem\Picked = 2 Then
 						Msg = GetLocalString("Messages", "178remove")
 						Msg = "You removed the glasses."
 						Wearing178 = 0
 						SelectedItem\Picked = 1
-					ElseIf Wearing178 = False
+					ElseIf Wearing178 = 0
 						GiveAchievement(Achv178)
 						Msg = GetLocalString("Messages", "178puton")
-						Wearing178 = 1
+						Wearing178 = SelectedItem\State + 1
 						SelectedItem\Picked = 2
 					Else
 						Msg = GetLocalString("Messages", "178double")
@@ -5541,12 +5552,12 @@ Function DrawGUI()
 						
 						DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 						
-						width% = 300
-						height% = 20
-						x% = I_Opt\GraphicWidth / 2 - width / 2
+						;width = 300
+						;height = 20
+						x% = I_Opt\GraphicWidth / 2 - 300 / 2
 						y% = I_Opt\GraphicHeight / 2 + 80
-						Rect(x, y, width+4, height, False)
-						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+						Rect(x, y, 300+4, 20, False)
+						For  i% = 1 To Int((300 - 2) * (SelectedItem\state / 100.0) / 10)
 							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
 						Next
 						
@@ -5586,12 +5597,12 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 					
-					width% = 300
-					height% = 20
-					x% = I_Opt\GraphicWidth / 2 - width / 2
+					;width = 300
+					;height = 20
+					x% = I_Opt\GraphicWidth / 2 - 300 / 2
 					y% = I_Opt\GraphicHeight / 2 + 80
-					Rect(x, y, width+4, height, False)
-					For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+					Rect(x, y, 300+4, 20, False)
+					For  i% = 1 To Int((300 - 2) * (SelectedItem\state / 100.0) / 10)
 						DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
 					Next
 					
@@ -5671,14 +5682,12 @@ Function DrawGUI()
 					
 					x = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
 					y = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
-					width = 287
-					height = 256
 					
 					Local PlayerX,PlayerZ
 					
 					DrawImage(SelectedItem\itemtemplate\img, x - ImageWidth(SelectedItem\itemtemplate\img) / 2, y - ImageHeight(SelectedItem\itemtemplate\img) / 2 + 85)
 					
-					AASetFont I_Opt\Fonts[3]
+					AASetFont 3
 					
 					Local NavWorks% = True
 					If PlayerRoom\RoomTemplate\Name$ = "pocketdimension" Lor PlayerRoom\RoomTemplate\Name$ = "dimension1499" Then
@@ -5697,8 +5706,8 @@ Function DrawGUI()
 					If (Not NavWorks) Then
 						If (MilliSecs() Mod 1000) > 300 Then
 							Color(200, 0, 0)
-							AAText(x, y + height / 2 - 80, "ERROR 06", True)
-							AAText(x, y + height / 2 - 60, "LOCATION UNKNOWN", True)						
+							AAText(x, y + NAV_HEIGHT / 2 - 80, "ERROR 06", True)
+							AAText(x, y + NAV_HEIGHT / 2 - 60, "LOCATION UNKNOWN", True)						
 						EndIf
 					Else
 						
@@ -5771,7 +5780,7 @@ Function DrawGUI()
 							EndIf
 							If (MilliSecs() Mod 1000) > 300 Then
 								If SelectedItem\itemtemplate\tempname <> "nav310" And SelectedItem\itemtemplate\tempname <> "navulti" Then
-									AAText(x - width/2 + 10, y - height/2 + 10, "MAP DATABASE OFFLINE")
+									AAText(x - NAV_WIDTH/2 + 10, y - NAV_HEIGHT/2 + 10, "MAP DATABASE OFFLINE")
 								EndIf
 								
 								yawvalue = EntityYaw(Collider)-90
@@ -5792,7 +5801,7 @@ Function DrawGUI()
 									If dist < 8.0 * 4 Then
 										Color 100, 0, 0
 										Oval(x - dist * 3, y - 7 - dist * 3, dist * 3 * 2, dist * 3 * 2, False)
-										AAText(x - width / 2 + 10, y - height / 2 + 30, "SCP-173")
+										AAText(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30, "SCP-173")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
@@ -5801,7 +5810,7 @@ Function DrawGUI()
 									If dist < 8.0 * 4 Then
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-106")
+										AAText(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-106")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
@@ -5810,7 +5819,7 @@ Function DrawGUI()
 									If dist < 8.0 * 4 Then
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-096")
+										AAText(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-096")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
@@ -5821,7 +5830,7 @@ Function DrawGUI()
 											If (Not np\HideFromNVG) Then
 												Color 100, 0, 0
 												Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-												AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-049")
+												AAText(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-049")
 												SCPs_found% = SCPs_found% + 1
 											EndIf
 										EndIf
@@ -5833,7 +5842,7 @@ Function DrawGUI()
 										dist = Rnd(4.0, 8.0)
 										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
-										AAText(x - width / 2 + 10, y - height / 2 + 30 + (20*SCPs_found), "SCP-895")
+										AAText(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-895")
 									EndIf
 								EndIf
 							EndIf
@@ -5841,15 +5850,15 @@ Function DrawGUI()
 							Color (30,30,30)
 							If SelectedItem\itemtemplate\tempname = "nav" Then Color(100, 0, 0)
 							If SelectedItem\state <= 100 Then
-								xtemp = x - width/2 + 196
-								ytemp = y - height/2 + 10
+								xtemp = x - NAV_WIDTH/2 + 196
+								ytemp = y - NAV_HEIGHT/2 + 10
 								Rect xtemp,ytemp,80,20,False
 								
 								For i = 1 To Ceil(SelectedItem\state / 10.0)
 									DrawImage NavImages(4),xtemp+i*8-6,ytemp+4
 								Next
 								
-								AASetFont I_Opt\Fonts[3]
+								AASetFont 3
 							EndIf
 						EndIf
 						
@@ -5870,12 +5879,12 @@ Function DrawGUI()
 						
 						DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 						
-						width% = 300
-						height% = 20
-						x% = I_Opt\GraphicWidth / 2 - width / 2
+						;width = 300
+						;height = 20
+						x% = I_Opt\GraphicWidth / 2 - 300 / 2
 						y% = I_Opt\GraphicHeight / 2 + 80
-						Rect(x, y, width+4, height, False)
-						For  i% = 1 To Int((width - 2) * (SelectedItem\state / 100.0) / 10)
+						Rect(x, y, 300+4, 20, False)
+						For  i% = 1 To Int((300 - 2) * (SelectedItem\state / 100.0) / 10)
 							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
 						Next
 						
@@ -6209,25 +6218,25 @@ Function DrawMenu()
 		EndIf
 		
 		If AchievementsMenu > 0 Then
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(x, y-(122-45)*MenuScale, Upper(GetLocalString("Menu", "ach")),False,True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 		ElseIf OptionsMenu > 0 Then
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(x, y-(122-45)*MenuScale, Upper(GetLocalString("Menu", "options")),False,True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 		ElseIf QuitMSG > 0 Then
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(x, y-(122-45)*MenuScale, Upper(GetLocalString("Menu", "quit")) + "?",False,True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 		ElseIf KillTimer >= 0 Then
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(x, y-(122-45)*MenuScale, GetLocalString("Menu", "paused"),False,True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 		Else
-			AASetFont I_Opt\Fonts[2]
+			AASetFont 2
 			AAText(x, y-(122-45)*MenuScale, GetLocalString("Menu", "died"),False,True)
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 		EndIf		
 		
 		Local AchvXIMG% = (x + (22*MenuScale))
@@ -6236,7 +6245,7 @@ Function DrawMenu()
 		Local imgsize% = 64
 		
 		If AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG <= 0
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 			AAText x, y, GetLocalString("Menu", "difficulty")+": "+SelectedDifficulty\name
 			AAText x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+CurrSave
 			AAText x, y+40*MenuScale, GetLocalString("Menu", "seed")+": "+RandomSeed
@@ -6276,7 +6285,7 @@ Function DrawMenu()
 			Color 255,255,255
 			Select OptionsMenu
 				Case 1 ;Graphics
-					AASetFont I_Opt\Fonts[1]
+					AASetFont 1
 
 					y=y+50*MenuScale
 					
@@ -6380,7 +6389,7 @@ Function DrawMenu()
 					CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan(Float(FOV)/2)*RealGraphicWidth/RealGraphicHeight))/2.0))					
 
 				Case 2 ;Audio
-					AASetFont I_Opt\Fonts[1]
+					AASetFont 1
 
 					y = y + 50*MenuScale
 					
@@ -6439,7 +6448,7 @@ Function DrawMenu()
 					EndIf
 
 				Case 3 ;Controls
-					AASetFont I_Opt\Fonts[1]
+					AASetFont 1
 
 					y = y + 50*MenuScale
 					
@@ -6530,7 +6539,7 @@ Function DrawMenu()
 					EndIf
 
 				Case 4 ;Advanced
-					AASetFont I_Opt\Fonts[1]
+					AASetFont 1
 					
 					Local PrevFramelimit% = Framelimit
 
@@ -6609,7 +6618,7 @@ Function DrawMenu()
 					Color 255,255,255
 					AAText(x, y, GetLocalString("Options", "textantialias"))
 					I_Opt\AATextEnabled% = DrawTick(x + 270 * MenuScale, y + MenuScale, I_Opt\AATextEnabled%)
-					If AATextEnable_Prev% <> I_Opt\AATextEnabled
+					If I_Opt\AATextEnabled_Prev <> I_Opt\AATextEnabled
 						For font.AAFont = Each AAFont
 							FreeFont font\lowResFont%
 							If (Not I_Opt\AATextEnabled)
@@ -6620,9 +6629,6 @@ Function DrawMenu()
 						Next
 						If (Not I_Opt\AATextEnabled) Then
 							FreeEntity AATextCam
-							;For i%=0 To 149
-							;	FreeEntity AATextSprite[i]
-							;Next
 						EndIf
 						ReloadFonts(I_Opt)
 						;ReloadAAFont()
@@ -6736,7 +6742,7 @@ Function DrawMenu()
 							LoadGameQuick(SavePath + CurrSave + "\")
 							
 							MoveMouse viewport_center_x,viewport_center_y
-							AASetFont I_Opt\Fonts[1]
+							AASetFont 1
 							HidePointer ()
 							
 							FlushKeys()
@@ -6772,7 +6778,7 @@ Function DrawMenu()
 					Else
 						DrawFrame(x,y,390*MenuScale, 60*MenuScale)
 						Color (100, 100, 100)
-						AASetFont I_Opt\Fonts[2]
+						AASetFont 2
 						AAText(x + (390*MenuScale) / 2, y + (60*MenuScale) / 2, GetLocalString("Menu", "loadgame"), True, True)
 					EndIf
 					y = y + 75*MenuScale
@@ -6792,7 +6798,7 @@ Function DrawMenu()
 						LoadGameQuick(SavePath + CurrSave + "\")
 						
 						MoveMouse viewport_center_x,viewport_center_y
-						AASetFont I_Opt\Fonts[1]
+						AASetFont 1
 						HidePointer ()
 						
 						FlushKeys()
@@ -6847,7 +6853,7 @@ Function DrawMenu()
 				EndIf
 			EndIf
 			
-			AASetFont I_Opt\Fonts[1]
+			AASetFont 1
 			If KillTimer < 0 Then RowText(DeathMSG$, x, y + 80*MenuScale, 390*MenuScale, 600*MenuScale)
 		EndIf
 
@@ -6855,7 +6861,7 @@ Function DrawMenu()
 		
 	EndIf
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	
 	;CatchErrors("Uncaught DrawMenu")
 End Function
@@ -7554,7 +7560,7 @@ Function InitNewGame(I_Opt.Options)
 	
 	MoveMouse viewport_center_x,viewport_center_y;320, 240
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	
 	HidePointer()
 	
@@ -7615,7 +7621,7 @@ Function InitLoadGame(I_Opt.Options)
 	
 	MoveMouse viewport_center_x,viewport_center_y
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	
 	HidePointer()
 	
@@ -7723,6 +7729,8 @@ Function NullGame(playbuttonsfx%=True)
 	For itt.ItemTemplates = Each ItemTemplates
 		itt\found = False
 	Next
+	
+	InvertMouseComplete = 0
 	
 	DropSpeed = 0
 	Shake = 0
@@ -9663,7 +9671,7 @@ Function RenderWorld2()
 			
 			Color 255,255,255
 			
-			AASetFont I_Opt\Fonts[3]
+			AASetFont 3
 			
 			Local plusY% = 0
 			If hasBattery=1 Then plusY% = 40
@@ -9738,7 +9746,7 @@ Function RenderWorld2()
 		EndIf
 		If hasBattery = 1 And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
-			AASetFont I_Opt\Fonts[3]
+			AASetFont 3
 			
 			AAText I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "nvglowbat"),True,False
 			Color 255,255,255

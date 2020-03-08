@@ -219,13 +219,15 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 			If temp1i<>0 Then
 				temp1s=ReadString(f)
 				tex[j]=GetTextureFromCache(temp1s)
-				If tex[j]=0 Then ;texture is not in cache
+				If tex[j]=0 And temp1s <> "" Then ;texture is not in cache
 					Select True
 						Case temp1i<3
-							tex[j]=LoadTexture(file+temp1s,1)
+							tex[j]=LoadTexture_Strict(file+temp1s,1)
 						Default
-							tex[j]=LoadTexture(file+temp1s,3)
+							tex[j]=LoadTexture_Strict(file+temp1s,3)
 					End Select
+					
+					CreateConsoleMsg (temp1s)
 					
 					If tex[j]<>0 Then
 						If temp1i=1 Then TextureBlend tex[j],5
@@ -362,13 +364,14 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				If temp1i<>0 Then
 					temp1s=ReadString(f)
 					tex[j]=GetTextureFromCache(temp1s)
-					If tex[j]=0 Then ;texture is not in cache
+					If tex[j]=0 And temp1s <> "" Then ;texture is not in cache
 						Select True
 							Case temp1i<3
-								tex[j]=LoadTexture(file+temp1s,1)
+								tex[j]=LoadTexture_Strict(file+temp1s,1)
 							Default
-								tex[j]=LoadTexture(file+temp1s,3)
+								tex[j]=LoadTexture_Strict(file+temp1s,3)
 						End Select
+						CreateConsoleMsg (temp1s)
 						
 						If tex[j]<>0 Then
 							If temp1i=1 Then TextureBlend tex[j],5
@@ -3539,19 +3542,18 @@ Function FillRoom(r.Rooms)
 			EntityParent de\obj, r\obj
 
 		Case "endroom"
-
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x, r\y, r\z + 1136 * RoomScale, 0, r, False, True, 6)
 			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
 			FreeEntity r\RoomDoors[0]\buttons[0] : r\RoomDoors[0]\buttons[0]=0
 			FreeEntity r\RoomDoors[0]\buttons[1] : r\RoomDoors[0]\buttons[1]=0
-
-		Case "endroomc"
-
-			d = CreateDoor(r\zone, r\x+1024*RoomScale, r\y, r\z, 0, r, False, 2, False, "")
-			d\open = False : d\AutoClose = False : d\locked = True
+			
+		Case "endroom3"
+			r\RoomDoors[0] = CreateDoor(r\zone, r\x, r\y, r\z + 1264 * RoomScale, 0, r, False, True, 6)
+			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
+			FreeEntity r\RoomDoors[0]\buttons[0] : r\RoomDoors[0]\buttons[0]=0
+			FreeEntity r\RoomDoors[0]\buttons[1] : r\RoomDoors[0]\buttons[1]=0
 
 		Case "room895"
-
 			d = CreateDoor(r\zone, r\x, r\y, r\z - 448.0 * RoomScale, 0, r, False, True, 2)
 			d\AutoClose = False : d\open = False
 			PositionEntity(d\buttons[0], r\x - 384.0 * RoomScale, r\y + 0.7, r\z - 280.0 * RoomScale, True)
@@ -3607,7 +3609,6 @@ Function FillRoom(r.Rooms)
 			;EntityParent de\obj, r\obj
 
 		Case "room2tesla","room2tesla_lcz","room2tesla_hcz"
-
 			r\Objects[0] = CreatePivot()
 			PositionEntity(r\Objects[0], r\x - 114.0 * RoomScale, r\y, r\z)
 			EntityParent(r\Objects[0], r\obj)
@@ -4419,7 +4420,6 @@ Function FillRoom(r.Rooms)
 			EndIf
 
 		Case "room3gw"
-			
 			d = CreateDoor(r\zone, r\x - 728.0 * RoomScale, r\y, r\z - 458.0 * RoomScale, 0, r, False, False, 3)
 			d\AutoClose = False	: d\open = False  : d\locked = False
 			
@@ -4455,7 +4455,6 @@ Function FillRoom(r.Rooms)
 			EntityPickMode r\Objects[3],2
 			
 		Case "room1162"
-
 			d = CreateDoor(r\zone, r\x + 248.0*RoomScale, r\y, r\z - 736.0*RoomScale, 90, r, False, False, 2)
 			r\Objects[0] = CreatePivot()
 			PositionEntity r\Objects[0],r\x+1012.0*RoomScale,r\y+128.0*RoomScale,r\z-640.0*RoomScale
@@ -4470,7 +4469,6 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 
 		Case "room2scps2"
-
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 288.0*RoomScale, r\y, r\z + 576.0*RoomScale, 90, r, False, False, 3)
 			r\RoomDoors[0]\open = False : r\RoomDoors[0]\locked = True
 			d = CreateDoor(r\zone, r\x + 777.0*RoomScale, r\y, r\z + 671.0*RoomScale, 90, r, False, False, 4)
@@ -6639,10 +6637,10 @@ Function CreateMap()
 			Case 1
 				SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
 				SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
+				SetRoom("room035", ROOM1, Room1Amount[zone], zone)
 				SetRoom("room079", ROOM1, Room1Amount[zone], zone)
 				SetRoom("room106", ROOM1, Room1Amount[zone], zone)
 				SetRoom("room008", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room035", ROOM1, Room1Amount[zone], zone)
 				SetRoom("room895", ROOM1, Room1Amount[zone], zone)
 				
 				SetRoom("room2nuke", ROOM2, Room2Amount[zone], zone)
@@ -7128,14 +7126,14 @@ Function UpdateRoomLights(cam%)
 							ShowEntity r\LightSprites[i]
 							
 							If EntityDistanceSquared(cam%,r\Lights%[i])<72.25 Then ;<8.5
-								If r\LightHidden[i] Then
+								If (Not r\LightHidden[i]) Then
 									ShowEntity r\Lights%[i]
-									r\LightHidden[i] = False
+									r\LightHidden[i] = True
 								EndIf
 							Else
-								If (Not r\LightHidden[i]) Then
+								If r\LightHidden[i] Then
 									HideEntity r\Lights%[i]
-									r\LightHidden[i] = True
+									r\LightHidden[i] = False
 								EndIf
 							EndIf
 							
@@ -7260,9 +7258,9 @@ Function UpdateRoomLights(cam%)
 							ShowEntity r\LightSprites[i]
 						EndIf
 						
-						If (Not r\LightHidden[i]) Then
+						If (r\LightHidden[i]) Then
 							HideEntity r\Lights%[i]
-							r\LightHidden[i] = True
+							r\LightHidden[i] = False
 						EndIf
 						If (Not r\LightSpriteHidden[i]) Then
 							HideEntity r\LightSprites2[i]

@@ -93,24 +93,27 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider, HIT_PLAYER
 			n\Gravity = True
 			
-			n\obj = LoadMesh_Strict("GFX\npcs\173_2.b3d")
+			n\obj = LoadMesh_Strict("GFX\npcs\173body.b3d")
+			n\obj2 = LoadMesh_Strict("GFX\npcs\173head.b3d")
 			
 			;On Halloween set jack-o-latern texture.
 			If (Left(CurrentDate(), 7) = "31 Oct ") Then
 				I_Opt\HalloweenTex = True
 				Local texFestive = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
-				EntityTexture n\obj, texFestive, 0, 0
+				EntityTexture n\obj, texFestive
+				EntityTexture n\obj2, texFestive
 				FreeTexture texFestive
 			EndIf
 			
 			temp# = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "scale") / MeshDepth(n\obj))			
 			ScaleEntity n\obj, temp,temp,temp
+			ScaleEntity n\obj2, temp,temp,temp
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-173", "speed") / 100.0)
 			
-			n\obj2 = LoadMesh_Strict("GFX\173box.b3d")
-			ScaleEntity n\obj2, RoomScale, RoomScale, RoomScale
-			HideEntity n\obj2
+			n\obj3 = LoadMesh_Strict("GFX\npcs\173box.b3d")
+			ScaleEntity n\obj3, RoomScale, RoomScale, RoomScale
+			HideEntity n\obj3
 			
 			n\CollRadius = 0.32
 
@@ -530,7 +533,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			
 			EntityFX n\obj,1
 			
-			temp# = (Rnd(0.85,1.15) * GetINIFloat("DATA\NPCs.ini", "SCP-178", "scale")) / MeshWidth(n\obj)
+			temp# = Rnd(0.6,0.8) / GetINIFloat("DATA\NPCs.ini", "SCP-178", "scale")
 			ScaleEntity n\obj, temp, temp, temp
 			
 			SetAnimTime n\obj,15.0
@@ -748,6 +751,9 @@ Function UpdateNPCs()
 							PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
 							RotateEntity (n\obj, 0, EntityYaw(n\Collider)-180, 0)
 							
+							PositionEntity(n\obj2, EntityX(n\Collider), EntityY(n\Collider) - 0.32, EntityZ(n\Collider))
+							RotateEntity (n\obj2, 0, (EntityYaw(n\Collider)-180)+n\Angle, 0)
+							
 							If n\Idle = False Then
 								Local temp% = False
 								Local move% = True
@@ -873,7 +879,8 @@ Function UpdateNPCs()
 										EndIf
 										
 										;player is not looking and is visible from 173's position -> attack
-										If temp Then 				
+										If temp Then
+											n\Angle = DeltaYaw(n\Collider,Camera)
 											If dist < 0.65 Then
 												If KillTimer >= 0 And ((Not I_Cheats\GodMode)) Then
 													
@@ -906,7 +913,8 @@ Function UpdateNPCs()
 											EndIf
 											
 										Else ;player is not visible -> move to the location where he was last seen							
-											If n\EnemyX <> 0 Then						
+											If n\EnemyX <> 0 Then
+												n\Angle = DeltaYaw(n\Collider,Camera)
 												If DistanceSquared(EntityX(n\Collider), n\EnemyX, EntityZ(n\Collider), n\EnemyZ) > 0.25 Then ;0.5
 													AlignToVector(n\Collider, n\EnemyX-EntityX(n\Collider), 0, n\EnemyZ-EntityZ(n\Collider), 3)
 													MoveEntity(n\Collider, 0, 0, n\Speed * FPSfactor)
@@ -917,7 +925,7 @@ Function UpdateNPCs()
 											Else
 												If Rand(400)=1 Then RotateEntity (n\Collider, 0, Rnd(360), 10)
 												TranslateEntity n\Collider,Cos(EntityYaw(n\Collider)+90.0)*n\Speed*FPSfactor,0.0,Sin(EntityYaw(n\Collider)+90.0)*n\Speed*FPSfactor
-												
+												n\Angle = Rnd(-120,120)
 											EndIf
 										EndIf
 										
@@ -960,10 +968,13 @@ Function UpdateNPCs()
 							PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider) + 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
 							RotateEntity (n\obj, 0, EntityYaw(n\Collider)-180, 0)
 							
-							ShowEntity n\obj2
+							PositionEntity(n\obj2, EntityX(n\Collider), EntityY(n\Collider) + 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
+							RotateEntity (n\obj2, 0, (EntityYaw(n\Collider)-180)+n\Angle, 0)
 							
-							PositionEntity(n\obj2, EntityX(n\Collider), EntityY(n\Collider) - 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
-							RotateEntity (n\obj2, 0, EntityYaw(n\Collider)-180, 0)
+							ShowEntity n\obj3
+							
+							PositionEntity(n\obj3, EntityX(n\Collider), EntityY(n\Collider) - 0.05 + Sin(MilliSecs()*0.08)*0.02, EntityZ(n\Collider))
+							RotateEntity (n\obj3, 0, EntityYaw(n\Collider)-180, 0)
 						EndIf
 					EndIf
 				EndIf
@@ -4077,7 +4088,6 @@ Function UpdateNPCs()
 				;	EndIf
 				;EndIf
 				
-				
 				If n\State3 > 0 Then
 					n\State3 = n\State3-FPSfactor
 					LightVolume = TempLightVolume-TempLightVolume*Min(Max(n\State3/500,0.01),0.6)
@@ -4098,12 +4108,12 @@ Function UpdateNPCs()
 				
 				dist = EntityDistanceSquared(n\Collider,Collider)
 				
-				For nnn.NPCs = Each NPCs
-					If nnn\NPCtype = NPCtype178 Then
-						CreateConsoleMsg(EntityDistance(nnn\Collider, Collider) + "   " + nnn\State3)
-						Exit
-					EndIf
-				Next
+				; For nnn.NPCs = Each NPCs
+					; If nnn\NPCtype = NPCtype178 Then
+						; CreateConsoleMsg(EntityDistance(nnn\Collider, Collider) + "   " + nnn\State2) ;DEBUG CODE
+						; Exit
+					; EndIf
+				; Next
 				
 				If n\Sound > 0 Then
 					temp = 0.5
@@ -4164,17 +4174,17 @@ Function UpdateNPCs()
 					RotateEntity n\Collider,0.0,CurveAngle(angle,EntityYaw(n\Collider),20.0),0.0
 					
 					For n2.NPCs = Each NPCs
-						If (n2\NPCtype=n\NPCtype) And (n<>n2) Then
+						If (n2\NPCtype=NPCtype178) And (n<>n2) Then
 							If n2\State>0.0 Then n\State=1.0
 							If n2\State3>0.0 Then n\State3=1.0
 							;if one of the npcs is hostile, make all of them hostile
 						EndIf
 						If n\State<>0 Then Exit
 					Next
-					If dist<1.0 And EntityInView(n\obj,Camera) Then ;1.0
-						n\State2=n\State2+FPSfactor
-					ElseIf EntityCollided(n\Collider,HIT_PLAYER)=Collider Then
-						n\State2=50.0
+					If dist<0.04 Then ;0.2
+						n\State2=50
+					ElseIf dist<0.36 Then ;0.6
+						n\State2=n\State2+FPSfactor*2
 					Else
 						n\State2=Max(n\State2-FPSfactor,0.0)
 					EndIf
@@ -4192,7 +4202,7 @@ Function UpdateNPCs()
 						Next
 					EndIf
 					
-					If (Wearing178=1) Lor (n\State3>0) Then
+					If (Wearing178<>0) Lor (n\State3>0) Then
 						n\State=Min(n\State+FPSfactor,300.0)
 					Else
 						n\State=Max(n\State-FPSfactor,0.0)

@@ -973,6 +973,7 @@ Function UpdateEvents()
 								
 								PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True), 0.5, EntityZ(e\room\Objects[5], True))
 								ResetEntity(Curr173\Collider)
+								Curr173\angle = 90
 								
 								PositionEntity Collider, PlayerRoom\x-(3072+1024)*RoomScale, 0.3, PlayerRoom\z+192.0*RoomScale
 								ResetEntity Collider
@@ -4622,7 +4623,7 @@ Function UpdateEvents()
 							Case 25
 								e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\obj)+Cos(e\room\angle-90)*760*RoomScale, EntityY(e\room\obj)+0.35, EntityZ(e\room\obj)+Sin(e\room\angle-90)*760*RoomScale)
 								RotateEntity e\room\NPC[0]\Collider, 0, e\room\angle-200, 0, True
-								tex=LoadTexture("GFX\NPCs\corpse.jpg")
+								tex=LoadTexture_Strict("GFX\NPCs\corpse.jpg")
 								e\room\NPC[0]\texture = "GFX\NPCs\corpse.jpg"
 								EntityTexture e\room\NPC[0]\obj, tex
 								FreeTexture tex
@@ -7369,7 +7370,7 @@ Function UpdateEvents()
 										Msg = GetLocalString("Messages", "914coarse")
 										MsgTimer = 70*8
 									Case "1:1"
-										InvertMouse = (Not InvertMouse)
+										InvertMouseComplete = (Not InvertMouseComplete)
 									Case "fine", "very fine"
 										I_Cheats\SuperMan = True
 								End Select

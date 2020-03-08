@@ -325,7 +325,7 @@ Function LoadAnimMesh_Strict(File$,parent=0)
 	Return tmp
 End Function   
 
-;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest 
+;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest ; I fucked around in it, and it works nandy dandy ~ Salvage
 Function LoadTexture_Strict(File$,flags=1)
 	Local I_Loc.Loc = First Loc
 	

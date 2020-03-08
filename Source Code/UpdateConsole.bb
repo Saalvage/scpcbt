@@ -13,7 +13,7 @@ Function UpdateConsole()
 	If ConsoleOpen Then
 		Local cm.ConsoleMsg
 		
-		AASetFont I_Opt\Fonts[0]
+		AASetFont 0
 		
 		ConsoleR = 255 : ConsoleG = 255 : ConsoleB = 255
 		
@@ -1127,6 +1127,6 @@ Function UpdateConsole()
 		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	EndIf
 	
-	AASetFont I_Opt\Fonts[1]
+	AASetFont 1
 	
 End Function

@@ -127,8 +127,10 @@ Function InitItemTemplates()
 	CreateItemTemplate("scp148", "GFX\items\metalpanel.b3d", "GFX\items\INVmetalpanel.jpg", "", RoomScale, 2)
 	CreateItemTemplate("scp148ingot", "GFX\items\scp148.b3d", "GFX\items\INVscp148.jpg", "", RoomScale * 1.5, 2)
 	CreateItemTemplate("scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02, 1, "", "", "", 1)
+							; state1: Refinement: (Coarse -2 (no blinking effect)), (Fine 1 (more SCP-178-1s, better blinking effect))
 	CreateItemTemplate("scp420j", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0005, 2)
 	CreateItemTemplate("cigarette", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2)
+							; state1: Has the player tried to lit the cig?
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "joint")
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "smellyjoint")
 	CreateItemTemplate("scp427", "GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.001, 3)
@@ -137,6 +139,7 @@ Function InitItemTemplates()
 	it = CreateItemTemplate("upgradedpill", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001, 2) : EntityColor it\obj,255,0,75
 	it = CreateItemTemplate("pill", "GFX\items\pill.b3d", "GFX\items\INVpillwhite.jpg", "", 0.0001, 2) : EntityColor it\obj,255,255,255
 	CreateItemTemplate("scp513", "GFX\items\513.b3d", "GFX\items\INV513.jpg", "", 0.1, 2)
+							; state1: ID of the associated 513-1, if it has been spawned
 	CreateItemTemplate("scp714", "GFX\items\scp714.b3d", "GFX\items\INV714.jpg", "", 0.3, 3)
 	CreateItemTemplate("scp860", "GFX\items\key.b3d", "GFX\items\INVkey.jpg", "", 0.001, 3)
 	CreateItemTemplate("scp1025", "GFX\items\scp1025.b3d", "GFX\items\INV1025.jpg", "", 0.1, 0)
@@ -148,6 +151,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("scp1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.023, 2)
 	CreateItemTemplate("super1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.025, 2)
 	CreateItemTemplate("fine1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.024, 2)
+							; state1: Puton progress (0 - 100)
 	
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc008.jpg", 0.003, 0, "d008")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc012.jpg", 0.003, 0, "d012")
@@ -229,6 +233,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("hazmat", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.013, 2)
 	CreateItemTemplate("hazmat2", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.014, 2)
 	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.015, 2)
+						; state1: Puton progress (0 - 100)
 	
 	CreateItemTemplate("badnvg", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.02, 2)
 	CreateItemTemplate("nvg", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02, 2)
@@ -241,11 +246,14 @@ Function InitItemTemplates()
 	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("navulti", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("nav310", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
+						; state1: Battery level (0 - 100)
 	
 	CreateItemTemplate("radio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
 	CreateItemTemplate("fineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
 	CreateItemTemplate("veryfineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
 	CreateItemTemplate("18vradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.02, 1)
+						; state1: Battery level (0 - 100)
+						; state2: Selected track (0 - 5)
 	
 	CreateItemTemplate("bat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008, 1)
 	CreateItemTemplate("18vbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, 1, "", "GFX\items\Battery\Battery 18V.jpg")
@@ -254,6 +262,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("badvest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.018, 2)
 	CreateItemTemplate("vest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.02, 2)
 	CreateItemTemplate("finevest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.022, 2)
+						; state1: Puton progress (0 - 100)
 	CreateItemTemplate("veryfinevest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.025, 2)
 	
 	CreateItemTemplate("cup", "GFX\items\cup.b3d", "GFX\items\INVcup.jpg", "", 0.04, 2)
@@ -263,6 +272,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("finefirstaid", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid.jpg", "", 0.03, 1)
 	CreateItemTemplate("firstaid2", "GFX\items\firstaid.b3d", "GFX\items\INVfirstaid2.jpg", "", 0.03, 1, "", "GFX\items\firstaidkit2.jpg")
 	CreateItemTemplate("veryfinefirstaid", "GFX\items\eyedrops.b3d", "GFX\items\INVbottle.jpg", "", 0.002, 1, "", "GFX\items\bottle.jpg")
+						; state1: Apply progress (0 - 100)
 	
 	CreateItemTemplate("fineeyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
 	CreateItemTemplate("supereyedrops", "GFX\items\eyedrops.b3d", "GFX\items\INVeyedrops.jpg", "", 0.0012, 1, "", "GFX\items\eyedrops.jpg")
@@ -280,6 +290,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
 	CreateItemTemplate("ticket", "GFX\items\key.b3d", "GFX\items\INVticket.jpg", "GFX\items\ticket.png", 0.002, 0, "", "GFX\items\tickettexture.png","",0,1+2+8)
 	CreateItemTemplate("badge", "GFX\items\badge.b3d", "GFX\items\INVoldbadge.jpg", "GFX\items\badge2.png", 0.0001, 1, "oldbadge", "GFX\items\badge2_tex.png","",0,1+2+8)
+						; state1: If the nostalgia item has been viewed yet; if not, play the sound
 	
 	CreateItemTemplate("quarter", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
 	CreateItemTemplate("wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005, 2, "","","",1)
@@ -493,6 +504,33 @@ Function UpdateItems()
 					EndIf
 				EndIf
 				
+				If i\dist<HideDist*0.2 Then
+					For i2.Items = Each Items
+						If i<>i2 And (i2\Picked = 0) And i2\dist<HideDist*0.2 Then
+							
+							xtemp# = (EntityX(i2\collider,True)-EntityX(i\collider,True))
+							ytemp# = (EntityY(i2\collider,True)-EntityY(i\collider,True))
+							ztemp# = (EntityZ(i2\collider,True)-EntityZ(i\collider,True))
+							
+							ed# = (xtemp*xtemp+ztemp*ztemp)
+							
+							If ed<0.07 And Abs(ytemp)<0.25 Then
+								;items are too close together, push away
+								xtemp = xtemp*(0.07-ed)
+								ztemp = ztemp*(0.07-ed)
+								
+								While Abs(xtemp)+Abs(ztemp)<0.001
+									xtemp = xtemp+Rnd(-0.002,0.002)
+									ztemp = ztemp+Rnd(-0.002,0.002)
+								Wend
+								
+								TranslateEntity i2\collider,xtemp,0,ztemp
+								TranslateEntity i\collider,-xtemp,0,-ztemp
+							EndIf
+						EndIf
+					Next
+				EndIf
+				
 				If EntityCollided(i\collider, HIT_MAP) Then
 					i\DropSpeed = 0
 					i\xspeed = 0.0
@@ -514,34 +552,6 @@ Function UpdateItems()
 						i\xspeed = 0.0
 						i\zspeed = 0.0
 					EndIf
-				EndIf
-				
-				If i\dist<HideDist*0.2 Then
-					For i2.Items = Each Items
-						If i<>i2 And (i2\Picked = 0) And i2\dist<HideDist*0.2 Then
-							
-							xtemp# = (EntityX(i2\collider,True)-EntityX(i\collider,True))
-							ytemp# = (EntityY(i2\collider,True)-EntityY(i\collider,True))
-							ztemp# = (EntityZ(i2\collider,True)-EntityZ(i\collider,True))
-							
-							ed# = (xtemp*xtemp+ztemp*ztemp)
-							If ed<0.07 And Abs(ytemp)<0.25 Then
-								;items are too close together, push away
-								If PlayerRoom\RoomTemplate\Name	<> "room2storage" Then
-									xtemp = xtemp*(0.07-ed)
-									ztemp = ztemp*(0.07-ed)
-									
-									While Abs(xtemp)+Abs(ztemp)<0.001
-										xtemp = xtemp+Rnd(-0.002,0.002)
-										ztemp = ztemp+Rnd(-0.002,0.002)
-									Wend
-									
-									TranslateEntity i2\collider,xtemp,0,ztemp
-									TranslateEntity i\collider,-xtemp,0,-ztemp
-								EndIf
-							EndIf
-						EndIf
-					Next
 				EndIf
 				
 				If EntityY(i\collider) < - 35.0 Then DebugLog "remove: " + i\itemtemplate\localname:RemoveItem(i):deletedItem=True
