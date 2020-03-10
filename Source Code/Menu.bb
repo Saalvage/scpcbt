@@ -1946,7 +1946,6 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 	Local txt$ = GetLocalString("Options", option + "txt")
 	Local txt2$ = GetLocalString("Options", option + "txt2")
 	Local R% = 0, G% = 0, B% = 0
-	Local usetestimg% = False, extraspace% = 0
 	
 	AASetFont 1
 	Color 255,255,255
@@ -2028,46 +2027,17 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 	End Select
 	
 	lines% = GetLineAmount(txt,fw,fh)
-	If usetestimg
-		extraspace = 210*MenuScale
-	EndIf
 	If txt2$ = ""
-		DrawFrame(x,y,width,((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+extraspace)
+		DrawFrame(x,y,width,(AAStringHeight(txt)*lines)+(10+lines)*MenuScale)
 	Else
 		lines2% = GetLineAmount(txt2,fw,fh)
-		DrawFrame(x,y,width,(((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+(AAStringHeight(txt2)*lines2)+(10+lines2)*MenuScale)+extraspace)
+		DrawFrame(x,y,width,((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+(AAStringHeight(txt2)*lines2)+(10+lines2)*MenuScale)
 	EndIf
 	RowText(txt,fx,fy,fw,fh)
 	If txt2$ <> ""
 		Color R,G,B
 		RowText(txt2,fx,(fy+(AAStringHeight(txt)*lines)+(5+lines)*MenuScale),fw,fh)
 	EndIf
-	If usetestimg
-		MidHandle Menu_TestIMG
-		If txt2$ = ""
-			DrawImage Menu_TestIMG,x+(width/2),y+100*MenuScale+((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)
-		Else
-			DrawImage Menu_TestIMG,x+(width/2),y+100*MenuScale+(((AAStringHeight(txt)*lines)+(10+lines)*MenuScale)+(AAStringHeight(txt2)*lines2)+(10+lines2)*MenuScale)
-		EndIf
-	EndIf
-	
-End Function
-
-Function ChangeMenu_TestIMG(change$)
-	
-	If Menu_TestIMG <> 0 Then FreeImage Menu_TestIMG
-	AmbientLightRoomTex% = CreateTexture(2,2,257)
-	TextureBlend AmbientLightRoomTex,5
-	SetBuffer(TextureBuffer(AmbientLightRoomTex))
-	ClsColor 0,0,0
-	Cls
-	SetBuffer BackBuffer()
-	Menu_TestIMG = Create3DIcon(200,200,"GFX\map\room3z3_opt.rmesh",0,-0.75,1,0,0,0,menuroomscale#,menuroomscale#,menuroomscale#,True)
-	ScaleImage Menu_TestIMG,MenuScale,MenuScale
-	MaskImage Menu_TestIMG,255,0,255
-	FreeTexture AmbientLightRoomTex : AmbientLightRoomTex = 0
-	
-	CurrMenu_TestIMG = change$
 	
 End Function
 

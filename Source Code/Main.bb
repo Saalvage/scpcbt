@@ -370,8 +370,6 @@ Global mouse_x_speed_1#, mouse_y_speed_1#
 
 Global MouseSmooth# = GetINIFloat(OptionFile,"options", "mouse smoothing", 1.0)
 
-Const INFINITY# = (999.0) ^ (99999.0), NAN# = (-1.0) ^ (0.5)
-
 Global Mesh_MinX#, Mesh_MinY#, Mesh_MinZ#
 Global Mesh_MaxX#, Mesh_MaxY#, Mesh_MaxZ#
 Global Mesh_MagX#, Mesh_MagY#, Mesh_MagZ#
@@ -768,11 +766,6 @@ Global IsZombie% = False
 Global room2gw_brokendoor% = False
 Global room2gw_x# = 0.0
 Global room2gw_z# = 0.0
-
-Global Menu_TestIMG
-Global menuroomscale# = 8.0 / 2048.0
-
-Global CurrMenu_TestIMG$ = ""
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
 
@@ -1516,12 +1509,14 @@ Function InitEvents()
 	
 	CreateEvent("1048a", "room2", 0, 1.0)	
 	
-	CreateEvent("room2storage", "room2storage", 0)	
+	CreateEvent("room2storage", "room2storage", 0)
 	
 	;096 spawns in the first (and last) lockroom2
 	CreateEvent("lockroom096", "lockroom2", 0)
 	
 	CreateEvent("endroom106", "endroom", Rand(0,1))
+	CreateEvent("endroom106", "endroom2", Rand(0,1))
+	CreateEvent("endroom106", "endroom3", Rand(0,1))
 	
 	CreateEvent("room2poffices2", "room2poffices2", 0)
 	
@@ -1611,7 +1606,7 @@ Function InitEvents()
 	
 	CreateEvent("008", "room008", 0, 0)
 	
-	CreateEvent("room106", "room106", 0, 0)	
+	CreateEvent("room106", "room106", 0, 0)
 	
 	CreateEvent("pj", "roompj", 0, 0)
 	
@@ -1787,77 +1782,6 @@ Local I_427.SCP427 = New SCP427
 ; MAIN LOOP
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
-Type FixedTimesteps
-	Field tickDuration#
-	Field accumulator#
-	Field prevTime%
-	Field currTime%
-	Field fps#
-End Type
-
-Function SetTickrate(tickrate%)
-	Local ft.FixedTimesteps = New FixedTimesteps
-	
-	ft\tickDuration = 70.0/Float(tickrate)
-End Function
-
-Function AddToTimingAccumulator(milliseconds%)
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	If (milliseconds<1 Lor milliseconds>500) Then
-		Return
-	EndIf
-	ft\accumulator = ft\accumulator+Max(0,Float(milliseconds)*70.0/1000.0)
-End Function
-
-Function ResetTimingAccumulator()
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	ft\accumulator = 0.0
-End Function
-
-Function SetCurrTime(time%)
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	ft\currTime = time%
-	
-End Function
-
-Function SetPrevTime(time%)
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	ft\prevTime = time%
-	
-End Function
-
-Function SetFPS(elapsedMilliseconds%)
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	Local instantFramerate# = 1000.0/Max(1,elapsedMilliseconds)
-	ft\fps = Max(0,ft\fps*0.99 + instantFramerate*0.01)
-	
-End Function
-
-Function GetCurrTime%()
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	Return ft\currTime
-End Function
-
-Function GetPrevTime%()
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	Return ft\prevTime
-End Function
-
-Function GetTickDuration#()
-	Local ft.FixedTimesteps = First FixedTimesteps
-	
-	Return ft\tickDuration
-End Function
-
-SetTickrate(60)
-
 Repeat
 	
 	Cls
@@ -1935,7 +1859,7 @@ Repeat
 		
 		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
 		
-		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then 
+		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
 			
 			If Rand(1500) = 1 Then
 				For i = 0 To 5
@@ -1948,7 +1872,7 @@ Repeat
 				
 				If Rand(3)=1 Then PlayerZone = 3
 				
-				If PlayerRoom\RoomTemplate\Name = "room173" Then 
+				If PlayerRoom\RoomTemplate\Name = "room173" Then
 					PlayerZone = 4
 				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
 					For e.Events = Each Events
@@ -10028,37 +9952,7 @@ Function CatchErrors(location$)
 		Next
 	EndIf
 	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
-	ErrorMessage errtxt
-End Function
-
-Function Create3DIcon(width%,height%,modelpath$,modelX#=0,modelY#=0,modelZ#=0,modelPitch#=0,modelYaw#=0,modelRoll#=0,modelscaleX#=1,modelscaleY#=1,modelscaleZ#=1,withfog%=False)
-	Local img% = CreateImage(width,height)
-	Local cam% = CreateCamera()
-	Local model%
-	
-	CameraRange cam,0.01,16
-	CameraViewport cam,0,0,width,height
-	If withfog
-		CameraFogMode cam,1
-		CameraFogRange cam,CameraFogNear,CameraFogFar
-	EndIf
-	
-	If Right(Lower(modelpath$),6)=".rmesh"
-		model = LoadRMesh(modelpath$,Null)
-	Else
-		model = LoadMesh(modelpath$)
-	EndIf
-	ScaleEntity model,modelscaleX,modelscaleY,modelscaleZ
-	PositionEntity model,modelX#,modelY#,modelZ#
-	RotateEntity model,modelPitch#,modelYaw#,modelRoll#
-	
-	;Cls
-	RenderWorld
-	CopyRect 0,0,width,height,0,0,BackBuffer(),ImageBuffer(img)
-	
-	FreeEntity model
-	FreeEntity cam
-	Return img%
+	;ErrorMessage errtxt
 End Function
 
 Function PlayAnnouncement(file$) ;This function streams the announcement currently playing

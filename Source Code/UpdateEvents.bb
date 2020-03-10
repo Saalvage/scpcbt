@@ -358,7 +358,7 @@ Function UpdateEvents()
 						ShouldPlay = 13
 						
 						;slow the player down to match his speed to the guards
-						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.008/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
+						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.01/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
 						
 						If e\EventState3 < 170 Then
 							If e\EventState3 = 1.0 Then
@@ -392,7 +392,6 @@ Function UpdateEvents()
 								z = EntityZ(e\room\obj)+8.0*RoomScale	
 								
 								If e\EventState3 < 14 Then
-									CreateConsoleMsg Playable
 									mouse_x_speed_1#=0
 									mouse_y_speed_1#=0
 									
@@ -1136,6 +1135,7 @@ Function UpdateEvents()
 							PositionEntity pvt, EntityX(Camera), EntityY(Curr173\Collider,True)-0.05, EntityZ(Camera)
 							PointEntity(pvt, Curr173\Collider)
 							RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), 40), 0)
+							Curr173\angle = 0
 							
 							TurnEntity(pvt, 90, 0, 0)
 							user_camera_pitch = CurveAngle(EntityPitch(pvt), user_camera_pitch + 90.0, 40)

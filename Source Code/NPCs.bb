@@ -773,12 +773,10 @@ Function UpdateNPCs()
 									n\PrevX = EntityX(n\Collider)
 									n\PrevZ = EntityZ(n\Collider)				
 									
-									If (BlinkTimer < - 16 Lor BlinkTimer > - 6) And (IsNVGBlinking=False) Then
-										If EntityInView(n\obj, Camera) Then move = False
+									If (Not NoTarget) And (BlinkTimer < - 16 Lor BlinkTimer > - 6) And (IsNVGBlinking=False) And (EntityInView(n\obj, Camera) Lor EntityInView(n\obj2, Camera)) Then
+										move = False
 									EndIf
 								EndIf
-								
-								If NoTarget Then move = True
 								
 								;player is looking at it -> doesn't move
 								If move=False Then

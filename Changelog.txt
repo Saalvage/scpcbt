@@ -14,6 +14,7 @@
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added EZ-style endroom.
+- Added SCP-106 endroom event to all threee endrooms.
 - Added improved Pizza Day poster.
 - (Re-)Added SCP-173's head rotating.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
@@ -47,7 +48,7 @@
 	- Improved player view inversion.
 	- And a lot of other improvements!
 - Added EZ lockroom version.
-- Much improved SCP-205 chamber and attack.
+- Much improved SCP-205 chamber.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
@@ -98,6 +99,7 @@ Bug Fixes:
 	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
 	- Fixed z-fighting on monitor model.
+	- Fixed origami model.
 	- Fixed and reworked the "revive" command.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.
 

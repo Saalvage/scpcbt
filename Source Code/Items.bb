@@ -606,7 +606,7 @@ Function PickItem(item.Items)
 			If Inventory(n) = Null Then
 				Select item\itemtemplate\tempname
 					Case "scp178"
-						SetAnimTime item\model,19.0
+						SetAnimTime(item\model, 2)
 					Case "scp1123"
 						If Not (Wearing714 = 1) Then
 							If PlayerRoom\RoomTemplate\Name <> "room1123" Then
