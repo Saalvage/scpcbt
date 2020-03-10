@@ -7324,7 +7324,7 @@ Function UpdateEvents()
 						If Distance(EntityX(Collider), EntityX(e\room\Objects[2], True), EntityZ(Collider), EntityZ(e\room\Objects[2], True)) < (170.0 * RoomScale) Then
 							
 							If setting = "rough" Lor setting = "coarse" Then
-								If e\EventState > 70 * 2.6 And e\EventState - FPSfactor2 < 70 * 2.6 Then PlaySound_Strict Death914SFX
+								If e\EventState > 70 * 2.6 And e\EventState - FPSfactor < 70 * 2.6 Then PlaySound_Strict Death914SFX
 							EndIf
 							
 							If e\EventState > 70 * 3 Then
@@ -7336,13 +7336,13 @@ Function UpdateEvents()
 										DeathMSG = GetLocalString("Deaths", "914")
 									Case "coarse"
 										BlinkTimer = -10
-										If e\EventState - FPSfactor2 < 70 * 3 Then PlaySound_Strict Use914SFX
+										If e\EventState - FPSfactor < 70 * 3 Then PlaySound_Strict Use914SFX
 									Case "1:1"
 										BlinkTimer = -10
-										If e\EventState - FPSfactor2 < 70 * 3 Then PlaySound_Strict Use914SFX
+										If e\EventState - FPSfactor < 70 * 3 Then PlaySound_Strict Use914SFX
 									Case "fine", "very fine"
 										BlinkTimer = -10
-										If e\EventState - FPSfactor2 < 70 * 3 Then PlaySound_Strict Use914SFX	
+										If e\EventState - FPSfactor < 70 * 3 Then PlaySound_Strict Use914SFX	
 								End Select
 							EndIf
 						EndIf

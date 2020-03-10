@@ -317,7 +317,7 @@ Global MenuScale# = (I_Opt\GraphicHeight / 1024.0)
 
 SetBuffer(BackBuffer())
 
-Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#, PrevFPSFactor#
+Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, PrevFPSFactor#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
 
 Global Framelimit% = GetINIInt(OptionFile, "options", "framelimit")
@@ -1791,7 +1791,6 @@ Repeat
 	PrevTime = CurTime
 	PrevFPSFactor = FPSfactor
 	FPSfactor = Max(Min(ElapsedTime * 70, 5.0), 0.2)
-	FPSfactor2 = FPSfactor
 	
 	If MenuOpen Lor InvOpen Lor OtherOpen<>Null Lor ConsoleOpen Lor SelectedDoor <> Null Lor SelectedScreen <> Null Lor Using294 Then FPSfactor = 0
 	
@@ -2269,7 +2268,7 @@ Repeat
 				EndIf
 				AAText((I_Opt\GraphicWidth / 2), (I_Opt\GraphicHeight * 0.94), Msg, True, False, Min(MsgTimer / 2, 255)/255.0)
 			EndIf
-			MsgTimer=MsgTimer-FPSfactor2 
+			MsgTimer=MsgTimer-FPSfactor 
 		EndIf
 		
 		Color 255, 255, 255
@@ -2649,11 +2648,11 @@ Function DrawEnding()
 	ShowPointer()
 	
 	FPSfactor = 0
-	;EndingTimer=EndingTimer-FPSfactor2
+	;EndingTimer=EndingTimer-FPSfactor
 	If EndingTimer>-2000
-		EndingTimer=Max(EndingTimer-FPSfactor2,-1111)
+		EndingTimer=Max(EndingTimer-FPSfactor,-1111)
 	Else
-		EndingTimer=EndingTimer-FPSfactor2
+		EndingTimer=EndingTimer-FPSfactor
 	EndIf
 	
 	GiveAchievement(Achv055)
@@ -2717,7 +2716,7 @@ Function DrawEnding()
 				Color 255,255,255
 			EndIf
 			
-			If EndingTimer+FPSfactor2 > -450 And EndingTimer <= -450 Then
+			If EndingTimer+FPSfactor > -450 And EndingTimer <= -450 Then
 				Select Lower(SelectedEnding)
 					Case "a1", "a2"
 						PlaySound_Strict LoadTempSound("SFX\Ending\GateA\Ending"+SelectedEnding+".ogg")
@@ -2900,7 +2899,7 @@ Function DrawCredits()
 		id=id+1
 	Next
 	If (credits_Y+(24*LastCreditLine\id*MenuScale))<-StringHeight(LastCreditLine\txt)
-		CreditsTimer=CreditsTimer+(0.5*FPSfactor2)
+		CreditsTimer=CreditsTimer+(0.5*FPSfactor)
 		If CreditsTimer>=0.0 And CreditsTimer<255.0
 			Color Max(Min(CreditsTimer,255),0),Max(Min(CreditsTimer,255),0),Max(Min(CreditsTimer,255),0)
 		ElseIf CreditsTimer>=255.0
@@ -3938,7 +3937,7 @@ Function DrawGUI()
 			
 			AASetFont 3
 			If KeypadMSG <> "" Then 
-				KeypadTimer = KeypadTimer-FPSfactor2
+				KeypadTimer = KeypadTimer-FPSfactor
 				
 				If (KeypadTimer Mod 70) < 35 Then AAText I_Opt\GraphicWidth/2, y+124*scale, KeypadMSG, True,True
 				If KeypadTimer =<0 Then
