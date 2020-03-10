@@ -1,4 +1,3 @@
-
 Function SaveGame(file$)
 	;CatchErrors("SaveGame")
 	

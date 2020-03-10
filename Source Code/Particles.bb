@@ -1,5 +1,3 @@
-
-
 Global ParticleTextures%[8]
 
 Type Particles

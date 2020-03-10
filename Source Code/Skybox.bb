@@ -1,4 +1,3 @@
-
 Function sky_CreateSky(filename$,parent%=0)
 	Local sky
 

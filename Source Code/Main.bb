@@ -9431,19 +9431,6 @@ Function DefaultOptionsINI()
 	
 End Function 
 
-;--------------------------------------- MakeCollBox -functions -------------------------------------------------------
-
-
-; Create a collision box For a mesh entity taking into account entity scale
-; (will not work in non-uniform scaled space)
-Function MakeCollBox(mesh%)
-	Local sx# = EntityScaleX(mesh, 1)
-	Local sy# = Max(EntityScaleY(mesh, 1), 0.001)
-	Local sz# = EntityScaleZ(mesh, 1)
-	GetMeshExtents(mesh)
-	EntityBox mesh, Mesh_MinX * sx, Mesh_MinY * sy, Mesh_MinZ * sz, Mesh_MagX * sx, Mesh_MagY * sy, Mesh_MagZ * sz
-End Function
-
 ; Find mesh extents
 Function GetMeshExtents(Mesh%)
 	Local s%, surf%, surfs%, v%, verts%, x#, y#, z#
@@ -10242,20 +10229,5 @@ Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
 		EventState = EventState + FPSfactor * 1.4
 	EndIf
 	Return EventState
-	
-End Function
-
-Function RotateEntity90DegreeAngles(entity%)
-	Local angle = WrapAngle(entity)
-	
-	If angle < 45.0 Then
-		Return 0
-	ElseIf angle >= 45.0 And angle < 135 Then
-		Return 90
-	ElseIf angle >= 135 And angle < 225 Then
-		Return 180
-	Else
-		Return 270
-	EndIf
 	
 End Function

@@ -6262,8 +6262,6 @@ Function UpdateEvents()
 				
 				If PlayerRoom = e\room And fr<>Null Then 
 					
-					;Local dp.DrawPortal
-					
 					If e\EventState=1.0 Then ;the player is in the forest
 						CurrStepSFX = 2
 						
@@ -6338,7 +6336,6 @@ Function UpdateEvents()
 											;SetAnimTime e\room\Objects[3], 0.0
 											;SetAnimTime e\room\Objects[4], 0.0
 											
-											;dp.DrawPortal=e\room\dp;Object.DrawPortal(e\room\Objects[0])
 											PositionEntity Collider, EntityX(e\room\Objects[2],True),0.5,EntityZ(e\room\Objects[2],True)
 											
 											RotateEntity Collider, 0, EntityYaw(e\room\obj,True)+e\EventState2*180, 0
@@ -6380,8 +6377,6 @@ Function UpdateEvents()
 					Else
 						
 						If (Not Contained106) Then Curr106\Idle = False
-						
-						;dp.DrawPortal=e\room\dp;Object.DrawPortal(e\room\Objects[0])
 						
 						;HideEntity fr\DetailEntities[0]
 						;HideEntity fr\DetailEntities[1]

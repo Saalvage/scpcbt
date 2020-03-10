@@ -5386,25 +5386,6 @@ Function MeNPCSeesPlayer%(me.NPCs,disablesoundoncrouch%=False)
 	
 End Function
 
-Function TeleportMTFGroup(n.NPCs)
-	Local n2.NPCs
-	
-	If n\MTFLeader <> Null Then Return
-	
-	TeleportCloser(n)
-	
-	For n2 = Each NPCs
-		If n2\NPCtype = NPCtypeMTF
-			If n2\MTFLeader <> Null
-				PositionEntity n2\Collider,EntityX(n2\MTFLeader\Collider),EntityY(n2\MTFLeader\Collider)+0.1,EntityZ(n2\MTFLeader\Collider)
-			EndIf
-		EndIf
-	Next
-	
-	DebugLog "Teleported MTF Group (dist:"+EntityDistance(n\Collider,Collider)+")"
-	
-End Function
-
 Function UpdateMTFUnit(n.NPCs)
 
 	
@@ -7482,77 +7463,6 @@ Function CheckForNPCInFacility(n.NPCs)
 	EndIf
 	
 	Return True
-End Function
-
-Function FindNextElevator(n.NPCs)
-	Local eo.ElevatorObj, eo2.ElevatorObj
-	
-	For eo = Each ElevatorObj
-		If eo\InFacility = n\InFacility
-			If Abs(EntityY(eo\obj,True)-EntityY(n\Collider))<10.0
-				For eo2 = Each ElevatorObj
-					If eo2 <> eo
-						If eo2\InFacility = n\InFacility
-							If Abs(EntityY(eo2\obj,True)-EntityY(n\Collider))<10.0
-								If EntityDistanceSquared(eo2\obj,n\Collider)<EntityDistanceSquared(eo\obj,n\Collider)
-									n\PathStatus = FindPath(n, EntityX(eo2\obj,True),EntityY(eo2\obj,True),EntityZ(eo2\obj,True))
-									n\CurrElevator = eo2
-									DebugLog "eo2 found for "+n\NPCtype
-									Exit
-								EndIf
-							EndIf
-						EndIf
-					EndIf
-				Next
-				If n\CurrElevator = Null
-					n\PathStatus = FindPath(n, EntityX(eo\obj,True),EntityY(eo\obj,True),EntityZ(eo\obj,True))
-					n\CurrElevator = eo
-					DebugLog "eo found for "+n\NPCtype
-				EndIf
-				If n\PathStatus <> 1
-					n\CurrElevator = Null
-					DebugLog "Unable to find elevator path: Resetting CurrElevator"
-				EndIf
-				Exit
-			EndIf
-		EndIf
-	Next
-	
-End Function
-
-Function GoToElevator(n.NPCs)
-	Local dist#,inside%
-	
-	If n\PathStatus <> 1
-		PointEntity n\obj,n\CurrElevator\obj
-		RotateEntity n\Collider,0,CurveAngle(EntityYaw(n\obj),EntityYaw(n\Collider),20.0),0
-		
-		inside% = False
-		If Abs(EntityX(n\Collider)-EntityX(n\CurrElevator\obj,True))<280.0*RoomScale
-			If Abs(EntityZ(n\Collider)-EntityZ(n\CurrElevator\obj,True))<280.0*RoomScale Then
-				If Abs(EntityY(n\Collider)-EntityY(n\CurrElevator\obj,True))<280.0*RoomScale Then
-					inside% = True
-				EndIf
-			EndIf
-		EndIf
-		
-		dist# = EntityDistance(n\Collider,n\CurrElevator\door\frameobj)
-		If n\CurrElevator\door\open
-			If (dist# > 0.4 And dist# < 0.7) And inside%
-				UseDoor(n\CurrElevator\door,False)
-				DebugLog n\NPCtype+" used elevator"
-			EndIf
-		Else
-			If dist# < 0.7
-				n\CurrSpeed = 0.0
-				If n\CurrElevator\door\NPCCalledElevator=False
-					n\CurrElevator\door\NPCCalledElevator = True
-					DebugLog n\NPCtype+" called elevator"
-				EndIf
-			EndIf
-		EndIf
-	EndIf
-	
 End Function
 
 Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)

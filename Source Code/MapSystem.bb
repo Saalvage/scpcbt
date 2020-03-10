@@ -778,8 +778,6 @@ Const max_deviation_distance% = 3
 Const return_chance% = 27
 Const center = 5 ;(gridsize-1) / 2
 
-Include "Source Code\Drawportals.bb"
-
 Type Forest
 	Field TileMesh%[6]
 	Field DetailMesh%[6]
@@ -793,38 +791,6 @@ Type Forest
 	
 	Field ID%
 End Type
-
-Function move_forward%(dir%,pathx%,pathy%,retval%=0)
-	;move 1 unit along the grid in the designated direction
-	If dir = 1 Then
-		If retval=0 Then
-			Return pathx
-		Else
-			Return pathy+1
-		EndIf
-	EndIf
-	If retval=0 Then
-		Return pathx-1+dir
-	Else
-		Return pathy
-	EndIf
-End Function
-
-Function chance%(chanc%)
-	;perform a chance given a probability
-	Return (Rand(0,100)<=chanc)
-End Function
-
-Function turn_if_deviating%(max_deviation_distance_%,pathx%,center_%,dir%,retval%=0)
-	;check if deviating and return the answer. if deviating, turn around
-	Local current_deviation% = center_ - pathx
-	Local deviated% = False
-	If (dir = 0 And current_deviation >= max_deviation_distance_) Lor (dir = 2 And current_deviation <= -max_deviation_distance_) Then
-		dir = (dir + 2) Mod 4
-		deviated = True
-	EndIf
-	If retval=0 Then Return dir Else Return deviated
-End Function
 
 Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	;CatchErrors("PlaceForest")
@@ -1290,27 +1256,6 @@ Function LoadRoomMesh(rt.RoomTemplates)
 	
 End Function
 
-Function LoadRoomMeshes()
-	Local temp% = 0
-	For rt.RoomTemplates = Each RoomTemplates
-		temp=temp+1
-	Next	
-	
-	Local i = 0
-	For rt.RoomTemplates = Each RoomTemplates
-		If Instr(rt\objpath,".rmesh")<>0 Then ;file is roommesh
-			rt\obj = LoadRMesh(rt\objPath, rt)
-		Else ;file is b3d
-			RuntimeError(".b3d rooms are no longer supported, please use the converter! Affected room: " + Chr(34)+mapfile+Chr(34))
-		EndIf
-		If (Not rt\obj) Then RuntimeError "Failed to load map file "+Chr(34)+mapfile+Chr(34)+"."
-		
-		HideEntity(rt\obj)
-		DrawLoading(Int(30 + (15.0 / temp)*i))
-		i=i+1
-	Next
-End Function
-
 LoadRoomTemplates("Data\rooms.ini")
 
 Const ZONE_AMOUNT = 3
@@ -1345,7 +1290,7 @@ Type Rooms
 	
 	Field SoundCHN%
 	
-	Field dp.DrawPortal, fr.Forest
+	Field fr.Forest
 	
 	Field SoundEmitter%[MaxRoomEmitters]
 	Field SoundEmitterObj%[MaxRoomEmitters]
@@ -1399,27 +1344,6 @@ Type Grids
 	Field Entities%[gridsz*gridsz]
 	Field waypoints.WayPoints[gridsz*gridsz]
 End Type
-
-Function UpdateGrid(grid.Grids)
-	;local variables
-	Local tx%,ty%
-	For tx% = 0 To gridsz-1
-		For ty% = 0 To gridsz-1
-			If grid\Entities[tx+(ty*gridsz)]<>0 Then
-				If Abs(EntityY(Collider,True)-EntityY(grid\Entities[tx+(ty*gridsz)],True))>4.0 Then Exit
-				If Abs(EntityX(Collider,True)-EntityX(grid\Entities[tx+(ty*gridsz)],True))<HideDistance Then
-					If Abs(EntityZ(Collider,True)-EntityZ(grid\Entities[tx+(ty*gridsz)],True))<HideDistance Then
-						ShowEntity grid\Entities[tx+(ty*gridsz)]
-					Else
-						HideEntity grid\Entities[tx+(ty*gridsz)]
-					EndIf
-				Else
-					HideEntity grid\Entities[tx+(ty*gridsz)]
-				EndIf
-			EndIf
-		Next
-	Next
-End Function
 
 Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 	;CatchErrors("CreateRoom")
@@ -5466,6 +5390,7 @@ Function FindPath(n.NPCs, x#, y#, z#)
 	EndIf
 	
 End Function
+
 Function CreateLine(x1#,y1#,z1#, x2#,y2#,z2#, mesh=0)
 	
 	If mesh = 0 Then 
@@ -5888,7 +5813,6 @@ Function UpdateSecurityCams()
 	Next
 	
 	Cls
-	
 	
 End Function
 
@@ -7661,16 +7585,6 @@ Type ElevatorObj
 	Field door.Doors
 End Type
 
-Function AssignElevatorObj.ElevatorObj(obj%,door.Doors,in_facility%)
-	Local eo.ElevatorObj = New ElevatorObj
-	
-	eo\obj% = obj%
-	eo\door = door
-	eo\InFacility% = in_facility%
-	
-	Return eo
-End Function
-
 Function DeleteElevatorObjects()
 	
 	Delete Each ElevatorObj
@@ -7696,26 +7610,6 @@ Function ValidRoom2slCamRoom(r.Rooms)
 	If RN$ = "room2ccont" Then Return True
 	
 	Return False
-	
-End Function
-
-Function FindAndDeleteFakeMonitor(r.Rooms,x#,y#,z#,Amount%)
-	Local i%
-	
-	For i = 0 To Amount%
-		If r\Objects[i]<>0
-			If EntityX(r\Objects[i],True) = x#
-				If EntityY(r\Objects[i],True) = y#
-					If EntityZ(r\Objects[i],True) = z#
-						FreeEntity r\Objects[i]
-						r\Objects[i]=0
-						DebugLog "Deleted Fake Monitor: "+i
-						Exit
-					EndIf
-				EndIf
-			EndIf
-		EndIf
-	Next
 	
 End Function
 
