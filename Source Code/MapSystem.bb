@@ -2393,7 +2393,6 @@ Function FillRoom(r.Rooms)
 			TurnEntity(sc\CameraObj, 20, 0, 0)
 
 		Case "room035"
-
 			d = CreateDoor(r\zone, r\x - 296.0 * RoomScale, r\y, r\z - 672.0 * RoomScale, 180, r, True, 0, 5)
 			d\AutoClose = False : d\locked = True : r\RoomDoors[0]=d
 			PositionEntity (d\buttons[1], r\x - 164.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
@@ -2481,7 +2480,6 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj)
 
 		Case "room513"
-
 			d = CreateDoor(r\zone, r\x - 704.0 * RoomScale, r\y, r\z + 304.0 * RoomScale, 0, r, False, 0, 2)
 			d\AutoClose = False ;: d\buttons[0] = False
 			PositionEntity (d\buttons[0], EntityX(d\buttons[0],True), EntityY(d\buttons[0],True), r\z + 288.0 * RoomScale, True)
@@ -7082,7 +7080,7 @@ Function UpdateRoomLights(cam%)
 									
 									dist# = (EntityDistance(cam%,r\LightSpritesPivot[i])+0.5)/7.5
 									dist# = Max(Min(dist#,1.0),0.0)
-									alpha# = Float(Inverse(dist#))
+									alpha# = 1.0 - dist
 									
 									If alpha# > 0.0 Then
 										EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)*alpha#

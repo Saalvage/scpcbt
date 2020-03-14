@@ -637,7 +637,7 @@ Function PickItem(item.Items)
 						DeathMSG = GetLocalString("Deaths", "killbat")
 						Kill()
 					Case "scp148"
-						GiveAchievement(Achv148)	
+						GiveAchievement(Achv148)
 					Case "scp513"
 						GiveAchievement(Achv513)
 					Case "scp860"

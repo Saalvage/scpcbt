@@ -36,6 +36,12 @@ Global SaveMSG$
 ;nykyisen tallennuksen nimi ja samalla missä kansiossa tallennustiedosto sijaitsee saves-kansiossa
 Global CurrSave$
 
+Type Save
+	Field Time$
+	Field Date$
+	Field Version$
+End Type
+
 Global SaveGameAmount%
 Dim SaveGames$(SaveGameAmount+1) 
 Dim SaveGameTime$(SaveGameAmount + 1)

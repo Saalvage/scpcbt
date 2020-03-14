@@ -1495,7 +1495,7 @@ Function InitEvents()
 	CreateEvent("173", "room173", 0)
 	CreateEvent("alarm", "start", 0)
 	
-	CreateEvent("pocketdimension", "pocketdimension", 0)	
+	CreateEvent("pocketdimension", "pocketdimension", 0)
 	
 	;there's a 7% chance that 106 appears in the rooms named "tunnel"
 	CreateEvent("tunnel106", "tunnel", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
@@ -1560,25 +1560,27 @@ Function InitEvents()
 	If Rand(5)<5 Then 
 		Select Rand(3)
 			Case 1
-				CreateEvent("682roar", "tunnel", Rand(0,2), 0)	
+				CreateEvent("682roar", "tunnel", Rand(0,2), 0)
 			Case 2
-				CreateEvent("682roar", "room3pit", Rand(0,2), 0)		
+				CreateEvent("682roar", "room3pit", Rand(0,2), 0)
 			Case 3
 				;CreateEvent("682roar", "room2offices", 0, 0)
 				CreateEvent("682roar", "room2z3", 0, 0)
 		End Select 
 	EndIf 
 	
-	CreateEvent("testroom173", "room2testroom2", 0, 1.0)	
+	CreateEvent("testroom173", "room2testroom2", 0, 1.0)
 	
 	CreateEvent("room2tesla", "room2tesla", 0, 0.9)
+	CreateEvent("room2tesla", "room2tesla_lcz", 0, 0.9)
+	CreateEvent("room2tesla", "room2tesla_hcz", 0, 0.9)
 	
 	CreateEvent("room2nuke", "room2nuke", 0, 0)
 	
-	If Rand(5) < 5 Then 
-		CreateEvent("coffin106", "room895", 0, 0)
-	Else
+	If Rand(5) = 1 Then 
 		CreateEvent("coffin", "room895", 0, 0)
+	Else
+		CreateEvent("coffin106", "room895", 0, 0)
 	EndIf 
 	
 	CreateEvent("checkpoint", "checkpoint1", 0, 1.0)
@@ -1636,8 +1638,6 @@ Function InitEvents()
 	CreateEvent("room966","room966", 0)
 	
 	CreateEvent("room1123", "room1123", 0, 0)
-	CreateEvent("room2tesla", "room2tesla_lcz", 0, 0.9)
-	CreateEvent("room2tesla", "room2tesla_hcz", 0, 0.9)
 	
 	;New Events in SCP:CB Version 1.3 - ENDSHN
 	CreateEvent("room4tunnels","room4tunnels",0)
