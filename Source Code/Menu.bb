@@ -30,37 +30,10 @@ Global IntroEnabled% = GetINIInt(OptionFile, "options", "intro enabled")
 
 Global SelectedInputBox%
 
-Global SavePath$ = "Saves\"
-Global SaveMSG$
-
-;nykyisen tallennuksen nimi ja samalla missä kansiossa tallennustiedosto sijaitsee saves-kansiossa
-Global CurrSave$
-
-Type Save
-	Field Time$
-	Field Date$
-	Field Version$
-End Type
-
-Global SaveGameAmount%
-Dim SaveGames$(SaveGameAmount+1) 
-Dim SaveGameTime$(SaveGameAmount + 1)
-Dim SaveGameDate$(SaveGameAmount + 1)
-Dim SaveGameVersion$(SaveGameAmount + 1)
-Dim SaveGameLang$(SaveGameAmount + 1)
-
-Global SavedMapsAmount% = 0
-Dim SavedMaps$(SavedMapsAmount+1)
-Dim SavedMapsAuthor$(SavedMapsAmount+1)
-
-Global SelectedMap$
-
 Global RandSeedAmount% = 1
 While GetLocalString("Menu", "randseed" + RandSeedAmount) <> ""
 	RandSeedAmount = RandSeedAmount + 1
 Wend
-
-LoadSaveGames()
 
 Global CurrLoadGamePage% = 0
 
@@ -180,6 +153,9 @@ Function UpdateMainMenu()
 
 						SelectedDifficulty = difficulties[EUCLID]
 						
+						LoadSaveGames()
+						CurrSave = New Save
+						
 						MainMenuTab = 1
 					EndIf
 				Case 1
@@ -216,9 +192,15 @@ Function UpdateMainMenu()
 			Select MainMenuTab
 				Case 1
 					PutINIValue(OptionFile, "options", "intro enabled", IntroEnabled%)
+					For I_SAV.Save = Each Save
+						Delete I_SAV
+					Next
 					MainMenuTab = 0
 				Case 2
 					CurrLoadGamePage = 0
+					For I_SAV.Save = Each Save
+						Delete I_SAV
+					Next
 					MainMenuTab = 0
 				Case 3,5,6,7 ;save the options
 					SaveOptionsINI()
@@ -228,10 +210,6 @@ Function UpdateMainMenu()
 					
 					AntiAlias Opt_AntiAlias
 					MainMenuTab = 0
-				Case 4 ;move back to the "new game" tab
-					MainMenuTab = 1
-					CurrLoadGamePage = 0
-					MouseHit1 = False
 				Default
 					MainMenuTab = 0
 			End Select
@@ -260,19 +238,19 @@ Function UpdateMainMenu()
 				AASetFont 1
 				
 				AAText (x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Menu", "name")+":")
-				CurrSave = InputBox(x + 150 * MenuScale, y + 15 * MenuScale, 200 * MenuScale, 30 * MenuScale, CurrSave, 1, 15)
-				CurrSave = Replace(CurrSave,":","")
-				CurrSave = Replace(CurrSave,".","")
-				CurrSave = Replace(CurrSave,"/","")
-				CurrSave = Replace(CurrSave,"\","")
-				CurrSave = Replace(CurrSave,"<","")
-				CurrSave = Replace(CurrSave,">","")
-				CurrSave = Replace(CurrSave,"|","")
-				CurrSave = Replace(CurrSave,"?","")
-				CurrSave = Replace(CurrSave,Chr(34),"")
-				CurrSave = Replace(CurrSave,"*","")
+				CurrSave\Name = InputBox(x + 150 * MenuScale, y + 15 * MenuScale, 200 * MenuScale, 30 * MenuScale, CurrSave\Name, 1, 15)
+				CurrSave\Name = Replace(CurrSave\Name,":","")
+				CurrSave\Name = Replace(CurrSave\Name,".","")
+				CurrSave\Name = Replace(CurrSave\Name,"/","")
+				CurrSave\Name = Replace(CurrSave\Name,"\","")
+				CurrSave\Name = Replace(CurrSave\Name,"<","")
+				CurrSave\Name = Replace(CurrSave\Name,">","")
+				CurrSave\Name = Replace(CurrSave\Name,"|","")
+				CurrSave\Name = Replace(CurrSave\Name,"?","")
+				CurrSave\Name = Replace(CurrSave\Name,Chr(34),"")
+				CurrSave\Name = Replace(CurrSave\Name,"*","")
 				
-				If Int(CurrSave) >= 0 And Int(CurrSave) <= 2 Then DO_DA_ZONE = Int(CurrSave)
+				If Int(CurrSave\Name) >= 0 And Int(CurrSave\Name) <= 2 Then DO_DA_ZONE = Int(CurrSave\Name)
 				
 				Color 255,255,255
 				AAText (x + 20 * MenuScale, y + 60 * MenuScale, GetLocalString("Menu", "seed")+":")
@@ -352,7 +330,7 @@ Function UpdateMainMenu()
 				AASetFont 2
 				
 				If DrawButton(x + 420 * MenuScale, y + height + 20 * MenuScale, 160 * MenuScale, 70 * MenuScale, GetLocalString("Menu", "start"), False) Then
-					If CurrSave = "" Then CurrSave = GetLocalString("Menu", "untitled")
+					If CurrSave\Name = "" Then CurrSave\Name = GetLocalString("Menu", "untitled")
 					
 					If RandomSeed = "" Then
 						RandomSeed = Abs(MilliSecs())
@@ -360,13 +338,15 @@ Function UpdateMainMenu()
 					
 					SeedRnd GenerateSeedNumber(RandomSeed)
 					
-					Local SameFound% = False
+					Local SameFound% = 0
+					Local LowestPossible% = 2
 					
-					For  i% = 1 To SaveGameAmount
-						If SaveGames(i - 1) = CurrSave Then SameFound = SameFound + 1
+					For  I_SAV.Save = Each Save
+						If (CurrSave <> I_SAV And CurrSave\Name = I_SAV\Name) Then SameFound = 1
+						If (I_SAV\Name = (CurrSave\Name + " (" + LowestPossible + ")")) Then LowestPossible = LowestPossible + 1
 					Next
 						
-					If SameFound > 0 Then CurrSave = CurrSave + " (" + (SameFound + 1) + ")"
+					If SameFound Then CurrSave\Name = CurrSave\Name + " (" + LowestPossible + ")"
 					
 					LoadEntities()
 					LoadAllSounds()
@@ -387,7 +367,7 @@ Function UpdateMainMenu()
 				
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
-				height = 510 * MenuScale
+				height = 430 * MenuScale
 				
 				DrawFrame(x, y, width, height)
 				
@@ -408,64 +388,65 @@ Function UpdateMainMenu()
 				
 				AASetFont 2
 				
-				If CurrLoadGamePage < Ceil(Float(SaveGameAmount)/6.0)-1 And SaveMSG = "" Then 
-					If DrawButton(x+530*MenuScale, y + 520*MenuScale, 50*MenuScale, 55*MenuScale, ">") Then
+				If CurrLoadGamePage < Ceil(Float(SaveGameAmount)/5.0)-1 And DelSave = Null Then 
+					If DrawButton(x+530*MenuScale, y + 440*MenuScale, 50*MenuScale, 55*MenuScale, ">") Then
 						CurrLoadGamePage = CurrLoadGamePage+1
 					EndIf
 				Else
-					DrawFrame(x+530*MenuScale, y + 520*MenuScale, 50*MenuScale, 55*MenuScale)
+					DrawFrame(x+530*MenuScale, y + 440*MenuScale, 50*MenuScale, 55*MenuScale)
 					Color(100, 100, 100)
-					AAText(x+555*MenuScale, y + 547.5*MenuScale, ">", True, True)
+					AAText(x+555*MenuScale, y + 467.5*MenuScale, ">", True, True)
 				EndIf
-				If CurrLoadGamePage > 0 And SaveMSG = "" Then
-					If DrawButton(x, y + 520*MenuScale, 50*MenuScale, 55*MenuScale, "<") Then
+				If CurrLoadGamePage > 0 And DelSave = Null Then
+					If DrawButton(x, y + 440*MenuScale, 50*MenuScale, 55*MenuScale, "<") Then
 						CurrLoadGamePage = CurrLoadGamePage-1
 					EndIf
 				Else
-					DrawFrame(x, y + 520*MenuScale, 50*MenuScale, 55*MenuScale)
+					DrawFrame(x, y + 440*MenuScale, 50*MenuScale, 55*MenuScale)
 					Color(100, 100, 100)
-					AAText(x+25*MenuScale, y + 547.5*MenuScale, "<", True, True)
+					AAText(x+25*MenuScale, y + 467.5*MenuScale, "<", True, True)
 				EndIf
 				
-				DrawFrame(x+60*MenuScale,y+520*MenuScale,width-120*MenuScale,55*MenuScale)
+				DrawFrame(x+60*MenuScale,y+440*MenuScale,width-120*MenuScale,55*MenuScale)
 				
-				AAText(x+(width/2.0),y+546*MenuScale,GetLocalString("Menu", "page")+" "+Int(Max((CurrLoadGamePage+1),1))+"/"+Int(Max((Int(Ceil(Float(SaveGameAmount)/6.0))),1)),True,True)
+				AAText(x+(width/2.0),y+466*MenuScale,GetLocalString("Menu", "page")+" "+Int(Max((CurrLoadGamePage+1),1))+"/"+Int(Max((Int(Ceil(Float(SaveGameAmount)/5.0))),1)),True,True)
 				
 				AASetFont 1
 				
-				If CurrLoadGamePage > Ceil(Float(SaveGameAmount)/6.0)-1 Then
+				If CurrLoadGamePage > Ceil(Float(SaveGameAmount)/5.0)-1 Then
 					CurrLoadGamePage = CurrLoadGamePage - 1
 				EndIf
 				
-				If SaveGameAmount = 0 Then
+				If ((First Save) = Null) Then
 					AAText(x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Menu", "nosavegames"))
 				Else
 					x = x + 20 * MenuScale
 					y = y + 20 * MenuScale
 					
-					For i% = (1+(6*CurrLoadGamePage)) To 6+(6*CurrLoadGamePage)
-						If i <= SaveGameAmount Then
+					CurrSave = First Save
+					
+					For i% = 0 To 4+(5*CurrLoadGamePage)
+						If i > 0 Then CurrSave = After CurrSave
+						If i >= (0+(5*CurrLoadGamePage))
 							DrawFrame(x,y,540* MenuScale, 70* MenuScale)
 							
-							If SaveGameVersion(i - 1) <> CompatibleNumber Lor SaveGameLang(i - 1) <> I_Loc\Lang Then
+							If CurrSave\Version <> CompatibleNumber Then
 								Color 255,0,0
 							Else
 								Color 255,255,255
 							EndIf
 							
-							AAText(x + 20 * MenuScale, y + 10 * MenuScale, SaveGames(i - 1))
-							AAText(x + 20 * MenuScale, y + (10+18) * MenuScale, SaveGameTime(i - 1)) ;y + (10+23) * MenuScale
-							AAText(x + 120 * MenuScale, y + (10+18) * MenuScale, SaveGameDate(i - 1))
-							AAText(x + 20 * MenuScale, y + (10+36) * MenuScale, SaveGameVersion(i - 1))
-							AAtext(x + 120 * MenuScale, y + (10+36) * MenuScale, SaveGameLang(i - 1))
+							AAText(x + 20 * MenuScale, y + 10 * MenuScale, CurrSave\Name)
+							AAText(x + 20 * MenuScale, y + (10+18) * MenuScale, CurrSave\Time) ;y + (10+23) * MenuScale
+							AAText(x + 120 * MenuScale, y + (10+18) * MenuScale, CurrSave\Date)
+							AAText(x + 20 * MenuScale, y + (10+36) * MenuScale, CurrSave\Version)
 							
-							If SaveMSG = "" Then
+							If DelSave = Null Then
 								If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "delete"), False) Then
-									SaveMSG = SaveGames(i - 1)
-									DebugLog SaveMSG
+									DelSave = CurrSave
 									Exit
 								EndIf
-								If SaveGameVersion(i - 1) <> CompatibleNumber Lor SaveGameLang(i - 1) <> I_Loc\Lang Then
+								If CurrSave\Version <> CompatibleNumber Then
 									DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
 									Color(255, 0, 0)
 									AAText(x + 330 * MenuScale, y + 34 * MenuScale, GetLocalString("Menu", "load"), True, True)
@@ -473,15 +454,15 @@ Function UpdateMainMenu()
 									If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "load"), False) Then
 										LoadEntities()
 										LoadAllSounds()
-										LoadGame(SavePath + SaveGames(i - 1) + "\")
-										CurrSave = SaveGames(i - 1)
+										LoadGame(SavePath + CurrSave\Name)
 										InitLoadGame(I_Opt)
 										MainMenuOpen = False
+										Exit
 									EndIf
 								EndIf
 							Else
 								DrawFrame(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale)
-								If SaveGameVersion(i - 1) <> CompatibleNumber Lor SaveGameLang(i - 1) <> I_Loc\Lang Then
+								If CurrSave\Version <> CompatibleNumber Then
 									Color(255, 0, 0)
 								Else
 									Color(100, 100, 100)
@@ -493,57 +474,27 @@ Function UpdateMainMenu()
 								AAText(x + 450 * MenuScale, y + 34 * MenuScale, GetLocalString("Menu", "delete"), True, True)
 							EndIf
 							
-							y = y + 80 * MenuScale
-						Else
-							Exit
-						EndIf
-					Next
-					
-					x = 180 * MenuScale
-					y = 396 * MenuScale
-					
-					For i% = (1+(6*CurrLoadGamePage)) To 6+(6*CurrLoadGamePage)
-						If i <= SaveGameAmount Then
-							If MouseOn(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale) And (SaveGameVersion(i - 1) <> CompatibleNumber Lor SaveGameLang(i - 1) <> I_Loc\Lang) Then
-								width = 275*MenuScale
-								height = 75*MenuScale
-								Color 255, 255, 255
-								Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height)
-								width = width - 6*MenuScale
-								height = height - 6*MenuScale
-								Color 0, 0, 0
-								Rect(ScaledMouseX(I_Opt)+(23*MenuScale),ScaledMouseY(I_Opt)+(23*MenuScale),width,height)
-								Color 255, 255, 255
-								AAText(ScaledMouseX(I_Opt)+(23*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(35*MenuScale), GetLocalString("Menu", "savein"), True, True)
-								If SaveGameVersion(i - 1) <> CompatibleNumber Then
-									If SaveGameLang(i - 1) <> I_Loc\Lang Then ;both wrong!
-										RowText(GetLocalString("Menu", "saveinboth"), ScaledMouseX(I_Opt)+(23*MenuScale), ScaledMouseY(I_Opt)+(50*MenuScale), width, height, True)
-									Else ;wrong ver
-										RowText(GetLocalString("Menu", "saveinver"), ScaledMouseX(I_Opt)+(23*MenuScale), ScaledMouseY(I_Opt)+(50*MenuScale), width, height, True)
-									EndIf
-								Else ;wrong loc
-									RowText(GetLocalString("Menu", "saveinloc"), ScaledMouseX(I_Opt)+(23*MenuScale), ScaledMouseY(I_Opt)+(50*MenuScale), width, height, True)
-								EndIf
+							If CurrSave = Last Save Then
+								Exit
 							EndIf
-						Else
-							Exit
+							
+							y = y + 80 * MenuScale
+							
 						EndIf
-						y = y + 80 * MenuScale
 					Next
 					
-					If SaveMSG <> ""
+					If DelSave <> Null
 						x = 740 * MenuScale
 						y = 376 * MenuScale
 						DrawFrame(x, y, 300 * MenuScale, 150 * MenuScale)
 						RowText(GetLocalString("Menu", "deletesave"), x + 20 * MenuScale, y + 15 * MenuScale, 275 * MenuScale, 200 * MenuScale)
 						If DrawButton(x + 25 * MenuScale, y + 100 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "yes"), False) Then
-							DeleteFile(CurrentDir() + SavePath + SaveMSG + "\save.txt")
-							DeleteDir(CurrentDir() + SavePath + SaveMSG)
-							SaveMSG = ""
+							DeleteFile(CurrentDir() + SavePath + DelSave\Name + ".cb")
+							DeleteDir(CurrentDir() + SavePath + DelSave\Name)
 							LoadSaveGames()
 						EndIf
 						If DrawButton(x + 175 * MenuScale, y + 100 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "no"), False) Then
-							SaveMSG = ""
+							DelSave = Null
 						EndIf
 					EndIf
 				EndIf

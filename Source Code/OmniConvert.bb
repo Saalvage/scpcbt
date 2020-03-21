@@ -21,7 +21,7 @@ Function StripPath$(file$)
 	EndIf 
 	
 	Return name$ 
-End Function 
+End Function
 
 Function StripFilename$(file$)
 	Local mi$=""

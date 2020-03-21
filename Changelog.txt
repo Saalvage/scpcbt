@@ -6,24 +6,23 @@
 - Added localization/mod support with built in support for Englisch (due), German, Spanish (South America),
 - Added FOV option (Made by TheHappyJammer).
 	- Decreased default FOV to 60.
-	- Made FOV also internally an integer, fixing an issue with the sliders allowing for float values.
+	- FOV is now also internally an integer, fixing an issue with the sliders allowing for float values.
 - Added support for resolutions of up to 4k.
 - Added anisotropic filtering.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
-- Added EZ-style endroom.
-- Added SCP-106 endroom event to all threee endrooms.
 - Added improved Pizza Day poster.
 - (Re-)Added SCP-173's head rotating.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added new achievment image for SCP-1048.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
 - Added Apollyon difficulty; can be unlocked by beating the game on Keter.
-- Added inventory size as a difficulty factor.
+- Added inventory size scaling with difficulty and custom inventory options.
 - Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A and the radio.
-- Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the render size will be the screen size.
+- Improved the Night Vision Goggles loading screen.
+- Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the game size will be the screen size.
 - Added button to restore all settings to standard values.
 - Added a sound when clicking on disabled checkboxes in the menus.
 - Added option to (re)enable/disable the launcher in-game.
@@ -47,7 +46,8 @@
 	- Fixed SCP-148's refinements.
 	- Improved player view inversion.
 	- And a lot of other improvements!
-- Added EZ lockroom version.
+- Added EZ endroom version.
+- Added SCP-106 endroom event to all threee endrooms.
 - Much improved SCP-205 chamber.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Made fonts dynamic and optimized and improved them.
@@ -67,6 +67,7 @@
 - Added "ulti" command, which spawns a set of ultimate tools.
 - Reworked the disable/enable commands for SCP-173 and SCP-106 and adjusted the teleport commands accordingly.
 - Added a retreat command for SCP-106.
+- Now only 5 save games are displayed per page on the load game tab.
 - Error logs are now stored in a folder.
 - Removed Check for updates feature in launcher.
 - Removed event load text to increase immersion.
@@ -99,8 +100,10 @@ Bug Fixes:
 	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
 	- Fixed z-fighting on monitor model.
+	- Fixed keycard model.
 	- Fixed origami model.
 	- Fixed and reworked the "revive" command.
+	- Fixed untitled save files not correctly being named after the second one.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.
 
 ----------------------------------------------------------------------------------

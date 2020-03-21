@@ -15,9 +15,7 @@ Function SaveGame(file$)
 	Local x%, y%, i%, temp%
 	Local n.NPCs, r.Rooms, do.Doors
 	
-	CreateDir(file)
-	
-	Local f% = WriteFile(file + "save.txt")
+	Local f% = WriteFile(file + ".cb")
 	
 	WriteString f, CurrentTime()
 	WriteString f, CurrentDate()
@@ -479,7 +477,7 @@ Function LoadGame(file$)
 	GameSaved = True
 	
 	Local x#, y#, z#, i%, temp%, strtemp$, r.Rooms, id%, n.NPCs, do.Doors
-	Local f% = ReadFile(file + "save.txt")
+	Local f% = ReadFile(file + ".cb")
 	
 	strtemp = ReadString(f)
 	strtemp = ReadString(f)
@@ -1262,7 +1260,7 @@ Function LoadGameQuick(file$)
 	
 	Local x#, y#, z#, i%, temp%, strtemp$, id%
 	Local player_x#,player_y#,player_z#, r.Rooms, n.NPCs, do.Doors
-	Local f% = ReadFile(file + "save.txt")
+	Local f% = ReadFile(file + ".cb")
 	
 	strtemp = ReadString(f)
 	strtemp = ReadString(f)
@@ -1950,65 +1948,55 @@ Function LoadGameQuick(file$)
 	;CatchErrors("Uncaught LoadGameQuick")
 End Function
 
+Global SavePath$ = "Saves\"
+
+Type Save
+	Field Name$
+	Field Time$
+	Field Date$
+	Field Version$
+End Type
+
+Global CurrSave.Save
+Global DelSave.Save
+Global SaveGameAmount%
+
 Function LoadSaveGames()
-	;CatchErrors("LoadSaveGames")
+
+	For I_SAV.Save = Each Save
+		Delete I_SAV
+	Next
 	SaveGameAmount = 0
+
+	;CatchErrors("LoadSaveGames")
 	If FileType(SavePath)=1 Then RuntimeError "Can't create dir "+Chr(34)+SavePath+Chr(34)
 	If FileType(SavePath)=0 Then CreateDir(SavePath)
-	myDir=ReadDir(SavePath) 
+	myDir=ReadDir(SavePath)
+	NextFile(myDir) : NextFile(myDir) ;Skipping "." and ".."
 	Repeat 
 		file$=NextFile$(myDir) 
 		If file$="" Then Exit 
-		If FileType(SavePath+"\"+file$) = 2 Then 
-			If file <> "." And file <> ".." Then 
-				If (FileType(SavePath + file + "\save.txt")>0) Then
-					SaveGameAmount=SaveGameAmount+1
-				EndIf
-			EndIf
-		EndIf 
-	Forever 
-	CloseDir myDir 
-	
-	Dim SaveGames$(SaveGameAmount+1) 
-	
-	myDir=ReadDir(SavePath) 
-	i = 0
-	Repeat 
-		file$=NextFile$(myDir) 
-		If file$="" Then Exit 
-		If FileType(SavePath+"\"+file$) = 2 Then 
-			If file <> "." And file <> ".." Then 
-				If (FileType(SavePath + file + "\save.txt")>0) Then
-					SaveGames(i) = file
-					i=i+1
-				EndIf
-			EndIf
-		EndIf 
-	Forever 
-	CloseDir myDir 
-	
-	Dim SaveGameTime$(SaveGameAmount + 1)
-	Dim SaveGameDate$(SaveGameAmount + 1)
-	Dim SaveGameVersion$(SaveGameAmount + 1)
-	Dim SaveGameLang$(SaveGameAmount + 1)
-	For i = 1 To SaveGameAmount
-		DebugLog (SavePath + SaveGames(i - 1) + "\save.txt")
-		Local f% = ReadFile(SavePath + SaveGames(i - 1) + "\save.txt")
-		SaveGameTime(i - 1) = ReadString(f)
-		SaveGameDate(i - 1) = ReadString(f)
-		;Skip all data until the CompatibleVersion number
-		ReadInt(f)
-		For j = 0 To 5
+		If FileType(SavePath+"\" + file) = 1 Then 
+			Local NEW_SAV.Save = New Save
+			NEW_SAV\Name = Left(file, Len(file)-3)
+			Local f% = ReadFile(SavePath + file)
+			NEW_SAV\Time = ReadString(f)
+			NEW_SAV\Date = ReadString(f)
+			;Skip all data until the CompatibleVersion number
+			ReadInt(f)
+			For j = 0 To 5
+				ReadFloat(f)
+			Next
+			ReadString(f)
 			ReadFloat(f)
-		Next
-		ReadString(f)
-		ReadFloat(f)
-		ReadFloat(f)
-		;End Skip
-		SaveGameVersion(i - 1) = ReadString(f)
-		SaveGameLang(i - 1) = ReadString(f)
-		CloseFile f
-	Next
+			ReadFloat(f)
+			;End Skip
+			NEW_SAV\Version = ReadString(f)
+			CloseFile f
+			SaveGameAmount = SaveGameAmount + 1
+		EndIf 
+	Forever 
+	CloseDir myDir
 	
 	;CatchErrors("Uncaught LoadSaveGames")
 End Function

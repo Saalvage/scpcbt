@@ -7,9 +7,9 @@
 		Juan Pablo Arce ("juanjp600")
 		Luggs123
 		Ryan Stillings ("Risingstar64")
-		Stefan ("Salvage")
 		Sam Lynch ("InnocentSam")
 		Shaun Gaylard ("ENDSHN")
+		Stefan ("Salvage")
 
 
 *3D Modellers
@@ -18,6 +18,8 @@
 		Apocryphos
 		Atomicsneak
 		Brandon Smith
+		Cpt. Hazama
+		Dawid Mleczko ("Mleczyk76")
 		EternalError
 		GamerEntitlement
 		Hakkla
@@ -32,7 +34,9 @@
 		Reilly Grindle ("Mirocaine")
 		SaitoFox
 		Sam Lynch ("InnocentSam")
+		Senhor
 		Shaun Gaylard ("ENDSHN")
+		Stefan ("Salvage")
 		Tom Malinowski
 		Vladislav Borisevich ("Vane Brain")
 
@@ -76,10 +80,12 @@
 		Brokami
 		Caleb Yu ("Omniary")
 		KyoteeWilliams
+		Manuel (Aesthetical#8028)
 		Orgil Pount ("Destructoid")
 		Pavel Lvovich Gorfunkel ("-Mark-")
 		Shadowscale48
 		Shaun Gaylard ("ENDSHN")
+		Stefan ("Salvage")
 		Vladislav Borisevich ("Vane Brain")
 
 

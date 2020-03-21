@@ -1156,7 +1156,7 @@ Type RoomTemplates
 	
 	Field MinX#, MinY#, MinZ#
 	Field MaxX#, MaxY#, MaxZ#
-End Type 	
+End Type
 
 Function CreateRoomTemplate.RoomTemplates(meshpath$)
 	Local rt.RoomTemplates = New RoomTemplates
@@ -1333,7 +1333,7 @@ Type Rooms
 	
 	Field MinX#, MinY#, MinZ#
 	Field MaxX#, MaxY#, MaxZ#
-End Type 
+End Type
 
 Const gridsz%=13 ;Same size as the main map itself (better for the map creator)
 
@@ -5002,7 +5002,7 @@ Type LightTemplates
 	
 	Field pitch#, yaw#
 	Field innerconeangle%, outerconeangle#
-End Type 
+End Type
 
 Function AddTempLight.LightTemplates(rt.RoomTemplates, x#, y#, z#, ltype%, range#, r%, g%, b%)
 	lt.lighttemplates = New LightTemplates
@@ -5024,7 +5024,7 @@ End Function
 Type TempWayPoints
 	Field x#, y#, z#
 	Field roomtemplate.RoomTemplates
-End Type 
+End Type
 
 Type WayPoints
 	Field obj
@@ -7317,7 +7317,7 @@ End Function
 ;CHUNKS FOR 1499
 ;#########################################################################
 
-Dim CHUNKDATA(64,64)
+Global CHUNKDATA[64 * 64 - 1]
 
 Function SetChunkDataValues()
 	Local StrTemp$,i%,j%
@@ -7326,7 +7326,7 @@ Function SetChunkDataValues()
 	
 	For i = 0 To 63
 		For j = 0 To 63
-			CHUNKDATA(i,j)=Rand(0,GetINIInt("Data\1499chunks.INI","general","count"))
+			CHUNKDATA[i * 64 + j]=Rand(0,GetINIInt("Data\1499chunks.INI","general","count"))
 		Next
 	Next
 	
@@ -7465,7 +7465,7 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 			EndIf
 		Next
 		If (Not chunkfound)
-			CurrChunkData = CHUNKDATA(Abs(((x+32)/40) Mod 64),Abs(((z+32)/40) Mod 64))
+			CurrChunkData = CHUNKDATA[Abs(((x+32)/40) Mod 64) * 64 + (Abs(((z+32)/40) Mod 64))]
 			;ch2 = CreateChunk(Rand(0,GetINIInt("Data\1499chunks.INI","general","count")),x#,y#,z#)
 			ch2 = CreateChunk(CurrChunkData%,x#,y#,z#)
 			ch2\IsSpawnChunk = False

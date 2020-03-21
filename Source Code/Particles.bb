@@ -10,7 +10,7 @@ Type Particles
 	Field SizeChange#
 	
 	Field lifetime#
-End Type 
+End Type
 	
 Function CreateParticle.Particles(x#, y#, z#, image%, size#, gravity# = 1.0, lifetime% = 200)
 	Local p.Particles = New Particles
@@ -96,7 +96,7 @@ Type Emitters
 	
 	Field Speed#, RandAngle#
 	Field SizeChange#, Achange#
-End Type 
+End Type
 
 Function UpdateEmitters()
 	InSmoke = False

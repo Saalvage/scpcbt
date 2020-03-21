@@ -311,7 +311,7 @@ Function LoadMesh_Strict(File$,parent=0)
 	tmp = LoadMesh(File$, parent)
 	If tmp = 0 Then RuntimeError "Failed to load 3D Mesh: " + File$ 
 	Return tmp  
-End Function   
+End Function
 
 Function LoadAnimMesh_Strict(File$,parent=0)
 	Local I_Loc.Loc = First Loc
@@ -323,7 +323,7 @@ Function LoadAnimMesh_Strict(File$,parent=0)
 	tmp = LoadAnimMesh(File$, parent)
 	If tmp = 0 Then RuntimeError "Failed to load 3D Animated Mesh: " + File$ 
 	Return tmp
-End Function   
+End Function
 
 ;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest ; I fucked around in it, and it works nandy dandy ~ Salvage
 Function LoadTexture_Strict(File$,flags=1)
@@ -336,7 +336,7 @@ Function LoadTexture_Strict(File$,flags=1)
 	tmp = LoadTexture(File$, flags+(256*(EnableVRam=True)))
 	If tmp = 0 Then RuntimeError "Failed to load Texture: " + File$ 
 	Return tmp 
-End Function   
+End Function
 
 Function LoadBrush_Strict(file$,flags,u#=1.0,v#=1.0)
 	Local I_Loc.Loc = First Loc
@@ -348,7 +348,7 @@ Function LoadBrush_Strict(file$,flags,u#=1.0,v#=1.0)
 	tmp = LoadBrush(file$, flags, u, v)
 	If tmp = 0 Then RuntimeError "Failed to load Brush: " + file$ 
 	Return tmp 
-End Function 
+End Function
 
 Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=0)
 	If FileType(file$)<>1 Then RuntimeError "Font " + file$ + " not found."

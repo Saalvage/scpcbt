@@ -317,6 +317,7 @@ Global MenuScale# = (I_Opt\GraphicHeight / 1024.0)
 
 SetBuffer(BackBuffer())
 
+; FPSfactor 1 value: 70 FPS
 Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, PrevFPSFactor#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
 
@@ -855,7 +856,7 @@ Type Doors
 	Field NPCCalledElevator% = False
 	
 	Field DoorHitOBJ%
-End Type 
+End Type
 
 Dim BigDoorOBJ(2), HeavyDoorObj(2)
 Dim OBJTunnel(7)
@@ -1415,6 +1416,7 @@ End Function
 DrawLoading(40,True)
 
 Include "Source Code\MapSystem.bb"
+Include "Source Code\Save.bb"
 
 DrawLoading(80,True)
 
@@ -1434,7 +1436,7 @@ Type Events
 	Field EventStr$
 	
 	Field img%
-End Type 
+End Type
 
 Function CreateEvent.Events(eventname$, roomname$, id%, prob# = 0.0)
 	;roomname = the name of the room(s) you want the event to be assigned to
@@ -1741,19 +1743,6 @@ Include "Source Code\Menu.bb"
 MainMenuOpen = True
 
 ;---------------------------------------------------------------------------------------------------
-
-Type MEMORYSTATUS
-	Field dwLength%
-	Field dwMemoryLoad%
-	Field dwTotalPhys%
-	Field dwAvailPhys%
-	Field dwTotalPageFile%
-	Field dwAvailPageFile%
-	Field dwTotalVirtual%
-	Field dwAvailVirtual%
-End Type
-
-Global m.MEMORYSTATUS = New MEMORYSTATUS
 
 FlushKeys()
 FlushMouse()
@@ -2162,7 +2151,7 @@ Repeat
 						Msg = Msg + " " + GetLocalString("Messages", "saveload")
 					EndIf
 				Else
-					SaveGame(SavePath + CurrSave + "\")
+					SaveGame(SavePath + CurrSave\Name)
 				EndIf
 			ElseIf SelectedDifficulty\saveType = SAVEONSCREENS
 				If SelectedScreen=Null And SelectedMonitor=Null Then
@@ -2185,7 +2174,7 @@ Repeat
 							Playable = True
 							DropSpeed = 0
 						EndIf
-						SaveGame(SavePath + CurrSave + "\")
+						SaveGame(SavePath + CurrSave\Name)
 					EndIf
 				EndIf
 			Else
@@ -2630,8 +2619,8 @@ Function Kill()
 		KillAnim = Rand(0,1)
 		PlaySound_Strict(DamageSFX(0))
 		If SelectedDifficulty\permaDeath Then
-			DeleteFile(CurrentDir() + SavePath + CurrSave+"\save.txt") 
-			DeleteDir(SavePath + CurrSave)
+			DeleteFile(CurrentDir() + SavePath + CurrSave\Name + ".cb")
+			DeleteDir(SavePath + CurrSave\Name)
 			LoadSaveGames()
 		EndIf
 		
@@ -2944,7 +2933,7 @@ Function DrawCredits()
 		MenuOpen = False
 		MainMenuOpen = True
 		MainMenuTab = 0
-		CurrSave = ""
+		CurrSave = Null
 		FlushKeys()
 	EndIf
 	
@@ -6170,7 +6159,7 @@ Function DrawMenu()
 		If AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG <= 0
 			AASetFont 1
 			AAText x, y, GetLocalString("Menu", "difficulty")+": "+SelectedDifficulty\name
-			AAText x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+CurrSave
+			AAText x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+CurrSave\Name
 			AAText x, y+40*MenuScale, GetLocalString("Menu", "seed")+": "+RandomSeed
 		ElseIf AchievementsMenu <= 0 And OptionsMenu > 0 And QuitMSG <= 0 And KillTimer >= 0
 			If DrawButton(x + 101 * MenuScale, y + 390 * MenuScale, 230 * MenuScale, 60 * MenuScale, GetLocalString("Menu", "back")) Then
@@ -6573,12 +6562,12 @@ Function DrawMenu()
 					QuitButton = 140
 					If DrawButton(x, y + 60*MenuScale, 390*MenuScale, 60*MenuScale, GetLocalString("Menu", "quitsave")) Then
 						DropSpeed = 0
-						SaveGame(SavePath + CurrSave + "\")
+						SaveGame(SavePath + CurrSave\Name)
 						NullGame()
 						MenuOpen = False
 						MainMenuOpen = True
 						MainMenuTab = 0
-						CurrSave = ""
+						CurrSave = Null
 						FlushKeys()
 					EndIf
 				EndIf
@@ -6589,7 +6578,7 @@ Function DrawMenu()
 				MenuOpen = False
 				MainMenuOpen = True
 				MainMenuTab = 0
-				CurrSave = ""
+				CurrSave = Null
 				FlushKeys()
 			EndIf
 			
@@ -6662,7 +6651,7 @@ Function DrawMenu()
 							DrawLoading(0)
 							
 							MenuOpen = False
-							LoadGameQuick(SavePath + CurrSave + "\")
+							LoadGameQuick(SavePath + CurrSave\Name)
 							
 							MoveMouse viewport_center_x,viewport_center_y
 							AASetFont 1
@@ -6718,7 +6707,7 @@ Function DrawMenu()
 						DrawLoading(0)
 						
 						MenuOpen = False
-						LoadGameQuick(SavePath + CurrSave + "\")
+						LoadGameQuick(SavePath + CurrSave\Name)
 						
 						MoveMouse viewport_center_x,viewport_center_y
 						AASetFont 1
@@ -6764,7 +6753,7 @@ Function DrawMenu()
 					MenuOpen = False
 					MainMenuOpen = True
 					MainMenuTab = 0
-					CurrSave = ""
+					CurrSave = Null
 					FlushKeys()
 				EndIf
 				y= y + 80*MenuScale
@@ -7631,8 +7620,6 @@ Function NullGame(playbuttonsfx%=True)
 	
 	DeathMSG$=""
 	
-	SelectedMap = ""
-	
 	UsedConsole = False
 	
 	DoorTempID = 0
@@ -7887,8 +7874,6 @@ Function NullGame(playbuttonsfx%=True)
 	;CatchErrors("Uncaught NullGame")
 End Function
 
-Include "Source Code\save.bb"
-
 ;--------------------------------------- music & sounds ----------------------------------------------
 
 Function PlaySound2%(SoundHandle%, cam%, entity%, range# = 10, volume# = 1.0)
@@ -7994,7 +7979,7 @@ Function UpdateMusic()
 		EndIf
 	EndIf
 	
-End Function 
+End Function
 
 Function PauseSounds()
 	For e.events = Each Events
@@ -9429,7 +9414,7 @@ Function DefaultOptionsINI()
 	PutINIValue(OptionFile, "console", "enabled", 0)
 	PutINIValue(OptionFile, "console", "auto opening", 0)
 	
-End Function 
+End Function
 
 ; Find mesh extents
 Function GetMeshExtents(Mesh%)

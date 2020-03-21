@@ -5,7 +5,7 @@ Const NPCtype372% = 6, NPCtypeApache% = 7, NPCtypeMTF% = 8, NPCtype096 = 9
 Const NPCtype049% = 10, NPCtypeZombie% = 11, NPCtype5131% = 12, NPCtypeTentacle% = 13
 Const NPCtype860% = 14, NPCtype939% = 15, NPCtype066% = 16, NPCtypePdPlane% = 17
 Const NPCtype966% = 18, NPCtype1048a = 19, NPCtype1499% = 20, NPCtype008% = 21, NPCtypeClerk% = 22
-Const NPCtype178% = 23
+Const NPCtype178% = 23, NPCtype682% = 24
 
 
 Type NPCs
@@ -501,15 +501,16 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-066", "scale")/2.5
 			ScaleEntity n\obj, temp, temp, temp		
 			
-			;If BumpEnabled Then 
-			;	diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.jpg")
-			;	bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
-			;	;TextureBlend bump1, FE_BUMP ;USE DOT3
-			;	EntityTexture n\obj, bump1, 0, 1
-			;	EntityTexture n\obj, diff1, 0, 2
-			;	FreeTexture diff1
-			;	FreeTexture bump1
-			;EndIf
+			; If BumpEnabled Then 
+				; diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.jpg")
+				; bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
+				; TextureBlend bump1, 4 ;USE DOT3
+				; EntityFX n\obj, 2
+				; EntityTexture n\obj, bump1, 0, 0
+				; EntityTexture n\obj, diff1, 0, 1
+				; FreeTexture diff1
+				; FreeTexture bump1
+			; EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-066", "speed") / 100.0)
 			
@@ -541,6 +542,21 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider,HIT_178
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-178", "speed") / 100.0)
+			
+		Case NPCtype682
+		
+			n\NVName = "SCP-682"
+			
+			n\Collider = CreatePivot()
+			EntityRadius n\Collider,1.2
+			EntityType n\Collider, HIT_PLAYER
+			
+			n\obj = LoadAnimMesh_Strict("GFX\npcs\682.b3d")
+			
+			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-682", "scale")
+			ScaleEntity n\obj, temp, temp, temp
+			
+			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-682", "speed") / 100.0)
 
 		Case NPCtype966
 
@@ -4277,6 +4293,15 @@ Function UpdateNPCs()
 					EndIf
 					
 				EndIf
+				
+			Case NPCtype682
+			
+				; Idle = 1 - 199
+				; IdleToWalk = 200 - 260
+				; Walk = 261 - 310
+			
+				AnimateNPC(n, 1, 199, 20.0/70.0)
+				PositionEntity(n\obj, EntityX(n\Collider, True), EntityY(n\Collider, True)-0.55, EntityZ(n\Collider, True))
 
 			Case NPCtype966
 
@@ -7213,36 +7238,31 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 			n.NPCs = CreateNPC(NPCtypeOldMan, EntityX(Collider), EntityY(Collider) - 0.5, EntityZ(Collider))
 			n\State = -1
 			consoleMSG = "SCP-106 spawned."
-			
 		Case "173", "scp173", "scp-173", "statue"
 			n.NPCs = CreateNPC(NPCtype173, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			Curr173 = n
 			If (Curr173\Idle = 3) Then Curr173\Idle = False
 			consoleMSG = "SCP-173 spawned."
-			
 		Case "178-1", "1781", "scp-178-1", "scp178-1"
 			n.NPCs = CreateNPC(NPCtype178, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-178-1 instance spawned."
 			CreateConsoleMsg("SCP-178-1 instances will be invisible unless you equip SCP-178.", 255, 255, 0)
-			
 		Case "372", "scp372", "scp-372"
 			n.NPCs = CreateNPC(NPCtype372, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-372 spawned."
-			
 		Case "513-1", "5131", "scp513-1", "scp-513-1"
 			n.NPCs = CreateNPC(NPCtype5131, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-513-1 spawned."
-			
 		Case "860-2", "8602", "scp860-2", "scp-860-2"
 			CreateConsoleMsg("SCP-860-2 cannot be spawned with the console. Sorry!", 255, 0, 0)
-			
 		Case "939", "scp939", "scp-939"
 			CreateConsoleMsg("SCP-939 instances cannot be spawned with the console. Sorry!", 255, 0, 0)
-
+		Case "682", "scp682", "scp-682"
+			n.NPCs = CreateNPC(NPCtype682, EntityX(Collider), EntityY(Collider) + 1.2, EntityZ(Collider))
+			consoleMSG = "SCP-682 instance spawned."
 		Case "966", "scp966", "scp-966"
 			n.NPCs = CreateNPC(NPCtype966, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-966 instance spawned."
-			
 		Case "1048-a", "scp1048-a", "scp-1048-a", "scp1048a", "scp-1048a"
 			CreateConsoleMsg("SCP-1048-A cannot be spawned with the console. Sorry!", 255, 0, 0)
 			

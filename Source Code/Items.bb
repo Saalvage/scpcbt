@@ -24,7 +24,7 @@ Type ItemTemplates
 	
 	Field scale#
 	Field tex%, texpath$
-End Type 
+End Type
 
 Function CreateItemTemplate.ItemTemplates(tempname$, objpath$, invimgpath$, imgpath$, scale#, sound%, namespec$ = "", texturepath$ = "",invimgpath2$="",Anim%=0, texflags%=9)
 	Local it.ItemTemplates = New ItemTemplates, n
@@ -309,7 +309,7 @@ Function InitItemTemplates()
 		EndIf
 	Next
 	
-End Function 
+End Function
 
 
 
@@ -335,7 +335,7 @@ Type Items
 	Field SecondInv.Items[20]
 	Field ID%
 	Field invSlots%
-End Type 
+End Type
 
 Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#=1.0,invSlots%=0)
 	;CatchErrors("CreateItem")
