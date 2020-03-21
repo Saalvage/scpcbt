@@ -1182,8 +1182,6 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 		Flip
 	Forever
 	
-	FreeImage(IMG)
-	
 	PutINIValue(OptionFile, "options", "width", I_LOpt\GfxModeWidths[I_LOpt\SelectedGFXMode])
 	PutINIValue(OptionFile, "options", "height", I_LOpt\GfxModeHeights[I_LOpt\SelectedGFXMode])
 	PutINIValue(OptionFile, "options", "mode", I_Opt\GraphicMode)
@@ -1191,6 +1189,8 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 	PutINIValue(OptionFile, "options", "pack", I_LOpt\Locs[I_LOpt\SelectedLoc])
 	
 	If quit Then End
+	
+	FreeImage(IMG)
 	
 End Function
 

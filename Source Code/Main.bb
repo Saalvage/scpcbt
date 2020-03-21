@@ -68,9 +68,19 @@ Type LocalString
 End Type
 
 Function UpdateLang(I_Loc.Loc, Lang$)
-	I_Loc\Lang = Lang
-	I_Loc\LangPath = "Localization\" + Lang + "\"
-	I_Loc\Localized = Lang <> "English"
+	If Lang = "English" Then
+		I_Loc\Lang = ""
+		I_Loc\LangPath = ""
+		I_Loc\Localized = False
+	Else
+		If I_Loc\LangPath <> "" Then ;Only need to delete local and fonts, because this line is only ever called twice in the launcher
+			DeleteINIFile(I_Loc\LangPath + "Data\local.ini")
+			DeleteINIFile(I_Loc\LangPath + "Data\fonts.ini")
+		EndIf
+		I_Loc\Lang = Lang
+		I_Loc\LangPath = "Localization\" + Lang + "\"
+		I_Loc\Localized = True
+	EndIf
 	For l.LocalString = Each LocalString
 		Delete l
 	Next
@@ -91,6 +101,7 @@ Function UpdateLang(I_Loc.Loc, Lang$)
 	SetLocalString("Menu", "options")
 	SetLocalString("Menu", "back")
 	SetLocalString("Menu", "quit")
+	ReloadFonts(First Options)
 End Function
 
 Local I_Loc.Loc = New Loc
@@ -137,7 +148,7 @@ Function GetLocalStringR$(Section$, Parameter$, Replace$)
 	
 End Function
 
-Function LoadLocalFont(AA%, Font$, Size%)
+Function LoadLocalFont(AA%, Font$, Size%) ;Fonts and especially AAText are a fucking mess, but I don't even know where to begin cleaning up
 
 	Local I_Loc.Loc = First Loc
 	
@@ -183,21 +194,6 @@ Function ReloadFonts(I_Opt.Options)
 	
 	AASetFont(1)
 End Function
-
-Type LauncherOptions
-	Field TotalGFXModes%
-	Field GFXModes%
-	Field SelectedGFXMode%
-	Field GfxModeWidths%[64], GfxModeHeights%[64]
-	Field TotalLocs%
-	Field SelectedLoc%
-	Field Locs$[2048]
-End Type
-
-Local I_LOpt.LauncherOptions = New LauncherOptions
-
-I_LOpt\TotalGFXModes = CountGfxModes3D()
-I_LOpt\TotalLocs = GetFileAmount("Localization\", True)
 
 Include "Source Code\StrictLoads.bb"
 Include "Source Code\Keys.bb"
@@ -253,18 +249,33 @@ Include "Source Code\AAText.bb"
 
 Global QuickLoad_CurrEvent.Events
 
+Type LauncherOptions
+	Field TotalGFXModes%
+	Field GFXModes%
+	Field SelectedGFXMode%
+	Field GfxModeWidths%[64], GfxModeHeights%[64]
+	Field TotalLocs%
+	Field SelectedLoc%
+	Field Locs$[2048]
+End Type
+
 ButtonSFX% = LoadSound_Strict("SFX\Interact\Button.ogg")
 ButtonSFX2% = LoadSound_Strict("SFX\Interact\Button2.ogg")
 
-If I_Opt\LauncherEnabled Then 
+If I_Opt\LauncherEnabled Then
+	Local I_LOpt.LauncherOptions = New LauncherOptions
+
+	I_LOpt\TotalGFXModes = CountGfxModes3D()
+	I_LOpt\TotalLocs = GetFileAmount("Localization\", True)
+
 	AspectRatioRatio = 1.0
 	
 	AppTitle GetLocalString("Menu", "titlelauncher")
 	
 	UpdateLauncher(I_LOpt, I_Loc)
+	
+	Delete I_LOpt
 EndIf
-
-Delete I_LOpt
 
 
 ;New "fake fullscreen" - ENDSHN Psst, it's called borderless windowed mode --Love Mark, But it's an alliteration (and it's true)!! ~Salvage
@@ -9067,6 +9078,24 @@ Function UpdateINIFile$(filename$)
 	CloseFile(f)
 End Function
 
+Function DeleteINIFile(filename$)
+	If FileType(filename) <> 0 Then
+		Local file.INIFile = Null
+		For k.INIFile = Each INIFile
+			If k\name = Lower(filename) Then
+				file = k
+			EndIf
+		Next
+		If file <> Null Then
+			FreeBank file\bank
+			DebugLog "FREED BANK FOR "+filename
+			Delete file
+			Return
+		EndIf
+	EndIf
+	DebugLog "COULD NOT FREE BANK FOR "+filename+": INI FILE IS NOT LOADED"
+End Function
+
 Function GetINIString$(file$, section$, parameter$, defaultvalue$="")
 	Local TemporaryString$ = ""
 	
@@ -9896,7 +9925,6 @@ Function CheckTriggers$()
 End Function
 
 Function ScaledMouseX%(I_Opt.Options)
-	DebugLog RealGraphicWidth
 	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(I_Opt\GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
 

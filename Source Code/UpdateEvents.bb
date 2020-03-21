@@ -9297,59 +9297,59 @@ Function UpdateEndings()
 							EndIf
 							
 							If e\EventState > 26.5*70 Then
-								If e\room\Objects[12] = 0 Then
-									e\room\Objects[12] = LoadMesh_Strict("GFX\NPCs\682arm.b3d")
-									ScaleEntity e\room\Objects[12], 0.15,0.15,0.15
-									temp = (Min(((EntityDistance(e\room\NPC[3]\Collider,Collider)/RoomScale)-3000.0)/4,1000)+12192.0)*RoomScale
-									PositionEntity e\room\Objects[12],EntityX(e\room\NPC[3]\Collider),12192.0*RoomScale,EntityZ(e\room\NPC[3]\Collider)
-									RotateEntity e\room\Objects[12],0,e\room\angle+Rnd(-10,10),0,True
-									TurnEntity e\room\Objects[12], 0,0,180
-								Else
-									If WrapAngle(EntityRoll(e\room\Objects[12]))<340.0 Then 
-										angle# = WrapAngle(EntityRoll(e\room\Objects[12]))
-										TurnEntity e\room\Objects[12], 0,0,(5.0+Abs(Sin(angle))*2)*FPSfactor
-										If angle < 270 And WrapAngle(EntityRoll(e\room\Objects[12]))=> 270 Then
-											PlaySound_Strict LoadTempSound("SFX\Character\Apache\Crash1.ogg")
-											e\room\NPC[3]\State = 4
-											e\room\NPC[3]\State2 = 1.0
-											e\room\NPC[3]\EnemyX = EntityX(e\room\Objects[7],True)
-											e\room\NPC[3]\EnemyY = EntityY(e\room\Objects[7],True)-2.5
-											e\room\NPC[3]\EnemyZ = EntityZ(e\room\Objects[7],True)
+								; If e\room\Objects[12] = 0 Then
+									; e\room\Objects[12] = LoadMesh_Strict("GFX\NPCs\682arm.b3d")
+									; ScaleEntity e\room\Objects[12], 0.15,0.15,0.15
+									; temp = (Min(((EntityDistance(e\room\NPC[3]\Collider,Collider)/RoomScale)-3000.0)/4,1000)+12192.0)*RoomScale
+									; PositionEntity e\room\Objects[12],EntityX(e\room\NPC[3]\Collider),12192.0*RoomScale,EntityZ(e\room\NPC[3]\Collider)
+									; RotateEntity e\room\Objects[12],0,e\room\angle+Rnd(-10,10),0,True
+									; TurnEntity e\room\Objects[12], 0,0,180
+								; Else
+									; If WrapAngle(EntityRoll(e\room\Objects[12]))<340.0 Then 
+										; angle# = WrapAngle(EntityRoll(e\room\Objects[12]))
+										; TurnEntity e\room\Objects[12], 0,0,(5.0+Abs(Sin(angle))*2)*FPSfactor
+										; If angle < 270 And WrapAngle(EntityRoll(e\room\Objects[12]))=> 270 Then
+											; PlaySound_Strict LoadTempSound("SFX\Character\Apache\Crash1.ogg")
+											; e\room\NPC[3]\State = 4
+											; e\room\NPC[3]\State2 = 1.0
+											; e\room\NPC[3]\EnemyX = EntityX(e\room\Objects[7],True)
+											; e\room\NPC[3]\EnemyY = EntityY(e\room\Objects[7],True)-2.5
+											; e\room\NPC[3]\EnemyZ = EntityZ(e\room\Objects[7],True)
 											
-											em.Emitters = CreateEmitter(EntityX(e\room\NPC[3]\Collider), EntityY(e\room\NPC[3]\Collider), EntityZ(e\room\NPC[3]\Collider),0)
-											em\Room = PlayerRoom
-											em\RandAngle = 45
-											em\Gravity = -0.18
-											em\LifeTime = 400
-											em\SizeChange = Rnd(0.005,0.007)
-											em\Achange = -0.004
-											TurnEntity(em\Obj, -80+20*i, 0, 0)
-											EntityParent em\Obj, e\room\NPC[3]\Collider
+											; em.Emitters = CreateEmitter(EntityX(e\room\NPC[3]\Collider), EntityY(e\room\NPC[3]\Collider), EntityZ(e\room\NPC[3]\Collider),0)
+											; em\Room = PlayerRoom
+											; em\RandAngle = 45
+											; em\Gravity = -0.18
+											; em\LifeTime = 400
+											; em\SizeChange = Rnd(0.005,0.007)
+											; em\Achange = -0.004
+											; TurnEntity(em\Obj, -80+20*i, 0, 0)
+											; EntityParent em\Obj, e\room\NPC[3]\Collider
 											
-											If ParticleAmount > 0
-												For i = 0 To (3+(4*(ParticleAmount-1)))
-													p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, Rnd(0.5,1.0), -0.1, 200)
-													p\speed = 0.01
-													p\SizeChange = 0.01
-													p\A = 1.0
-													p\Achange = -0.005
-													RotateEntity p\pvt, Rnd(360),Rnd(360),0
-													MoveEntity p\pvt, 0,0,0.3
-												Next
+											; If ParticleAmount > 0
+												; For i = 0 To (3+(4*(ParticleAmount-1)))
+													; p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, Rnd(0.5,1.0), -0.1, 200)
+													; p\speed = 0.01
+													; p\SizeChange = 0.01
+													; p\A = 1.0
+													; p\Achange = -0.005
+													; RotateEntity p\pvt, Rnd(360),Rnd(360),0
+													; MoveEntity p\pvt, 0,0,0.3
+												; Next
 												
-												For i = 0 To (6+(6*(ParticleAmount-1)))
-													p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, 0.02, 0.003, 200)
-													p\speed = 0.04
-													p\A = 1.0
-													p\Achange = -0.005
-													RotateEntity p\pvt, Rnd(360),Rnd(360),0
-												Next
-											EndIf
-										EndIf
-									Else
-										HideEntity e\room\Objects[12]
-									EndIf
-								EndIf
+												; For i = 0 To (6+(6*(ParticleAmount-1)))
+													; p.Particles = CreateParticle(EntityX(e\room\NPC[3]\Collider),EntityY(e\room\NPC[3]\Collider),EntityZ(e\room\NPC[3]\Collider), 0, 0.02, 0.003, 200)
+													; p\speed = 0.04
+													; p\A = 1.0
+													; p\Achange = -0.005
+													; RotateEntity p\pvt, Rnd(360),Rnd(360),0
+												; Next
+											; EndIf
+										; EndIf
+									; Else
+										; HideEntity e\room\Objects[12]
+									; EndIf
+								; EndIf TODO NEW 682
 							EndIf
 							
 							

@@ -454,34 +454,6 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			If n\obj = 0 Then 
 				n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-939.b3d")
 				
-				;If BumpEnabled Then
-				;	bump1 = LoadTexture_Strict("GFX\npcs\scp-939_licker_normal.png")
-				;	;TextureBlend bump1, FE_BUMP ;USE DOT3
-				;	
-				;	For i = 2 To CountSurfaces(n\obj)
-				;		sf = GetSurface(n\obj,i)
-				;		b = GetSurfaceBrush( sf )
-				;		If b<>0 Then
-				;			t1 = GetBrushTexture(b,0)
-				;			If t1<>0 Then
-				;				Select Lower(StripPath(TextureName(t1)))
-				;					Case "scp-939-licker_diffusetest01.png"
-				;						
-				;						;BrushTexture b, bump1, 0, 0
-				;						BrushTexture b, t1, 0, 1
-				;						PaintSurface sf,b
-				;						
-				;				  ;If StripPath(TextureName(t1)) <> "" Then FreeTexture t1
-				;				  ;FreeBrush b   
-				;				End Select
-				;				FreeTexture t1
-				;			EndIf
-				;			FreeBrush b
-				;		EndIf
-				;	Next
-				;	FreeTexture bump1
-				;EndIf
-				
 				temp# = GetINIFloat("DATA\NPCs.ini", "SCP-939", "scale")/2.5
 				ScaleEntity n\obj, temp, temp, temp		
 			EndIf
@@ -500,17 +472,6 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-066.b3d")
 			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-066", "scale")/2.5
 			ScaleEntity n\obj, temp, temp, temp		
-			
-			; If BumpEnabled Then 
-				; diff1 = LoadTexture_Strict("GFX\npcs\scp-066_diffuse01.jpg")
-				; bump1 = LoadTexture_Strict("GFX\npcs\scp-066_normal.png")
-				; TextureBlend bump1, 4 ;USE DOT3
-				; EntityFX n\obj, 2
-				; EntityTexture n\obj, bump1, 0, 0
-				; EntityTexture n\obj, diff1, 0, 1
-				; FreeTexture diff1
-				; FreeTexture bump1
-			; EndIf
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-066", "speed") / 100.0)
 			
