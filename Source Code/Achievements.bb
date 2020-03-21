@@ -51,11 +51,11 @@ Function AchievementTooltip(achvno%)
 
 	Local scale# = I_Opt\GraphicHeight/768.0
 	
-	AASetFont 3
-	Local width = AAStringWidth(AchievementStrings[achvno])
-	AASetFont 1
-	If (AAStringWidth(AchievementDescs[achvno])>width) Then
-		width = AAStringWidth(AchievementDescs[achvno])
+	SetFont I_Opt\Fonts[3]
+	Local width = StringWidth(AchievementStrings[achvno])
+	SetFont I_Opt\Fonts[1]
+	If (StringWidth(AchievementDescs[achvno])>width) Then
+		width = StringWidth(AchievementDescs[achvno])
 	EndIf
 	width = width+20*MenuScale
 	
@@ -65,10 +65,10 @@ Function AchievementTooltip(achvno%)
 	Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height,True)
 	Color 150,150,150
 	Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height,False)
-	AASetFont 3
-	AAText(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(35*MenuScale), AchievementStrings[achvno], True, True)
-	AASetFont 1
-	AAText(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(55*MenuScale), AchievementDescs[achvno], True, True)
+	SetFont I_Opt\Fonts[3]
+	Text(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(35*MenuScale), AchievementStrings[achvno], True, True)
+	SetFont I_Opt\Fonts[1]
+	Text(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(55*MenuScale), AchievementDescs[achvno], True, True)
 End Function
 
 Function DrawAchvIMG(x%, y%, achvno%)
@@ -142,7 +142,7 @@ Function UpdateAchievementMsg()
 			Color 50,50,50
 			Rect(x+10*scale,y+10*scale,64*scale,64*scale,False)
 			Color 255,255,255
-			AASetFont 1
+			SetFont I_Opt\Fonts[1]
 			RowText(GetLocalString("Messages", "achvunlock")+" - "+amsg\txt,x+84*scale,y+10*scale,width-94*scale,y-20*scale)
 			If amsg\msgtime > 0.0 And amsg\msgtime < 70*7
 				amsg\msgtime = amsg\msgtime + FPSfactor

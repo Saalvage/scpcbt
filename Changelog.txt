@@ -73,6 +73,7 @@
 - Removed event load text to increase immersion.
 - Removed scene in which Guard Ulgrin provides D-9341 with classified information (the document will now be found just after the initial intro).
 - Removed 16-Bit mode.
+- Removed Antialiased Text (the implementation was very inconsistent and caused a lot of problems, if enough people request it, I will look towards reimplementation).
 - Removed and renamed a few commands.
 - Removed Graphics Driver Selection, which did not change anything anyways.
 - Removed unused and duplicate files.

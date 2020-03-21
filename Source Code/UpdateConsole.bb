@@ -13,7 +13,7 @@ Function UpdateConsole()
 	If ConsoleOpen Then
 		Local cm.ConsoleMsg
 		
-		AASetFont 0
+		SetFont I_Opt\Fonts[0]
 		
 		ConsoleR = 255 : ConsoleG = 255 : ConsoleB = 255
 		
@@ -1112,9 +1112,9 @@ Function UpdateConsole()
 					EndIf
 					Color cm\r,cm\g,cm\b
 					If cm\isCommand Then
-						AAText(x + 20*MenuScale, TempY, "> "+cm\txt)
+						Text(x + 20*MenuScale, TempY, "> "+cm\txt)
 					Else
-						AAText(x + 20*MenuScale, TempY, cm\txt)
+						Text(x + 20*MenuScale, TempY, cm\txt)
 					EndIf
 				EndIf
 				TempY = TempY - 15*MenuScale
@@ -1127,6 +1127,6 @@ Function UpdateConsole()
 		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
 	EndIf
 	
-	AASetFont 1
+	SetFont I_Opt\Fonts[1]
 	
 End Function
