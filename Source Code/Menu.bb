@@ -296,7 +296,7 @@ Function UpdateMainMenu()
 							SelectedDifficulty\items = SelectedDifficulty\items + 2
 							If SelectedDifficulty\items = 3 Then
 								SelectedDifficulty\items = 2
-							Else If SelectedDifficulty\items > 20 Then
+							ElseIf SelectedDifficulty\items > 20 Then
 								SelectedDifficulty\items = 1
 							EndIf
 							PlaySound_Strict(ButtonSFX)
@@ -304,7 +304,7 @@ Function UpdateMainMenu()
 							SelectedDifficulty\items = SelectedDifficulty\items - 2
 							If SelectedDifficulty\items = 0 Then
 								SelectedDifficulty\items = 1
-							Else If SelectedDifficulty\items < 0 Then
+							ElseIf SelectedDifficulty\items < 0 Then
 								SelectedDifficulty\items = 20
 							EndIf
 							PlaySound_Strict(ButtonSFX)
@@ -454,7 +454,7 @@ Function UpdateMainMenu()
 									If DrawButton(x + 280 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "load"), False) Then
 										LoadEntities()
 										LoadAllSounds()
-										LoadGame(SavePath + CurrSave\Name)
+										LoadGame(CurrSave\Name)
 										InitLoadGame(I_Opt)
 										MainMenuOpen = False
 										Exit
@@ -489,9 +489,7 @@ Function UpdateMainMenu()
 						DrawFrame(x, y, 300 * MenuScale, 150 * MenuScale)
 						RowText(GetLocalString("Menu", "deletesave"), x + 20 * MenuScale, y + 15 * MenuScale, 275 * MenuScale, 200 * MenuScale)
 						If DrawButton(x + 25 * MenuScale, y + 100 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "yes"), False) Then
-							DeleteFile(CurrentDir() + SavePath + DelSave\Name + ".cb")
-							DeleteDir(CurrentDir() + SavePath + DelSave\Name)
-							LoadSaveGames()
+							DeleteGame(DelSave)
 						EndIf
 						If DrawButton(x + 175 * MenuScale, y + 100 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "no"), False) Then
 							DelSave = Null
@@ -1028,7 +1026,7 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 	
 	MenuScale = 1
 	
-	Graphics3DExt(L_WIDTH, L_HEIGHT, 0, 2)
+	Graphics3DExt(L_WIDTH, L_HEIGHT, 2)
 
 	;InitExt
 	
@@ -1037,10 +1035,10 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 	RealGraphicWidth = I_Opt\GraphicWidth
 	RealGraphicHeight = I_Opt\GraphicHeight
 	
-	I_Opt\Fonts[1] = LoadLocalFont("Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[1] = LoadLocalFont("Font1", 18)
 	SetFont I_Opt\Fonts[1]
 	MenuWhite = LoadImage_Strict("GFX\menu\menuwhite.jpg")
-	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")	
+	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")
 	MaskImage MenuBlack, 255,255,0
 	
 	Local IMG% = LoadImage_Strict("GFX\menu\launcher.jpg")

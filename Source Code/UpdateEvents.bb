@@ -158,7 +158,7 @@ Function UpdateEvents()
 					
 					If (CurrTrigger = "173scene_timer") Then
 						e\EventState = e\EventState+FPSfactor
-					Else If (CurrTrigger = "173scene_activated")
+					ElseIf (CurrTrigger = "173scene_activated")
 						e\EventState = Max(e\EventState, 500)
 					EndIf
 					
@@ -1920,6 +1920,9 @@ Function UpdateEvents()
 					If Curr096=Null Then
 						Curr096 = CreateNPC(NPCtype096, EntityX(e\room\obj,True), EntityY(e\room\obj,True)+0.3, EntityZ(e\room\obj,True))
 						RotateEntity Curr096\Collider, 0, e\room\angle+45, 0, True
+						tex = LoadTexture_Strict("GFX\NPCs\SCP096Bloody.jpg")
+						EntityTexture Curr096\obj, tex
+						FreeTexture tex
 					EndIf
 					RemoveEvent(e)
 				EndIf
@@ -3570,7 +3573,7 @@ Function UpdateEvents()
 						PositionEntity e\room\Objects[0],e\room\x+firstX*2.0,8.0,e\room\z+firstY*2.0,True
 						PositionEntity e\room\Objects[1],e\room\x+lastX*2.0,8.0,e\room\z+lastY*2.0,True
 						
-					Else If e\room\grid\Meshes[0]=0 Then
+					ElseIf e\room\grid\Meshes[0]=0 Then
 						
 						;place the tunnels
 						For i=0 To 6
@@ -4087,10 +4090,10 @@ Function UpdateEvents()
 									GiveAchievement(Achv1048)
 								EndIf
 							EndIf
-						Else If e\EventState=1
+						ElseIf e\EventState=1
 							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 1, 205, 0.5, False)
 							If AnimTime(e\room\Objects[2])=205 Then e\EventState=2
-						Else If e\EventState = 2
+						ElseIf e\EventState = 2
 							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 205, 353, 1.0)	
 							If (EntityDistanceSquared(Collider, e\room\Objects[2])<2.25) Then ;1.5
 								DrawHandIcon = True
@@ -4344,6 +4347,9 @@ Function UpdateEvents()
 							FreeSound_Strict e\Sound : e\Sound = 0
 							e\Sound=LoadSound_Strict("SFX\Character\Guard\096ServerRoom2.ogg")
 							e\SoundCHN=PlaySound_Strict(e\Sound)
+							tex = LoadTexture_Strict("GFX\NPCs\SCP096Bloody.jpg")
+							EntityTexture Curr096\obj, tex
+							FreeTexture tex
 							
 							Curr096\CurrSpeed = 0
 							
@@ -6241,7 +6247,7 @@ Function UpdateEvents()
 								EndIf
 						End Select
 					EndIf
-				Else If (e\room\Objects[3]<>0)
+				ElseIf (e\room\Objects[3]<>0)
 					HideEntity(e\room\Objects[3])
 					HideEntity(e\room\Objects[4])
 					HideEntity(e\room\Objects[5])
@@ -7464,7 +7470,7 @@ Function UpdateEvents()
 							If (e\EventState2>250.0 And e\EventState2-FPSfactor <= 250.0) Then
 								Msg = GetLocalString("Messages", "1048aa" + Rand(3))
 								MsgTimer = 70.0 * 3.0
-							Else If (e\EventState2>600.0 And e\EventState2-FPSfactor <= 600.0)
+							ElseIf (e\EventState2>600.0 And e\EventState2-FPSfactor <= 600.0)
 								Msg = GetLocalString("Messages", "1048ab" + Rand(4))
 								MsgTimer = 70.0 * 5.0
 							EndIf

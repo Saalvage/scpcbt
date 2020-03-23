@@ -467,13 +467,13 @@ Function UpdateConsole()
 							it.Items = CreateItem(itt\tempname, EntityX(Collider), EntityY(Camera,True), EntityZ(Collider), itt\namespec)
 							EntityType(it\collider, HIT_ITEM)
 							Exit
-						Else If (Lower(itt\tempname) = StrTemp) Then
+						ElseIf (Lower(itt\tempname) = StrTemp) Then
 							temp = True
 							CreateConsoleMsg(itt\localname + " spawned.")
 							it.Items = CreateItem(itt\tempname, EntityX(Collider), EntityY(Camera,True), EntityZ(Collider), itt\namespec)
 							EntityType(it\collider, HIT_ITEM)
 							Exit
-						Else If (Lower(itt\localname) = StrTemp) Then
+						ElseIf (Lower(itt\localname) = StrTemp) Then
 							temp = True
 							CreateConsoleMsg(itt\localname + " spawned.")
 							it.Items = CreateItem(itt\tempname, EntityX(Collider), EntityY(Camera,True), EntityZ(Collider), itt\namespec)
@@ -652,7 +652,7 @@ Function UpdateConsole()
 						CreateConsoleMsg("Death by SCP-173 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 						Curr173\Idle = False
-					Else If EntityDistance(Collider, Curr106\Collider) < 1.0 Then
+					ElseIf EntityDistance(Collider, Curr106\Collider) < 1.0 Then
 						CreateConsoleMsg("Death by SCP-106 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 					EndIf
@@ -815,8 +815,8 @@ Function UpdateConsole()
 				Case "asd3"
 					I_Cheats\GodMode = 1
 					I_Cheats\NoClip = 1
-					CameraFogNear = 15
-					CameraFogFar = 20
+					CameraFogNear = INFINITY
+					CameraFogFar = INFINITY
 					
 					;stfu
 					For snd.Sound = Each Sound
@@ -981,6 +981,9 @@ Function UpdateConsole()
 					it\state = 101
 					
 					it.Items = CreateItem("finenvg", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
+					EntityType(it\collider, HIT_ITEM)
+					
+					it.Items = CreateItem("scramble", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\collider, HIT_ITEM)
 					
 					it.Items = CreateItem("supergasmask", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))

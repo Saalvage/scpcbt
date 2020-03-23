@@ -15,10 +15,16 @@ Function SaveGame(file$)
 	Local x%, y%, i%, temp%
 	Local n.NPCs, r.Rooms, do.Doors
 	
-	Local f% = WriteFile(file + ".cb")
+	file = SavePath + file
+	
+	CreateDir(file)
+	
+	Local f% = WriteFile(file + "\main.cb")
 	
 	WriteString f, CurrentTime()
 	WriteString f, CurrentDate()
+	
+	WriteString f, CompatibleNumber
 	
 	WriteInt f, PlayTime
 	
@@ -34,10 +40,6 @@ Function SaveGame(file$)
 	
 	WriteFloat f, EntityPitch(Collider)
 	WriteFloat f, EntityYaw(Collider)
-	
-	WriteString f, CompatibleNumber
-	
-	WriteString f, I_Loc\Lang
 	
 	WriteByte f, InvertMouseComplete
 	
@@ -96,6 +98,7 @@ Function SaveGame(file$)
 	WriteByte f, WearingVest
 	WriteByte f, WearingHazmat
 	
+	WriteByte f, WearingScramble
 	WriteByte f, WearingNightVision
 	WriteByte f, Wearing178
 	WriteByte f, Wearing1499
@@ -477,10 +480,12 @@ Function LoadGame(file$)
 	GameSaved = True
 	
 	Local x#, y#, z#, i%, temp%, strtemp$, r.Rooms, id%, n.NPCs, do.Doors
-	Local f% = ReadFile(file + ".cb")
+	Local f% = ReadFile(SavePath + file + "\main.cb")
 	
-	strtemp = ReadString(f)
-	strtemp = ReadString(f)
+	ReadString(f)
+	ReadString(f)
+	
+	version = ReadString(f)
 	
 	PlayTime = ReadInt(f)
 	
@@ -501,11 +506,6 @@ Function LoadGame(file$)
 	x = ReadFloat(f)
 	y = ReadFloat(f)
 	RotateEntity(Collider, x, y, 0, 0)
-	
-	strtemp = ReadString(f)
-	version = strtemp
-	
-	If I_Loc\Lang <> ReadString(f) Then RuntimeError("Savegame has different localization, couldn't load")
 	
 	InvertMouseComplete = ReadByte(f)
 	
@@ -560,6 +560,7 @@ Function LoadGame(file$)
 	WearingVest = ReadByte(f)	
 	WearingHazmat = ReadByte(f)
 	
+	WearingScramble = ReadByte(f)
 	WearingNightVision = ReadByte(f)
 	Wearing178 = ReadByte(f)
 	Wearing1499 = ReadByte(f)
@@ -747,7 +748,7 @@ Function LoadGame(file$)
 			id = ReadByte(f)
 			If id=2 Then
 				Exit
-			Else If id=1 Then
+			ElseIf id=1 Then
 				RotateEntity(r\Levers[x], 78, EntityYaw(r\Levers[x]), 0)
 			Else
 				RotateEntity(r\Levers[x], -78, EntityYaw(r\Levers[x]), 0)
@@ -1260,10 +1261,12 @@ Function LoadGameQuick(file$)
 	
 	Local x#, y#, z#, i%, temp%, strtemp$, id%
 	Local player_x#,player_y#,player_z#, r.Rooms, n.NPCs, do.Doors
-	Local f% = ReadFile(file + ".cb")
+	Local f% = ReadFile(SavePath + file + "\main.cb")
 	
-	strtemp = ReadString(f)
-	strtemp = ReadString(f)
+	ReadString(f)
+	ReadString(f)
+	
+	version = ReadString(f)
 	
 	DropSpeed = -0.1
 	HeadDropSpeed = 0.0
@@ -1307,11 +1310,6 @@ Function LoadGameQuick(file$)
 	x = ReadFloat(f)
 	y = ReadFloat(f)
 	RotateEntity(Collider, x, y, 0, 0)
-	
-	strtemp = ReadString(f)
-	version = strtemp
-	
-	If I_Loc\Lang <> ReadString(f) Then RuntimeError("Savegame has different localization, couldn't load")
 	
 	InvertMouseComplete = ReadByte(f)
 	
@@ -1366,6 +1364,7 @@ Function LoadGameQuick(file$)
 	WearingVest = ReadByte(f)	
 	WearingHazmat = ReadByte(f)
 	
+	WearingScramble = ReadByte(f)
 	WearingNightVision = ReadByte(f)
 	Wearing178 = ReadByte(f)
 	Wearing1499 = ReadByte(f)
@@ -1551,7 +1550,7 @@ Function LoadGameQuick(file$)
 			id = ReadByte(f)
 			If id=2 Then
 				Exit
-			Else If id=1 Then
+			ElseIf id=1 Then
 				RotateEntity(r\Levers[x], 78, EntityYaw(r\Levers[x]), 0)
 			Else
 				RotateEntity(r\Levers[x], -78, EntityYaw(r\Levers[x]), 0)
@@ -1948,6 +1947,20 @@ Function LoadGameQuick(file$)
 	;CatchErrors("Uncaught LoadGameQuick")
 End Function
 
+Function DeleteGame(I_SAV.Save)
+	I_SAV\Name = SavePath + I_SAV\Name + "\"
+	delDir% = ReadDir(I_SAV\Name)
+	NextFile(delDir) : NextFile(delDir) ;Skipping "." and ".."
+	file$=NextFile(delDir) ;B3D doesn't have footcontrolled while :(
+	While file<>""
+		DeleteFile(I_SAV\Name + file)
+		file=NextFile$(delDir)
+	Wend
+	CloseDir(delDir)
+	DeleteDir(I_SAV\Name)
+	Delete I_SAV
+End Function
+
 Global SavePath$ = "Saves\"
 
 Type Save
@@ -1973,29 +1986,20 @@ Function LoadSaveGames()
 	If FileType(SavePath)=0 Then CreateDir(SavePath)
 	myDir=ReadDir(SavePath)
 	NextFile(myDir) : NextFile(myDir) ;Skipping "." and ".."
-	Repeat 
-		file$=NextFile$(myDir) 
-		If file$="" Then Exit 
-		If FileType(SavePath+"\" + file) = 1 Then 
+	file$=NextFile$(myDir) ;B3D doesn't have footcontrolled while :(
+	While file<>""
+		If FileType(SavePath + file) = 2 Then 
 			Local NEW_SAV.Save = New Save
-			NEW_SAV\Name = Left(file, Len(file)-3)
-			Local f% = ReadFile(SavePath + file)
+			NEW_SAV\Name = file
+			Local f% = ReadFile(SavePath + file + "\main.cb")
 			NEW_SAV\Time = ReadString(f)
 			NEW_SAV\Date = ReadString(f)
-			;Skip all data until the CompatibleVersion number
-			ReadInt(f)
-			For j = 0 To 5
-				ReadFloat(f)
-			Next
-			ReadString(f)
-			ReadFloat(f)
-			ReadFloat(f)
-			;End Skip
 			NEW_SAV\Version = ReadString(f)
 			CloseFile f
 			SaveGameAmount = SaveGameAmount + 1
-		EndIf 
-	Forever 
+		EndIf
+		file=NextFile$(myDir)
+	Wend
 	CloseDir myDir
 	
 	;CatchErrors("Uncaught LoadSaveGames")

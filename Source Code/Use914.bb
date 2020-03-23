@@ -831,6 +831,8 @@ Function Use914(item.Items, setting$, x#, y#, z#)
 				Case "1:1", "fine", "very fine"
 					remove = 0
 			End Select
+		Case "scramble"
+			;TODO
 		Case "nav300", "nav"
 			Select setting
 				Case "rough", "coarse"

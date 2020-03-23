@@ -25,14 +25,14 @@ Function CreateBlurImage(I_Opt.Options)
 	AddTriangle sf, 0, 1, 2
 	AddTriangle sf, 3, 2, 1
 	EntityFX spr, 17
-	ScaleEntity spr, 2048.0 / Float(ark_sw), 2048.0 / Float(ark_sw), 1
+	ScaleEntity spr, SMALLEST_POWER_TWO / Float(ark_sw), SMALLEST_POWER_TWO / Float(ark_sw), 1
 	PositionEntity spr, 0, 0, 1.0001
 	EntityOrder spr, -100000
 	EntityBlend spr, 1
 	ark_blur_image = spr
 	
 	;Create blur texture
-	ark_blur_texture = CreateTexture(2048, 2048, 256)
+	ark_blur_texture = CreateTexture(SMALLEST_POWER_TWO, SMALLEST_POWER_TWO, 256)
 	EntityTexture spr, ark_blur_texture
 End Function
 
@@ -40,6 +40,6 @@ Function UpdateBlur(power#, I_Opt.Options)
 	
 	EntityAlpha ark_blur_image, power#
 	
-	CopyRect 0, 0, I_Opt\GraphicWidth, I_Opt\GraphicHeight, 1024.0 - (I_Opt\GraphicWidth/2), 1024.0 - (I_Opt\GraphicHeight/2), BackBuffer(), TextureBuffer(ark_blur_texture)
+	CopyRect 0, 0, ark_sw, ark_sh, SMALLEST_POWER_TWO_HALF - (ark_sw/2), SMALLEST_POWER_TWO_HALF - (ark_sh/2), BackBuffer(), TextureBuffer(ark_blur_texture)
 	
 End Function

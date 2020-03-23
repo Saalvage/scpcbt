@@ -242,6 +242,9 @@ Function InitItemTemplates()
 						; state1: Battery level (0 - 1000)
 						; state2: Used for interaction with SCP-895
 						
+	CreateItemTemplate("scramble", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.02, 2)
+						; state1: Battery level (0 - 1000)
+						
 	CreateItemTemplate("nav300", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("navulti", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
@@ -437,6 +440,8 @@ Function RemoveItem(i.Items)
 		Select SelectedItem\itemtemplate\tempname
 			Case "badnvg", "nvg", "finenvg", "supernvg"
 				WearingNightVision = False
+			Case "scramble"
+				WearingScramble = False
 			Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 				WearingGasMask = False
 			Case "badvest", "vest", "finevest"
@@ -755,35 +760,40 @@ Function DropItem(item.Items,playdropsound%=True)
 	
 	ResetEntity (item\collider)
 	
-	item\Picked = 0
 	For z% = 0 To MaxItemAmount - 1
 		If Inventory(z) = item Then Inventory(z) = Null
 	Next
-	Select item\itemtemplate\tempname
-		Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
-			WearingGasMask = False
-		Case "hazmat0", "hazmat", "hazmat2", "hazmat3"
-			WearingHazmat = False
-		Case "badvest", "vest", "finevest"
-			WearingVest = False
-		Case "badnvg"
-			If WearingNightVision = -1 Then WearingNightVision = False
-		Case "nvg"
-			If WearingNightVision = 1 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
-		Case "supernvg"
-			If WearingNightVision = 2 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
-		Case "finenvg"
-			If WearingNightVision = 3 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
-		Case "scp178"
-			Wearing178 = 0
-		Case "scp427", "super427"
-			Local I_427.SCP427 = First SCP427
-			I_427\Using = 0
-		Case "scp714"
-			Wearing714 = False
-		Case "bad1499","scp1499","super1499","fine1499"
-			Wearing1499 = False
-	End Select
+	If item\Picked = 2 Then
+		Select item\itemtemplate\tempname
+			Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
+				WearingGasMask = False
+			Case "hazmat0", "hazmat", "hazmat2", "hazmat3"
+				WearingHazmat = False
+			Case "badvest", "vest", "finevest"
+				WearingVest = False
+			Case "badnvg"
+				If WearingNightVision = -1 Then WearingNightVision = False
+			Case "nvg"
+				If WearingNightVision = 1 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
+			Case "supernvg"
+				If WearingNightVision = 2 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
+			Case "finenvg"
+				If WearingNightVision = 3 Then CameraFogFar = StoredCameraFogFar : WearingNightVision = False
+			Case "scramble"
+				WearingScramble = False
+			Case "scp178"
+				Wearing178 = 0
+			Case "scp427", "super427"
+				Local I_427.SCP427 = First SCP427
+				I_427\Using = 0
+			Case "scp714"
+				Wearing714 = False
+			Case "bad1499","scp1499","super1499","fine1499"
+				Wearing1499 = False
+		End Select
+	EndIf
+	
+	item\Picked = 0
 	
 	;CatchErrors("Uncaught DropItem")
 	

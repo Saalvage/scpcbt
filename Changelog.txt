@@ -9,12 +9,14 @@
 	- FOV is now also internally an integer, fixing an issue with the sliders allowing for float values.
 - Added support for resolutions of up to 4k.
 - Added anisotropic filtering.
+- Added SCRAMBLE gear.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
+- (Re-)Added SCP-173's head rotating.
+- Added bloody SCP-096 texture after killing someone.
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
-- (Re-)Added SCP-173's head rotating.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added new achievment image for SCP-1048.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
@@ -60,6 +62,7 @@
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
+- Flipped vest around.
 - Increased size of the SCP-148 ingot.
 - Increased size of Electronical Components.
 - Added ability to clear current console input via Ctrl + Backspace.
@@ -80,8 +83,8 @@
 
 
 Bug Fixes:
-	- Fixed button sound not working when not using launcher.
 	- Fixed room lights not working most of the time.
+	- Fixed button sound not working when not using launcher.
 	- Fixed input boxes displaying too many characters for a frame, if too many characters are entered.
 	- Fixed inventory not being fully centered.
 	- Fixed an exploit allowing the player to avoid SCP-1025 resetting by opening the inventory.
@@ -94,7 +97,9 @@ Bug Fixes:
 	- Fixed SCP-1025's appendicitis messages not showing up.
 	- Fixed SCP-1074-A's scream being able to be heard anywhere.
 	- Fixed godmode not protecting against all injuries.
+	- Fixed inventory single clicks being recognized as double clicks.
 	- Fixed launcher options not saving when quitting instead of launching.
+	- Fixed messages being visible in the pause menu.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.

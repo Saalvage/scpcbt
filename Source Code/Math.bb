@@ -49,7 +49,7 @@ Function angleDist#(a0#,a1#)
 	Local bb#
 	If b<-180.0 Then
 		bb = b+360.0
-	Else If b>180.0 Then
+	ElseIf b>180.0 Then
 		bb = b-360.0
 	Else
 		bb = b

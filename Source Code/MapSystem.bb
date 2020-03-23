@@ -1134,7 +1134,7 @@ Type RoomTemplates
 	Field obj%, id%
 	Field objPath$
 	
-	Field zone%[5]
+	Field zone%
 	
 	;Field ambience%
 	
@@ -1213,9 +1213,7 @@ Function LoadRoomTemplates(file$)
 				Default
 			End Select
 			
-			For i = 0 To 4
-				rt\zone[i]= GetINIInt(file, TemporaryString, "zone"+(i+1))
-			Next
+			rt\zone = GetINIInt(file, TemporaryString, "zone")
 			
 			rt\Commonness = Max(Min(GetINIInt(file, TemporaryString, "commonness"), 100), 0)
 			rt\Large = GetINIInt(file, TemporaryString, "large")
@@ -1382,43 +1380,35 @@ Function CreateRoom.Rooms(zone%, roomshape%, x#, y#, z#, name$ = "")
 	
 	Local temp% = 0
 	For rt.RoomTemplates = Each RoomTemplates
-		
-		For i = 0 To 4
-			If rt\zone[i]=zone Then 
-				If rt\Shape = roomshape Then temp=temp+rt\Commonness : Exit
-			EndIf
-		Next
-		
+		If rt\zone = zone And rt\Shape = roomshape Then temp=temp+rt\Commonness
 	Next
 	
 	Local RandomRoom% = Rand(temp)
 	temp = 0
 	For rt.RoomTemplates = Each RoomTemplates
-		For i = 0 To 4
-			If rt\zone[i]=zone And rt\Shape = roomshape Then
-				temp=temp+rt\Commonness
-				If RandomRoom > temp - rt\Commonness And RandomRoom <= temp Then
-					r\RoomTemplate = rt
-					
-					If rt\obj=0 Then LoadRoomMesh(rt)
-					
-					r\obj = CopyEntity(rt\obj)
-					ScaleEntity(r\obj, RoomScale, RoomScale, RoomScale)
-					EntityType(r\obj, HIT_MAP)
-					EntityPickMode(r\obj, 2)
-					
-					PositionEntity(r\obj, x, y, z)
-					FillRoom(r)
-					
-					If r\RoomTemplate\UseLightCones
-						AddLightCones(r)
-					EndIf
-					
-					CalculateRoomExtents(r)
-					Return r	
+		If rt\zone = zone And rt\Shape = roomshape Then
+			temp=temp+rt\Commonness
+			If RandomRoom > temp - rt\Commonness And RandomRoom <= temp Then
+				r\RoomTemplate = rt
+				
+				If rt\obj=0 Then LoadRoomMesh(rt)
+				
+				r\obj = CopyEntity(rt\obj)
+				ScaleEntity(r\obj, RoomScale, RoomScale, RoomScale)
+				EntityType(r\obj, HIT_MAP)
+				EntityPickMode(r\obj, 2)
+				
+				PositionEntity(r\obj, x, y, z)
+				FillRoom(r)
+				
+				If r\RoomTemplate\UseLightCones
+					AddLightCones(r)
 				EndIf
+				
+				CalculateRoomExtents(r)
+				Return r	
 			EndIf
-		Next
+		EndIf
 	Next
 	
 	;CatchErrors("Uncaught CreateRoom")
@@ -6449,7 +6439,7 @@ Function CreateMap()
 										DebugLog "ROOM2C forced into slot ("+(x+1)+", "+(y)+")"
 										MapTemp(x+1,y-1)=1
 										temp=1
-									Else If (MapTemp(x+1,y+2)+MapTemp(x+2,y+1)+MapTemp(x+1,y+1))=0 Then
+									ElseIf (MapTemp(x+1,y+2)+MapTemp(x+2,y+1)+MapTemp(x+1,y+1))=0 Then
 										MapTemp(x,y)=2
 										MapTemp(x+1,y)=2
 										DebugLog "ROOM2C forced into slot ("+(x+1)+", "+(y)+")"
@@ -6465,7 +6455,7 @@ Function CreateMap()
 										DebugLog "ROOM2C forced into slot ("+(x-1)+", "+(y)+")"
 										MapTemp(x-1,y-1)=1
 										temp=1
-									Else If (MapTemp(x-1,y+2)+MapTemp(x-2,y+1)+MapTemp(x-1,y+1))=0 Then
+									ElseIf (MapTemp(x-1,y+2)+MapTemp(x-2,y+1)+MapTemp(x-1,y+1))=0 Then
 										MapTemp(x,y)=2
 										MapTemp(x-1,y)=2
 										DebugLog "ROOM2C forced into slot ("+(x-1)+", "+(y)+")"
@@ -6481,7 +6471,7 @@ Function CreateMap()
 										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y+1)+")"
 										MapTemp(x-1,y+1)=1
 										temp=1
-									Else If (MapTemp(x+2,y+1)+MapTemp(x+1,y+2)+MapTemp(x+1,y+1))=0 Then
+									ElseIf (MapTemp(x+2,y+1)+MapTemp(x+1,y+2)+MapTemp(x+1,y+1))=0 Then
 										MapTemp(x,y)=2
 										MapTemp(x,y+1)=2
 										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y+1)+")"
@@ -6497,7 +6487,7 @@ Function CreateMap()
 										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y-1)+")"
 										MapTemp(x-1,y-1)=1
 										temp=1
-									Else If (MapTemp(x+2,y-1)+MapTemp(x+1,y-2)+MapTemp(x+1,y-1))=0 Then
+									ElseIf (MapTemp(x+2,y-1)+MapTemp(x+1,y-2)+MapTemp(x+1,y-1))=0 Then
 										MapTemp(x,y)=2
 										MapTemp(x,y-1)=2
 										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y-1)+")"
@@ -6738,11 +6728,11 @@ Function CreateMap()
 						Else
 							If MapTemp(x, y) = 255 Then
 								Color 0,200,0
-							Else If MapTemp(x,y)=4 Then
+							ElseIf MapTemp(x,y)=4 Then
 								Color 50,50,255
-							Else If MapTemp(x,y)=3 Then
+							ElseIf MapTemp(x,y)=3 Then
 								Color 50,255,255
-							Else If MapTemp(x,y)=2 Then
+							ElseIf MapTemp(x,y)=2 Then
 								Color 255,255,50
 							Else
 								Color 255, 255, 255

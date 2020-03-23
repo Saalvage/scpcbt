@@ -227,6 +227,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 
 		Case NPCtype372
 
+			n\NVName = "SCP-372"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.2
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\372.b3d")
@@ -255,6 +256,12 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.26
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp096.b3d")
+			
+			n\Obj2 = CreateSprite(FindChild(n\Obj, "Reyelid"))
+			ScaleSprite(n\Obj2, 0.07, 0.08)
+			EntityOrder(n\Obj2, -5)
+			EntityTexture(n\Obj2, DarkTexture)
+			HideEntity n\Obj2
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-096", "speed") / 100.0)
 			
@@ -1261,6 +1268,15 @@ Function UpdateNPCs()
 				Local I_Opt.Options = First Options
 
 				dist = EntityDistance(Collider, n\Collider)
+				angle = WrapAngle(DeltaYaw(n\Collider, Collider));-EntityYaw(n\Collider,True))
+				
+				If WearingScramble <> 0 And dist < 16.0 And (angle<135 Lor angle>225) And EntityVisible(Camera, n\obj2) Then
+					ShowEntity n\obj2
+					ScaleSprite(n\obj2, Rnd(0.06, 0.08), Rnd(0.07, 0.09))
+					PositionEntity n\obj2, Rnd(0.1)-0.05, Rnd(0.1)-0.05, Rnd(0.1)-0.05
+				Else
+					HideEntity n\obj2
+				EndIf
 				
 				Select n\State
 					Case 0
@@ -1300,31 +1316,20 @@ Function UpdateNPCs()
 							EndIf
 							;AnimateNPC(n, 1085,1412, 0.1) ;sitting
 							
-							angle = WrapAngle(DeltaYaw(n\Collider, Collider));-EntityYaw(n\Collider,True))
-							
-							If (Not NoTarget)
-								If angle<90 Lor angle>270 Then
-									CameraProject Camera,EntityX(n\Collider), EntityY(n\Collider)+0.25, EntityZ(n\Collider)
+							If (Not NoTarget) And WearingScramble = 0 And (angle<90 Lor angle>270) Then
+								CameraProject Camera,EntityX(n\Collider), EntityY(n\Collider)+0.25, EntityZ(n\Collider)
+								
+								If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth And ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight And EntityVisible(Collider, n\Collider) And (BlinkTimer < - 16 Lor BlinkTimer > - 6) Then
+									PlaySound_Strict LoadTempSound("SFX\SCP\096\Triggered.ogg")
 									
-									If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth Then
-										If ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight Then
-											If EntityVisible(Collider, n\Collider) Then
-												If (BlinkTimer < - 16 Lor BlinkTimer > - 6)
-													PlaySound_Strict LoadTempSound("SFX\SCP\096\Triggered.ogg")
-													
-													CurrCameraZoom = 10
-													
-													n\Frame = 194
-													;n\Frame = 307
-													StopStream_Strict(n\SoundChn) : n\SoundChn=0
-													n\Sound = 0
-													n\State = 1
-													n\State3 = 0
-												EndIf
-											EndIf									
-										EndIf
-									EndIf								
+									CurrCameraZoom = 10
 									
+									n\Frame = 194
+									;n\Frame = 307
+									StopStream_Strict(n\SoundChn) : n\SoundChn=0
+									n\Sound = 0
+									n\State = 1
+									n\State3 = 0
 								EndIf
 							EndIf
 						EndIf
@@ -1643,29 +1648,21 @@ Function UpdateNPCs()
 							EndIf
 							
 							angle = WrapAngle(DeltaYaw(n\Collider, Camera));-EntityYaw(n\Collider))
-							If (Not NoTarget)
-								If angle<55 Lor angle>360-55 Then
-									CameraProject Camera,EntityX(n\Collider), EntityY(Collider)+5.8*0.2-0.25, EntityZ(n\Collider)
+							
+							If (Not NoTarget) And WearingScramble = 0 And (angle<55 Lor angle>360-55) Then
+								CameraProject Camera,EntityX(n\Collider), EntityY(Collider)+5.8*0.2-0.25, EntityZ(n\Collider)
+								
+								If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth And ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight And EntityVisible(Collider, n\Collider) And (BlinkTimer < - 16 Lor BlinkTimer > - 6)
+									PlaySound_Strict LoadTempSound("SFX\SCP\096\Triggered.ogg")
 									
-									If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth Then
-										If ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight Then
-											If EntityVisible(Collider, n\Collider) Then
-												If (BlinkTimer < - 16 Lor BlinkTimer > - 6)
-													PlaySound_Strict LoadTempSound("SFX\SCP\096\Triggered.ogg")
-													
-													CurrCameraZoom = 10
-													
-													If n\Frame >= 422
-														n\Frame = 677 ;833
-													EndIf
-													StopStream_Strict(n\SoundChn) : n\SoundChn=0
-													n\Sound = 0
-													n\State = 2
-												EndIf
-											EndIf									
-										EndIf
+									CurrCameraZoom = 10
+									
+									If n\Frame >= 422
+										n\Frame = 677 ;833
 									EndIf
-									
+									StopStream_Strict(n\SoundChn) : n\SoundChn=0
+									n\Sound = 0
+									n\State = 2
 								EndIf
 							EndIf
 						EndIf
@@ -3065,7 +3062,7 @@ Function UpdateNPCs()
 				Select n\State
 					Case 0 ;idle
 						n\CurrSpeed = CurveValue(0.0, n\CurrSpeed, 5.0)
-					Case 1 ;rides
+					Case 1 ;driving
 						n\CurrSpeed = CurveValue(n\Speed*0.7, n\CurrSpeed, 20.0)
 						Animate2(n\obj, AnimTime(n\obj), 1, 20, n\CurrSpeed * 5)
 				End Select
@@ -4315,7 +4312,7 @@ Function UpdateNPCs()
 					
 					If Stamina<10 Then 
 						n\State3=n\State3+FPSfactor
-					Else If n\State3 < 900.0
+					ElseIf n\State3 < 900.0
 						n\State3=Max(n\State3-FPSfactor*0.2,0.0)
 					EndIf
 					
