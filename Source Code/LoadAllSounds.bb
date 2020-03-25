@@ -192,4 +192,6 @@ Function LoadAllSounds()
 	;Dim VehicleSFX%(1)
 		VehicleSFX(0) = LoadSound_Strict("SFX\Room\Intro\Vehicle\VehicleMove.ogg")
 		VehicleSFX(1) = LoadSound_Strict("SFX\Room\Intro\Vehicle\VehicleIdle.ogg")
+		
+	ScrambleSFX = LoadSound_Strict("SFX\General\scramble_ambiance.ogg")
 End Function

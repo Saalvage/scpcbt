@@ -325,17 +325,65 @@ Function LoadAnimMesh_Strict(File$,parent=0)
 	Return tmp
 End Function
 
+Type TextureInCache
+	Field tex%
+	Field name$
+	Field delType%
+End Type
+
+Const DEL_NEVER = 0
+Const DEL_GAME = 1
+Const DEL_ZONE = 2
+
 ;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest ; I fucked around in it, and it works nandy dandy ~ Salvage
-Function LoadTexture_Strict(File$,flags=1)
+Function LoadTexture_Strict(File$,flags=1,delType%=-1)
+	
+	If delType > -1 Then
+		Local FileStripped$ = StripPath(File)
+		For Tic.TextureInCache = Each TextureInCache
+			If FileStripped = Tic\name Then
+				Return Tic\tex
+			EndIf
+		Next
+	EndIf
+	
 	Local I_Loc.Loc = First Loc
+	Local tmp%
 	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
-		Return LoadTexture(I_Loc\LangPath + File$, flags+(256*(EnableVRam=True)))
+		tmp = LoadTexture(I_Loc\LangPath + File$, flags+(256*(EnableVRam=True)))
 	EndIf
-	If FileType(File$) <> 1 Then RuntimeError "Texture " + File$ + " not found."
-	tmp = LoadTexture(File$, flags+(256*(EnableVRam=True)))
-	If tmp = 0 Then RuntimeError "Failed to load Texture: " + File$ 
-	Return tmp 
+	If tmp = 0 Then
+		If FileType(File$) <> 1 Then RuntimeError "Texture " + File$ + " not found."
+		tmp = LoadTexture(File$, flags+(256*(EnableVRam=True)))
+		If tmp = 0 Then RuntimeError "Failed to load Texture: " + File$ 
+	EndIf
+	If delType > -1 Then
+		Tic.TextureInCache = New TextureInCache
+		Tic\name = FileStripped
+		Tic\delType = delType
+		Tic\tex = tmp
+	EndIf
+	Return tmp
+End Function
+
+Function FreeTexture_Cache(tex%)
+	FreeTexture tex
+	For Tic.TextureInCache = Each TextureInCache
+		If tex = Tic\tex Then
+			Delete Tic
+			Exit
+		EndIf
+	Next
+End Function
+
+Function DeleteTextures_Cache(delType%)
+	For Tic.TextureInCache = Each TextureInCache
+		If Tic\delType >= delType Then
+			FreeTexture Tic\tex
+			Delete Tic
+		EndIf
+	Next
 End Function
 
 Function LoadBrush_Strict(file$,flags,u#=1.0,v#=1.0)

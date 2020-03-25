@@ -107,7 +107,7 @@ Function CreateAchievementMsg.AchievementMsg(id%,txt$)
 	amsg\achvID = id
 	amsg\txt = txt
 	amsg\msgx = 0.0
-	amsg\msgtime = FPSfactor
+	amsg\msgtime = FPSfactor2
 	amsg\msgID = CurrAchvMSGID
 	CurrAchvMSGID = CurrAchvMSGID + 1
 	
@@ -145,15 +145,15 @@ Function UpdateAchievementMsg()
 			SetFont I_Opt\Fonts[1]
 			RowText(GetLocalString("Messages", "achvunlock")+" - "+amsg\txt,x+84*scale,y+10*scale,width-94*scale,y-20*scale)
 			If amsg\msgtime > 0.0 And amsg\msgtime < 70*7
-				amsg\msgtime = amsg\msgtime + FPSfactor
+				amsg\msgtime = amsg\msgtime + FPSfactor2
 				If amsg\msgx > -width%
-					amsg\msgx = Max(amsg\msgx-4*FPSfactor,-width%)
+					amsg\msgx = Max(amsg\msgx-4*FPSfactor2,-width%)
 				EndIf
 			ElseIf amsg\msgtime >= 70*7
 				amsg\msgtime = -1
 			ElseIf amsg\msgtime = -1
 				If amsg\msgx < 0.0
-					amsg\msgx = Min(amsg\msgx+4*FPSfactor,0.0)
+					amsg\msgx = Min(amsg\msgx+4*FPSfactor2,0.0)
 				Else
 					amsg\msgtime = 0.0
 				EndIf

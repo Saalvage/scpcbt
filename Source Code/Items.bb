@@ -68,7 +68,7 @@ Function CreateItemTemplate.ItemTemplates(tempname$, objpath$, invimgpath$, imgp
 				Exit
 			EndIf
 		Next
-		If texture=0 Then texture=LoadTexture_Strict(texturepath,texflags%) : it\texpath = texturepath; : DebugLog texturepath
+		If texture=0 Then texture=LoadTexture_Strict(texturepath,texflags%,1) : it\texpath = texturepath; : DebugLog texturepath
 		EntityTexture it\obj, texture
 		it\tex = texture
 	EndIf  
@@ -152,7 +152,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("super1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.025, 2)
 	CreateItemTemplate("fine1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.024, 2)
 							; state1: Puton progress (0 - 100)
-	
+
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc008.jpg", 0.003, 0, "d008")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc012.jpg", 0.003, 0, "d012")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc035.jpg", 0.003, 0, "d035")
@@ -235,15 +235,16 @@ Function InitItemTemplates()
 	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.015, 2)
 						; state1: Puton progress (0 - 100)
 	
-	CreateItemTemplate("badnvg", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.02, 2)
+	CreateItemTemplate("badnvg", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.019, 2)
 	CreateItemTemplate("nvg", "GFX\items\NVG.b3d", "GFX\items\INVnightvision.jpg", "", 0.02, 2)
-	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.02, 2)
-	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.02, 2)
+	CreateItemTemplate("finenvg", "GFX\items\NVG.b3d", "GFX\items\INVveryfinenightvision.jpg", "", 0.021, 2)
+	CreateItemTemplate("supernvg", "GFX\items\NVG.b3d", "GFX\items\INVsupernightvision.jpg", "", 0.022, 2)
 						; state1: Battery level (0 - 1000)
 						; state2: Used for interaction with SCP-895
 						
-	CreateItemTemplate("scramble", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.02, 2)
+	CreateItemTemplate("scramble", "GFX\items\SCRAMBLE.b3d", "GFX\items\INVscramble.jpg", "", 0.03, 2)
 						; state1: Battery level (0 - 1000)
+						; state2: Refinement: (Coarse -2 (sometimes malfunctions)), (1:1 +/-100 (white censor instead of black)) (Fine 1 (slower battery drain), (Very Fine 2 (way too big censor box)))
 						
 	CreateItemTemplate("nav300", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 	CreateItemTemplate("nav", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
@@ -251,16 +252,18 @@ Function InitItemTemplates()
 	CreateItemTemplate("nav310", "GFX\items\navigator.b3d", "GFX\items\INVnavigator.jpg", "GFX\items\navigator.png", 0.0008, 1)
 						; state1: Battery level (0 - 100)
 	
-	CreateItemTemplate("radio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
-	CreateItemTemplate("fineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
-	CreateItemTemplate("veryfineradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
-	CreateItemTemplate("18vradio", "GFX\items\radio.x", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.02, 1)
+	CreateItemTemplate("radio", "GFX\items\radio.b3d", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
+	CreateItemTemplate("fineradio", "GFX\items\radio.b3d", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
+	CreateItemTemplate("veryfineradio", "GFX\items\radio.b3d", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.0, 1)
+	CreateItemTemplate("18vradio", "GFX\items\radio.b3d", "GFX\items\INVradio.jpg", "GFX\items\radioHUD.png", 1.02, 1)
 						; state1: Battery level (0 - 100)
 						; state2: Selected track (0 - 5)
 	
 	CreateItemTemplate("bat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery9v.jpg", "", 0.008, 1)
+	CreateItemTemplate("badbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery4.5v.jpg", "", 0.008, 1, "", "GFX\items\Battery\Battery 4.5V.jpg")
 	CreateItemTemplate("18vbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery18v.jpg", "", 0.01, 1, "", "GFX\items\Battery\Battery 18V.jpg")
 	CreateItemTemplate("killbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery22900.jpg", "", 0.01, 1, "","GFX\items\Battery\Strange Battery.jpg")
+	CreateItemTemplate("superbat", "GFX\items\Battery\Battery.b3d", "GFX\items\Battery\INVbattery999v.jpg", "", 0.009, 1, "", "GFX\items\Battery\Battery 999V.jpg")
 	
 	CreateItemTemplate("badvest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.018, 2)
 	CreateItemTemplate("vest", "GFX\items\vest.b3d", "GFX\items\INVvest.jpg", "", 0.02, 2)
@@ -288,6 +291,7 @@ Function InitItemTemplates()
 	
 	CreateItemTemplate("hand", "GFX\items\severedhand.b3d", "GFX\items\INVhand.jpg", "", 0.04, 2)
 	CreateItemTemplate("hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.04, 2, "", "GFX\items\shand2.png")
+	CreateItemTemplate("hand3", "GFX\items\severedhand.b3d", "GFX\items\INVhand3.jpg", "", 0.04, 2, "", "GFX\items\shand3.png")
 	
 	CreateItemTemplate("key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, 3, "lkey", "GFX\items\key2.png","",0,1+2+8)
 	CreateItemTemplate("coin", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
@@ -296,8 +300,10 @@ Function InitItemTemplates()
 						; state1: If the nostalgia item has been viewed yet; if not, play the sound
 	
 	CreateItemTemplate("quarter", "GFX\items\key.b3d", "GFX\items\INVcoin.jpg", "", 0.0005, 3, "", "GFX\items\coin.png","",0,1+2+8)
+	
 	CreateItemTemplate("wallet", "GFX\items\wallet.b3d", "GFX\items\INVwallet.jpg", "", 0.0005, 2, "","","",1)
 	CreateItemTemplate("clipboard", "GFX\items\clipboard.b3d", "GFX\items\INVclipboard.jpg", "", 0.003, 1, "", "", "GFX\items\INVclipboard2.jpg", 1)
+	CreateItemTemplate("backpack", "GFX\items\backpack.b3d", "GFX\items\INVbackpack.jpg", "", 0.1, 2)
 	
 	For it = Each ItemTemplates
 		If (it\tex<>0) Then
@@ -313,7 +319,6 @@ Function InitItemTemplates()
 	Next
 	
 End Function
-
 
 
 Type Items
@@ -408,7 +413,7 @@ Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#
 	EndIf
 	
 	If tempname = "scp1025" Then
-		If Rand(3-(state2<>2)*state2) = 1 Then ;higher chance for good illness if "fine", lower change for good illness if "coarse"
+		If Rand(3-(state2<>2)*state2) = 1 Then ;higher chance for good illness if FINE, lower change for good illness if COARSE
 			state = 6
 		Else
 			state = Rand(0,7)
@@ -656,7 +661,6 @@ Function PickItem(item.Items)
 					Case "firstaid", "finefirstaid", "veryfinefirstaid", "firstaid2"
 						item\state = 0
 					Case "navulti"
-						item\state = 101
 						GiveAchievement(AchvSNAV)
 					Case "fineradio", "veryfineradio"
 						item\state = 101

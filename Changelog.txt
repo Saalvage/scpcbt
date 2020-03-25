@@ -1,5 +1,6 @@
 ﻿v2.0.0
 
+- Added SCP-682.
 - (Re-)Added SCP-178 with improved mechanics.
 	- It now increases blinking time.
 	- Better refinements.
@@ -10,6 +11,7 @@
 - Added support for resolutions of up to 4k.
 - Added anisotropic filtering.
 - Added SCRAMBLE gear.
+	- Including coarse, fine and very fine variants.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
 - (Re-)Added SCP-173's head rotating.
@@ -18,12 +20,12 @@
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
-- Added new achievment image for SCP-1048.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
 - Added Apollyon difficulty; can be unlocked by beating the game on Keter.
 - Added inventory size scaling with difficulty and custom inventory options.
 - Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A and the radio.
-- Improved the Night Vision Goggles loading screen.
+- Improved the SCP-682 and Night Vision Goggles loading screen.
+- Added new achievment image for SCP-1048.
 - Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the game size will be the screen size.
 - Added button to restore all settings to standard values.
 - Added a sound when clicking on disabled checkboxes in the menus.
@@ -37,21 +39,24 @@
 	- Added "Super" SCP-427 and refinements for SCP-427.
 	- Added refinements for the Strange Bottle.
 	- Added extremely low chance to get SCP-1499 by refining a gas mask.
+	- Added a bad and a super battery.
 	- Added SCP-1025 refinements.
 	- Added a very special book.
 	- Added ability to get electronics via Electronical Components.
-	- Added Not Vision Goggles
+	- Added Not Vision Goggles.
 	- Added worse clipboards and wallets.
 	- Added Bad Hazmat Suit.
 	- Added a weird vest.
 	- Added consistency.
 	- Fixed SCP-148's refinements.
-	- Improved player view inversion.
+	- Improved player view invertion.
 	- And a lot of other improvements!
+- Improved boxfile models.
 - Added EZ endroom version.
 - Added SCP-106 endroom event to all threee endrooms.
 - Much improved SCP-205 chamber.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
+- Slightly improved SCP-372 model.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
 - Added some space between the page indicator and the next/previous page buttons on the load game screen.
@@ -75,6 +80,7 @@
 - Removed Check for updates feature in launcher.
 - Removed event load text to increase immersion.
 - Removed scene in which Guard Ulgrin provides D-9341 with classified information (the document will now be found just after the initial intro).
+- Removed orientation document in inventory when disabling the intro.
 - Removed 16-Bit mode.
 - Removed Antialiased Text (the implementation was very inconsistent and caused a lot of problems, if enough people request it, I will look towards reimplementation).
 - Removed and renamed a few commands.
@@ -98,16 +104,20 @@ Bug Fixes:
 	- Fixed SCP-1074-A's scream being able to be heard anywhere.
 	- Fixed godmode not protecting against all injuries.
 	- Fixed inventory single clicks being recognized as double clicks.
-	- Fixed launcher options not saving when quitting instead of launching.
+	- Fixed message being moved down if selecting a document, while a clipboard/wallet is open.
+	- Fixed launcher options not saving when quitting.
 	- Fixed messages being visible in the pause menu.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.
 	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
+	- Fixed certain item attributes not being saved.
 	- Fixed z-fighting on monitor model.
+	- Fixed vest model.
 	- Fixed keycard model.
 	- Fixed origami model.
+	- Fixed SCP-513-1 model.
 	- Fixed and reworked the "revive" command.
 	- Fixed untitled save files not correctly being named after the second one.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.

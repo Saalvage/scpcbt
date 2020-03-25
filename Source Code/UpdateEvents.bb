@@ -6266,6 +6266,8 @@ Function UpdateEvents()
 				
 				Local fr.Forest=e\room\fr
 				
+				CreateConsoleMsg "ELLO" + e\EventState
+				
 				If PlayerRoom = e\room And fr<>Null Then 
 					
 					If e\EventState=1.0 Then ;the player is in the forest
@@ -7273,28 +7275,28 @@ Function UpdateEvents()
 						GrabbedEntity = 0
 					EndIf
 					
-					Local setting$ = ""
+					Local setting%
 					
 					If GrabbedEntity <> e\room\Objects[1] Then
 						angle# = WrapAngle(EntityRoll(e\room\Objects[1]))
 						If angle < 22.5 Then
 							angle = 0
-							setting = "1:1"
+							setting = ONETOONE
 						ElseIf angle < 67.5
 							angle = 40
-							setting = "coarse"
+							setting = COARSE
 						ElseIf angle < 180
 							angle = 90
-							setting = "rough"
+							setting = ROUGH
 						ElseIf angle > 337.5
 							angle = 359 - 360
-							setting = "1:1"
+							setting = ONETOONE
 						ElseIf angle > 292.5
 							angle = 320 - 360
-							setting = "fine"
+							setting = FINE
 						Else
 							angle = 270 - 360
-							setting = "very fine"
+							setting = VERY_FINE
 						EndIf
 						RotateEntity(e\room\Objects[1], 0, 0, CurveValue(angle, EntityRoll(e\room\Objects[1]), 20))
 					EndIf
@@ -7324,24 +7326,24 @@ Function UpdateEvents()
 						
 						If Distance(EntityX(Collider), EntityX(e\room\Objects[2], True), EntityZ(Collider), EntityZ(e\room\Objects[2], True)) < (170.0 * RoomScale) Then
 							
-							If setting = "rough" Lor setting = "coarse" Then
+							If setting = ROUGH Lor setting = COARSE Then
 								If e\EventState > 70 * 2.6 And e\EventState - FPSfactor < 70 * 2.6 Then PlaySound_Strict Death914SFX
 							EndIf
 							
 							If e\EventState > 70 * 3 Then
 								Select setting
-									Case "rough"
+									Case ROUGH
 										KillTimer = Min(-1, KillTimer)
 										BlinkTimer = -10
 										If e\SoundCHN <> 0 Then StopChannel e\SoundCHN
 										DeathMSG = GetLocalString("Deaths", "914")
-									Case "coarse"
+									Case COARSE
 										BlinkTimer = -10
 										If e\EventState - FPSfactor < 70 * 3 Then PlaySound_Strict Use914SFX
-									Case "1:1"
+									Case ONETOONE
 										BlinkTimer = -10
 										If e\EventState - FPSfactor < 70 * 3 Then PlaySound_Strict Use914SFX
-									Case "fine", "very fine"
+									Case FINE, VERY_FINE
 										BlinkTimer = -10
 										If e\EventState - FPSfactor < 70 * 3 Then PlaySound_Strict Use914SFX	
 								End Select
@@ -7366,13 +7368,13 @@ Function UpdateEvents()
 							
 							If Distance(EntityX(Collider), EntityX(e\room\Objects[2], True), EntityZ(Collider), EntityZ(e\room\Objects[2], True)) < (160.0 * RoomScale) Then
 								Select setting
-									Case "coarse"
+									Case COARSE
 										Injuries = 4.0
 										Msg = GetLocalString("Messages", "914coarse")
 										MsgTimer = 70*8
-									Case "1:1"
+									Case ONETOONE
 										InvertMouseComplete = (Not InvertMouseComplete)
-									Case "fine", "very fine"
+									Case FINE, VERY_FINE
 										I_Cheats\SuperMan = True
 								End Select
 								BlurTimer = 1000

@@ -86,9 +86,10 @@ Function UpdateLang(I_Loc.Loc, Lang$)
 	SetLocalString("Messages", "savecantmom")
 	SetLocalString("Messages", "saved")
 	SetLocalString("Messages", "savepress")
-	SetLocalString("Messages", "nvglowbat")
 	SetLocalString("Messages", "nvgrefresh")
 	SetLocalString("Messages", "nvgseconds")
+	SetLocalString("Messages", "lowbat")
+	SetLocalString("Messages", "nobat")
 	SetLocalString("Menu", "paused")
 	SetLocalString("Menu", "difficulty")
 	SetLocalString("Menu", "save")
@@ -320,7 +321,7 @@ Global MenuScale# = (I_Opt\GraphicHeight / 1024.0)
 SetBuffer(BackBuffer())
 
 ; FPSfactor 1 value: 70 FPS
-Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, PrevFPSFactor#
+Global CurTime%, PrevTime%, LoopDelay%, FPSfactor#, FPSfactor2#, PrevFPSFactor#
 Local CheckFPS%, ElapsedLoops%, FPS%, ElapsedTime#
 
 Global Framelimit% = GetINIInt(OptionFile, "options", "framelimit")
@@ -397,7 +398,7 @@ Global SCP1025state#[7]
 Global HeartBeatRate#, HeartBeatTimer#, HeartBeatVolume#
 
 Global WearingGasMask%, WearingHazmat%, WearingVest%, Wearing178%, Wearing714%, WearingNightVision%, WearingScramble%
-Global NVTimer#
+Global NVTimer#, ScrambleActive%, ScrambleCHN%
 
 Global Injuries#, Bloodloss#, Infect#, HealTimer#
 
@@ -419,7 +420,7 @@ Global GrabbedEntity%
 
 Global InvertMouse% = GetINIInt(OptionFile, "options", "invert mouse y")
 Global InvertMouseComplete%
-Global MouseHit1%, MouseDown1%, MouseHit2%, DoubleClick%, LastMouseHit1%, MouseUp1%, doubleClickSlot%
+Global MouseHit1%, MouseDown1%, MouseHit2%, DoubleClick%, LastMouseHit1%, MouseUp1%, DoubleClickSlot%
 
 Global CoffinDistance# = 100.0
 
@@ -546,11 +547,7 @@ Global EnableVRam% = GetINIInt(OptionFile, "options", "enable vram")
 
 Include "Source Code\Dreamfilter.bb"
 
-Dim LightSpriteTex(10)
-
 ;----------------------------------------------  Sounds -----------------------------------------------------
-
-
 
 Global SoundEmitter%
 Global TempSounds%[9]
@@ -701,13 +698,15 @@ Dim CoughSFX%(3)
 Global CoughCHN%, VomitCHN%
 
 Global MachineSFX% 
-Global ApacheSFX
-Global CurrStepSFX
+Global ApacheSFX%
+Global CurrStepSFX%
 Dim StepSFX%(5, 2, 8) ;(normal/metal, walk/run, id)
 
 Dim Step2SFX(6)
 
 Dim VehicleSFX%(1)
+
+Global ScrambleSFX%
 
 DrawLoading(30, True)
 
@@ -768,12 +767,12 @@ Global room2gw_z# = 0.0
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
 
-Dim NavImages(5)
+Global NavImages[4]
 For i = 0 To 3
-	NavImages(i) = LoadImage_Strict("GFX\navigator\roomborder"+i+".png")
-	MaskImage NavImages(i),255,0,255
+	NavImages[i] = LoadImage_Strict("GFX\navigator\roomborder"+i+".png")
+	MaskImage NavImages[i],255,0,255
 Next
-NavImages(4) = LoadImage_Strict("GFX\navigator\batterymeter.png")
+NavImages[4] = LoadImage_Strict("GFX\navigator\batterymeter.png")
 
 Global NavBG = CreateImage(I_Opt\GraphicWidth,I_Opt\GraphicHeight)
 
@@ -1313,7 +1312,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 	ElseIf d\KeyCard < 0
 		;I can't find any way to produce short circuited boolean expressions so work around this by using a temporary variable - risingstar64
 		;And now we have the capabilities to produce short circuited boolean expressions, oh how far we've come! ~Salvage
-		If SelectedItem <> Null And ((SelectedItem\itemtemplate\tempname = "hand" And d\KeyCard=-1) Lor (SelectedItem\itemtemplate\tempname = "hand2" And d\KeyCard=-2))
+		If SelectedItem <> Null And ((SelectedItem\itemtemplate\tempname = "hand" And d\KeyCard=-1) Lor (SelectedItem\itemtemplate\tempname = "hand2" And d\KeyCard=-2) Lor (SelectedItem\itemtemplate\tempname = "hand3" And d\KeyCard=-3))
 			PlaySound_Strict ScannerSFX1
 			Msg = GetLocalString("Messages", "scannergranted")
 			MsgTimer = 70 * 10
@@ -1708,7 +1707,7 @@ Global NVTexture%, NVOverlay%
 Global TeslaTexture%
 
 Global LightTexture%, Light%
-Dim LightSpriteTex%(5)
+Global LightSpriteTex%[2]
 Global DoorOBJ%, DoorFrameOBJ%
 
 Global LeverOBJ%, LeverBaseOBJ%
@@ -1727,10 +1726,6 @@ Global ApacheObj%,ApacheRotorObj%
 Global UnableToMove% = False
 Global ShouldEntitiesFall% = True
 Global PlayerFallingPickDistance# = 10.0
-
-Global Save_MSG$ = ""
-Global Save_MSG_Timer# = 0.0
-Global Save_MSG_Y# = 0.0
 
 Global MTF_CameraCheckTimer# = 0.0
 Global MTF_CameraCheckDetected% = False
@@ -1778,6 +1773,7 @@ Repeat
 	PrevTime = CurTime
 	PrevFPSFactor = FPSfactor
 	FPSfactor = Max(Min(ElapsedTime * 70, 5.0), 0.2)
+	FPSfactor2 = FPSfactor ;for use in menus etc, when the main game is paused.
 	
 	If MenuOpen Lor InvOpen Lor OtherOpen<>Null Lor ConsoleOpen Lor SelectedDoor <> Null Lor SelectedScreen <> Null Lor Using294 Then FPSfactor = 0
 	
@@ -2127,7 +2123,7 @@ Repeat
 						ResumeSounds()
 						MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
 					Else
-						LastMouseHit1 = 0 ;Reset doubleclick
+						DoubleClickSlot = -1
 						PauseSounds()
 					EndIf
 					InvOpen = Not InvOpen
@@ -2231,12 +2227,8 @@ Repeat
 		
 		If MsgTimer > 0 And MenuOpen = 0 Then
 			Local temp% = False
-			If (Not InvOpen%)
-				If SelectedItem <> Null
-					If SelectedItem\itemtemplate\tempname = "paper"
-						temp% = True
-					EndIf
-				EndIf
+			If (Not (InvOpen Lor OtherOpen<>Null)) And SelectedItem <> Null And SelectedItem\itemtemplate\tempname = "paper" Then
+				temp% = True
 			EndIf
 			
 			Local temp2% = Min(MsgTimer / 2, 255)
@@ -2257,7 +2249,7 @@ Repeat
 				EndIf
 				Text((I_Opt\GraphicWidth / 2), (I_Opt\GraphicHeight * 0.94), Msg, True)
 			EndIf
-			MsgTimer=MsgTimer-FPSfactor 
+			MsgTimer=MsgTimer-FPSfactor2
 		EndIf
 		
 		Color 255, 255, 255
@@ -2524,6 +2516,8 @@ Function QuickLoadEvents()
 			EndIf
 
 		Case "room860"
+		
+			CreateConsoleMsg("HELLOOOOOO")
 
 			If e\EventStr = "load0"
 				ForestNPC = CreateSprite()
@@ -2544,6 +2538,7 @@ Function QuickLoadEvents()
 				If e\room\NPC[0]=Null Then e\room\NPC[0]=CreateNPC(NPCtype860, 0,0,0)
 				e\EventStr = "loaddone"
 				QuickLoad_CurrEvent = Null
+				CreateConsoleMsg("We're done here")
 			EndIf
 
 		Case "room966"
@@ -2635,11 +2630,11 @@ Function DrawEnding()
 	ShowPointer()
 	
 	FPSfactor = 0
-	;EndingTimer=EndingTimer-FPSfactor
+	;EndingTimer=EndingTimer-FPSfactor2
 	If EndingTimer>-2000
-		EndingTimer=Max(EndingTimer-FPSfactor,-1111)
+		EndingTimer=Max(EndingTimer-FPSfactor2,-1111)
 	Else
-		EndingTimer=EndingTimer-FPSfactor
+		EndingTimer=EndingTimer-FPSfactor2
 	EndIf
 	
 	GiveAchievement(Achv055)
@@ -2703,7 +2698,7 @@ Function DrawEnding()
 				Color 255,255,255
 			EndIf
 			
-			If EndingTimer+FPSfactor > -450 And EndingTimer <= -450 Then
+			If EndingTimer+FPSfactor2 > -450 And EndingTimer <= -450 Then
 				Select Lower(SelectedEnding)
 					Case "a1", "a2"
 						PlaySound_Strict LoadTempSound("SFX\Ending\GateA\Ending"+SelectedEnding+".ogg")
@@ -2886,7 +2881,7 @@ Function DrawCredits()
 		id=id+1
 	Next
 	If (credits_Y+(24*LastCreditLine\id*MenuScale))<-StringHeight(LastCreditLine\txt)
-		CreditsTimer=CreditsTimer+(0.5*FPSfactor)
+		CreditsTimer=CreditsTimer+(0.5*FPSfactor2)
 		If CreditsTimer>=0.0 And CreditsTimer<255.0
 			Color Max(Min(CreditsTimer,255),0),Max(Min(CreditsTimer,255),0),Max(Min(CreditsTimer,255),0)
 		ElseIf CreditsTimer>=255.0
@@ -3926,7 +3921,7 @@ Function DrawGUI()
 			
 			SetFont I_Opt\Fonts[3]
 			If KeypadMSG <> "" Then 
-				KeypadTimer = KeypadTimer-FPSfactor
+				KeypadTimer = KeypadTimer-FPSfactor2
 				
 				If (KeypadTimer Mod 70) < 35 Then Text I_Opt\GraphicWidth/2, y+124*scale, KeypadMSG, True,True
 				If KeypadTimer =<0 Then
@@ -4086,15 +4081,15 @@ Function DrawGUI()
 		y = I_Opt\GraphicHeight / 2 - INVENTORY_GFX_SIZE * (Float(OtherSize) / 10 * 2 - 1) - INVENTORY_GFX_SPACING
 		
 		ItemAmount = 0
+		isMouseOn = -1
 		For  n% = 0 To OtherSize - 1
-			isMouseOn% = False
 			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + INVENTORY_GFX_SIZE Then
 				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + INVENTORY_GFX_SIZE Then
-					isMouseOn = True
+					isMouseOn = n
 				EndIf
 			EndIf
 			
-			If isMouseOn Then
+			If isMouseOn = n Then
 				MouseSlot = n
 				Color 255, 0, 0
 				Rect(x - 1, y - 1, INVENTORY_GFX_SIZE + 2, INVENTORY_GFX_SIZE + 2)
@@ -4105,26 +4100,25 @@ Function DrawGUI()
 			If OtherOpen = Null Then Exit
 			
 			If OtherOpen\SecondInv[n] <> Null Then
-				If (SelectedItem <> OtherOpen\SecondInv[n] Lor isMouseOn) Then DrawImage(OtherOpen\SecondInv[n]\invimg, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
+				If (isMouseOn = n Lor SelectedItem <> OtherOpen\SecondInv[n]) Then
+					DrawImage(OtherOpen\SecondInv[n]\invimg, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
+				EndIf
 			EndIf
 			DebugLog "otheropen: "+(OtherOpen<>Null)
 			If OtherOpen\SecondInv[n] <> Null And SelectedItem <> OtherOpen\SecondInv[n] Then
-				If isMouseOn Then
+				If isMouseOn = n Then
 					Color 255, 255, 255	
 					Text(x + INVENTORY_GFX_SIZE / 2, y + INVENTORY_GFX_SIZE + INVENTORY_GFX_SPACING - 15, OtherOpen\SecondInv[n]\itemtemplate\localname, True)				
 					If SelectedItem = Null Then
 						If MouseHit1 Then
 							SelectedItem = OtherOpen\SecondInv[n]
-							MouseHit1 = False
 							
-							If DoubleClick And doubleClickSlot = n Then
+							If DoubleClick And DoubleClickSlot = n Then
 								If OtherOpen\SecondInv[n]\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(OtherOpen\SecondInv[n]\itemtemplate\sound))
 								OtherOpen = Null
 								closedInv = True
 								InvOpen = False
 								DoubleClick = False
-							Else
-								doubleClickSlot = n
 							EndIf
 						EndIf
 					EndIf
@@ -4132,7 +4126,7 @@ Function DrawGUI()
 				
 				ItemAmount=ItemAmount+1
 			Else
-				If isMouseOn And MouseHit1 Then
+				If isMouseOn = n And MouseHit1 Then
 					For z% = 0 To OtherSize - 1
 						If OtherOpen\SecondInv[z] = SelectedItem Then OtherOpen\SecondInv[z] = Null
 					Next
@@ -4148,6 +4142,10 @@ Function DrawGUI()
 				x = I_Opt\GraphicWidth / 2 - (INVENTORY_GFX_SIZE * 10 /2 + INVENTORY_GFX_SPACING * (10 / 2 - 1)) / 2
 			EndIf
 		Next
+		
+		If MouseHit1 Then
+			DoubleClickSlot = isMouseOn
+		EndIf
 		
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
@@ -4282,14 +4280,12 @@ Function DrawGUI()
 			x = x - (INVENTORY_GFX_SIZE * MaxItemAmount /2 + INVENTORY_GFX_SPACING) / 2
 		EndIf
 		
-		CreateConsoleMsg(doubleClickSlot)
-		
 		ItemAmount = 0
+		isMouseOn = -1
 		For  n% = 0 To MaxItemAmount - 1
-			isMouseOn% = False
 			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + INVENTORY_GFX_SIZE Then
 				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + INVENTORY_GFX_SIZE Then
-					isMouseOn = True
+					isMouseOn = n
 				EndIf
 			EndIf
 			
@@ -4300,7 +4296,7 @@ Function DrawGUI()
 				EndIf
 			EndIf
 			
-			If isMouseOn Then
+			If isMouseOn = n Then
 				MouseSlot = n
 				Color 255, 0, 0
 				Rect(x - 1, y - 1, INVENTORY_GFX_SIZE + 2, INVENTORY_GFX_SIZE + 2)
@@ -4310,20 +4306,19 @@ Function DrawGUI()
 			DrawFrame(x, y, INVENTORY_GFX_SIZE, INVENTORY_GFX_SIZE, (x Mod 64), (x Mod 64))
 			
 			If Inventory(n) <> Null Then
-				If (isMouseOn Lor SelectedItem <> Inventory(n)) Then 
+				If (isMouseOn = n Lor SelectedItem <> Inventory(n)) Then 
 					DrawImage(Inventory(n)\invimg, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
 				EndIf
 			EndIf
 			
 			If Inventory(n) <> Null And SelectedItem <> Inventory(n) Then
 				;drawimage(Inventory(n).InvIMG, x + INVENTORY_GFX_SIZE / 2 - 32, y + INVENTORY_GFX_SIZE / 2 - 32)
-				If isMouseOn Then
+				If isMouseOn = n Then
 					If SelectedItem = Null Then
 						If MouseHit1 Then
 							SelectedItem = Inventory(n)
-							MouseHit1 = False
 							
-							If DoubleClick And doubleClickSlot = n Then
+							If DoubleClick And DoubleClickSlot = n Then
 								If WearingHazmat <> 0 And Instr(SelectedItem\itemtemplate\tempname,"hazmat")=0 Then
 									Msg = GetLocalString("Messages", "canthazmat")
 									MsgTimer = 70*5
@@ -4333,8 +4328,6 @@ Function DrawGUI()
 								If Inventory(n)\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(Inventory(n)\itemtemplate\sound))
 								InvOpen = False
 								DoubleClick = False
-							Else
-								doubleClickSlot = n
 							EndIf
 							
 						EndIf
@@ -4350,7 +4343,7 @@ Function DrawGUI()
 				
 				ItemAmount=ItemAmount+1
 			Else
-				If isMouseOn And MouseHit1 Then
+				If isMouseOn = n And MouseHit1 Then
 					For z% = 0 To MaxItemAmount - 1
 						If Inventory(z) = SelectedItem Then Inventory(z) = Null
 					Next
@@ -4365,6 +4358,10 @@ Function DrawGUI()
 				x = I_Opt\GraphicWidth / 2 - (INVENTORY_GFX_SIZE * MaxItemAmount /2 + INVENTORY_GFX_SPACING * (MaxItemAmount / 2 - 1)) / 2
 			EndIf
 		Next
+		
+		If MouseHit1 Then
+			DoubleClickSlot = isMouseOn
+		EndIf
 		
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
@@ -4480,14 +4477,48 @@ Function DrawGUI()
 									Msg = GetLocalString("Messages", "cantcombine")
 								EndIf
 								
+							Case "badbat"
+								Select Inventory(MouseSlot)\itemtemplate\tempname
+									Case "nav", "nav300", "navulti"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem (SelectedItem)
+										Inventory(MouseSlot)\state = 50.0
+										Msg = GetLocalString("Messages", "batnavsucc")
+									Case "nav310"
+										Msg = GetLocalString("Messages", "batnavult")
+									Case "radio"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem (SelectedItem)
+										Inventory(MouseSlot)\state = 50.0
+										Msg = GetLocalString("Messages", "batradiosucc")
+									Case "fineradio", "veryfineradio"
+										Msg = GetLocalString("Messages", "batradioult")
+									Case "18vradio"
+										Msg = GetLocalString("Messages", "batradiofit")
+									Case "badnvg", "nvg", "supernvg"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem(SelectedItem)
+										Inventory(MouseSlot)\state = 500.0
+										Msg = GetLocalString("Messages", "batnvgsucc")
+									Case "finenvg"
+										Msg = GetLocalString("Messages", "batnvgult")
+									Case "scramble"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem(SelectedItem)
+										Inventory(MouseSlot)\state = 500.0
+										Msg = GetLocalString("Messages", "batscramblesucc")
+									Default
+										Msg = GetLocalString("Messages", "cantcombine")
+								End Select
+							
 							Case "bat"
 								Select Inventory(MouseSlot)\itemtemplate\tempname
-									Case "nav", "nav300", "nav310"
+									Case "nav", "nav300", "navulti"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 										RemoveItem (SelectedItem)
 										Inventory(MouseSlot)\state = 100.0
 										Msg = GetLocalString("Messages", "batnavsucc")
-									Case "navulti"
+									Case "nav310"
 										Msg = GetLocalString("Messages", "batnavult")
 									Case "radio"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
@@ -4516,9 +4547,9 @@ Function DrawGUI()
 								
 							Case "18vbat"
 								Select Inventory(MouseSlot)\itemtemplate\tempname
-									Case "nav", "nav300", "nav310"
+									Case "nav", "nav300", "navulti"
 										Msg = GetLocalString("Messages", "batnavfit")
-									Case "navulti"
+									Case "nav310"
 										Msg = GetLocalString("Messages", "batnavult")
 									Case "radio"
 										Msg = GetLocalString("Messages", "batradiofit")
@@ -4532,6 +4563,41 @@ Function DrawGUI()
 									Default
 										Msg = GetLocalString("Messages", "cantcombine")
 								End Select
+							
+							Case "superbat", "killbat" ;If you somehow manage to pick it up ;P
+								Select Inventory(MouseSlot)\itemtemplate\tempname
+									Case "nav", "nav300", "navulti"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem (SelectedItem)
+										Inventory(MouseSlot)\state = 1000.0
+										Msg = GetLocalString("Messages", "batnavsucc")
+									Case "nav310"
+										Msg = GetLocalString("Messages", "batnavult")
+									Case "radio"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem (SelectedItem)
+										Inventory(MouseSlot)\state = 1000.0
+										Msg = GetLocalString("Messages", "batradiosucc")
+									Case "fineradio", "veryfineradio"
+										Msg = GetLocalString("Messages", "batradioult")
+									Case "18vradio"
+										Msg = GetLocalString("Messages", "batradiofit")
+									Case "badnvg", "nvg", "supernvg"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem(SelectedItem)
+										Inventory(MouseSlot)\state = 10000.0
+										Msg = GetLocalString("Messages", "batnvgsucc")
+									Case "finenvg"
+										Msg = GetLocalString("Messages", "batnvgult")
+									Case "scramble"
+										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
+										RemoveItem(SelectedItem)
+										Inventory(MouseSlot)\state = 10000.0
+										Msg = GetLocalString("Messages", "batscramblesucc")
+									Default
+										Msg = GetLocalString("Messages", "cantcombine")
+								End Select
+							
 							Default
 								Msg = GetLocalString("Messages", "cantcombine")
 						End Select
@@ -4597,7 +4663,7 @@ Function DrawGUI()
 					Else
 						If WearingScramble = False Then
 							SelectedItem\Picked = 2
-							WearingScramble = True
+							WearingScramble = SelectedItem\state2 + 1
 							Msg = GetLocalString("Messages", "scrambleon")
 						Else
 							Msg = GetLocalString("Messages", "scrambledouble")
@@ -4629,7 +4695,7 @@ Function DrawGUI()
 						Next
 					EndIf
 
-				Case "key1", "key2", "key3", "key4", "key5", "keyomni", "keyomni", "scp860", "hand", "hand2", "quarter"
+				Case "key1", "key2", "key3", "key4", "key5", "keyomni", "keyomni", "scp860", "hand", "hand2", "hand3", "quarter"
 
 					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 
@@ -4918,10 +4984,10 @@ Function DrawGUI()
 								If Infect = 0 Then Infect = 1
 							Else
 								SCP1025state[SelectedItem\state]=Max(1,SCP1025state[SelectedItem\state])
-								SCP1025state[7] = 1 + (SelectedItem\state2 = 2)*2 ;3x as fast if "very fine"
+								SCP1025state[7] = 1 + (SelectedItem\state2 = 2)*2 ;3x as fast if VERY_FINE
 							EndIf
 						EndIf
-						If Rand(3-(SelectedItem\state2<>2)*SelectedItem\state2) = 1 Then ;higher chance for good illness if "fine", lower change for good illness if "coarse"
+						If Rand(3-(SelectedItem\state2<>2)*SelectedItem\state2) = 1 Then ;higher chance for good illness if FINE, lower change for good illness if COARSE
 							SelectedItem\state = 6
 						Else
 							SelectedItem\state = Rand(0,7)
@@ -5574,7 +5640,7 @@ Function DrawGUI()
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
-					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.005)
+					If SelectedItem\itemtemplate\tempname <> "nav310" Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.005)
 					
 					x = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
 					y = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
@@ -5607,7 +5673,7 @@ Function DrawGUI()
 						EndIf
 					Else
 						
-						If SelectedItem\state > 0 And (Rnd(CoffinDistance + 15.0) > 1.0 Lor PlayerRoom\RoomTemplate\Name <> "room895") Then
+						If (SelectedItem\state > 0 Lor SelectedItem\itemtemplate\tempname = "nav310") And (Rnd(CoffinDistance + 15.0) > 1.0 Lor PlayerRoom\RoomTemplate\Name <> "room895") Then
 							
 							PlayerX% = Floor((EntityX(PlayerRoom\obj)+8) / 8.0 + 0.5)
 							PlayerZ% = Floor((EntityZ(PlayerRoom\obj)+8) / 8.0 + 0.5)
@@ -5623,36 +5689,36 @@ Function DrawGUI()
 								For z2 = Max(0, PlayerZ - 6) To Min(MapHeight, PlayerZ + 6)
 									
 									If CoffinDistance > 16.0 Lor Rnd(16.0)<CoffinDistance Then 
-										If MapTemp(x2, z2)>0 And (MapFound(x2, z2) > 0 Lor SelectedItem\itemtemplate\tempname = "nav310" Lor SelectedItem\itemtemplate\tempname = "navulti") Then
+										If MapTemp(x2, z2)>0 And (MapFound(x2, z2) > 0 Lor SelectedItem\itemtemplate\tempname = "navulti") Then
 											Local drawx% = x + (PlayerX - 1 - x2) * 24 , drawy% = y - (PlayerZ - 1 - z2) * 24
 											
 											If x2+1<=MapWidth Then
 												If MapTemp(x2+1,z2)=False
-													DrawImage NavImages(3),drawx-12,drawy-12
+													DrawImage NavImages[3],drawx-12,drawy-12
 												EndIf
 											Else
-												DrawImage NavImages(3),drawx-12,drawy-12
+												DrawImage NavImages[3],drawx-12,drawy-12
 											EndIf
 											If x2-1>=0 Then
 												If MapTemp(x2-1,z2)=False
-													DrawImage NavImages(1),drawx-12,drawy-12
+													DrawImage NavImages[1],drawx-12,drawy-12
 												EndIf
 											Else
-												DrawImage NavImages(1),drawx-12,drawy-12
+												DrawImage NavImages[1],drawx-12,drawy-12
 											EndIf
 											If z2-1>=0 Then
 												If MapTemp(x2,z2-1)=False
-													DrawImage NavImages(0),drawx-12,drawy-12
+													DrawImage NavImages[0],drawx-12,drawy-12
 												EndIf
 											Else
-												DrawImage NavImages(0),drawx-12,drawy-12
+												DrawImage NavImages[0],drawx-12,drawy-12
 											EndIf
 											If z2+1<=MapHeight Then
 												If MapTemp(x2,z2+1)=False
-													DrawImage NavImages(2),drawx-12,drawy-12
+													DrawImage NavImages[2],drawx-12,drawy-12
 												EndIf
 											Else
-												DrawImage NavImages(2),drawx-12,drawy-12
+												DrawImage NavImages[2],drawx-12,drawy-12
 											EndIf
 										EndIf
 									EndIf
@@ -5663,19 +5729,13 @@ Function DrawGUI()
 							SetBuffer BackBuffer()
 							DrawImageRect NavBG,xx+80,yy+70,xx+80,yy+70,270,230
 							Color 30,30,30
-							If SelectedItem\itemtemplate\tempname = "nav" Then Color(100, 0, 0)
 							Rect xx+80,yy+70,270,230,False
 							
 							x = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20
 							y = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
 							
-							If SelectedItem\itemtemplate\tempname = "nav" Then 
-								Color(100, 0, 0)
-							Else
-								Color (30,30,30)
-							EndIf
 							If (MilliSecs() Mod 1000) > 300 Then
-								If SelectedItem\itemtemplate\tempname <> "nav310" And SelectedItem\itemtemplate\tempname <> "navulti" Then
+								If SelectedItem\itemtemplate\tempname <> "navulti" Then
 									Text(x - NAV_WIDTH/2 + 10, y - NAV_HEIGHT/2 + 10, "MAP DATABASE OFFLINE")
 								EndIf
 								
@@ -5689,13 +5749,13 @@ Function DrawGUI()
 								Line x2,y2,x3,y3
 							EndIf
 							
+							Color 100, 0, 0
 							Local SCPs_found% = 0
 							If SelectedItem\itemtemplate\tempname = "navulti" And (MilliSecs() Mod 600) < 400 Then
 								If Curr173<>Null Then
 									Local dist# = EntityDistance(Camera, Curr173\obj)
 									dist = Ceil(dist / 8.0) * 8.0
 									If dist < 8.0 * 4 Then
-										Color 100, 0, 0
 										Oval(x - dist * 3, y - 7 - dist * 3, dist * 3 * 2, dist * 3 * 2, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30, "SCP-173")
 										SCPs_found% = SCPs_found% + 1
@@ -5704,7 +5764,6 @@ Function DrawGUI()
 								If Curr106<>Null Then
 									dist# = EntityDistance(Camera, Curr106\obj)
 									If dist < 8.0 * 4 Then
-										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-106")
 										SCPs_found% = SCPs_found% + 1
@@ -5713,7 +5772,6 @@ Function DrawGUI()
 								If Curr096<>Null Then 
 									dist# = EntityDistance(Camera, Curr096\obj)
 									If dist < 8.0 * 4 Then
-										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-096")
 										SCPs_found% = SCPs_found% + 1
@@ -5724,7 +5782,6 @@ Function DrawGUI()
 										dist# = EntityDistance(Camera, np\obj)
 										If dist < 8.0 * 4 Then
 											If (Not np\HideFromNVG) Then
-												Color 100, 0, 0
 												Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 												Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-049")
 												SCPs_found% = SCPs_found% + 1
@@ -5736,7 +5793,6 @@ Function DrawGUI()
 								If PlayerRoom\RoomTemplate\Name = "room895" Then
 									If CoffinDistance < 8.0 Then
 										dist = Rnd(4.0, 8.0)
-										Color 100, 0, 0
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-895")
 									EndIf
@@ -5744,14 +5800,13 @@ Function DrawGUI()
 							EndIf
 							
 							Color (30,30,30)
-							If SelectedItem\itemtemplate\tempname = "nav" Then Color(100, 0, 0)
-							If SelectedItem\state <= 100 Then
+							If SelectedItem\itemtemplate\tempname <> "nav310" Then
 								xtemp = x - NAV_WIDTH/2 + 196
 								ytemp = y - NAV_HEIGHT/2 + 10
 								Rect xtemp,ytemp,80,20,False
 								
 								For i = 1 To Ceil(SelectedItem\state / 10.0)
-									DrawImage NavImages(4),xtemp+i*8-6,ytemp+4
+									DrawImage NavImages[4],xtemp+i*8-6,ytemp+4
 								Next
 								
 								SetFont I_Opt\Fonts[3]
@@ -6991,9 +7046,9 @@ Function LoadEntities()
 ;	OBJTunnel(6)=LoadRMesh("GFX\map\mt_generator.rmesh",Null)
 ;	HideEntity OBJTunnel(6)
 	
-	LightSpriteTex(0) = LoadTexture_Strict("GFX\light1.jpg", 1)
-	LightSpriteTex(1) = LoadTexture_Strict("GFX\light2.jpg", 1)
-	LightSpriteTex(2) = LoadTexture_Strict("GFX\lightsprite.jpg",1)
+	LightSpriteTex[0] = LoadTexture_Strict("GFX\light1.jpg", 1)
+	LightSpriteTex[1] = LoadTexture_Strict("GFX\light2.jpg", 1)
+	LightSpriteTex[2] = LoadTexture_Strict("GFX\lightsprite.jpg",1)
 	
 	DrawLoading(10)
 	
@@ -7377,15 +7432,6 @@ Function InitNewGame(I_Opt.Options)
 		If (r\RoomTemplate\Name = "start" And IntroEnabled = False) Then 
 			PositionEntity (Collider, EntityX(r\obj)+3584*RoomScale, 704*RoomScale, EntityZ(r\obj)+1024*RoomScale)
 			PlayerRoom = r
-			it = CreateItem("paper", 1, 1, 1, "classd")
-			it\Picked = 1
-			it\Dropped = -1
-			it\itemtemplate\found=True
-			Inventory(0) = it
-			HideEntity(it\collider)
-			EntityType (it\collider, HIT_ITEM)
-			EntityParent(it\collider, 0)
-			ItemAmount = ItemAmount + 1
 		ElseIf (r\RoomTemplate\Name = "room173" And IntroEnabled) Then
 			PositionEntity (Collider, EntityX(r\obj), 1.0, EntityZ(r\obj))
 			PlayerRoom = r
@@ -7562,6 +7608,8 @@ Function NullGame(playbuttonsfx%=True)
 	KillSounds()
 	If playbuttonsfx Then PlaySound_Strict ButtonSFX
 	
+	DeleteTextures_Cache(1)
+	
 	FreeParticles()
 	
 	ClearTextureCache
@@ -7696,7 +7744,6 @@ Function NullGame(playbuttonsfx%=True)
 	Msg = ""
 	MsgTimer = 0
 	
-	doubleClickSlot = -1
 	SelectedItem = Null
 	
 	For i = 0 To MaxItemAmount - 1
@@ -9490,7 +9537,7 @@ Function RenderWorld2()
 	If (WearingNightVision<>0 And WearingNightVision<>3) Lor WearingScramble<>0 Then
 		For i% = 0 To MaxItemAmount - 1
 			If Inventory(i)<>Null And Inventory(i)\picked = 2 And (Inventory(i)\itemtemplate\tempname = "badnvg" Lor Inventory(i)\itemtemplate\tempname = "nvg" Lor Inventory(i)\itemtemplate\tempname = "supernvg" Lor Inventory(i)\itemtemplate\tempname = "scramble") Then
-				Inventory(i)\state = Max(0, Inventory(i)\state - (FPSfactor * ((0.02 * Abs(WearingNightVision)) + (0.25 * Abs(WearingScramble)))))
+				Inventory(i)\state = Max(0, Inventory(i)\state - (FPSfactor * ((0.02 * Abs(WearingNightVision)) + (0.25 * (WearingScramble <> 0)) - (0.1 * (WearingScramble = 2)))))
 				power%=Int(Inventory(i)\state)
 				If power=0.0 Then ;this nvg can't be used
 					hasBattery = 0
@@ -9539,7 +9586,25 @@ Function RenderWorld2()
 	
 	CurrTrisAmount = TrisRendered()
 	
-	If hasBattery > 0 And (BlinkTimer < -16 Lor BlinkTimer > -6)
+	ScrambleActive = 0
+	
+	If WearingScramble <> 0 Then
+		If hasBattery = 0 
+			If (MilliSecs() Mod 400) < 200 Then
+				Color 255,0,0
+				SetFont I_Opt\Fonts[3]
+				Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "nobat"),True,False
+			EndIf
+			If ChannelPlaying(ScrambleCHN) Then StopChannel(ScrambleCHN)
+		Else
+			ScrambleActive = WearingScramble Mod 100
+			ScrambleCHN = LoopSound2(ScrambleSFX, ScrambleCHN, Camera, Camera)
+		EndIf
+	Else
+		If ChannelPlaying(ScrambleCHN) Then StopChannel(ScrambleCHN)
+	EndIf
+	
+	If hasBattery > 0 Then
 		If WearingNightVision=2 Then ;show a HUD
 			
 			Color 255,255,255
@@ -9632,7 +9697,7 @@ Function RenderWorld2()
 			Color 255,0,0
 			SetFont I_Opt\Fonts[3]
 			
-			Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "nvglowbat"),True,False
+			Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "lowbat"),True,False
 			Color 255,255,255
 		EndIf
 	EndIf

@@ -43,7 +43,6 @@ Type NPCs
 	Field GravityMult# = 1.0
 	Field MaxGravity# = 0.2
 	
-	Field MTFVariant%
 	Field MTFLeader.NPCs
 	Field IsDead%
 	Field BlinkTimer# = 1.0
@@ -250,18 +249,17 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			ScaleEntity n\obj2, temp, temp, temp
 
 		Case NPCtype096
-
 			n\NVName = "SCP-096"
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.26
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp096.b3d")
 			
-			n\Obj2 = CreateSprite(FindChild(n\Obj, "Reyelid"))
-			ScaleSprite(n\Obj2, 0.07, 0.08)
-			EntityOrder(n\Obj2, -5)
-			EntityTexture(n\Obj2, DarkTexture)
-			HideEntity n\Obj2
+			n\obj2 = CreateSprite(FindChild(n\Obj, "Reyelid"))
+			ScaleSprite(n\obj2, 0.07, 0.08)
+			EntityOrder(n\obj2, -5)
+			EntityTexture(n\obj2, DarkTexture)
+			HideEntity n\obj2
 			
 			n\Speed = (GetINIFloat("DATA\NPCs.ini", "SCP-096", "speed") / 100.0)
 			
@@ -371,7 +369,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 				Local lightsprite = CreateSprite(n\obj)
 				PositionEntity(lightsprite, 1.65*i, 1.17, 0, -0.25)
 				ScaleSprite(lightsprite, 0.13, 0.13)
-				EntityTexture(lightsprite, LightSpriteTex(0))
+				EntityTexture(lightsprite, LightSpriteTex[0])
 				EntityBlend (lightsprite, 3)
 				EntityFX lightsprite, 1+8				
 			Next
@@ -516,7 +514,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\NVName = "SCP-682"
 			
 			n\Collider = CreatePivot()
-			EntityRadius n\Collider,1.2
+			EntityRadius n\Collider,0.2
 			EntityType n\Collider, HIT_PLAYER
 			
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\682.b3d")
@@ -1266,13 +1264,25 @@ Function UpdateNPCs()
 			Case NPCtype096
 			
 				Local I_Opt.Options = First Options
+				
+				If Abs(WearingScramble > 50) And n\BlinkTimer = 0 Then ;I am using a variable outside of its intended use
+					EntityTexture n\obj2, LightTexture
+					n\BlinkTimer = 1
+				ElseIf Abs(WearingScramble < 50) And n\Blinktimer = 1 Then
+					EntityTexture n\obj2, DarkTexture
+					n\BlinkTimer = 0
+				EndIf
 
 				dist = EntityDistance(Collider, n\Collider)
 				angle = WrapAngle(DeltaYaw(n\Collider, Collider));-EntityYaw(n\Collider,True))
 				
-				If WearingScramble <> 0 And dist < 16.0 And (angle<135 Lor angle>225) And EntityVisible(Camera, n\obj2) Then
+				If (ScrambleActive > 0 Lor (ScrambleActive = -1 And Rand(20) < 20)) And dist < 16.0 And (angle<135 Lor angle>225) And EntityVisible(Camera, n\obj2) Then
 					ShowEntity n\obj2
-					ScaleSprite(n\obj2, Rnd(0.06, 0.08), Rnd(0.07, 0.09))
+					If ScrambleActive = 3
+						ScaleSprite(n\obj2, Rnd(0.5, 2), Rnd(0.5, 2))
+					Else
+						ScaleSprite(n\obj2, Rnd(0.06, 0.08), Rnd(0.07, 0.09))
+					EndIf
 					PositionEntity n\obj2, Rnd(0.1)-0.05, Rnd(0.1)-0.05, Rnd(0.1)-0.05
 				Else
 					HideEntity n\obj2
@@ -1316,7 +1326,7 @@ Function UpdateNPCs()
 							EndIf
 							;AnimateNPC(n, 1085,1412, 0.1) ;sitting
 							
-							If (Not NoTarget) And WearingScramble = 0 And (angle<90 Lor angle>270) Then
+							If (Not NoTarget) And (ScrambleActive = 0 Lor (ScrambleActive = -1 And Rand(300) = 300)) And (angle<90 Lor angle>270) Then
 								CameraProject Camera,EntityX(n\Collider), EntityY(n\Collider)+0.25, EntityZ(n\Collider)
 								
 								If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth And ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight And EntityVisible(Collider, n\Collider) And (BlinkTimer < - 16 Lor BlinkTimer > - 6) Then
@@ -1649,7 +1659,7 @@ Function UpdateNPCs()
 							
 							angle = WrapAngle(DeltaYaw(n\Collider, Camera));-EntityYaw(n\Collider))
 							
-							If (Not NoTarget) And WearingScramble = 0 And (angle<55 Lor angle>360-55) Then
+							If (Not NoTarget) And (ScrambleActive = 0 Lor (ScrambleActive = -1 And Rand(300) = 300)) And (angle<55 Lor angle>360-55) Then
 								CameraProject Camera,EntityX(n\Collider), EntityY(Collider)+5.8*0.2-0.25, EntityZ(n\Collider)
 								
 								If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth And ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight And EntityVisible(Collider, n\Collider) And (BlinkTimer < - 16 Lor BlinkTimer > - 6)
@@ -3018,8 +3028,7 @@ Function UpdateNPCs()
 						PositionEntity(n\obj, EntityX(n\Collider) + Rnd(-0.005, 0.005), EntityY(n\Collider)+0.3+0.1*Sin(MilliSecs()/2), EntityZ(n\Collider) + Rnd(-0.005, 0.005))
 						RotateEntity n\obj, 0, EntityYaw(n\Collider), ((MilliSecs()/5) Mod 360)
 						
-						AnimateNPC(n, 32, 113, 0.4)
-						;Animate2(n\obj, AnimTime(n\obj), 32, 113, 0.4)
+						AnimateNPC(n, 1, 300, 1)
 						
 						If EntityInView(n\obj, Camera) Then
 							GiveAchievement(Achv372)
@@ -4259,7 +4268,7 @@ Function UpdateNPCs()
 				; Walk = 261 - 310
 			
 				AnimateNPC(n, 1, 199, 20.0/70.0)
-				PositionEntity(n\obj, EntityX(n\Collider, True), EntityY(n\Collider, True)-0.55, EntityZ(n\Collider, True))
+				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider)-0.2, EntityZ(n\Collider))
 
 			Case NPCtype966
 
@@ -7216,7 +7225,7 @@ Function Console_SpawnNPC(c_input$, c_state$ = "")
 		Case "939", "scp939", "scp-939"
 			CreateConsoleMsg("SCP-939 instances cannot be spawned with the console. Sorry!", 255, 0, 0)
 		Case "682", "scp682", "scp-682"
-			n.NPCs = CreateNPC(NPCtype682, EntityX(Collider), EntityY(Collider) + 1.2, EntityZ(Collider))
+			n.NPCs = CreateNPC(NPCtype682, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
 			consoleMSG = "SCP-682 instance spawned."
 		Case "966", "scp966", "scp-966"
 			n.NPCs = CreateNPC(NPCtype966, EntityX(Collider), EntityY(Collider) + 0.2, EntityZ(Collider))
@@ -7457,7 +7466,7 @@ Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)
 	
 End Function
 
-Function ChangeNPCTextureID(n.NPCs,textureid%)
+Function ChangeNPCTextureID(n.NPCs,textureid%) ;TODO check wtf this is
 
 	Local I_Opt.Options = First Options
 	
