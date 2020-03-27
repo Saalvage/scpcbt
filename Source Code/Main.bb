@@ -86,10 +86,10 @@ Function UpdateLang(I_Loc.Loc, Lang$)
 	SetLocalString("Messages", "savecantmom")
 	SetLocalString("Messages", "saved")
 	SetLocalString("Messages", "savepress")
-	SetLocalString("Messages", "nvgrefresh")
-	SetLocalString("Messages", "nvgseconds")
-	SetLocalString("Messages", "lowbat")
-	SetLocalString("Messages", "nobat")
+	SetLocalString("Game", "nvgrefresh")
+	SetLocalString("Game", "nvgseconds")
+	SetLocalString("Game", "lowbat")
+	SetLocalString("Game", "nobat")
 	SetLocalString("Menu", "paused")
 	SetLocalString("Menu", "difficulty")
 	SetLocalString("Menu", "save")
@@ -200,8 +200,8 @@ While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
-Const VersionNumber$ = "2.0.0"
-Const CompatibleNumber$ = "2.0.0" ;Lowest version with compatible saves
+Const VersionNumber$ = "1.4.0"
+Const CompatibleNumber$ = "1.4.0" ;Lowest version with compatible saves
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%, ButtonSFX2%
@@ -1145,7 +1145,7 @@ Function UpdateDoors()
 						If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
 					EndIf
 					If d\AutoClose And RemoteDoorOn = True Then
-						If EntityDistance(Camera, d\obj) < 2.1 Then
+						If EntityDistanceSquared(Camera, d\obj) < 4.41 Then ;2.1
 							If (Not Wearing714) Then PlaySound_Strict HorrorSFX(7)
 							d\open = False : d\SoundCHN = PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
 						EndIf
@@ -2085,10 +2085,9 @@ Repeat
 				darkA = Max(darkA, Min(Abs(FallTimer / 400.0), 1.0))				
 			EndIf
 			
-			If SelectedItem <> Null Then
-				If SelectedItem\itemtemplate\tempname = "nav" Lor SelectedItem\itemtemplate\tempname = "navulti" Lor SelectedItem\itemtemplate\tempname = "nav310" Lor SelectedItem\itemtemplate\tempname = "nav300" Then darkA = Max(darkA, 0.5)
+			If SelectedItem <> Null And (SelectedItem\itemtemplate\tempname = "badnav" Lor SelectedItem\itemtemplate\tempname = "nav" Lor SelectedItem\itemtemplate\tempname = "navulti" Lor SelectedItem\itemtemplate\tempname = "nav310" Lor SelectedItem\itemtemplate\tempname = "nav300") Lor SelectedScreen <> Null Then
+				darkA = Max(darkA, 0.5)
 			EndIf
-			If SelectedScreen <> Null Then darkA = Max(darkA, 0.5)
 			
 			EntityAlpha(Dark, darkA)	
 		EndIf
@@ -2178,7 +2177,7 @@ Repeat
 			EndIf
 		ElseIf SelectedDifficulty\saveType = SAVEONSCREENS And (SelectedScreen<>Null Lor SelectedMonitor<>Null)
 			If (Msg<>GetLocalString("Messages", "saved") And Msg<>GetLocalString("Messages", "savecantloc") And Msg<>GetLocalString("Messages", "savecantmom")) Lor MsgTimer<=0 Then
-				Msg = Replace(GetLocalString("Messages", "savepress"), "%s", I_Keys\KeyName[I_Keys\SAVE])
+				Msg = GetLocalStringR("Messages", "savepress", I_Keys\KeyName[I_Keys\SAVE])
 				MsgTimer = 70*4
 			EndIf
 			
@@ -2516,8 +2515,6 @@ Function QuickLoadEvents()
 			EndIf
 
 		Case "room860"
-		
-			CreateConsoleMsg("HELLOOOOOO")
 
 			If e\EventStr = "load0"
 				ForestNPC = CreateSprite()
@@ -2538,7 +2535,6 @@ Function QuickLoadEvents()
 				If e\room\NPC[0]=Null Then e\room\NPC[0]=CreateNPC(NPCtype860, 0,0,0)
 				e\EventStr = "loaddone"
 				QuickLoad_CurrEvent = Null
-				CreateConsoleMsg("We're done here")
 			EndIf
 
 		Case "room966"
@@ -3310,23 +3306,11 @@ Function MouseLook()
 		
 		HeadDropSpeed = 0
 		
-		;If 0 Then 
-		;fixing the black screen bug with some bubblegum code 
-		Local Zero# = 0.0
-		Local Nan1# = 0.0 / Zero
-		If Int(EntityX(Collider))=Int(Nan1) Then
-			
-			PositionEntity Collider, EntityX(Camera, True), EntityY(Camera, True) - 0.5, EntityZ(Camera, True), True
-			Msg = "EntityX(Collider) = NaN, RESETTING COORDINATES	-	New coordinates: "+EntityX(Collider)
-			MsgTimer = 300				
-		EndIf
-		;EndIf
-		
 		Local up# = (Sin(Shake) / (20.0+CrouchState*20.0))*0.6;, side# = Cos(Shake / 2.0) / 35.0		
 		Local roll# = Max(Min(Sin(Shake/2)*2.5*Min(Injuries+0.25,3.0),8.0),-8.0)
 		
 		;käännetään kameraa sivulle jos pelaaja on vammautunut
-		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Max(Min(up*30*Injuries,50),-50)
+		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Clamp(up*30*Injuries,50),-50)
 		PositionEntity Camera, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
 		RotateEntity Camera, 0, EntityYaw(Collider), roll*0.5
 		
@@ -3336,7 +3320,7 @@ Function MouseLook()
 		;moveentity player, side, up, 0	
 		; -- Update the smoothing que To smooth the movement of the mouse.
 		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, (6.0 / (MouseSens + 1.0))*MouseSmooth) 
-		If Int(mouse_x_speed_1) = Int(Nan1) Then mouse_x_speed_1 = 0
+		;If mouse_x_speed_1 = NaN Then mouse_x_speed_1 = 0
 		If PrevFPSFactor>0 Then
 			If Abs(FPSfactor/PrevFPSFactor-1.0)>1.0 Then
 				;lag spike detected - stop all camera movement
@@ -3349,7 +3333,7 @@ Function MouseLook()
 		Else
 			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth)
 		EndIf
-		If Int(mouse_y_speed_1) = Int(Nan1) Then mouse_y_speed_1 = 0
+		;If mouse_y_speed_1 = NaN Then mouse_y_speed_1 = 0
 		
 		Local the_yaw# = ((mouse_x_speed_1#)) * mouselook_x_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
 		Local the_pitch# = ((mouse_y_speed_1#)) * mouselook_y_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
@@ -3361,7 +3345,7 @@ Function MouseLook()
 		
 		TurnEntity Collider, 0.0, -the_yaw#, 0.0 ; Turn the user on the Y (yaw) axis.
 		user_camera_pitch# = user_camera_pitch# + the_pitch#
-		; -- Limit the user;s camera To within 180 degrees of pitch rotation. ;EntityPitch(); returns useless values so we need To use a variable To keep track of the camera pitch.
+		; -- Limit the user's camera To within 180 degrees of pitch rotation. ;EntityPitch(); returns useless values so we need To use a variable To keep track of the camera pitch.
 		If user_camera_pitch# > 70.0 Then user_camera_pitch# = 70.0
 		If user_camera_pitch# < - 70.0 Then user_camera_pitch# = -70.0
 		
@@ -3513,7 +3497,7 @@ Function MouseLook()
 					tempint2=True
 					For n.NPCs = Each NPCs
 						If n\NPCtype=NPCtype178 Then
-							If EntityDistance(n\Collider,w\obj)<0.5
+							If EntityDistanceSquared(n\Collider,w\obj)<0.25 ;0.5
 								tempint2=False
 								Exit
 							EndIf
@@ -4479,7 +4463,7 @@ Function DrawGUI()
 								
 							Case "badbat"
 								Select Inventory(MouseSlot)\itemtemplate\tempname
-									Case "nav", "nav300", "navulti"
+									Case "badnav", "nav", "nav300", "navulti"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 										RemoveItem (SelectedItem)
 										Inventory(MouseSlot)\state = 50.0
@@ -4513,7 +4497,7 @@ Function DrawGUI()
 							
 							Case "bat"
 								Select Inventory(MouseSlot)\itemtemplate\tempname
-									Case "nav", "nav300", "navulti"
+									Case "badnav", "nav", "nav300", "navulti"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 										RemoveItem (SelectedItem)
 										Inventory(MouseSlot)\state = 100.0
@@ -4547,7 +4531,7 @@ Function DrawGUI()
 								
 							Case "18vbat"
 								Select Inventory(MouseSlot)\itemtemplate\tempname
-									Case "nav", "nav300", "navulti"
+									Case "badnav", "nav", "nav300", "navulti"
 										Msg = GetLocalString("Messages", "batnavfit")
 									Case "nav310"
 										Msg = GetLocalString("Messages", "batnavult")
@@ -4566,7 +4550,7 @@ Function DrawGUI()
 							
 							Case "superbat", "killbat" ;If you somehow manage to pick it up ;P
 								Select Inventory(MouseSlot)\itemtemplate\tempname
-									Case "nav", "nav300", "navulti"
+									Case "badnav", "nav", "nav300", "navulti"
 										If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))	
 										RemoveItem (SelectedItem)
 										Inventory(MouseSlot)\state = 1000.0
@@ -5104,7 +5088,7 @@ Function DrawGUI()
 
 				Case "radio","18vradio","fineradio","veryfineradio"
 
-					If SelectedItem\state <= 100 Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.004)
+					If SelectedItem\itemtemplate\tempname <> "fineradio" And SelectedItem\itemtemplate\tempname <> "veryfineradio" Then SelectedItem\state = Max(0, SelectedItem\state - FPSfactor * 0.004)
 					
 					If SelectedItem\itemtemplate\img=0 Then
 						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
@@ -5129,7 +5113,7 @@ Function DrawGUI()
 					
 					DrawImage(SelectedItem\itemtemplate\img, x, y)
 					
-					If SelectedItem\state > 0 Then
+					If SelectedItem\state > 0 Lor SelectedItem\itemtemplate\tempname = "fineradio" Lor SelectedItem\itemtemplate\tempname = "veryfineradio" Then
 						If CoffinDistance < 4.0 Lor PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
 							ResumeChannel(RadioCHN[5])
 							If ChannelPlaying(RadioCHN[5]) = False Then RadioCHN[5] = PlaySound_Strict(RadioStatic)	
@@ -5137,13 +5121,13 @@ Function DrawGUI()
 							Select Int(SelectedItem\state2)
 								Case 0 ;randomkanava
 									ResumeChannel(RadioCHN[0])
-									strtemp = "		USER TRACK PLAYER - "
+									strtemp = "		"+GetLocalString("Game", "radio1utp")+" - "
 									If (Not EnableUserTracks)
 										If ChannelPlaying(RadioCHN[0]) = False Then RadioCHN[0] = PlaySound_Strict(RadioStatic)
-										strtemp = strtemp + "NOT ENABLED	 "
+										strtemp = strtemp + GetLocalString("Game", "radio1ne")+"	 "
 									ElseIf UserTrackMusicAmount<1
 										If ChannelPlaying(RadioCHN[0]) = False Then RadioCHN[0] = PlaySound_Strict(RadioStatic)
-										strtemp = strtemp + "NO TRACKS FOUND	 "
+										strtemp = strtemp + GetLocalString("Game", "radio1ntf")+"	 "
 									Else
 										If (Not ChannelPlaying(RadioCHN[0]))
 											If (Not UserTrackFlag%)
@@ -5193,7 +5177,7 @@ Function DrawGUI()
 									DebugLog RadioState[1] 
 									
 									ResumeChannel(RadioCHN[1])
-									strtemp = "		WARNING - CONTAINMENT BREACH		  "
+									strtemp = "		"+GetLocalString("Game", "radio2")+"		  "
 									If ChannelPlaying(RadioCHN[1]) = False Then
 										
 										If RadioState[1] => 5 Then
@@ -5208,7 +5192,7 @@ Function DrawGUI()
 									
 								Case 2 ;scp-radio
 									ResumeChannel(RadioCHN[2])
-									strtemp = "		SCP Foundation On-Site Radio		  "
+									strtemp = "		"+GetLocalString("Game", "radio3")+"		  "
 									If ChannelPlaying(RadioCHN[2]) = False Then
 										RadioState[2]=RadioState[2]+1
 										If RadioState[2] = 17 Then RadioState[2] = 1
@@ -5220,7 +5204,7 @@ Function DrawGUI()
 									EndIf 
 								Case 3
 									ResumeChannel(RadioCHN[3])
-									strtemp = "			 EMERGENCY CHANNEL - RESERVED FOR COMMUNICATION IN THE EVENT OF A CONTAINMENT BREACH		 "
+									strtemp = "			 "+GetLocalString("Game", "radio4")+"		 "
 									If ChannelPlaying(RadioCHN[3]) = False Then RadioCHN[3] = PlaySound_Strict(RadioStatic)
 									
 									If MTFtimer > 0 Then 
@@ -5360,7 +5344,7 @@ Function DrawGUI()
 							
 							Color (30,30,30)
 							
-							If SelectedItem\state <= 100 Then
+							If SelectedItem\itemtemplate\tempname <> "fineradio" And SelectedItem\itemtemplate\tempname <> "veryfineradio" Then
 								;Text (x - 60, y - 20, "BATTERY")
 								For i = 0 To 4
 									Rect(x, y+8*i, 43 - i * 6, 4, Ceil(SelectedItem\state / 20.0) > 4 - i )
@@ -5368,7 +5352,7 @@ Function DrawGUI()
 							EndIf	
 							
 							SetFont I_Opt\Fonts[3]
-							Text(x+60, y, "CHN")						
+							Text(x+60, y, GetLocalString("Game", "radiochn"))						
 							
 							If SelectedItem\itemtemplate\tempname = "veryfineradio" Then ;"KOODIKANAVA"
 								ResumeChannel(RadioCHN[0])
@@ -5632,7 +5616,7 @@ Function DrawGUI()
 					SelectedItem = Null
 					MsgTimer = 70 * 5
 
-				Case "nav", "nav300", "nav310", "navulti"
+				Case "badnav", "nav", "nav300", "nav310", "navulti"
 
 					
 					If SelectedItem\itemtemplate\img=0 Then
@@ -5668,8 +5652,8 @@ Function DrawGUI()
 					If (Not NavWorks) Then
 						If (MilliSecs() Mod 1000) > 300 Then
 							Color(200, 0, 0)
-							Text(x, y + NAV_HEIGHT / 2 - 80, "ERROR 06", True)
-							Text(x, y + NAV_HEIGHT / 2 - 60, "LOCATION UNKNOWN", True)						
+							Text(x, y + NAV_HEIGHT / 2 - 80, GetLocalString("Game", "nave06"), True)
+							Text(x, y + NAV_HEIGHT / 2 - 60, GetLocalString("Game", "navloc"), True)						
 						EndIf
 					Else
 						
@@ -5683,48 +5667,49 @@ Function DrawGUI()
 							Local yy = y-ImageHeight(SelectedItem\itemtemplate\img)/2+85
 							DrawImage(SelectedItem\itemtemplate\img, xx, yy)
 							
-							x = x - 12 + (((EntityX(Collider)-4.0)+8.0) Mod 8.0)*3
-							y = y + 12 - (((EntityZ(Collider)-4.0)+8.0) Mod 8.0)*3
-							For x2 = Max(0, PlayerX - 6) To Min(MapWidth, PlayerX + 6)
-								For z2 = Max(0, PlayerZ - 6) To Min(MapHeight, PlayerZ + 6)
-									
-									If CoffinDistance > 16.0 Lor Rnd(16.0)<CoffinDistance Then 
-										If MapTemp(x2, z2)>0 And (MapFound(x2, z2) > 0 Lor SelectedItem\itemtemplate\tempname = "navulti") Then
-											Local drawx% = x + (PlayerX - 1 - x2) * 24 , drawy% = y - (PlayerZ - 1 - z2) * 24
-											
-											If x2+1<=MapWidth Then
-												If MapTemp(x2+1,z2)=False
+							If SelectedItem\itemtemplate\tempname = "badnav" Then
+								Local drawx2% = I_Opt\GraphicWidth - ImageWidth(SelectedItem\itemtemplate\img)*0.5+20, drawy2% = I_Opt\GraphicHeight - ImageHeight(SelectedItem\itemtemplate\img)*0.4-85
+								
+								PlayerX = PlayerX - 1
+								PlayerZ = PlayerZ - 1
+								
+								If PlayerX+1>MapWidth Lor MapTemp(PlayerX+1,PlayerZ)=False Then
+									DrawImage NavImages[3],drawx2-12,drawy2-12
+								EndIf
+								If PlayerX-1<0 Lor MapTemp(PlayerX-1,PlayerZ)=False Then
+									DrawImage NavImages[1],drawx2-12,drawy2-12
+								EndIf
+								If PlayerZ-1<0 Lor MapTemp(PlayerX,PlayerZ-1)=False Then
+									DrawImage NavImages[0],drawx2-12,drawy2-12
+								EndIf
+								If PlayerZ+1>MapHeight Lor MapTemp(PlayerX,PlayerZ+1)=False Then
+									DrawImage NavImages[2],drawx2-12,drawy2-12
+								EndIf
+							ElseIf SelectedItem\itemtemplate\tempname <> "nav"
+								x = x - 12 + (((EntityX(Collider)-4.0)+8.0) Mod 8.0)*3
+								y = y + 12 - (((EntityZ(Collider)-4.0)+8.0) Mod 8.0)*3
+								For x2 = Max(0, PlayerX - 6) To Min(MapWidth, PlayerX + 6)
+									For z2 = Max(0, PlayerZ - 6) To Min(MapHeight, PlayerZ + 6)
+										If CoffinDistance > 16.0 Lor Rnd(16.0)<CoffinDistance Then 
+											If MapTemp(x2, z2)>0 And (MapFound(x2, z2) > 0 Lor SelectedItem\itemtemplate\tempname = "navulti") Then
+												Local drawx% = x + (PlayerX - 1 - x2) * 24 , drawy% = y - (PlayerZ - 1 - z2) * 24
+												If x2+1>MapWidth Lor MapTemp(x2+1,z2)=False Then
 													DrawImage NavImages[3],drawx-12,drawy-12
 												EndIf
-											Else
-												DrawImage NavImages[3],drawx-12,drawy-12
-											EndIf
-											If x2-1>=0 Then
-												If MapTemp(x2-1,z2)=False
+												If x2-1<0 Lor MapTemp(x2-1,z2)=False Then
 													DrawImage NavImages[1],drawx-12,drawy-12
 												EndIf
-											Else
-												DrawImage NavImages[1],drawx-12,drawy-12
-											EndIf
-											If z2-1>=0 Then
-												If MapTemp(x2,z2-1)=False
+												If z2-1<0 Lor MapTemp(x2,z2-1)=False Then
 													DrawImage NavImages[0],drawx-12,drawy-12
 												EndIf
-											Else
-												DrawImage NavImages[0],drawx-12,drawy-12
-											EndIf
-											If z2+1<=MapHeight Then
-												If MapTemp(x2,z2+1)=False
+												If z2+1>MapHeight Lor MapTemp(x2,z2+1)=False Then
 													DrawImage NavImages[2],drawx-12,drawy-12
 												EndIf
-											Else
-												DrawImage NavImages[2],drawx-12,drawy-12
 											EndIf
 										EndIf
-									EndIf
-									
+									Next
 								Next
-							Next
+							EndIf
 							
 							SetBuffer BackBuffer()
 							DrawImageRect NavBG,xx+80,yy+70,xx+80,yy+70,270,230
@@ -5736,7 +5721,7 @@ Function DrawGUI()
 							
 							If (MilliSecs() Mod 1000) > 300 Then
 								If SelectedItem\itemtemplate\tempname <> "navulti" Then
-									Text(x - NAV_WIDTH/2 + 10, y - NAV_HEIGHT/2 + 10, "MAP DATABASE OFFLINE")
+									Text(x - NAV_WIDTH/2 + 10, y - NAV_HEIGHT/2 + 10, GetLocalString("Game", "navoff"))
 								EndIf
 								
 								yawvalue = EntityYaw(Collider)-90
@@ -5750,8 +5735,8 @@ Function DrawGUI()
 							EndIf
 							
 							Color 100, 0, 0
-							Local SCPs_found% = 0
-							If SelectedItem\itemtemplate\tempname = "navulti" And (MilliSecs() Mod 600) < 400 Then
+							If (SelectedItem\itemtemplate\tempname = "navulti" Lor SelectedItem\itemtemplate\tempname = "nav") And (MilliSecs() Mod 600) < 400 Then
+								Local SCPs_found% = 0
 								If Curr173<>Null Then
 									Local dist# = EntityDistance(Camera, Curr173\obj)
 									dist = Ceil(dist / 8.0) * 8.0
@@ -5805,11 +5790,10 @@ Function DrawGUI()
 								ytemp = y - NAV_HEIGHT/2 + 10
 								Rect xtemp,ytemp,80,20,False
 								
-								For i = 1 To Ceil(SelectedItem\state / 10.0)
+								For i = 1 To Min(Ceil(SelectedItem\state / 10.0), 10)
 									DrawImage NavImages[4],xtemp+i*8-6,ytemp+4
 								Next
 								
-								SetFont I_Opt\Fonts[3]
 							EndIf
 						EndIf
 						
@@ -6132,7 +6116,7 @@ Function DrawMenu()
 		
 		If PlayerRoom\RoomTemplate\Name$ <> "gateb" And PlayerRoom\RoomTemplate\Name$ <> "gatea"
 			If StopHidingTimer = 0 Then
-				If EntityDistance(Curr173\Collider, Collider)<4.0 Lor EntityDistance(Curr106\Collider, Collider)<4.0 Then 
+				If EntityDistanceSquared(Curr173\Collider, Collider)<16.0 Lor EntityDistanceSquared(Curr106\Collider, Collider)<16.0 Then ;4 4
 					StopHidingTimer = 1
 				EndIf	
 			ElseIf StopHidingTimer < 40
@@ -7010,7 +6994,7 @@ Function LoadEntities()
 	
 	;Other NPCs pre-loaded
 
-	NPC049OBJ = LoadAnimMesh_Strict("GFX\npcs\scp-049.b3d")
+	NPC049OBJ = LoadAnimMesh_Strict("GFX\npcs\049.b3d")
 	HideEntity NPC049OBJ
 	NPC0492OBJ = LoadAnimMesh_Strict("GFX\npcs\zombie1.b3d")
 	HideEntity NPC0492OBJ
@@ -8531,7 +8515,7 @@ Function Use294()
 					
 				Else
 					;out of range
-					Input294 = GetLocalString("294", "oor")
+					Input294 = GetLocalString("Game", "oor")
 					PlayerRoom\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\SCP\294\outofrange.ogg"))
 				EndIf
 				
@@ -8547,10 +8531,10 @@ Function Use294()
 		EndIf
 		
 	Else ;playing a dispensing sound
-		If Input294 <> GetLocalString("294", "oor") Then Input294 = GetLocalString("294", "disp")
+		If Input294 <> GetLocalString("Game", "oor") Then Input294 = GetLocalString("Game", "disp")
 		
 		If Not ChannelPlaying(PlayerRoom\SoundCHN) Then
-			If Input294 <> GetLocalString("294", "oor") Then
+			If Input294 <> GetLocalString("Game", "oor") Then
 				HidePointer()
 				Using294 = False
 				MouseXSpeed() : MouseYSpeed() : MouseZSpeed() : mouse_x_speed_1#=0.0 : mouse_y_speed_1#=0.0
@@ -9593,7 +9577,7 @@ Function RenderWorld2()
 			If (MilliSecs() Mod 400) < 200 Then
 				Color 255,0,0
 				SetFont I_Opt\Fonts[3]
-				Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "nobat"),True,False
+				Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Game", "nobat"),True,False
 			EndIf
 			If ChannelPlaying(ScrambleCHN) Then StopChannel(ScrambleCHN)
 		Else
@@ -9614,10 +9598,10 @@ Function RenderWorld2()
 			Local plusY% = 0
 			If hasBattery=1 Then plusY% = 40
 			
-			Text I_Opt\GraphicWidth/2,(20+plusY)*MenuScale,GetLocalString("Messages", "nvgrefresh"),True,False
+			Text I_Opt\GraphicWidth/2,(20+plusY)*MenuScale,GetLocalString("Game", "nvgrefresh"),True,False
 			
 			Text I_Opt\GraphicWidth/2,(60+plusY)*MenuScale,Max(f2s(NVTimer/60.0,1),0.0),True,False
-			Text I_Opt\GraphicWidth/2,(100+plusY)*MenuScale,GetLocalString("Messages", "nvgseconds"),True,False
+			Text I_Opt\GraphicWidth/2,(100+plusY)*MenuScale,GetLocalString("Game", "nvgseconds"),True,False
 			
 			temp% = CreatePivot() : temp2% = CreatePivot()
 			PositionEntity temp, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
@@ -9660,46 +9644,26 @@ Function RenderWorld2()
 			FreeEntity (temp) : FreeEntity (temp2)
 			
 			Color 0,0,55
-			For k=0 To 10
-				Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
-			Next
-			Color 0,0,255
-			For l=0 To Floor((power%+50)*0.01)
-				Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
-			Next
-			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,1
-			
-			Color 255,255,255
 		ElseIf WearingNightVision=1
 			Color 0,55,0
-			For k=0 To 10
-				Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
-			Next
-			Color 0,255,0
-			For l=0 To Floor((power%+50)*0.01)
-				Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
-			Next
-			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,0
-			Color 255,255,255
 		Else ;SCRAMBLE or NoVG
 			Color 55,55,55
-			For k=0 To 10
-				Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
-			Next
-			Color 255,255,255
-			For l=0 To Floor((power%+50)*0.01)
-				Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
-			Next
-			DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,2
-			Color 255,255,255
 		EndIf
+		For k=0 To 10
+			Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
+		Next
+		For l=0 To Min(Floor((power%+50)*0.01), 11)
+			Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
+		Next
+		DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,2
+		
 		If hasBattery = 1 And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
 			SetFont I_Opt\Fonts[3]
 			
-			Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Messages", "lowbat"),True,False
-			Color 255,255,255
+			Text I_Opt\GraphicWidth/2,20*MenuScale,GetLocalString("Game", "lowbat"),True,False
 		EndIf
+		Color 255,255,255
 	EndIf
 	
 	;render sprites
@@ -9840,10 +9804,7 @@ Function CheckForPlayerInFacility()
 	If EntityY(Collider)>100.0
 		Return False
 	EndIf
-	If EntityY(Collider)< -10.0
-		Return 2
-	EndIf
-	If EntityY(Collider)> 7.0 And EntityY(Collider)<=100.0
+	If EntityY(Collider) < -10.0 Lor EntityY(Collider) > 7.0
 		Return 2
 	EndIf
 	
@@ -9955,28 +9916,6 @@ End Function
 
 Function ScaledMouseY%(I_Opt.Options)
 	Return Float(MouseY())*Float(I_Opt\GraphicHeight)/Float(RealGraphicHeight)
-End Function
-
-Function CatchErrors(location$)
-	Local errtxt$
-	errtxt = "An error occured in SCP - Containment Breach v"+VersionNumber+Chr(10)+"Save compatible version: "+CompatibleNumber+". Engine version: "+SystemProperty("blitzversion")+Chr(10)
-	errtxt = errtxt+"Date and time: "+CurrentDate()+" at "+CurrentTime()+Chr(10)+"OS: "+SystemProperty("os")+" "+(32 + (GetEnv("ProgramFiles(X86)")<>0)*32)+" bit (Build: "+SystemProperty("osbuild")+")"+Chr(10)
-	errtxt = errtxt+"GPU: "+GfxDriverName(CountGfxDrivers())+" ("+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB)"+Chr(10)
-	errtxt = errtxt+"Video memory: "+((TotalVidMem()/1024)-(AvailVidMem()/1024))+" MB/"+(TotalVidMem()/1024)+" MB"+Chr(10)
-	errtxt = errtxt+"Global memory status: "+((TotalPhys()/1024)-(AvailPhys()/1024))+" MB/"+(TotalPhys()/1024)+" MB"+Chr(10)
-	errtxt = errtxt+"Triangles rendered: "+CurrTrisAmount+", Active textures: "+ActiveTextures()+Chr(10)+Chr(10)
-	If PlayerRoom <> Null Then
-		errtxt = errtxt+"Map seed: "+RandomSeed+", Room: " + PlayerRoom\RoomTemplate\Name+" (" + Floor(EntityX(PlayerRoom\obj) / 8.0 + 0.5) + ", " + Floor(EntityZ(PlayerRoom\obj) / 8.0 + 0.5) + ", angle: "+PlayerRoom\angle + ")"+Chr(10)
-		
-		For ev.Events = Each Events
-			If ev\room = PlayerRoom Then
-				errtxt=errtxt+"Room event: "+ev\EventName+" (" +ev\EventState+", "+ev\EventState2+", "+ev\EventState3+")"+Chr(10)+Chr(10)
-				Exit
-			EndIf
-		Next
-	EndIf
-	errtxt = errtxt+"Error located in: "+location+Chr(10)+Chr(10)+"Please take a screenshot of this error and send it to us!"
-	;ErrorMessage errtxt
 End Function
 
 Function PlayAnnouncement(file$) ;This function streams the announcement currently playing

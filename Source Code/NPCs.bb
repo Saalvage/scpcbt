@@ -457,7 +457,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			Next
 			
 			If n\obj = 0 Then 
-				n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-939.b3d")
+				n\obj = LoadAnimMesh_Strict("GFX\NPCs\939.b3d")
 				
 				temp# = GetINIFloat("DATA\NPCs.ini", "SCP-939", "scale")/2.5
 				ScaleEntity n\obj, temp, temp, temp		
@@ -474,7 +474,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityRadius n\Collider, 0.2
 			EntityType n\Collider, HIT_PLAYER
 			
-			n\obj = LoadAnimMesh_Strict("GFX\NPCs\scp-066.b3d")
+			n\obj = LoadAnimMesh_Strict("GFX\NPCs\066.b3d")
 			temp# = GetINIFloat("DATA\NPCs.ini", "SCP-066", "scale")/2.5
 			ScaleEntity n\obj, temp, temp, temp		
 			
@@ -495,7 +495,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			Next
 			
 			If n\obj = 0 Then 
-				n\obj = LoadAnimMesh_Strict("GFX\npcs\npc178.b3d")
+				n\obj = LoadAnimMesh_Strict("GFX\npcs\178_npc.b3d")
 			EndIf
 			
 			EntityFX n\obj,1
@@ -543,7 +543,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			Next
 			
 			If n\obj = 0 Then 
-				n\obj = LoadAnimMesh_Strict("GFX\npcs\scp-966.b3d")
+				n\obj = LoadAnimMesh_Strict("GFX\npcs\966.b3d")
 			EndIf
 			
 			EntityFX n\obj,1
@@ -562,7 +562,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 		Case NPCtype1048a
 
 			n\NVName = "SCP-1048-A"
-			n\obj =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
+			n\obj =	LoadAnimMesh_Strict("GFX\npcs\1048a.b3d")
 			ScaleEntity n\obj, 0.05,0.05,0.05
 			SetAnimTime(n\obj, 2)
 			
@@ -4213,7 +4213,7 @@ Function UpdateNPCs()
 								
 								n\CurrSpeed = CurveValue(n\Speed,n\CurrSpeed,10.0)
 								
-								If EntityDistance(n\Collider,n\Path[n\PathLocation]\obj) < 0.2 Then
+								If EntityDistanceSquared(n\Collider,n\Path[n\PathLocation]\obj) < 0.04 Then ;0.2
 									n\PathLocation = n\PathLocation + 1
 								EndIf 
 							EndIf
@@ -4234,7 +4234,7 @@ Function UpdateNPCs()
 						;Animate2(n\obj, AnimTime(n\obj), 64, 91, n\CurrSpeed*10.0)
 						
 						For d.Doors = Each Doors
-							If (EntityDistance(n\Collider,d\obj)<1.25) And (d\Code<>"GEAR") And (EntityCollided(n\Collider,HIT_178)=0) Then
+							If (EntityDistanceSquared(n\Collider,d\obj)<1.5625) And (d\Code<>"GEAR") And (EntityCollided(n\Collider,HIT_178)=0) Then ;1.25
 								n\DropSpeed=0
 								ResetEntity n\Collider
 							EndIf
@@ -7412,16 +7412,15 @@ Function PlayerInReachableRoom(canSpawnIn049Chamber%=False)
 		Return False
 	EndIf
 	;Player is in 860's test room and inside the forest, returning false
-	temp = False
-	For e = Each Events
-		If e\EventName$ = "room860" And e\EventState = 1.0 Then
-			temp = True
-			Exit
-		EndIf
-	Next
-	If RN = "room860" And temp Then
-		Return False
+	If RN = "room860" Then
+		For e = Each Events
+			If e\EventName$ = "room860" And e\EventState = 1.0 Then
+				Return False
+				Exit
+			EndIf
+		Next
 	EndIf
+	
 	If (Not canSpawnIn049Chamber) Then
 		If SelectedDifficulty\aggressiveNPCs = False Then
 			If RN = "room049" And EntityY(Collider)<=-2848*RoomScale Then

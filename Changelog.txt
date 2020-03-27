@@ -1,4 +1,4 @@
-﻿v2.0.0
+﻿v1.4.0
 
 - Added SCP-682.
 - (Re-)Added SCP-178 with improved mechanics.
@@ -7,13 +7,14 @@
 - Added localization/mod support with built in support for Englisch (due), German, Spanish (South America),
 - Added FOV option (Made by TheHappyJammer).
 	- Decreased default FOV to 60.
-	- FOV is now also internally an integer, fixing an issue with the sliders allowing for float values.
+	- Fixed float values being allowed in the menus.
 - Added support for resolutions of up to 4k.
 - Added anisotropic filtering.
 - Added SCRAMBLE gear.
 	- Including coarse, fine and very fine variants.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
+- Rebalanced the S-NAVs, making the S-NAV 5000 (S-NAV Ultimate) less overpowered, the S-NAV 400 (formerly S-NAV 310) less useless and the S-LOC (formerly S-NAV) more interesting.
 - (Re-)Added SCP-173's head rotating.
 - Added bloody SCP-096 texture after killing someone.
 - Added vehicle in the intro sequence.
@@ -42,7 +43,9 @@
 	- Added a bad and a super battery.
 	- Added SCP-1025 refinements.
 	- Added a very special book.
+	- Added a hand.
 	- Added ability to get electronics via Electronical Components.
+	- Added a bad NAV (NAV 95).
 	- Added Not Vision Goggles.
 	- Added worse clipboards and wallets.
 	- Added Bad Hazmat Suit.
@@ -63,7 +66,7 @@
 - Added a tooltip that tells the user what is causing a save to be invalid.
 - SCP-1123 can now be picked up using SCP-714.
 - Updated SCP-294's loading screen units to metric (as per wiki page).
-- Changed the name of the Custom difficulty to "Esoteric" (suggested by /u/05-69).
+- Changed the name of the Custom difficulty to "Esoteric".
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
@@ -117,7 +120,9 @@ Bug Fixes:
 	- Fixed vest model.
 	- Fixed keycard model.
 	- Fixed origami model.
+	- Fixed radio model (mostly).
 	- Fixed SCP-513-1 model.
+	- Fixed tank models.
 	- Fixed and reworked the "revive" command.
 	- Fixed untitled save files not correctly being named after the second one.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.

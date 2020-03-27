@@ -653,7 +653,11 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 										it2 = Createitem("veryfineradio", x, y, z)
 									EndIf
 								Case 2
-									it2 = CreateItem("navulti", x, y, z)
+									If Rand(2) = 1 Then
+										it2 = CreateItem("navulti", x, y, z)
+									Else
+										it2 = CreateItem("nav310", x, y, z)
+									EndIf
 								Case 3
 									If Rand(2) = 1 Then
 										it2 = CreateItem("finenvg", x, y, z)
@@ -880,8 +884,10 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 			End Select
 		Case "nav300", "nav"
 			Select setting
-				Case ROUGH, COARSE
+				Case ROUGH
 					it2 = CreateItem("misc", x, y, z, "electronical")
+				Case COARSE
+					it2 = CreateItem("badnav", x, y, z)
 				Case ONETOONE
 					If item\itemtemplate\tempname = "nav" Then
 						it2 = CreateItem("nav300", x, y, z)
@@ -897,7 +903,7 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 		Case "nav310"
 			Select setting
 				Case ROUGH
-					it2 = CreateItem("misc", x, y, z, "electronical")
+					it2 = CreateItem("badnav", x, y, z)
 				Case COARSE
 					If Rand(3) = 1 Then
 						it2 = CreateItem("nav", x, y, z)

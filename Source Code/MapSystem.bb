@@ -793,6 +793,206 @@ Type Forest
 	Field ID%
 End Type
 
+Function move_forward%(dir%,pathx%,pathy%,retval%=0)
+	;move 1 unit along the grid in the designated direction
+	If dir = 1 Then
+		If retval=0 Then
+			Return pathx
+		Else
+			Return pathy+1
+		EndIf
+	EndIf
+	If retval=0 Then
+		Return pathx-1+dir
+	Else
+		Return pathy
+	EndIf
+End Function
+
+Function chance%(chanc%)
+	;perform a chance given a probability
+	Return (Rand(0,100)<=chanc)
+End Function
+
+Function turn_if_deviating%(max_deviation_distance_%,pathx%,center_%,dir%,retval%=0)
+	;check if deviating and return the answer. if deviating, turn around
+	Local current_deviation% = center_ - pathx
+	Local deviated% = False
+	If (dir = 0 And current_deviation >= max_deviation_distance_) Or (dir = 2 And current_deviation <= -max_deviation_distance_) Then
+		dir = (dir + 2) Mod 4
+		deviated = True
+	EndIf
+	If retval=0 Then Return dir Else Return deviated
+End Function
+
+Function GenForestGrid(fr.Forest)
+	;CatchErrors("Uncaught (GenForestGrid)")
+	fr\ID=LastForestID+1
+	LastForestID=LastForestID+1
+	
+	Local door1_pos%,door2_pos%
+	Local i%,j%
+	door1_pos=Rand(3,7)
+	door2_pos=Rand(3,7)
+	
+	;clear the grid
+	For i=0 To gridsize-1
+		For j=0 To gridsize-1
+			fr\grid[(j*gridsize)+i]=0
+		Next
+	Next
+	
+	;set the position of the concrete and doors
+	;For i=0 To gridsize-1
+	;	fr\grid[i]=2
+	;	fr\grid[((gridsize-1)*gridsize)+i]=2
+	;Next
+	fr\grid[door1_pos]=3
+	fr\grid[((gridsize-1)*gridsize)+door2_pos]=3
+	
+	;generate the path
+	Local pathx = door2_pos
+	Local pathy = 1
+	Local dir = 1 ;0 = left, 1 = up, 2 = right
+	fr\grid[((gridsize-1-pathy)*gridsize)+pathx] = 1
+	
+	Local deviated%
+	
+	While pathy < gridsize -4
+		If dir = 1 Then ;determine whether to go forward or to the side
+			If chance(deviation_chance) Then
+				;pick a branch direction
+				dir = 2 * Rand(0,1)
+				;make sure you have not passed max side distance
+				dir = turn_if_deviating(max_deviation_distance,pathx,center,dir)
+				deviated = turn_if_deviating(max_deviation_distance,pathx,center,dir,1)
+				If deviated Then fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
+				pathx=move_forward(dir,pathx,pathy)
+				pathy=move_forward(dir,pathx,pathy,1)
+			EndIf
+			
+		Else
+			;we are going to the side, so determine whether to keep going or go forward again
+			dir = turn_if_deviating(max_deviation_distance,pathx,center,dir)
+			deviated = turn_if_deviating(max_deviation_distance,pathx,center,dir,1)
+			If deviated Or chance(return_chance) Then dir = 1
+			
+			pathx=move_forward(dir,pathx,pathy)
+			pathy=move_forward(dir,pathx,pathy,1)
+			;if we just started going forward go twice so as to avoid creating a potential 2x2 line
+			If dir=1 Then
+				fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
+				pathx=move_forward(dir,pathx,pathy)
+				pathy=move_forward(dir,pathx,pathy,1)
+			EndIf
+		EndIf
+		
+		;add our position to the grid
+		fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
+		
+	Wend
+	;finally, bring the path back to the door now that we have reached the end
+	dir = 1
+	While pathy < gridsize-2
+		pathx=move_forward(dir,pathx,pathy)
+		pathy=move_forward(dir,pathx,pathy,1)
+		fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
+	Wend
+	
+	If pathx<>door1_pos Then
+		dir=0
+		If door1_pos>pathx Then dir=2
+		While pathx<>door1_pos
+			pathx=move_forward(dir,pathx,pathy)
+			pathy=move_forward(dir,pathx,pathy,1)
+			fr\grid[((gridsize-1-pathy)*gridsize)+pathx]=1
+		Wend
+	EndIf
+	
+	;attempt to create new branches
+	Local new_y%,temp_y%,new_x%
+	Local branch_type%,branch_pos%
+	new_y=-3 ;used for counting off; branches will only be considered once every 4 units so as to avoid potentially too many branches
+	While new_y<gridsize-6
+		new_y=new_y+4
+		temp_y=new_y
+		new_x=0
+		If chance(branch_chance) Then
+			branch_type=-1
+			If chance(cobble_chance) Then
+				branch_type=-2
+			EndIf
+			;create a branch at this spot
+			;determine if on left or on right
+			branch_pos=2*Rand(0,1)
+			;get leftmost or rightmost path in this row
+			leftmost=gridsize
+			rightmost=0
+			For i=0 To gridsize
+				If fr\grid[((gridsize-1-new_y)*gridsize)+i]=1 Then
+					If i<leftmost Then leftmost=i
+					If i>rightmost Then rightmost=i
+				EndIf
+			Next
+			If branch_pos=0 Then new_x=leftmost-1 Else new_x=rightmost+1
+			;before creating a branch make sure there are no 1's above or below
+			If (temp_y<>0 And fr\grid[((gridsize-1-temp_y+1)*gridsize)+new_x]=1) Or fr\grid[((gridsize-1-temp_y-1)*gridsize)+new_x]=1 Then
+				Exit ;break simply to stop creating the branch
+			EndIf
+			fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;make 4s so you don't confuse your branch for a path; will be changed later
+			If branch_pos=0 Then new_x=leftmost-2 Else new_x=rightmost+2
+			fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;branch out twice to avoid creating an unwanted 2x2 path with the real path
+			i = 2
+			While i<branch_max_life
+				i=i+1
+				If chance(branch_die_chance) Then
+					Exit
+				EndIf
+				If Rand(0,3)=0 Then ;have a higher chance to go up to confuse the player
+					If branch_pos = 0 Then
+						new_x=new_x-1
+					Else
+						new_x=new_x+1
+					EndIf
+				Else
+					temp_y=temp_y+1
+				EndIf
+				
+				;before creating a branch make sure there are no 1's above or below
+				n=((gridsize - 1 - temp_y + 1)*gridsize)+new_x
+				If n < gridsize-1 Then 
+					If temp_y <> 0 And fr\grid[n]=1 Then Exit
+				EndIf
+				n=((gridsize - 1 - temp_y - 1)*gridsize)+new_x
+				If n>0 Then 
+					If fr\grid[n]=1 Then Exit
+				EndIf
+				
+				;If (temp_y <> 0 And fr\grid[((gridsize - 1 - temp_y + 1)*gridsize)+new_x]=1) Or fr\grid[((gridsize - 1 - temp_y - 1)*gridsize)+new_x] = 1 Then
+				;	Exit
+				;EndIf
+				fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;make 4s so you don't confuse your branch for a path; will be changed later
+				If temp_y>=gridsize-2 Then Exit
+			Wend
+		EndIf
+	Wend
+	
+	;change branches from 4s to 1s (they were 4s so that they didn't accidently create a 2x2 path unintentionally)
+	For i=0 To gridsize-1
+		For j=0 To gridsize-1
+			If fr\grid[(i*gridsize)+j]=-1 Then
+				fr\grid[(i*gridsize)+j]=1
+			ElseIf fr\grid[(i*gridsize)+j]=-2
+				fr\grid[(i*gridsize)+j]=1
+			;ElseIf fr\grid[(i*gridsize)+j]=0
+				
+			EndIf
+		Next
+	Next
+	
+	;CatchErrors("GenForestGrid")
+End Function
+
 Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	;CatchErrors("PlaceForest")
 	;local variables
@@ -1455,6 +1655,11 @@ Function FillRoom(r.Rooms)
 			d = CreateDoor(r\zone, r\x+416.0*RoomScale,r\y,r\z + 640.0 * RoomScale,0,r,False,False,1)
 			
 			;the forest
+			Local fr.Forest = New Forest
+			r\fr=fr
+			GenForestGrid(fr)
+			PlaceForest(fr,r\x,r\y+30.0,r\z,r)
+			
 			it = CreateItem("paper", r\x + 672.0 * RoomScale, r\y + 176.0 * RoomScale, r\z + 335.0 * RoomScale, "d8601")
 			RotateEntity it\collider, 0, r\angle+10, 0
 			EntityParent(it\collider, r\obj)
@@ -3431,6 +3636,8 @@ Function FillRoom(r.Rooms)
 			
 			CameraZoom (sc\Cam, 1.5)
 			
+			HideEntity sc\obj
+			HideEntity sc\CameraObj
 			HideEntity sc\ScrOverlay
 			HideEntity sc\MonitorObj
 			
@@ -5442,7 +5649,7 @@ Function UpdateScreens()
 	
 	For s.screens = Each Screens
 		If s\room = PlayerRoom Then
-			If EntityDistance(Collider,s\obj)<1.2 Then
+			If EntityDistanceSquared(Collider,s\obj)<1.44 Then ;1.2
 				EntityPick(Camera, 1.2)
 				If PickedEntity()=s\obj And s\imgpath<>"" Then
 					DrawHandIcon=True
@@ -5473,9 +5680,9 @@ Dim GorePics%(GorePicsAmount)
 Global SelectedMonitor.SecurityCams
 Global CoffinCam.SecurityCams
 Type SecurityCams
-	Field obj%, MonitorObj%
+	Field MonitorObj%
 	
-	Field BaseObj%, CameraObj%
+	Field obj%, CameraObj%
 	
 	Field ScrObj%, ScrWidth#, ScrHeight#
 	Field Screen%, Cam%, ScrTexture%, ScrOverlay%
@@ -6696,19 +6903,21 @@ Function CreateMap()
 			Next
 		Next		
 		
-		r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 500, 8, "gatea")
-		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
-		
 		r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
 		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1	
 		
-		If IntroEnabled
+		If IntroEnabled And zone = 0 Then
 			r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "room173")
 			MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
 		EndIf
 		
 		r = CreateRoom(0, ROOM1, 8, 800, 0, "dimension1499")
 		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+		
+		If zone = 2 Then
+			r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 500, 8, "gatea")
+			MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+		EndIf
 		
 		For r.Rooms = Each Rooms
 			PreventRoomOverlap(r)

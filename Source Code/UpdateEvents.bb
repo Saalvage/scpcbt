@@ -1660,7 +1660,7 @@ Function UpdateEvents()
 							tempF2# = EntityYaw(Collider)
 							tempF3# = angleDist(tempF+90+Sin(WrapAngle(e\EventState3/10)),tempF2)
 							TurnEntity Collider, 0,tempF3/4,0,True
-							tempF# = Abs(Distance(EntityX(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(Collider,True),EntityZ(e\room\Objects[1],True)))
+							tempF# = Distance(EntityX(Collider,True),EntityX(e\room\Objects[1],True),EntityZ(Collider,True),EntityZ(e\room\Objects[1],True))
 							tempF2# = -60.0 * Min(Max((2.0-tempF)/2.0,0.0),1.0)
 							user_camera_pitch=(user_camera_pitch * 0.8)+(tempF2 * 0.2)
 							
@@ -6266,8 +6266,6 @@ Function UpdateEvents()
 				
 				Local fr.Forest=e\room\fr
 				
-				CreateConsoleMsg "ELLO" + e\EventState
-				
 				If PlayerRoom = e\room And fr<>Null Then 
 					
 					If e\EventState=1.0 Then ;the player is in the forest
@@ -6391,7 +6389,7 @@ Function UpdateEvents()
 						
 						If EntityYaw(e\room\Objects[3])=0.0 Then
 							HideEntity fr.Forest\Forest_Pivot
-							If (Abs(Distance(EntityX(e\room\Objects[3],True),EntityX(Collider,True),EntityZ(e\room\Objects[3],True),EntityZ(Collider,True)))<1.0) Then
+							If (DistanceSquared(EntityX(e\room\Objects[3],True),EntityX(Collider,True),EntityZ(e\room\Objects[3],True),EntityZ(Collider,True))<1.0) Then ;1.0
 								DrawHandIcon = True
 								
 								If SelectedItem = Null Then
@@ -7028,7 +7026,7 @@ Function UpdateEvents()
 									
 									If MouseDown1 Then
 										DrawArrowIcon[2] = True
-										RotateEntity(e\room\Levers[0], Max(Min(EntityPitch(e\room\Levers[0])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
+										RotateEntity(e\room\Levers[0], Clamp(EntityPitch(e\room\Levers[0])+Clamp(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
 									EndIf
 								EndIf
 							EndIf
@@ -7414,7 +7412,7 @@ Function UpdateEvents()
 								EndIf
 							Next
 							If e\room\Objects[0]=0 Then
-								e\room\Objects[0] =	LoadAnimMesh_Strict("GFX\npcs\scp-1048a.b3d")
+								e\room\Objects[0] =	LoadAnimMesh_Strict("GFX\npcs\1048a.b3d")
 							EndIf
 							ScaleEntity e\room\Objects[0], 0.05,0.05,0.05
 							SetAnimTime(e\room\Objects[0], 2)
@@ -7445,7 +7443,6 @@ Function UpdateEvents()
 							dist = Clamp((EntityDistanceSquared(e\room\Objects[0], Collider)-9)/25, 0, 1) ;3 is full audio distance, 5 is distance after full in which it fades
 							ChannelVolume(e\SoundCHN, 1 - dist)
 							Local volume# = Max(1.0 - (Abs(prevFrame - 600.0)/100.0) - dist, 0.0)
-							CreateConsoleMsg(dist)
 							
 							BlurTimer = volume*1000.0
 							CameraShake = volume*10.0
@@ -8261,7 +8258,7 @@ Function UpdateEvents()
 
 					If e\EventState <> 2
 						If Curr096<>Null
-							If EntityDistance(Curr096\Collider,Collider)<40
+							If EntityDistanceSquared(Curr096\Collider,Collider)<1600 ;40
 								e\EventState = 2
 								DebugLog "Failed to spawn SCP-096 in room "+e\room\RoomTemplate\Name$
 								DebugLog "- SCP-096 too close to player"
@@ -8928,7 +8925,7 @@ Function UpdateDimension1499()
 						EndIf
 					EndIf
 					
-					If EntityDistance(Collider,e\room\obj)>40.0
+					If EntityDistanceSquared(Collider,e\room\obj)>1600.0 ;40
 						For du.Dummy1499 = Each Dummy1499
 							HideEntity du\obj
 						Next

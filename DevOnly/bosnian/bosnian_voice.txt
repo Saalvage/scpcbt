@@ -1,0 +1,28 @@
+035:
+equal (nice)
+dist
+equal
+pitch -10
+reverb (small dark)
+Compress
+
+049:
+delay x2
+reverb
+low pass 3000 12db
+equal
+pitch -2.5%
+Compress
+
+079: https://responsivevoice.org/text-to-speech-languages/teksta-u-govor-u-bosanskom/
+Comp
+Speed 0.7
+Delay x2
+Comp
+pitch +15%
+
+Franklin:
+Distort
+Equal (Tele)
+Reverb
+Compress

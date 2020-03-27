@@ -652,7 +652,7 @@ Function UpdateConsole()
 						CreateConsoleMsg("Death by SCP-173 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 						Curr173\Idle = False
-					ElseIf EntityDistance(Collider, Curr106\Collider) < 1.0 Then
+					ElseIf EntityDistanceSquared(Collider, Curr106\Collider) < 1.0 Then
 						CreateConsoleMsg("Death by SCP-106 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 					EndIf
