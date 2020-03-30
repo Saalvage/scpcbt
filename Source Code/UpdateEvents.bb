@@ -1920,7 +1920,7 @@ Function UpdateEvents()
 					If Curr096=Null Then
 						Curr096 = CreateNPC(NPCtype096, EntityX(e\room\obj,True), EntityY(e\room\obj,True)+0.3, EntityZ(e\room\obj,True))
 						RotateEntity Curr096\Collider, 0, e\room\angle+45, 0, True
-						tex = LoadTexture_Strict("GFX\NPCs\SCP096Bloody.jpg")
+						tex = LoadTexture_Strict("GFX\NPCs\096BLOOD.jpg")
 						EntityTexture Curr096\obj, tex
 						FreeTexture tex
 					EndIf
@@ -4347,7 +4347,7 @@ Function UpdateEvents()
 							FreeSound_Strict e\Sound : e\Sound = 0
 							e\Sound=LoadSound_Strict("SFX\Character\Guard\096ServerRoom2.ogg")
 							e\SoundCHN=PlaySound_Strict(e\Sound)
-							tex = LoadTexture_Strict("GFX\NPCs\SCP096Bloody.jpg")
+							tex = LoadTexture_Strict("GFX\NPCs\096BLOOD.jpg")
 							EntityTexture Curr096\obj, tex
 							FreeTexture tex
 							
@@ -7026,7 +7026,7 @@ Function UpdateEvents()
 									
 									If MouseDown1 Then
 										DrawArrowIcon[2] = True
-										RotateEntity(e\room\Levers[0], Clamp(EntityPitch(e\room\Levers[0])+Clamp(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
+										RotateEntity(e\room\Levers[0], Max(Min(EntityPitch(e\room\Levers[0])+Max(Min(-mouse_y_speed_1,10.0),-10), 89), 35), EntityYaw(e\room\Levers[0]), 0)
 									EndIf
 								EndIf
 							EndIf

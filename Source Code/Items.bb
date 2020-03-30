@@ -125,7 +125,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("misc", "GFX\items\keycard.b3d", "GFX\items\INVmastercard.jpg", "", 0.0004, 1, "keymaster", "GFX\items\mastercard.jpg")
 	
 	CreateItemTemplate("scp148", "GFX\items\metalpanel.b3d", "GFX\items\INVmetalpanel.jpg", "", RoomScale, 2)
-	CreateItemTemplate("scp148ingot", "GFX\items\scp148.b3d", "GFX\items\INVscp148.jpg", "", RoomScale * 1.5, 2)
+	CreateItemTemplate("scp148ingot", "GFX\items\scp148.b3d", "GFX\items\INV148.jpg", "", RoomScale * 1.5, 2)
 	CreateItemTemplate("scp178", "GFX\items\scp178.b3d", "GFX\items\INV178.jpg", "", 0.02, 1, "", "", "", 1)
 							; state1: Refinement: (Coarse -2 (no blinking effect)), (Fine 1 (more SCP-178-1s, better blinking effect))
 	CreateItemTemplate("scp420j", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0005, 2)
@@ -133,8 +133,8 @@ Function InitItemTemplates()
 							; state1: Has the player tried to lit the cig?
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "joint")
 	CreateItemTemplate("420s", "GFX\items\420.b3d", "GFX\items\INV420.jpg", "", 0.0004, 2, "smellyjoint")
-	CreateItemTemplate("scp427", "GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.001, 3)
-	CreateItemTemplate("super427", "GFX\items\427.b3d","GFX\items\INVscp427.jpg", "", 0.0011, 3)
+	CreateItemTemplate("scp427", "GFX\items\427.b3d","GFX\items\INV427.jpg", "", 0.001, 3)
+	CreateItemTemplate("super427", "GFX\items\427.b3d","GFX\items\INV427.jpg", "", 0.0011, 3)
 	it = CreateItemTemplate("scp500", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001, 2) : EntityColor it\obj,255,0,0
 	it = CreateItemTemplate("upgradedpill", "GFX\items\pill.b3d", "GFX\items\INVpill.jpg", "", 0.0001, 2) : EntityColor it\obj,255,0,75
 	it = CreateItemTemplate("pill", "GFX\items\pill.b3d", "GFX\items\INVpillwhite.jpg", "", 0.0001, 2) : EntityColor it\obj,255,255,255
@@ -147,10 +147,10 @@ Function InitItemTemplates()
 							; state2: Refinement: (Coarse -1 (lower good chance)), (Fine 1 (higher good chance)), (Very Fine 2 (3x faster effect))
 	CreateItemTemplate("book", "GFX\items\scp1025.b3d", "GFX\items\INVbook.jpg", "", 0.07, 0, "", "GFX\items\book_diff.png")
 	CreateItemTemplate("scp1123", "GFX\items\HGIB_Skull1.b3d", "GFX\items\inv1123.jpg", "", 0.015, 2)
-	CreateItemTemplate("bad1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.022, 2)
-	CreateItemTemplate("scp1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.023, 2)
-	CreateItemTemplate("super1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.025, 2)
-	CreateItemTemplate("fine1499","GFX\items\SCP-1499.b3d","GFX\items\INVscp1499.jpg", "", 0.024, 2)
+	CreateItemTemplate("bad1499","GFX\items\SCP-1499.b3d","GFX\items\INV1499.jpg", "", 0.022, 2)
+	CreateItemTemplate("scp1499","GFX\items\SCP-1499.b3d","GFX\items\INV1499.jpg", "", 0.023, 2)
+	CreateItemTemplate("super1499","GFX\items\SCP-1499.b3d","GFX\items\INV1499.jpg", "", 0.025, 2)
+	CreateItemTemplate("fine1499","GFX\items\SCP-1499.b3d","GFX\items\INV1499.jpg", "", 0.024, 2)
 							; state1: Puton progress (0 - 100)
 
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc008.jpg", 0.003, 0, "d008")
@@ -230,10 +230,10 @@ Function InitItemTemplates()
 	CreateItemTemplate("supergasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.021, 2)
 	CreateItemTemplate("heavygasmask", "GFX\items\gasmask.b3d", "GFX\items\INVgasmask.jpg", "", 0.021, 2)
 	
-	CreateItemTemplate("hazmat0", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.012, 2)
-	CreateItemTemplate("hazmat", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.013, 2)
-	CreateItemTemplate("hazmat2", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.014, 2)
-	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.015, 2)
+	CreateItemTemplate("hazmat0", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.012, 2, "", "", "", 1)
+	CreateItemTemplate("hazmat", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.013, 2, "", "", "", 1)
+	CreateItemTemplate("hazmat2", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.014, 2, "", "", "", 1)
+	CreateItemTemplate("hazmat3", "GFX\items\hazmat.b3d", "GFX\items\INVhazmat.jpg", "", 0.015, 2, "", "", "", 1)
 						; state1: Puton progress (0 - 100)
 	
 	CreateItemTemplate("badnvg", "GFX\items\NVG.b3d", "GFX\items\INVnovision.jpg", "", 0.019, 2)
@@ -668,6 +668,7 @@ Function PickItem(item.Items)
 					Case "fineradio", "veryfineradio"
 						item\state = 101
 					Case "hazmat0", "hazmat", "hazmat2", "hazmat3"
+						SetAnimTime(item\model, 4)
 						canpickitem = True
 						For z% = 0 To MaxItemAmount - 1
 							If Inventory(z) <> Null Then

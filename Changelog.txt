@@ -4,8 +4,9 @@
 - (Re-)Added SCP-178 with improved mechanics.
 	- It now increases blinking time.
 	- Better refinements.
+	- Improved inventory icon.
 - Added localization/mod support with built in support for Englisch (due), German, Spanish (South America),
-- Added FOV option (Made by TheHappyJammer).
+- Added FOV option.
 	- Decreased default FOV to 60.
 	- Fixed float values being allowed in the menus.
 - Added support for resolutions of up to 4k.
@@ -71,6 +72,7 @@
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
 - Flipped vest around.
+- The hazmat suit is now hunched over when put off.
 - Increased size of the SCP-148 ingot.
 - Increased size of Electronical Components.
 - Added ability to clear current console input via Ctrl + Backspace.

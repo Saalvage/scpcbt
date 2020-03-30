@@ -253,7 +253,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			n\Collider = CreatePivot()
 			EntityRadius n\Collider, 0.26
 			EntityType n\Collider, HIT_PLAYER
-			n\obj = LoadAnimMesh_Strict("GFX\npcs\scp096.b3d")
+			n\obj = LoadAnimMesh_Strict("GFX\npcs\096.b3d")
 			
 			n\obj2 = CreateSprite(FindChild(n\Obj, "Reyelid"))
 			ScaleSprite(n\obj2, 0.07, 0.08)

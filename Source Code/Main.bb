@@ -3310,7 +3310,7 @@ Function MouseLook()
 		Local roll# = Max(Min(Sin(Shake/2)*2.5*Min(Injuries+0.25,3.0),8.0),-8.0)
 		
 		;käännetään kameraa sivulle jos pelaaja on vammautunut
-		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Clamp(up*30*Injuries,50),-50)
+		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Clamp(up*30*Injuries,-50,50)
 		PositionEntity Camera, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
 		RotateEntity Camera, 0, EntityYaw(Collider), roll*0.5
 		
@@ -3320,7 +3320,7 @@ Function MouseLook()
 		;moveentity player, side, up, 0	
 		; -- Update the smoothing que To smooth the movement of the mouse.
 		mouse_x_speed_1# = CurveValue(MouseXSpeed() * (MouseSens + 0.6) , mouse_x_speed_1, (6.0 / (MouseSens + 1.0))*MouseSmooth) 
-		;If mouse_x_speed_1 = NaN Then mouse_x_speed_1 = 0
+		If IsNaN(mouse_x_speed_1) Then mouse_x_speed_1 = 0
 		If PrevFPSFactor>0 Then
 			If Abs(FPSfactor/PrevFPSFactor-1.0)>1.0 Then
 				;lag spike detected - stop all camera movement
@@ -3333,7 +3333,7 @@ Function MouseLook()
 		Else
 			mouse_y_speed_1# = CurveValue(MouseYSpeed () * (MouseSens + 0.6), mouse_y_speed_1, (6.0/(MouseSens+1.0))*MouseSmooth)
 		EndIf
-		;If mouse_y_speed_1 = NaN Then mouse_y_speed_1 = 0
+		If IsNaN(mouse_y_speed_1) Then mouse_y_speed_1 = 0
 		
 		Local the_yaw# = ((mouse_x_speed_1#)) * mouselook_x_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
 		Local the_pitch# = ((mouse_y_speed_1#)) * mouselook_y_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
@@ -6103,7 +6103,7 @@ Function DrawMenu()
 	Local I_Keys.Keys = First Keys
 	
 	Local x%, y%, width%, height%
-	If api_GetFocus() = 0 Then ;Game is out of focus -> pause the game
+	If InFocus() = 0 Then ;Game is out of focus -> pause the game
 		If (Not Using294) Then
 			MenuOpen = True
 			PauseSounds()
@@ -8772,7 +8772,7 @@ Function UpdateInfect()
 			HeartBeatRate = Max(HeartBeatRate, 100)
 			HeartBeatVolume = Max(HeartBeatVolume, Infect/120.0)
 			
-			EntityAlpha InfectOverlay, Min(((Infect*0.2)^2)/1000.0,0.5) * (Sin(MilliSecs()/8.0)+2.0)
+			EntityAlpha InfectOverlay, Min((PowTwo(Infect*0.2))/1000.0,0.5) * (Sin(MilliSecs()/8.0)+2.0)
 			
 			For i = 0 To 6
 				If Infect>i*15+10 And temp =< i*15+10 Then
