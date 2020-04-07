@@ -533,7 +533,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 				temp2=ReadFloat(f)*RoomScale
 				temp3=ReadFloat(f)*RoomScale
 				
-				temp2s$ =ReadString(f)
+				temp2s$=ReadString(f)
 				
 				If temp1<>0 Lor temp2<>0 Lor temp3<>0 Then 
 					Local ts.TempScreens = New TempScreens	
@@ -818,7 +818,7 @@ Function turn_if_deviating%(max_deviation_distance_%,pathx%,center_%,dir%,retval
 	;check if deviating and return the answer. if deviating, turn around
 	Local current_deviation% = center_ - pathx
 	Local deviated% = False
-	If (dir = 0 And current_deviation >= max_deviation_distance_) Or (dir = 2 And current_deviation <= -max_deviation_distance_) Then
+	If (dir = 0 And current_deviation >= max_deviation_distance_) Lor (dir = 2 And current_deviation <= -max_deviation_distance_) Then
 		dir = (dir + 2) Mod 4
 		deviated = True
 	EndIf
@@ -875,7 +875,7 @@ Function GenForestGrid(fr.Forest)
 			;we are going to the side, so determine whether to keep going or go forward again
 			dir = turn_if_deviating(max_deviation_distance,pathx,center,dir)
 			deviated = turn_if_deviating(max_deviation_distance,pathx,center,dir,1)
-			If deviated Or chance(return_chance) Then dir = 1
+			If deviated Lor chance(return_chance) Then dir = 1
 			
 			pathx=move_forward(dir,pathx,pathy)
 			pathy=move_forward(dir,pathx,pathy,1)
@@ -936,7 +936,7 @@ Function GenForestGrid(fr.Forest)
 			Next
 			If branch_pos=0 Then new_x=leftmost-1 Else new_x=rightmost+1
 			;before creating a branch make sure there are no 1's above or below
-			If (temp_y<>0 And fr\grid[((gridsize-1-temp_y+1)*gridsize)+new_x]=1) Or fr\grid[((gridsize-1-temp_y-1)*gridsize)+new_x]=1 Then
+			If (temp_y<>0 And fr\grid[((gridsize-1-temp_y+1)*gridsize)+new_x]=1) Lor fr\grid[((gridsize-1-temp_y-1)*gridsize)+new_x]=1 Then
 				Exit ;break simply to stop creating the branch
 			EndIf
 			fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;make 4s so you don't confuse your branch for a path; will be changed later
@@ -968,7 +968,7 @@ Function GenForestGrid(fr.Forest)
 					If fr\grid[n]=1 Then Exit
 				EndIf
 				
-				;If (temp_y <> 0 And fr\grid[((gridsize - 1 - temp_y + 1)*gridsize)+new_x]=1) Or fr\grid[((gridsize - 1 - temp_y - 1)*gridsize)+new_x] = 1 Then
+				;If (temp_y <> 0 And fr\grid[((gridsize - 1 - temp_y + 1)*gridsize)+new_x]=1) Lor fr\grid[((gridsize - 1 - temp_y - 1)*gridsize)+new_x] = 1 Then
 				;	Exit
 				;EndIf
 				fr\grid[((gridsize-1-temp_y)*gridsize)+new_x]=branch_type ;make 4s so you don't confuse your branch for a path; will be changed later
@@ -1522,8 +1522,7 @@ Type Rooms
 	Field AlarmRotor%[1]
 	Field AlarmRotorLight%[1]
 	Field TriggerboxAmount
-	Field Triggerbox[128]
-	Field TriggerboxName$[128]
+	Field Triggerboxes.Triggerbox[8]
 	Field MaxWayPointY#
 	Field LightR#[MaxRoomLights],LightG#[MaxRoomLights],LightB#[MaxRoomLights]
 	Field LightCone%[MaxRoomLights]
@@ -1532,6 +1531,17 @@ Type Rooms
 	
 	Field MinX#, MinY#, MinZ#
 	Field MaxX#, MaxY#, MaxZ#
+End Type
+
+Type Triggerbox
+	Field obj%
+	Field Name$
+	Field minX#
+	Field minY#
+	Field minZ#
+	Field maxX#
+	Field maxY#
+	Field maxZ#
 End Type
 
 Const gridsz%=13 ;Same size as the main map itself (better for the map creator)
@@ -3755,7 +3765,7 @@ Function FillRoom(r.Rooms)
 			
 			w.waypoints = CreateWaypoint(r\x, r\y + 66.0 * RoomScale, r\z + 292.0 * RoomScale, Null, r)
 			w2.waypoints = CreateWaypoint(r\x, r\y + 66.0 * RoomScale, r\z - 284.0 * RoomScale, Null, r)
-			w\connected[0] = w2 : w\dist[0] = EntityDistance(w\obj, w2\obj)
+			w\connected[0] = w2 : w\dist[0] = EntityDistance(w\obj, w2\obj) ;TODO WAYPOINT DISTACNCE
 			w2\connected[0] = w : w2\dist[0] = w\dist[0]
 			
 			r\Objects[4] = CreateSprite()
@@ -4939,10 +4949,11 @@ Function FillRoom(r.Rooms)
 	If r\RoomTemplate\TempTriggerboxAmount > 0
 		r\TriggerboxAmount = r\RoomTemplate\TempTriggerboxAmount
 		For i = 0 To r\TriggerboxAmount-1
-			r\Triggerbox[i] = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
-			r\TriggerboxName[i] = r\RoomTemplate\TempTriggerboxName[i]
+			r\Triggerboxes[i] = New Triggerbox
+			r\Triggerboxes[i]\obj = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
+			r\Triggerboxes[i]\Name = r\RoomTemplate\TempTriggerboxName[i]
 			DebugLog "Triggerbox found: "+i
-			DebugLog "Triggerbox "+i+" name: "+r\TriggerboxName[i]
+			DebugLog "Triggerbox "+i+" name: "+r\Triggerboxes[i]\Name
 		Next
 	EndIf
 	
@@ -4958,6 +4969,72 @@ Function FillRoom(r.Rooms)
 	Next
 	
 	;CatchErrors("Uncaught FillRoom ("+r\RoomTemplate\Name+")")
+End Function
+
+; This must be called after the room angle has been finalized!
+Function SetupTriggerBoxes(r.Rooms)
+	Local sx#, sy#, sz#
+	Local pxmin#, pxmax#
+	Local pzmin#, pzmax#
+	Local t.Triggerbox
+	
+	For i = 0 To r\TriggerboxAmount-1
+		t = r\Triggerboxes[i]
+		sx = EntityScaleX(t\obj, 1)
+		sy = Max(EntityScaleY(t\obj, 1), 0.001)
+		sz = EntityScaleZ(t\obj, 1)
+		
+		GetMeshExtents(t\obj)
+		
+		pxmin = cos(r\angle) * (((sx#*Mesh_MinX)+r\x)-r\x) - sin(r\angle) * (((sz#*Mesh_MinZ)+r\z)-r\z) + r\x
+		pzmin = sin(r\angle) * (((sx#*Mesh_MinX)+r\x)-r\x) + cos(r\angle) * (((sz#*Mesh_MinZ)+r\z)-r\z) + r\z
+		
+		pxmax = cos(r\angle) * (((sx#*Mesh_MaxX)+r\x)-r\x) - sin(r\angle) * (((sz#*Mesh_MaxZ)+r\z)-r\z) + r\x
+		pzmax = sin(r\angle) * (((sx#*Mesh_MaxX)+r\x)-r\x) + cos(r\angle) * (((sz#*Mesh_MaxZ)+r\z)-r\z) + r\z
+		
+		If pxmin > pxmax Then
+			t\minX = pxmax
+			t\maxX = pxmin
+		Else
+			t\minX = pxmin
+			t\maxX = pxmax
+		EndIf
+		
+		If pzmin > pzmax Then
+			t\minZ = pzmax
+			t\maxZ = pzmin
+		Else
+			t\minZ = pzmin
+			t\maxZ = pzmax
+		EndIf
+		
+		t\minY = ((sy#*Mesh_MinY)+r\y)
+		t\maxY = ((sy#*Mesh_MaxY)+r\y)
+	Next
+End Function
+
+Function CheckTriggers$()
+	If PlayerRoom\TriggerboxAmount = 0
+		Return
+	Else
+		For i = 0 To PlayerRoom\TriggerboxAmount-1
+			If DebugHUD
+				EntityColor PlayerRoom\Triggerboxes[i]\obj,255,255,0
+				EntityAlpha PlayerRoom\Triggerboxes[i]\obj,0.2
+			Else
+				EntityColor PlayerRoom\Triggerboxes[i]\obj,255,255,255
+				EntityAlpha PlayerRoom\Triggerboxes[i]\obj,0.0
+ 			EndIf
+			
+			If EntityX(Collider)>PlayerRoom\Triggerboxes[i]\minX And EntityX(Collider)<PlayerRoom\Triggerboxes[i]\maxX
+				If EntityY(Collider)>PlayerRoom\Triggerboxes[i]\minY And EntityY(Collider)<PlayerRoom\Triggerboxes[i]\maxY
+					If EntityZ(Collider)>PlayerRoom\Triggerboxes[i]\minZ And EntityZ(Collider)<PlayerRoom\Triggerboxes[i]\maxZ
+						Return PlayerRoom\Triggerboxes[i]\Name
+					EndIf
+				EndIf
+			EndIf
+		Next
+	EndIf
 End Function
 
 Function UpdateRooms()
@@ -5009,14 +5086,13 @@ Function UpdateRooms()
 		
 		x = Abs(r\x-EntityX(Collider,True))
 		z = Abs(r\z-EntityZ(Collider,True))
-		r\dist = Max(x,z)
+		r\dist = Max(x,z) ;TODO ThIS
 		
 		
 		If x < 16 And z < 16 Then
 			For i = 0 To MaxRoomEmitters-1
 				If r\SoundEmitter[i]<>0 Then 
-					dist# = EntityDistance(r\SoundEmitterObj[i],Collider)
-					If dist < r\SoundEmitterRange[i] Then
+					If EntityDistanceSquared(r\SoundEmitterObj[i],Collider) < PowTwo(r\SoundEmitterRange[i]) Then ;TODO soundemitterrange
 						r\SoundEmitterCHN[i] = LoopSound2(RoomAmbience[r\SoundEmitter[i]-1],r\SoundEmitterCHN[i], Camera, r\SoundEmitterObj[i],r\SoundEmitterRange[i])
 					EndIf
 				EndIf
@@ -5050,9 +5126,9 @@ Function UpdateRooms()
 			ShowEntity r\obj
 			For i = 0 To MaxRoomLights-1
 				If r\Lights[i] <> 0 Then
-					dist = EntityDistance(Collider,r\Lights[i])
-					If dist < HideDistance Then
-						TempLightVolume = TempLightVolume + r\LightIntensity[i]*r\LightIntensity[i]*((HideDistance-dist)/HideDistance)
+					dist = EntityDistanceSquared(Collider,r\Lights[i])
+					If dist < PowTwo(HideDistance) Then
+						TempLightVolume = TempLightVolume + r\LightIntensity[i]*r\LightIntensity[i]*((HideDistance-Sqr(dist))/HideDistance)
 						;ShowEntity(r\Lights[i]) 						
 					EndIf
 				Else
@@ -5062,15 +5138,15 @@ Function UpdateRooms()
 			If DebugHUD
 				If r\TriggerboxAmount>0
 					For i=0 To r\TriggerboxAmount-1
-						EntityColor r\Triggerbox[i],255,255,0
-						EntityAlpha r\Triggerbox[i],0.2
+						EntityColor r\Triggerboxes[i]\obj,255,255,0
+						EntityAlpha r\Triggerboxes[i]\obj,0.2
 					Next
 				EndIf
 			Else
 				If r\TriggerboxAmount>0
 					For i=0 To r\TriggerboxAmount-1
-						EntityColor r\Triggerbox[i],255,255,255
-						EntityAlpha r\Triggerbox[i],0.0
+						EntityColor r\Triggerboxes[i]\obj,255,255,255
+						EntityAlpha r\Triggerboxes[i]\obj,0.0
 					Next
 				EndIf
  			EndIf
@@ -5321,7 +5397,7 @@ Function InitWayPoints(loadingstart=45)
 			
 			If (w\room=w2\room Lor w\door<>Null Lor w2\door<>Null)
 				
-				dist# = EntityDistance(w\obj, w2\obj);;Sqr(x*x+y*y+z*z)
+				dist# = EntityDistance(w\obj, w2\obj);;Sqr(x*x+y*y+z*z) ;TODO WAYPOINT P2?
 				
 				If w\room\MaxWayPointY# = 0.0 Lor w2\room\MaxWayPointY# = 0.0
 					canCreateWayPoint = True
@@ -5649,7 +5725,7 @@ Function UpdateScreens()
 	
 	For s.screens = Each Screens
 		If s\room = PlayerRoom Then
-			If EntityDistanceSquared(Collider,s\obj)<1.44 Then ;1.2
+			If EntityDistanceSquared(Collider,s\obj) < PowTwo(1.2) Then
 				EntityPick(Camera, 1.2)
 				If PickedEntity()=s\obj And s\imgpath<>"" Then
 					DrawHandIcon=True
@@ -6026,7 +6102,7 @@ Function UpdateMonitorSaving()
 			EndIf
 			
 			If close And GrabbedEntity = 0 And ClosestButton = 0 Then
-				If EntityInView(sc\ScrObj,Camera) And EntityDistanceSquared(sc\ScrObj,Camera)<1.0 Then
+				If EntityInView(sc\ScrObj,Camera) And EntityDistanceSquared(sc\ScrObj,Camera) < PowTwo(1.0) Then
 					If EntityVisible(sc\ScrObj,Camera) Then
 						DrawHandIcon = True
 						If MouseHit1 Then SelectedMonitor = sc
@@ -6059,9 +6135,9 @@ End Function
 
 Function UpdateLever(obj, locked=False)
 	
-	Local dist# = EntityDistance(Camera, obj)
-	If dist < 8.0 Then 
-		If dist < 0.8 And (Not locked) Then 
+	Local dist# = EntityDistanceSquared(Camera, obj)
+	If dist < PowTwo(8.0) Then 
+		If dist < PowTwo(0.8) And (Not locked) Then 
 			If EntityInView(obj, Camera) Then 
 				
 				EntityPick(Camera, 0.65)
@@ -6116,8 +6192,8 @@ End Function
 
 Function UpdateButton(obj)
 	
-	Local dist# = EntityDistance(Collider, obj);entityDistance(collider, d\buttons[i])
-	If dist < 0.8 Then
+	Local dist# = EntityDistanceSquared(Collider, obj);entityDistance(collider, d\buttons[i])
+	If dist < PowTwo(0.8) Then
 		Local temp% = CreatePivot()
 		PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
 		PointEntity temp,obj
@@ -6126,7 +6202,7 @@ Function UpdateButton(obj)
 			If ClosestButton = 0 Then 
 				ClosestButton = obj
 			Else
-				If dist < EntityDistance(Collider, ClosestButton) Then ClosestButton = obj
+				If dist < EntityDistanceSquared(Collider, ClosestButton) Then ClosestButton = obj
 			EndIf							
 		EndIf
 		
@@ -6417,679 +6493,677 @@ End Function
 
 ;-------------------------------------------------------------------------------------------------------
 
-Function CreateMap()
+Function CreateMap(zone%)
 	DebugLog ("Generating a map using the seed "+RandomSeed)
 	
 	Local x%, y%, temp%
 	Local i%, x2%, y2%
 	Local width%, height%
 	
-	Local zone%
+	SeedRnd GenerateSeedNumber(RandomSeed + zone)
 	
-	SeedRnd GenerateSeedNumber(RandomSeed)
+	CurrentZone = zone
 	
-	For zone = DO_DA_ZONE To DO_DA_ZONE
-		temp = 0
-		Dim MapRoomID%(ROOM4 + 1)
-		Dim MapName$(MapWidth, MapHeight)
+	Dim MapRoomID%(ROOM4 + 1)
+	Dim MapName$(MapWidth, MapHeight)
+	
+	x = Floor(MapWidth / 2)
+	y = MapHeight - 2;Rand(3, 5)
+
+	For i = y To MapHeight - 1
+		MapTemp(x, i) = True
+	Next
+	
+	Repeat
+		width = Rand(7, 11)
 		
-		x = Floor(MapWidth / 2)
-		y = MapHeight - 2;Rand(3, 5)
-	
-		For i = y To MapHeight - 1
-			MapTemp(x, i) = True
+		If x > MapWidth*0.6 Then
+			width = -width
+		ElseIf x > MapWidth*0.4
+			x = x-width/2
+		EndIf
+		
+		;make sure the hallway doesn't go outside the array
+		If x+width > MapWidth-3 Then
+			;x = -width+MapWidth-4
+			
+			width=MapWidth-3-x
+		ElseIf x+width < 2
+			
+			;x = 3-width
+			width=-x+2
+		EndIf
+		
+		x = Min(x, x + width)
+		width = Abs(width)
+		For i = x To x + width
+			MapTemp(Min(i,MapWidth), y) = True
 		Next
 		
-		Repeat
-			width = Rand(7, 11)
+		height = Rand(2, 4)
+		If y - height < 1 Then height = y-1
+		
+		yhallways = Rand(4,5)
+		
+		For i = 1 To yhallways
 			
-			If x > MapWidth*0.6 Then
-				width = -width
-			ElseIf x > MapWidth*0.4
-				x = x-width/2
-			EndIf
+			x2 = Max(Min(Rand(x, x + width-1),MapWidth-2),2)
+			While MapTemp(x2, y - 1) Lor MapTemp(x2 - 1, y - 1) Lor MapTemp(x2 + 1, y - 1)
+				x2=x2+1
+			Wend
 			
-			;make sure the hallway doesn't go outside the array
-			If x+width > MapWidth-3 Then
-				;x = -width+MapWidth-4
-				
-				width=MapWidth-3-x
-			ElseIf x+width < 2
-				
-				;x = 3-width
-				width=-x+2
-			EndIf
-			
-			x = Min(x, x + width)
-			width = Abs(width)
-			For i = x To x + width
-				MapTemp(Min(i,MapWidth), y) = True
-			Next
-			
-			height = Rand(2, 4)
-			If y - height < 1 Then height = y-1
-			
-			yhallways = Rand(4,5)
-			
-			For i = 1 To yhallways
-				
-				x2 = Max(Min(Rand(x, x + width-1),MapWidth-2),2)
-				While MapTemp(x2, y - 1) Lor MapTemp(x2 - 1, y - 1) Lor MapTemp(x2 + 1, y - 1)
-					x2=x2+1
-				Wend
-				
-				If x2<x+width Then
-					If i = 1 Then
-						tempheight = height 
-						If Rand(2)=1 Then x2 = x Else x2 = x+width
-					Else
-						tempheight = Rand(1,height)
-					EndIf
-					
-					For y2 = y - tempheight To y
-						MapTemp(x2, y2) = True
-					Next
-					
-					If tempheight = height Then temp = x2
+			If x2<x+width Then
+				If i = 1 Then
+					tempheight = height 
+					If Rand(2)=1 Then x2 = x Else x2 = x+width
+				Else
+					tempheight = Rand(1,height)
 				EndIf
 				
-			Next
+				For y2 = y - tempheight To y
+					MapTemp(x2, y2) = True
+				Next
+				
+				If tempheight = height Then temp = x2
+			EndIf
 			
-			x = temp
-			y = y - height
-		Until y < 2
-		
-		Local Room1Amount%[3], Room2Amount%[3],Room2CAmount%[3],Room3Amount%[3],Room4Amount%[3]
-		
-		;count the amount of rooms
-		For y = 1 To MapHeight - 1
-			
-			For x = 1 To MapWidth - 1
-				If MapTemp(x, y) > 0 Then
-					temp = Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1)
-					temp = temp + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)			
-					If MapTemp(x,y)<255 Then MapTemp(x, y) = temp
-					Select MapTemp(x,y)
-						Case 1
-							Room1Amount[zone]=Room1Amount[zone]+1
-						Case 2
-							If Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1)= 2 Then
-								Room2Amount[zone]=Room2Amount[zone]+1	
-							ElseIf Min(MapTemp(x, y + 1),1) + Min(MapTemp(x , y - 1),1)= 2
-								Room2Amount[zone]=Room2Amount[zone]+1	
-							Else
-								Room2CAmount[zone] = Room2CAmount[zone]+1
-							EndIf
-						Case 3
-							Room3Amount[zone]=Room3Amount[zone]+1
-						Case 4
-							Room4Amount[zone]=Room4Amount[zone]+1
-					End Select
-				EndIf
-			Next
 		Next
 		
-		;force more room1s (if needed)
-		;need more rooms if there are less than 3 of them
-		temp = -Room1Amount[zone]+3
+		x = temp
+		y = y - height
+	Until y < 2
+	
+	Local Room1Amount%[3], Room2Amount%[3],Room2CAmount%[3],Room3Amount%[3],Room4Amount%[3]
+	
+	;count the amount of rooms
+	For y = 1 To MapHeight - 1
 		
-		If temp > 0 Then
+		For x = 1 To MapWidth - 1
+			If MapTemp(x, y) > 0 Then
+				temp = Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1)
+				temp = temp + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)			
+				If MapTemp(x,y)<255 Then MapTemp(x, y) = temp
+				Select MapTemp(x,y)
+					Case 1
+						Room1Amount[zone]=Room1Amount[zone]+1
+					Case 2
+						If Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1)= 2 Then
+							Room2Amount[zone]=Room2Amount[zone]+1	
+						ElseIf Min(MapTemp(x, y + 1),1) + Min(MapTemp(x , y - 1),1)= 2
+							Room2Amount[zone]=Room2Amount[zone]+1	
+						Else
+							Room2CAmount[zone] = Room2CAmount[zone]+1
+						EndIf
+					Case 3
+						Room3Amount[zone]=Room3Amount[zone]+1
+					Case 4
+						Room4Amount[zone]=Room4Amount[zone]+1
+				End Select
+			EndIf
+		Next
+	Next
+	
+	;force more room1s (if needed)
+	;need more rooms if there are less than 3 of them
+	temp = -Room1Amount[zone]+3
+	
+	If temp > 0 Then
+		
+		For y = 2 To MapHeight - 2
 			
-			For y = 2 To MapHeight - 2
-				
-				For x = 2 To MapWidth - 2
-					If MapTemp(x, y) = 0 Then
-						DebugLog "test" + width + " " + height + " " + x + " " + y
-						If (Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1) + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)) = 1 Then
-							;If Rand(4)=1 Then
-							
-							If MapTemp(x + 1, y) Then
-								x2 = x+1 : y2 = y
-							ElseIf MapTemp(x - 1, y)
-								x2 = x-1 : y2 = y
-							ElseIf MapTemp(x, y+1)
-								x2 = x : y2 = y+1	
-							ElseIf MapTemp(x, y-1)
-								x2 = x : y2 = y-1
-							EndIf
-							
-							placed = False
-							If MapTemp(x2,y2)>1 And MapTemp(x2,y2)<4 Then
-								Select MapTemp(x2,y2)
-									Case 2
-										If Min(MapTemp(x2 + 1, y2),1) + Min(MapTemp(x2 - 1, y2),1)= 2 Then
-											Room2Amount[zone]=Room2Amount[zone]-1
-											Room3Amount[zone]=Room3Amount[zone]+1
-											placed = True
-										ElseIf Min(MapTemp(x2, y2 + 1),1) + Min(MapTemp(x2, y2 - 1),1)= 2
-											Room2Amount[zone]=Room2Amount[zone]-1
-											Room3Amount[zone]=Room3Amount[zone]+1
-											placed = True
-										EndIf
-									Case 3
-										Room3Amount[zone]=Room3Amount[zone]-1
-										Room4Amount[zone]=Room4Amount[zone]+1	
+			For x = 2 To MapWidth - 2
+				If MapTemp(x, y) = 0 Then
+					DebugLog "test" + width + " " + height + " " + x + " " + y
+					If (Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1) + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)) = 1 Then
+						;If Rand(4)=1 Then
+						
+						If MapTemp(x + 1, y) Then
+							x2 = x+1 : y2 = y
+						ElseIf MapTemp(x - 1, y)
+							x2 = x-1 : y2 = y
+						ElseIf MapTemp(x, y+1)
+							x2 = x : y2 = y+1	
+						ElseIf MapTemp(x, y-1)
+							x2 = x : y2 = y-1
+						EndIf
+						
+						placed = False
+						If MapTemp(x2,y2)>1 And MapTemp(x2,y2)<4 Then
+							Select MapTemp(x2,y2)
+								Case 2
+									If Min(MapTemp(x2 + 1, y2),1) + Min(MapTemp(x2 - 1, y2),1)= 2 Then
+										Room2Amount[zone]=Room2Amount[zone]-1
+										Room3Amount[zone]=Room3Amount[zone]+1
 										placed = True
-								End Select
+									ElseIf Min(MapTemp(x2, y2 + 1),1) + Min(MapTemp(x2, y2 - 1),1)= 2
+										Room2Amount[zone]=Room2Amount[zone]-1
+										Room3Amount[zone]=Room3Amount[zone]+1
+										placed = True
+									EndIf
+								Case 3
+									Room3Amount[zone]=Room3Amount[zone]-1
+									Room4Amount[zone]=Room4Amount[zone]+1	
+									placed = True
+							End Select
+							
+							If placed Then
+								MapTemp(x2,y2)=MapTemp(x2,y2)+1
 								
-								If placed Then
-									MapTemp(x2,y2)=MapTemp(x2,y2)+1
-									
-									MapTemp(x, y) = 1
-									Room1Amount[zone] = Room1Amount[zone]+1	
-									
-									temp=temp-1
-								EndIf
+								MapTemp(x, y) = 1
+								Room1Amount[zone] = Room1Amount[zone]+1	
+								
+								temp=temp-1
 							EndIf
 						EndIf
 					EndIf
-					If temp = 0 Then Exit
-				Next
+				EndIf
 				If temp = 0 Then Exit
 			Next
-		EndIf
+			If temp = 0 Then Exit
+		Next
+	EndIf
+	
+	
+	
+	
+	
+	;force more room4s and room2Cs
+	If Room4Amount[zone]<1 Then ;we want at least 1 ROOM4
+		DebugLog "forcing a ROOM4 into zone "+i
+		temp=0
 		
-		
-		
-		
-		
-		;force more room4s and room2Cs
-		If Room4Amount[zone]<1 Then ;we want at least 1 ROOM4
-			DebugLog "forcing a ROOM4 into zone "+i
-			temp=0
-			
-			For y = 2 To MapHeight - 2
-				For x = 2 To MapWidth - 2
-					If MapTemp(x,y)=3 Then
-						Select 0 ;see if adding a ROOM1 is possible
-							Case (MapTemp(x+1,y) Lor MapTemp(x+1,y+1) Lor MapTemp(x+1,y-1) Lor MapTemp(x+2,y))
-								MapTemp(x+1,y)=1
-								temp=1
-							Case (MapTemp(x-1,y) Lor MapTemp(x-1,y+1) Lor MapTemp(x-1,y-1) Lor MapTemp(x-2,y))
-								MapTemp(x-1,y)=1
-								temp=1
-							Case (MapTemp(x,y+1) Lor MapTemp(x+1,y+1) Lor MapTemp(x-1,y+1) Lor MapTemp(x,y+2))
-								MapTemp(x,y+1)=1
-								temp=1
-							Case (MapTemp(x,y-1) Lor MapTemp(x+1,y-1) Lor MapTemp(x-1,y-1) Lor MapTemp(x,y-2))
-								MapTemp(x,y-1)=1
-								temp=1
-						End Select
-						If temp=1 Then
-							MapTemp(x,y)=4 ;turn this room into a ROOM4
-							DebugLog "ROOM4 forced into slot ("+x+", "+y+")"
-							Room4Amount[zone]=Room4Amount[zone]+1
-							Room3Amount[zone]=Room3Amount[zone]-1
-							Room1Amount[zone]=Room1Amount[zone]+1
-						EndIf
-					EndIf
-					If temp=1 Then Exit
-				Next
-				If temp=1 Then Exit
-			Next
-			
-			If temp=0 Then DebugLog "Couldn't place ROOM4 in zone "+i
-		EndIf
-		
-		If Room2CAmount[zone]<1 Then ;we want at least 1 ROOM2C
-			DebugLog "forcing a ROOM2C into zone "+i
-			temp=0
-			
-			For y = 3 To MapHeight - 3
-				For x = 3 To MapWidth - 3
-					If MapTemp(x,y)=1 Then
-						Select True ;see if adding some rooms is possible
-							Case MapTemp(x-1,y)>0
-								If (MapTemp(x,y-1)+MapTemp(x,y+1)+MapTemp(x+2,y))=0 Then
-									If (MapTemp(x+1,y-2)+MapTemp(x+2,y-1)+MapTemp(x+1,y-1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x+1,y)=2
-										DebugLog "ROOM2C forced into slot ("+(x+1)+", "+(y)+")"
-										MapTemp(x+1,y-1)=1
-										temp=1
-									ElseIf (MapTemp(x+1,y+2)+MapTemp(x+2,y+1)+MapTemp(x+1,y+1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x+1,y)=2
-										DebugLog "ROOM2C forced into slot ("+(x+1)+", "+(y)+")"
-										MapTemp(x+1,y+1)=1
-										temp=1
-									EndIf
-								EndIf
-							Case MapTemp(x+1,y)>0
-								If (MapTemp(x,y-1)+MapTemp(x,y+1)+MapTemp(x-2,y))=0 Then
-									If (MapTemp(x-1,y-2)+MapTemp(x-2,y-1)+MapTemp(x-1,y-1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x-1,y)=2
-										DebugLog "ROOM2C forced into slot ("+(x-1)+", "+(y)+")"
-										MapTemp(x-1,y-1)=1
-										temp=1
-									ElseIf (MapTemp(x-1,y+2)+MapTemp(x-2,y+1)+MapTemp(x-1,y+1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x-1,y)=2
-										DebugLog "ROOM2C forced into slot ("+(x-1)+", "+(y)+")"
-										MapTemp(x-1,y+1)=1
-										temp=1
-									EndIf
-								EndIf
-							Case MapTemp(x,y-1)>0
-								If (MapTemp(x-1,y)+MapTemp(x+1,y)+MapTemp(x,y+2))=0 Then
-									If (MapTemp(x-2,y+1)+MapTemp(x-1,y+2)+MapTemp(x-1,y+1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x,y+1)=2
-										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y+1)+")"
-										MapTemp(x-1,y+1)=1
-										temp=1
-									ElseIf (MapTemp(x+2,y+1)+MapTemp(x+1,y+2)+MapTemp(x+1,y+1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x,y+1)=2
-										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y+1)+")"
-										MapTemp(x+1,y+1)=1
-										temp=1
-									EndIf
-								EndIf
-							Case MapTemp(x,y+1)>0
-								If (MapTemp(x-1,y)+MapTemp(x+1,y)+MapTemp(x,y-2))=0 Then
-									If (MapTemp(x-2,y-1)+MapTemp(x-1,y-2)+MapTemp(x-1,y-1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x,y-1)=2
-										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y-1)+")"
-										MapTemp(x-1,y-1)=1
-										temp=1
-									ElseIf (MapTemp(x+2,y-1)+MapTemp(x+1,y-2)+MapTemp(x+1,y-1))=0 Then
-										MapTemp(x,y)=2
-										MapTemp(x,y-1)=2
-										DebugLog "ROOM2C forced into slot ("+(x)+", "+(y-1)+")"
-										MapTemp(x+1,y-1)=1
-										temp=1
-									EndIf
-								EndIf
-						End Select
-						If temp=1 Then
-							Room2CAmount[zone]=Room2CAmount[zone]+1
-							Room2Amount[zone]=Room2Amount[zone]+1
-						EndIf
-					EndIf
-					If temp=1 Then Exit
-				Next
-				If temp=1 Then Exit
-			Next
-			
-			If temp=0 Then DebugLog "Couldn't place ROOM2C in zone "+i
-		EndIf
-
-		
-		Local MaxRooms% = 55*MapWidth/20
-		MaxRooms=Max(MaxRooms,Room1Amount[zone]+1)
-		MaxRooms=Max(MaxRooms,Room2Amount[zone]+1)
-		MaxRooms=Max(MaxRooms,Room2CAmount[zone]+1)
-		MaxRooms=Max(MaxRooms,Room3Amount[zone]+1)
-		MaxRooms=Max(MaxRooms,Room4Amount[zone]+1)
-		Dim MapRoom$(ROOM4 + 1, MaxRooms)
-		
-		MapRoom(ROOM1, 0) = "start"
-		
-		Select zone
-			Case 0	
-				SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
-				SetRoom("roompj", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room914", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room1archive", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room205", ROOM1, Room1Amount[zone], zone)
-				
-				SetRoom("lockroom", ROOM2C, Room2CAmount[zone], zone)
-				SetRoom("room1162", ROOM2C, Room2CAmount[zone], zone)
-				
-				SetRoom("room2closets", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2testroom2", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2scps", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2storage", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2gw_b", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2sl", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room012", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2scps2", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room1123", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2elevator", ROOM2, Room2Amount[zone], zone)
-				
-				SetRoom("room3storage", ROOM3, Room3Amount[zone], zone)
-				
-				SetRoom("room4info", ROOM4, Room4Amount[zone], zone)
-		
-			Case 1
-				SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
-				SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room035", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room079", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room106", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room008", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room895", ROOM1, Room1Amount[zone], zone)
-				
-				SetRoom("room2nuke", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2tunnel", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room049", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2shaft",ROOM2,Room2Amount[zone], zone)
-				SetRoom("testroom", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2servers", ROOM2, Room2Amount[zone], zone)
-				
-				SetRoom("room513", ROOM3, Room3Amount[zone], zone)
-				SetRoom("room966", ROOM3, Room3Amount[zone], zone)
-				
-				SetRoom("room2cpit", ROOM2C, Room2CAmount[zone], zone)
-				
-			Case 2
-				SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
-				SetRoom("gateb", ROOM1, Room1Amount[zone], zone)
-				SetRoom("gateaentrance", ROOM1, Room1Amount[zone], zone)
-				SetRoom("room1lifts", ROOM1, Room1Amount[zone], zone)
-				
-				SetRoom("room2poffices", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2cafeteria", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2sroom", ROOM2, Room2Amount[zone], zone)
-				SetRoom("room2servers2", ROOM2, Room2Amount[2], zone)
-				SetRoom("room2offices", ROOM2, Room2Amount[2], zone)
-				SetRoom("room2offices4", ROOM2, Room2Amount[2], zone)
-				SetRoom("room860", ROOM2, Room2Amount[2], zone)
-				SetRoom("medibay", ROOM2, Room2Amount[2], zone)
-				SetRoom("room2poffices2", ROOM2, Room2Amount[2], zone)
-				SetRoom("room2offices2", ROOM2, Room2Amount[2], zone)
-				
-				SetRoom("room2ccont", ROOM2C, Room2CAmount[zone], zone)
-				SetRoom("lockroom2", ROOM2C, Room2CAmount[zone], zone)
-				
-				SetRoom("room3servers", ROOM3, Room3Amount[zone], zone)
-				SetRoom("room3servers2", ROOM3, Room3Amount[zone], zone)
-				SetRoom("room3gw", ROOM3, Room3Amount[zone], zone)
-				SetRoom("room3offices", ROOM3, Room3Amount[zone], zone)
-		End Select
-		
-		;----------------------- Laden der Karte -------------------------------- (Loading the map, for you international peeps <3)
-		
-		temp = 0
-		Local tempzone = zone + 1
-		Local r.Rooms, spacing# = 8.0
-		For y = MapHeight - 1 To 1 Step - 1
-			
-			For x = 1 To MapWidth - 2
-				If MapTemp(x, y) > 0
-					
-					temp = Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1) + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)
-					
-					Select temp ;amount of bordering rooms
-						Case 1
-							If MapRoomID(ROOM1) < MaxRooms And MapName(x,y) = "" Then
-								If MapRoom(ROOM1, MapRoomID(ROOM1)) <> "" Then MapName(x, y) = MapRoom(ROOM1, MapRoomID(ROOM1))	
-							EndIf
-							
-							r = CreateRoom(tempzone, ROOM1, x * 8, 0, y * 8, MapName(x, y))
-							If MapTemp(x, y + 1) Then
-								r\angle = 180 
-								TurnEntity(r\obj, 0, r\angle, 0)
-							ElseIf MapTemp(x - 1, y)
-								r\angle = 270
-								TurnEntity(r\obj, 0, r\angle, 0)
-							ElseIf MapTemp(x + 1, y)
-								r\angle = 90
-								TurnEntity(r\obj, 0, r\angle, 0)
-							Else 
-								r\angle = 0
-							EndIf
-							MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
-						Case 2
-							If MapTemp(x - 1, y)>0 And MapTemp(x + 1, y)>0 Then
-								If MapRoomID(ROOM2) < MaxRooms And MapName(x, y) = ""  Then
-									If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
-								EndIf
-								r = CreateRoom(tempzone, ROOM2, x * 8, 0, y * 8, MapName(x, y))
-								If Rand(2) = 1 Then r\angle = 90 Else r\angle = 270
-								TurnEntity(r\obj, 0, r\angle, 0)
-								MapRoomID(ROOM2)=MapRoomID(ROOM2)+1
-							ElseIf MapTemp(x, y - 1)>0 And MapTemp(x, y + 1)>0
-								If MapRoomID(ROOM2) < MaxRooms And MapName(x, y) = ""  Then
-									If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
-								EndIf
-								r = CreateRoom(tempzone, ROOM2, x * 8, 0, y * 8, MapName(x, y))
-								If Rand(2) = 1 Then r\angle = 180 Else r\angle = 0
-								TurnEntity(r\obj, 0, r\angle, 0)
-								MapRoomID(ROOM2)=MapRoomID(ROOM2)+1
-							Else
-								If MapRoomID(ROOM2C) < MaxRooms And MapName(x, y) = ""  Then
-									If MapRoom(ROOM2C, MapRoomID(ROOM2C)) <> "" Then MapName(x, y) = MapRoom(ROOM2C, MapRoomID(ROOM2C))	
-								EndIf
-								
-								If MapTemp(x - 1, y)>0 And MapTemp(x, y + 1)>0 Then
-									r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
-									r\angle = 180
-									TurnEntity(r\obj, 0, r\angle, 0)
-								ElseIf MapTemp(x + 1, y)>0 And MapTemp(x, y + 1)>0
-									r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
-									r\angle = 90
-									TurnEntity(r\obj, 0, r\angle, 0)
-								ElseIf MapTemp(x - 1, y)>0 And MapTemp(x, y - 1)>0
-									r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
-									TurnEntity(r\obj, 0, 270, 0)
-									r\angle = 270
-								Else
-									r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
-								EndIf
-								MapRoomID(ROOM2C)=MapRoomID(ROOM2C)+1
-							EndIf
-						Case 3
-							If MapRoomID(ROOM3) < MaxRooms And MapName(x, y) = ""  Then
-								If MapRoom(ROOM3, MapRoomID(ROOM3)) <> "" Then MapName(x, y) = MapRoom(ROOM3, MapRoomID(ROOM3))	
-							EndIf
-							
-							r = CreateRoom(tempzone, ROOM3, x * 8, 0, y * 8, MapName(x, y))
-							If (Not MapTemp(x, y - 1)) Then
-								TurnEntity(r\obj, 0, 180, 0)
-								r\angle = 180
-							ElseIf (Not MapTemp(x - 1, y))
-								TurnEntity(r\obj, 0, 90, 0)
-								r\angle = 90
-							ElseIf (Not MapTemp(x + 1, y))
-								TurnEntity(r\obj, 0, -90, 0)
-								r\angle = 270
-							EndIf
-							MapRoomID(ROOM3)=MapRoomID(ROOM3)+1
-						Case 4
-							If MapRoomID(ROOM4) < MaxRooms And MapName(x, y) = ""  Then
-								If MapRoom(ROOM4, MapRoomID(ROOM4)) <> "" Then MapName(x, y) = MapRoom(ROOM4, MapRoomID(ROOM4))	
-							EndIf
-							
-							r = CreateRoom(tempzone, ROOM4, x * 8, 0, y * 8, MapName(x, y))
-							MapRoomID(ROOM4)=MapRoomID(ROOM4)+1
+		For y = 2 To MapHeight - 2
+			For x = 2 To MapWidth - 2
+				If MapTemp(x,y)=3 Then
+					Select 0 ;see if adding a ROOM1 is possible
+						Case (MapTemp(x+1,y) Lor MapTemp(x+1,y+1) Lor MapTemp(x+1,y-1) Lor MapTemp(x+2,y))
+							MapTemp(x+1,y)=1
+							temp=1
+						Case (MapTemp(x-1,y) Lor MapTemp(x-1,y+1) Lor MapTemp(x-1,y-1) Lor MapTemp(x-2,y))
+							MapTemp(x-1,y)=1
+							temp=1
+						Case (MapTemp(x,y+1) Lor MapTemp(x+1,y+1) Lor MapTemp(x-1,y+1) Lor MapTemp(x,y+2))
+							MapTemp(x,y+1)=1
+							temp=1
+						Case (MapTemp(x,y-1) Lor MapTemp(x+1,y-1) Lor MapTemp(x-1,y-1) Lor MapTemp(x,y-2))
+							MapTemp(x,y-1)=1
+							temp=1
 					End Select
-				
+					If temp=1 Then
+						MapTemp(x,y)=4 ;turn this room into a ROOM4
+						DebugLog "ROOM4 forced into slot ("+x+", "+y+")"
+						Room4Amount[zone]=Room4Amount[zone]+1
+						Room3Amount[zone]=Room3Amount[zone]-1
+						Room1Amount[zone]=Room1Amount[zone]+1
+					EndIf
 				EndIf
-				
+				If temp=1 Then Exit
 			Next
-		Next		
-		
-		r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
-		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1	
-		
-		If IntroEnabled And zone = 0 Then
-			r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "room173")
-			MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
-		EndIf
-		
-		r = CreateRoom(0, ROOM1, 8, 800, 0, "dimension1499")
-		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
-		
-		If zone = 2 Then
-			r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 500, 8, "gatea")
-			MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
-		EndIf
-		
-		For r.Rooms = Each Rooms
-			PreventRoomOverlap(r)
+			If temp=1 Then Exit
 		Next
 		
-		Local I_Opt.Options = First Options
+		If temp=0 Then DebugLog "Couldn't place ROOM4 in zone "+i
+	EndIf
+	
+	If Room2CAmount[zone]<1 Then ;we want at least 1 ROOM2C
+		DebugLog "forcing a ROOM2C into zone "+i
+		temp=0
 		
-		If I_Opt\DebugMode Then 
-			Repeat
-				Cls
-				i = MapWidth - 1
-				For x = 0 To MapWidth - 1
-					For y = 0 To MapHeight - 1
-						If MapTemp(x, y) = 0 Then
-							
-							Color 50*tempzone, 50*tempzone, 50*tempzone
-							Rect(i * 64, y * 64, 30, 30)
-						Else
-							If MapTemp(x, y) = 255 Then
-								Color 0,200,0
-							ElseIf MapTemp(x,y)=4 Then
-								Color 50,50,255
-							ElseIf MapTemp(x,y)=3 Then
-								Color 50,255,255
-							ElseIf MapTemp(x,y)=2 Then
-								Color 255,255,50
-							Else
-								Color 255, 255, 255
+		For y = 3 To MapHeight - 3
+			For x = 3 To MapWidth - 3
+				If MapTemp(x,y)=1 Then
+					Select True ;see if adding some rooms is possible
+						Case MapTemp(x-1,y)>0
+							If (MapTemp(x,y-1)+MapTemp(x,y+1)+MapTemp(x+2,y))=0 Then
+								If (MapTemp(x+1,y-2)+MapTemp(x+2,y-1)+MapTemp(x+1,y-1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x+1,y)=2
+									DebugLog "ROOM2C forced into slot ("+(x+1)+", "+(y)+")"
+									MapTemp(x+1,y-1)=1
+									temp=1
+								ElseIf (MapTemp(x+1,y+2)+MapTemp(x+2,y+1)+MapTemp(x+1,y+1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x+1,y)=2
+									DebugLog "ROOM2C forced into slot ("+(x+1)+", "+(y)+")"
+									MapTemp(x+1,y+1)=1
+									temp=1
+								EndIf
 							EndIf
-							Rect(i * 64, y * 64, 30, 30)
+						Case MapTemp(x+1,y)>0
+							If (MapTemp(x,y-1)+MapTemp(x,y+1)+MapTemp(x-2,y))=0 Then
+								If (MapTemp(x-1,y-2)+MapTemp(x-2,y-1)+MapTemp(x-1,y-1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x-1,y)=2
+									DebugLog "ROOM2C forced into slot ("+(x-1)+", "+(y)+")"
+									MapTemp(x-1,y-1)=1
+									temp=1
+								ElseIf (MapTemp(x-1,y+2)+MapTemp(x-2,y+1)+MapTemp(x-1,y+1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x-1,y)=2
+									DebugLog "ROOM2C forced into slot ("+(x-1)+", "+(y)+")"
+									MapTemp(x-1,y+1)=1
+									temp=1
+								EndIf
+							EndIf
+						Case MapTemp(x,y-1)>0
+							If (MapTemp(x-1,y)+MapTemp(x+1,y)+MapTemp(x,y+2))=0 Then
+								If (MapTemp(x-2,y+1)+MapTemp(x-1,y+2)+MapTemp(x-1,y+1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x,y+1)=2
+									DebugLog "ROOM2C forced into slot ("+(x)+", "+(y+1)+")"
+									MapTemp(x-1,y+1)=1
+									temp=1
+								ElseIf (MapTemp(x+2,y+1)+MapTemp(x+1,y+2)+MapTemp(x+1,y+1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x,y+1)=2
+									DebugLog "ROOM2C forced into slot ("+(x)+", "+(y+1)+")"
+									MapTemp(x+1,y+1)=1
+									temp=1
+								EndIf
+							EndIf
+						Case MapTemp(x,y+1)>0
+							If (MapTemp(x-1,y)+MapTemp(x+1,y)+MapTemp(x,y-2))=0 Then
+								If (MapTemp(x-2,y-1)+MapTemp(x-1,y-2)+MapTemp(x-1,y-1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x,y-1)=2
+									DebugLog "ROOM2C forced into slot ("+(x)+", "+(y-1)+")"
+									MapTemp(x-1,y-1)=1
+									temp=1
+								ElseIf (MapTemp(x+2,y-1)+MapTemp(x+1,y-2)+MapTemp(x+1,y-1))=0 Then
+									MapTemp(x,y)=2
+									MapTemp(x,y-1)=2
+									DebugLog "ROOM2C forced into slot ("+(x)+", "+(y-1)+")"
+									MapTemp(x+1,y-1)=1
+									temp=1
+								EndIf
+							EndIf
+					End Select
+					If temp=1 Then
+						Room2CAmount[zone]=Room2CAmount[zone]+1
+						Room2Amount[zone]=Room2Amount[zone]+1
+					EndIf
+				EndIf
+				If temp=1 Then Exit
+			Next
+			If temp=1 Then Exit
+		Next
+		
+		If temp=0 Then DebugLog "Couldn't place ROOM2C in zone "+i
+	EndIf
+
+	
+	Local MaxRooms% = 55*MapWidth/20
+	MaxRooms=Max(MaxRooms,Room1Amount[zone]+1)
+	MaxRooms=Max(MaxRooms,Room2Amount[zone]+1)
+	MaxRooms=Max(MaxRooms,Room2CAmount[zone]+1)
+	MaxRooms=Max(MaxRooms,Room3Amount[zone]+1)
+	MaxRooms=Max(MaxRooms,Room4Amount[zone]+1)
+	Dim MapRoom$(ROOM4 + 1, MaxRooms)
+	
+	MapRoom(ROOM1, 0) = "start"
+	
+	Select zone
+		Case 0	
+			SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
+			SetRoom("roompj", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room914", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room1archive", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room205", ROOM1, Room1Amount[zone], zone)
+			
+			SetRoom("lockroom", ROOM2C, Room2CAmount[zone], zone)
+			SetRoom("room1162", ROOM2C, Room2CAmount[zone], zone)
+			
+			SetRoom("room2closets", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2testroom2", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2scps", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2storage", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2gw_b", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2sl", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room012", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2scps2", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room1123", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2elevator", ROOM2, Room2Amount[zone], zone)
+			
+			SetRoom("room3storage", ROOM3, Room3Amount[zone], zone)
+			
+			SetRoom("room4info", ROOM4, Room4Amount[zone], zone)
+	
+		Case 1
+			SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
+			SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room035", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room079", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room106", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room008", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room895", ROOM1, Room1Amount[zone], zone)
+			
+			SetRoom("room2nuke", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2tunnel", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room049", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2shaft",ROOM2,Room2Amount[zone], zone)
+			SetRoom("testroom", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2servers", ROOM2, Room2Amount[zone], zone)
+			
+			SetRoom("room513", ROOM3, Room3Amount[zone], zone)
+			SetRoom("room966", ROOM3, Room3Amount[zone], zone)
+			
+			SetRoom("room2cpit", ROOM2C, Room2CAmount[zone], zone)
+			
+		Case 2
+			SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
+			SetRoom("gateb", ROOM1, Room1Amount[zone], zone)
+			SetRoom("gateaentrance", ROOM1, Room1Amount[zone], zone)
+			SetRoom("room1lifts", ROOM1, Room1Amount[zone], zone)
+			
+			SetRoom("room2poffices", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2cafeteria", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2sroom", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2servers2", ROOM2, Room2Amount[2], zone)
+			SetRoom("room2offices", ROOM2, Room2Amount[2], zone)
+			SetRoom("room2offices4", ROOM2, Room2Amount[2], zone)
+			SetRoom("room860", ROOM2, Room2Amount[2], zone)
+			SetRoom("medibay", ROOM2, Room2Amount[2], zone)
+			SetRoom("room2poffices2", ROOM2, Room2Amount[2], zone)
+			SetRoom("room2offices2", ROOM2, Room2Amount[2], zone)
+			
+			SetRoom("room2ccont", ROOM2C, Room2CAmount[zone], zone)
+			SetRoom("lockroom2", ROOM2C, Room2CAmount[zone], zone)
+			
+			SetRoom("room3servers", ROOM3, Room3Amount[zone], zone)
+			SetRoom("room3servers2", ROOM3, Room3Amount[zone], zone)
+			SetRoom("room3gw", ROOM3, Room3Amount[zone], zone)
+			SetRoom("room3offices", ROOM3, Room3Amount[zone], zone)
+	End Select
+	
+	;----------------------- Laden der Karte -------------------------------- (Loading the map, for you international peeps <3)
+	
+	temp = 0
+	Local tempzone = zone + 1
+	Local r.Rooms, spacing# = 8.0
+	For y = MapHeight - 1 To 1 Step - 1
+		
+		For x = 1 To MapWidth - 2
+			If MapTemp(x, y) > 0
+				
+				temp = Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1) + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)
+				
+				Select temp ;amount of bordering rooms
+					Case 1
+						If MapRoomID(ROOM1) < MaxRooms And MapName(x,y) = "" Then
+							If MapRoom(ROOM1, MapRoomID(ROOM1)) <> "" Then MapName(x, y) = MapRoom(ROOM1, MapRoomID(ROOM1))	
 						EndIf
-					Next
-					i = i - 1
+						
+						r = CreateRoom(tempzone, ROOM1, x * 8, 0, y * 8, MapName(x, y))
+						If MapTemp(x, y + 1) Then
+							r\angle = 180 
+							TurnEntity(r\obj, 0, r\angle, 0)
+						ElseIf MapTemp(x - 1, y)
+							r\angle = 270
+							TurnEntity(r\obj, 0, r\angle, 0)
+						ElseIf MapTemp(x + 1, y)
+							r\angle = 90
+							TurnEntity(r\obj, 0, r\angle, 0)
+						Else 
+							r\angle = 0
+						EndIf
+						MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+					Case 2
+						If MapTemp(x - 1, y)>0 And MapTemp(x + 1, y)>0 Then
+							If MapRoomID(ROOM2) < MaxRooms And MapName(x, y) = ""  Then
+								If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
+							EndIf
+							r = CreateRoom(tempzone, ROOM2, x * 8, 0, y * 8, MapName(x, y))
+							If Rand(2) = 1 Then r\angle = 90 Else r\angle = 270
+							TurnEntity(r\obj, 0, r\angle, 0)
+							MapRoomID(ROOM2)=MapRoomID(ROOM2)+1
+						ElseIf MapTemp(x, y - 1)>0 And MapTemp(x, y + 1)>0
+							If MapRoomID(ROOM2) < MaxRooms And MapName(x, y) = ""  Then
+								If MapRoom(ROOM2, MapRoomID(ROOM2)) <> "" Then MapName(x, y) = MapRoom(ROOM2, MapRoomID(ROOM2))	
+							EndIf
+							r = CreateRoom(tempzone, ROOM2, x * 8, 0, y * 8, MapName(x, y))
+							If Rand(2) = 1 Then r\angle = 180 Else r\angle = 0
+							TurnEntity(r\obj, 0, r\angle, 0)
+							MapRoomID(ROOM2)=MapRoomID(ROOM2)+1
+						Else
+							If MapRoomID(ROOM2C) < MaxRooms And MapName(x, y) = ""  Then
+								If MapRoom(ROOM2C, MapRoomID(ROOM2C)) <> "" Then MapName(x, y) = MapRoom(ROOM2C, MapRoomID(ROOM2C))	
+							EndIf
+							
+							If MapTemp(x - 1, y)>0 And MapTemp(x, y + 1)>0 Then
+								r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
+								r\angle = 180
+								TurnEntity(r\obj, 0, r\angle, 0)
+							ElseIf MapTemp(x + 1, y)>0 And MapTemp(x, y + 1)>0
+								r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
+								r\angle = 90
+								TurnEntity(r\obj, 0, r\angle, 0)
+							ElseIf MapTemp(x - 1, y)>0 And MapTemp(x, y - 1)>0
+								r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
+								TurnEntity(r\obj, 0, 270, 0)
+								r\angle = 270
+							Else
+								r = CreateRoom(tempzone, ROOM2C, x * 8, 0, y * 8, MapName(x, y))
+							EndIf
+							MapRoomID(ROOM2C)=MapRoomID(ROOM2C)+1
+						EndIf
+					Case 3
+						If MapRoomID(ROOM3) < MaxRooms And MapName(x, y) = ""  Then
+							If MapRoom(ROOM3, MapRoomID(ROOM3)) <> "" Then MapName(x, y) = MapRoom(ROOM3, MapRoomID(ROOM3))	
+						EndIf
+						
+						r = CreateRoom(tempzone, ROOM3, x * 8, 0, y * 8, MapName(x, y))
+						If (Not MapTemp(x, y - 1)) Then
+							TurnEntity(r\obj, 0, 180, 0)
+							r\angle = 180
+						ElseIf (Not MapTemp(x - 1, y))
+							TurnEntity(r\obj, 0, 90, 0)
+							r\angle = 90
+						ElseIf (Not MapTemp(x + 1, y))
+							TurnEntity(r\obj, 0, -90, 0)
+							r\angle = 270
+						EndIf
+						MapRoomID(ROOM3)=MapRoomID(ROOM3)+1
+					Case 4
+						If MapRoomID(ROOM4) < MaxRooms And MapName(x, y) = ""  Then
+							If MapRoom(ROOM4, MapRoomID(ROOM4)) <> "" Then MapName(x, y) = MapRoom(ROOM4, MapRoomID(ROOM4))	
+						EndIf
+						
+						r = CreateRoom(tempzone, ROOM4, x * 8, 0, y * 8, MapName(x, y))
+						MapRoomID(ROOM4)=MapRoomID(ROOM4)+1
+				End Select
+			
+			EndIf
+			
+		Next
+	Next		
+	
+	r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 0, (MapHeight-1) * 8, "pocketdimension")
+	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1	
+	
+	If IntroEnabled And zone = 0 Then
+		r = CreateRoom(0, ROOM1, 8, 0, (MapHeight-1) * 8, "room173")
+		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+	EndIf
+	
+	r = CreateRoom(0, ROOM1, 8, 800, 0, "dimension1499")
+	MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+	
+	If zone = 2 Then
+		r = CreateRoom(0, ROOM1, (MapWidth-1) * 8, 500, 8, "gatea")
+		MapRoomID(ROOM1)=MapRoomID(ROOM1)+1
+	EndIf
+	
+	For r.Rooms = Each Rooms
+		PreventRoomOverlap(r)
+	Next
+	
+	Local I_Opt.Options = First Options
+	
+	If I_Opt\DebugMode Then 
+		Repeat
+			Cls
+			i = MapWidth - 1
+			For x = 0 To MapWidth - 1
+				For y = 0 To MapHeight - 1
+					If MapTemp(x, y) = 0 Then
+						
+						Color 50*tempzone, 50*tempzone, 50*tempzone
+						Rect(i * 64, y * 64, 30, 30)
+					Else
+						If MapTemp(x, y) = 255 Then
+							Color 0,200,0
+						ElseIf MapTemp(x,y)=4 Then
+							Color 50,50,255
+						ElseIf MapTemp(x,y)=3 Then
+							Color 50,255,255
+						ElseIf MapTemp(x,y)=2 Then
+							Color 255,255,50
+						Else
+							Color 255, 255, 255
+						EndIf
+						Rect(i * 64, y * 64, 30, 30)
+					EndIf
+				Next
+				i = i - 1
+			Next
+			
+			i = MapWidth - 1
+			For x = 0 To MapWidth - 1
+				For y = 0 To MapHeight - 1
+					
+					If MouseX()>i*64 And MouseX()<i*64+32 And MouseY()>y*64 And MouseY()<y*64+32 Then
+						Color 255, 0, 0
+						Text i * 64 +2, (y) * 64 + 2,MapTemp(x, y) +" "+ MapName(x, y)
+					Else
+						If MapName(x, y) <> "" Then
+							Color 0, 0, 0
+							Text i * 64 +2, (y) * 64 + 2,MapTemp(x, y)
+						EndIf
+					EndIf
+				Next
+			i = i - 1
+			Next		
+			
+			Flip
+		Until KeyHit(28)		
+	EndIf
+	
+	
+	For y = 0 To MapHeight
+		For x = 0 To MapWidth
+			MapTemp(x, y) = Min(MapTemp(x, y),1)
+		Next
+	Next
+	
+	Local d.Doors
+	Local shouldSpawnDoor%
+	For y = MapHeight To 0 Step -1
+		
+		For x = MapWidth To 0 Step -1
+			If MapTemp(x, y) > 0 Then
+				
+				For r.Rooms = Each Rooms
+					r\angle = WrapAngle(r\angle)
+					If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=90 Lor r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=0 Lor r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=0 Lor r\angle=180 Lor r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (x+1)<(MapWidth+1)
+								If MapTemp(x + 1, y) > 0 Then
+									d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), (zone Mod 2) * 2)
+									r\AdjDoor[0] = d
+								EndIf
+							EndIf
+						EndIf
+						
+						shouldSpawnDoor = False
+						Select r\RoomTemplate\Shape
+							Case ROOM1
+								If r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2
+								If r\angle=0 Lor r\angle=180
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM2C
+								If r\angle=180 Lor r\angle=90
+									shouldSpawnDoor = True
+								EndIf
+							Case ROOM3
+								If r\angle=180 Lor r\angle=90 Lor r\angle=270
+									shouldSpawnDoor = True
+								EndIf
+							Default
+								shouldSpawnDoor = True
+						End Select
+						If shouldSpawnDoor
+							If (y+1)<(MapHeight+1)
+								If MapTemp(x, y + 1) > 0 Then
+									d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), (zone Mod 2) * 2)
+									r\AdjDoor[3] = d
+								EndIf
+							EndIf
+						EndIf
+						
+						Exit
+					EndIf
 				Next
 				
-				i = MapWidth - 1
-				For x = 0 To MapWidth - 1
-					For y = 0 To MapHeight - 1
-						
-						If MouseX()>i*64 And MouseX()<i*64+32 And MouseY()>y*64 And MouseY()<y*64+32 Then
-							Color 255, 0, 0
-							Text i * 64 +2, (y) * 64 + 2,MapTemp(x, y) +" "+ MapName(x, y)
-						Else
-							If MapName(x, y) <> "" Then
-								Color 0, 0, 0
-								Text i * 64 +2, (y) * 64 + 2,MapTemp(x, y)
-							EndIf
-						EndIf
-					Next
-				i = i - 1
-				Next		
-				
-				Flip
-			Until KeyHit(28)		
-		EndIf
-		
-		
-		For y = 0 To MapHeight
-			For x = 0 To MapWidth
-				MapTemp(x, y) = Min(MapTemp(x, y),1)
-			Next
-		Next
-		
-		Local d.Doors
-		Local shouldSpawnDoor%
-		For y = MapHeight To 0 Step -1
+			EndIf
 			
-			For x = MapWidth To 0 Step -1
-				If MapTemp(x, y) > 0 Then
-					
-					For r.Rooms = Each Rooms
-						r\angle = WrapAngle(r\angle)
-						If Int(r\x/8.0)=x And Int(r\z/8.0)=y Then
-							shouldSpawnDoor = False
-							Select r\RoomTemplate\Shape
-								Case ROOM1
-									If r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2
-									If r\angle=90 Lor r\angle=270
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2C
-									If r\angle=0 Lor r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM3
-									If r\angle=0 Lor r\angle=180 Lor r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Default
-									shouldSpawnDoor = True
-							End Select
-							If shouldSpawnDoor
-								If (x+1)<(MapWidth+1)
-									If MapTemp(x + 1, y) > 0 Then
-										d.Doors = CreateDoor(r\zone, Float(x) * spacing + spacing / 2.0, 0, Float(y) * spacing, 90, r, Max(Rand(-3, 1), 0), (zone Mod 2) * 2)
-										r\AdjDoor[0] = d
-									EndIf
-								EndIf
-							EndIf
-							
-							shouldSpawnDoor = False
-							Select r\RoomTemplate\Shape
-								Case ROOM1
-									If r\angle=180
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2
-									If r\angle=0 Lor r\angle=180
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM2C
-									If r\angle=180 Lor r\angle=90
-										shouldSpawnDoor = True
-									EndIf
-								Case ROOM3
-									If r\angle=180 Lor r\angle=90 Lor r\angle=270
-										shouldSpawnDoor = True
-									EndIf
-								Default
-									shouldSpawnDoor = True
-							End Select
-							If shouldSpawnDoor
-								If (y+1)<(MapHeight+1)
-									If MapTemp(x, y + 1) > 0 Then
-										d.Doors = CreateDoor(r\zone, Float(x) * spacing, 0, Float(y) * spacing + spacing / 2.0, 0, r, Max(Rand(-3, 1), 0), (zone Mod 2) * 2)
-										r\AdjDoor[3] = d
-									EndIf
-								EndIf
-							EndIf
-							
-							Exit
-						EndIf
-					Next
-					
-				EndIf
-				
-			Next
 		Next
-		
-		For r.Rooms = Each Rooms
-			r\angle = WrapAngle(r\angle)
-			r\Adjacent[0]=Null
-			r\Adjacent[1]=Null
-			r\Adjacent[2]=Null
-			r\Adjacent[3]=Null
-			For r2.Rooms = Each Rooms
-				If r<>r2 Then
-					If r\zone=r2\zone Then
-						If r2\z=r\z Then
-							If (r2\x)=(r\x+8.0) Then
-								r\Adjacent[0]=r2
-								If r\AdjDoor[0] = Null Then r\AdjDoor[0] = r2\AdjDoor[2]
-							ElseIf (r2\x)=(r\x-8.0)
-								r\Adjacent[2]=r2
-								If r\AdjDoor[2] = Null Then r\AdjDoor[2] = r2\AdjDoor[0]
-							EndIf
-						ElseIf r2\x=r\x Then
-							If (r2\z)=(r\z-8.0) Then
-								r\Adjacent[1]=r2
-								If r\AdjDoor[1] = Null Then r\AdjDoor[1] = r2\AdjDoor[3]
-							ElseIf (r2\z)=(r\z+8.0)
-								r\Adjacent[3]=r2
-								If r\AdjDoor[3] = Null Then r\AdjDoor[3] = r2\AdjDoor[1]
-							EndIf
+	Next
+	
+	For r.Rooms = Each Rooms
+		r\angle = WrapAngle(r\angle)
+		SetupTriggerBoxes(r)
+		r\Adjacent[0]=Null
+		r\Adjacent[1]=Null
+		r\Adjacent[2]=Null
+		r\Adjacent[3]=Null
+		For r2.Rooms = Each Rooms
+			If r<>r2 Then
+				If r\zone=r2\zone Then
+					If r2\z=r\z Then
+						If (r2\x)=(r\x+8.0) Then
+							r\Adjacent[0]=r2
+							If r\AdjDoor[0] = Null Then r\AdjDoor[0] = r2\AdjDoor[2]
+						ElseIf (r2\x)=(r\x-8.0)
+							r\Adjacent[2]=r2
+							If r\AdjDoor[2] = Null Then r\AdjDoor[2] = r2\AdjDoor[0]
+						EndIf
+					ElseIf r2\x=r\x Then
+						If (r2\z)=(r\z-8.0) Then
+							r\Adjacent[1]=r2
+							If r\AdjDoor[1] = Null Then r\AdjDoor[1] = r2\AdjDoor[3]
+						ElseIf (r2\z)=(r\z+8.0)
+							r\Adjacent[3]=r2
+							If r\AdjDoor[3] = Null Then r\AdjDoor[3] = r2\AdjDoor[1]
 						EndIf
 					EndIf
 				EndIf
-				If (r\Adjacent[0]<>Null) And (r\Adjacent[1]<>Null) And (r\Adjacent[2]<>Null) And (r\Adjacent[3]<>Null) Then Exit
-			Next
+			EndIf
+			If (r\Adjacent[0]<>Null) And (r\Adjacent[1]<>Null) And (r\Adjacent[2]<>Null) And (r\Adjacent[3]<>Null) Then Exit
 		Next
 	Next
 	
@@ -7247,7 +7321,7 @@ Function UpdateRoomLights(cam%)
 						If UpdateRoomLightsTimer=0.0 Then
 							ShowEntity r\LightSprites[i]
 							
-							If EntityDistanceSquared(cam%,r\Lights%[i])<72.25 Then ;<8.5
+							If EntityDistanceSquared(cam%,r\Lights%[i]) < PowTwo(8.5) Then
 								If (Not r\LightHidden[i]) Then
 									ShowEntity r\Lights%[i]
 									r\LightHidden[i] = True
@@ -7259,7 +7333,7 @@ Function UpdateRoomLights(cam%)
 								EndIf
 							EndIf
 							
-							If (EntityDistanceSquared(cam%,r\LightSprites2[i])<72.25 Lor r\RoomTemplate\UseLightCones) Then ;<8.5
+							If (EntityDistanceSquared(cam%,r\LightSprites2[i]) < PowTwo(8.5) Lor r\RoomTemplate\UseLightCones) Then
 								If EntityVisible(cam%,r\LightSpritesPivot[i]) Lor r\RoomTemplate\UseLightCones Then
 									If r\LightSpriteHidden%[i] Then
 										ShowEntity r\LightSprites2%[i]
@@ -7278,9 +7352,7 @@ Function UpdateRoomLights(cam%)
 									EndIf
 									ScaleSprite r\LightSprites2[i],random#,random#
 									
-									dist# = (EntityDistance(cam%,r\LightSpritesPivot[i])+0.5)/7.5
-									dist# = Max(Min(dist#,1.0),0.0)
-									alpha# = 1.0 - dist
+									alpha# = 1.0 - Max(Min(((EntityDistance(cam%,r\LightSpritesPivot[i])+0.5)/7.5),1.0),0.0)
 									
 									If alpha# > 0.0 Then
 										EntityAlpha r\LightSprites2[i],Max(3*(Brightness/255)*(r\LightIntensity[i]/2),1)*alpha#
@@ -7293,7 +7365,7 @@ Function UpdateRoomLights(cam%)
 									EndIf
 									
 									If r\RoomTemplate\UseLightCones Then
-										If EntityDistanceSquared(cam%,r\LightSprites2[i])>=72.25 Lor (Not EntityVisible(cam%,r\LightSpritesPivot[i])) Then ;>=8.5
+										If EntityDistanceSquared(cam%,r\LightSprites2[i]) >= PowTwo(8.5) Lor (Not EntityVisible(cam%,r\LightSpritesPivot[i])) Then
 											HideEntity r\LightSprites2%[i]
 											r\LightSpriteHidden%[i] = True
 										EndIf
@@ -7337,7 +7409,7 @@ Function UpdateRoomLights(cam%)
 								EndIf
 							EndIf
 						Else
-							If (EntityDistanceSquared(cam%,r\LightSprites2[i])<72.25 Lor r\RoomTemplate\UseLightCones) Then ;8.5
+							If (EntityDistanceSquared(cam%,r\LightSprites2[i]) < PowTwo(8.5) Lor r\RoomTemplate\UseLightCones) Then
 								If PlayerRoom\RoomTemplate\Name$ = "room173" Then
 									random# = Rnd(0.38,0.42)
 								Else
@@ -7641,9 +7713,11 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#,isSpawnChunk%=False)
 	Return ch
 End Function
 
+Const ChunkMaxDistance#=3*40
+
 Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Local ch.Chunk,StrTemp$,i%,x#,z#,ch2.Chunk,y#,n.NPCs,j%
-	Local ChunkX#,ChunkZ#,ChunkMaxDistance#=3*40
+	Local ChunkX#,ChunkZ#
 	
 	ChunkX# = Int(EntityX(Collider)/40)
 	ChunkZ# = Int(EntityZ(Collider)/40)
@@ -7684,7 +7758,7 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 ;			HideEntity ch\ChunkPivotDebug
 ;		EndIf
 		If (Not ch\IsSpawnChunk)
-			If Distance(EntityX(Collider),EntityX(ch\ChunkPivot),EntityZ(Collider),EntityZ(ch\ChunkPivot))>ChunkMaxDistance
+			If DistanceSquared(EntityX(Collider),EntityX(ch\ChunkPivot),EntityZ(Collider),EntityZ(ch\ChunkPivot))>PowTwo(ChunkMaxDistance) Then
 				FreeEntity ch\ChunkPivot
 				Delete ch
 			EndIf
@@ -7734,7 +7808,7 @@ Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 		For n = Each NPCs
 			If n\NPCtype = NPCtype1499 Then
 				If n\PrevState=0 Then
-					If EntityDistance(n\Collider,Collider)>ChunkMaxDistance Lor EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5 Then
+					If EntityDistanceSquared(n\Collider,Collider)>PowTwo(ChunkMaxDistance) Lor EntityY(n\Collider)<EntityY(PlayerRoom\obj)-5 Then
 						;This will be updated like this so that new NPCs can spawn for the player
 						RemoveNPC(n)
 					EndIf

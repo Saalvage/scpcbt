@@ -1,14 +1,8 @@
-Function SaveGame(file$)
+Function SaveGame(file$, zonemod%=0)
 	;CatchErrors("SaveGame")
 	
 	Local I_Cheats.Cheats = First Cheats
 	Local I_Loc.Loc = First Loc
-	
-	If Not Playable Then Return ;don't save if the player can't move at all
-	
-	If DropSpeed#>0.02*FPSfactor Lor DropSpeed#<-0.02*FPSfactor Then Return
-	
-	If KillTimer < 0 Then Return
 	
 	GameSaved = True
 	
@@ -132,6 +126,94 @@ Function SaveGame(file$)
 		WriteByte f, Achievements[i]
 	Next
 	WriteInt f, RefinedItems
+	
+	For itt.itemtemplates = Each ItemTemplates
+		WriteByte f, itt\found
+	Next
+	
+	If UsedConsole
+		WriteInt f, 100
+		DebugLog "Used Console"
+	Else
+		WriteInt f, 994
+	EndIf
+	WriteFloat f, CameraFogFar
+	WriteFloat f, StoredCameraFogFar
+	
+	Local I_427.SCP427 = First SCP427
+	WriteByte f, I_427\Using
+	WriteFloat f, I_427\Timer
+	
+	WriteByte f, Wearing714
+	
+	temp = 0
+	For it.items = Each Items
+		If it\Picked <> 0 Then temp=temp+1
+	Next
+	WriteInt f, temp
+	For it.items = Each Items
+		If it\Picked <> 0 Then
+			WriteString f, it\itemtemplate\namespec
+			WriteString f, it\itemtemplate\tempName
+			
+			WriteFloat f, EntityX(it\collider, True)
+			WriteFloat f, EntityY(it\collider, True)
+			WriteFloat f, EntityZ(it\collider, True)
+			
+			WriteByte f, it\r
+			WriteByte f, it\g
+			WriteByte f, it\b
+			WriteFloat f, it\a
+			
+			WriteFloat f, it\state2
+			
+			WriteFloat f, EntityPitch(it\collider)
+			WriteFloat f, EntityYaw(it\collider)
+			
+			WriteFloat f, it\state
+			WriteByte f, it\Picked
+			
+			If SelectedItem = it Then WriteByte f, 1 Else WriteByte f, 0
+			Local ItemFound% = False
+			For i = 0 To MaxItemAmount - 1
+				If Inventory(i) = it Then ItemFound = True : Exit
+			Next
+			If ItemFound Then WriteByte f, i Else WriteByte f, 66
+			
+			If it\itemtemplate\isAnim<>0 Then
+				WriteFloat f, AnimTime(it\model)
+			EndIf
+			WriteByte f,it\invSlots
+			WriteInt f,it\ID
+			If it\itemtemplate\invimg=it\invimg Then WriteByte f,0 Else WriteByte f,1
+		EndIf
+	Next
+	
+	temp=0
+	For it.items = Each Items
+		If it\Picked <> 0 And it\invSlots>0 Then temp=temp+1
+	Next
+	
+	WriteInt f,temp
+	
+	For it.items = Each Items
+		If it\Picked <> 0 And it\invSlots>0 Then
+			WriteInt f,it\ID
+			For i=0 To it\invSlots-1
+				If it\SecondInv[i] <> Null Then
+					WriteInt f, it\SecondInv[i]\ID
+				Else
+					WriteInt f, -1
+				EndIf
+			Next
+		EndIf
+	Next
+	
+	WriteInt f, CurrentZone + zonemod
+	
+	CloseFile(f)
+	
+	f% = WriteFile(file + "\" + CurrentZone + ".zone")
 	
 	For x = 0 To MapWidth
 		For y = 0 To MapHeight
@@ -367,56 +449,58 @@ Function SaveGame(file$)
 	Next
 	
 	temp = 0
-	For it.items = Each Items	
-		temp=temp+1
+	For it.items = Each Items
+		If it\Picked = 0 Then temp=temp+1
 	Next
 	WriteInt f, temp
 	For it.items = Each Items
-		WriteString f, it\itemtemplate\namespec
-		WriteString f, it\itemtemplate\tempName
-		
-		WriteFloat f, EntityX(it\collider, True)
-		WriteFloat f, EntityY(it\collider, True)
-		WriteFloat f, EntityZ(it\collider, True)
-		
-		WriteByte f, it\r
-		WriteByte f, it\g
-		WriteByte f, it\b
-		WriteFloat f, it\a
-		
-		WriteFloat f, it\state2
-		
-		WriteFloat f, EntityPitch(it\collider)
-		WriteFloat f, EntityYaw(it\collider)
-		
-		WriteFloat f, it\state
-		WriteByte f, it\Picked
-		
-		If SelectedItem = it Then WriteByte f, 1 Else WriteByte f, 0
-		Local ItemFound% = False
-		For i = 0 To MaxItemAmount - 1
-			If Inventory(i) = it Then ItemFound = True : Exit
-		Next
-		If ItemFound Then WriteByte f, i Else WriteByte f, 66
-		
-		If it\itemtemplate\isAnim<>0 Then
-			WriteFloat f, AnimTime(it\model)
+		If it\Picked = 0 Then
+			WriteString f, it\itemtemplate\namespec
+			WriteString f, it\itemtemplate\tempName
+			
+			WriteFloat f, EntityX(it\collider, True)
+			WriteFloat f, EntityY(it\collider, True)
+			WriteFloat f, EntityZ(it\collider, True)
+			
+			WriteByte f, it\r
+			WriteByte f, it\g
+			WriteByte f, it\b
+			WriteFloat f, it\a
+			
+			WriteFloat f, it\state2
+			
+			WriteFloat f, EntityPitch(it\collider)
+			WriteFloat f, EntityYaw(it\collider)
+			
+			WriteFloat f, it\state
+			WriteByte f, it\Picked
+			
+			If SelectedItem = it Then WriteByte f, 1 Else WriteByte f, 0
+			ItemFound% = False
+			For i = 0 To MaxItemAmount - 1
+				If Inventory(i) = it Then ItemFound = True : Exit
+			Next
+			If ItemFound Then WriteByte f, i Else WriteByte f, 66
+			
+			If it\itemtemplate\isAnim<>0 Then
+				WriteFloat f, AnimTime(it\model)
+			EndIf
+			WriteByte f,it\invSlots
+			WriteInt f,it\ID
+			If it\itemtemplate\invimg=it\invimg Then WriteByte f,0 Else WriteByte f,1
 		EndIf
-		WriteByte f,it\invSlots
-		WriteInt f,it\ID
-		If it\itemtemplate\invimg=it\invimg Then WriteByte f,0 Else WriteByte f,1
 	Next
 	
 	temp=0
 	For it.items = Each Items
-		If it\invSlots>0 Then temp=temp+1
+		If it\Picked = 0 And it\invSlots>0 Then temp=temp+1
 	Next
 	
 	WriteInt f,temp
 	
 	For it.items = Each Items
 		;OtherInv
-		If it\invSlots>0 Then
+		If it\Picked = 0 And it\invSlots>0 Then
 			WriteInt f,it\ID
 			For i=0 To it\invSlots-1
 				If it\SecondInv[i] <> Null Then
@@ -429,24 +513,6 @@ Function SaveGame(file$)
 		;OtherInv End
 	Next
 	
-	For itt.itemtemplates = Each ItemTemplates
-		WriteByte f, itt\found
-	Next
-	
-	If UsedConsole
-		WriteInt f, 100
-		DebugLog "Used Console"
-	Else
-		WriteInt f, 994
-	EndIf
-	WriteFloat f, CameraFogFar
-	WriteFloat f, StoredCameraFogFar
-	
-	Local I_427.SCP427 = First SCP427
-	WriteByte f, I_427\Using
-	WriteFloat f, I_427\Timer
-	
-	WriteByte f, Wearing714
 	CloseFile f
 	
 	If Not MenuOpen Then
@@ -582,13 +648,126 @@ Function LoadGame(file$)
 	SecondaryLightOn = ReadFloat(f)
 	PrevSecondaryLightOn = ReadFloat(f)
 	RemoteDoorOn = ReadByte(f)
-	SoundTransmission = ReadByte(f)	
-	Contained106 = ReadByte(f)	
+	SoundTransmission = ReadByte(f)
+	Contained106 = ReadByte(f)
 	
 	For i = 0 To MAXACHIEVEMENTS
 		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
+	
+	For itt.ItemTemplates = Each ItemTemplates
+		itt\found = ReadByte(f)
+	Next
+	
+	If ReadInt(f)<>994
+		UsedConsole = True
+		DebugLog "Used Console"
+	EndIf
+	
+	CameraFogFar = ReadFloat(f)
+	StoredCameraFogFar = ReadFloat(f)
+	If CameraFogFar = 0 Then
+		CameraFogFar = 6
+	EndIf
+	
+	Local I_427.SCP427 = First SCP427
+	I_427\Using = ReadByte(f)
+	I_427\Timer = ReadFloat(f)
+	
+	Wearing714 = ReadByte(f)
+	
+	Local it.Items
+	For it.Items = Each Items
+		RemoveItem(it)
+	Next
+	
+	temp = ReadInt(f)
+	For i = 1 To temp
+		Local ittName$ = ReadString(f)
+		Local tempName$ = ReadString(f)
+		
+		x = ReadFloat(f)
+		y = ReadFloat(f)
+		z = ReadFloat(f)
+		
+		red = ReadByte(f)
+		green = ReadByte(f)
+		blue = ReadByte(f)
+		a = ReadFloat(f)
+		
+		it.Items = CreateItem(tempName, x, y, z, ittName, red, green, blue, a)
+		
+		it\state2 = ReadFloat(f)
+		
+		EntityType it\collider, HIT_ITEM
+		
+		x = ReadFloat(f)
+		y = ReadFloat(f)
+		RotateEntity(it\collider, x, y, 0)
+		
+		it\state = ReadFloat(f)
+		it\Picked = ReadByte(f)
+		HideEntity(it\collider)
+		
+		nt = ReadByte(f)
+		If nt = True Then SelectedItem = it
+		
+		nt = ReadByte(f)
+		If nt < 66
+			Inventory(nt) = it
+			ItemAmount = ItemAmount + 1
+		EndIf
+		
+		For itt.ItemTemplates = Each ItemTemplates
+			If (itt\tempname = tempName) And (itt\namespec = ittName) Then
+				If itt\isAnim<>0 Then SetAnimTime it\model,ReadFloat(f) : Exit
+			EndIf
+		Next
+		it\invSlots = ReadByte(f)
+		it\ID = ReadInt(f)
+		
+		If it\ID>LastItemID Then LastItemID=it\ID
+		
+		If ReadByte(f)=0 Then
+			it\invimg=it\itemtemplate\invimg
+		Else
+			it\invimg=it\itemtemplate\invimg2
+		EndIf
+	Next	
+	
+	Local o_i%
+	
+	temp = ReadInt(f)
+	For i=1 To temp
+		;OtherInv
+		o_i=ReadInt(f)
+		
+		For ij.Items = Each Items
+			If ij\ID=o_i Then it.Items=ij : Exit
+		Next
+		For j%=0 To it\invSlots-1
+			o_i=ReadInt(f)
+			DebugLog "secondinv "+o_i
+			If o_i<>-1 Then
+				For ij.Items=Each Items
+					If ij\ID=o_i Then
+						it\SecondInv[j]=ij
+						Exit
+					EndIf
+				Next
+			EndIf
+		Next
+		;OtherInv End
+	Next
+	
+	CurrentZone = ReadInt(f)
+	
+	CloseFile(f)
+	
+	; ZONE FILE ------------------------------------------------
+	
+	f% = ReadFile(SavePath + file + "\" + CurrentZone + ".zone")
 	
 	For x = 0 To MapWidth 
 		For y = 0 To MapHeight
@@ -728,6 +907,7 @@ Function LoadGame(file$)
 				r.Rooms = CreateRoom(level, rt\shape, x, y, z, rt\name)
 				TurnEntity(r\obj, 0, angle, 0)
 				r\angle = angle
+				SetupTriggerBoxes(r)
 				r\found = found
 				Exit
 			EndIf
@@ -825,7 +1005,7 @@ Function LoadGame(file$)
 	
 	Local spacing# = 8.0
 	Local shouldSpawnDoor%
-	For zone% = DO_DA_ZONE To DO_DA_ZONE
+	For zone% = CurrentZone To CurrentZone
 		For y = MapHeight To 0 Step -1
 			For x = MapWidth To 0 Step -1
 				If MapTemp(x,y) > 0 Then
@@ -1035,16 +1215,15 @@ Function LoadGame(file$)
 			EndIf
 		EndIf
 	Next
-	
-	Local it.Items
+
 	For it.Items = Each Items
-		RemoveItem(it)
+		If it\Picked = 0 Then RemoveItem(it)
 	Next
 	
 	temp = ReadInt(f)
 	For i = 1 To temp
-		Local ittName$ = ReadString(f)
-		Local tempName$ = ReadString(f)
+		ittName$ = ReadString(f)
+		tempName$ = ReadString(f)
 		
 		x = ReadFloat(f)
 		y = ReadFloat(f)
@@ -1052,7 +1231,7 @@ Function LoadGame(file$)
 		
 		red = ReadByte(f)
 		green = ReadByte(f)
-		blue = ReadByte(f)		
+		blue = ReadByte(f)
 		a = ReadFloat(f)
 		
 		it.Items = CreateItem(tempName, x, y, z, ittName, red, green, blue, a)
@@ -1067,7 +1246,6 @@ Function LoadGame(file$)
 		
 		it\state = ReadFloat(f)
 		it\Picked = ReadByte(f)
-		If it\Picked > 0 Then HideEntity(it\collider)
 		
 		nt = ReadByte(f)
 		If nt = True Then SelectedItem = it
@@ -1093,9 +1271,7 @@ Function LoadGame(file$)
 		Else
 			it\invimg=it\itemtemplate\invimg2
 		EndIf
-	Next	
-	
-	Local o_i%
+	Next
 	
 	temp = ReadInt(f)
 	For i=1 To temp
@@ -1120,16 +1296,12 @@ Function LoadGame(file$)
 		;OtherInv End
 	Next
 	
-	For itt.ItemTemplates = Each ItemTemplates
-		itt\found = ReadByte(f)
-	Next
-	
 	For do.Doors = Each Doors
 		If do\room <> Null Then
-			dist# = 20.0
+			dist# = PowTwo(20.0)
 			Local closestroom.Rooms
 			For r.Rooms = Each Rooms
-				dist2# = EntityDistance(r\obj, do\obj)
+				dist2# = EntityDistanceSquared(r\obj, do\obj)
 				If dist2 < dist Then
 					dist = dist2
 					closestroom = r.Rooms
@@ -1141,24 +1313,7 @@ Function LoadGame(file$)
 	
 	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
 	
-	If ReadInt(f)<>994
-		UsedConsole = True
-		DebugLog "Used Console"
-	EndIf
-	
-	CameraFogFar = ReadFloat(f)
-	StoredCameraFogFar = ReadFloat(f)
-	If CameraFogFar = 0 Then
-		CameraFogFar = 6
-	EndIf
-	
-	Local I_427.SCP427 = First SCP427
-	I_427\Using = ReadByte(f)
-	I_427\Timer = ReadFloat(f)
-	
-	Wearing714 = ReadByte(f)
-	
-	CloseFile f
+	CloseFile(f)
 	
 	For r.Rooms = Each Rooms
 		r\Adjacent[0]=Null
@@ -1236,7 +1391,7 @@ Function LoadGame(file$)
 	;CatchErrors("Uncaught LoadGame")
 End Function
 
-Function LoadGameQuick(file$)
+Function LoadGameQuick(file$, loadzone%=1)
 	Local version$ = ""
 	
 	;CatchErrors("LoadGameQuick")
@@ -1394,352 +1549,30 @@ Function LoadGameQuick(file$)
 	Next
 	RefinedItems = ReadInt(f)
 	
-	For x = 0 To MapWidth
-		For y = 0 To MapHeight
-			MapTemp(x, y) = ReadInt(f)
-			MapFound(x, y) = ReadByte(f)
-		Next
+	For itt.ItemTemplates = Each ItemTemplates
+		itt\found = ReadByte(f)
 	Next
 	
-	If ReadInt(f) <> 113 Then RuntimeError("Couldn't load the game, save file corrupted (error 2.5)")
+	If ReadInt(f)<>994
+		UsedConsole = True
+		DebugLog "Used Console"
+	EndIf
 	
-	For n.NPCs = Each NPCs
-		RemoveNPC(n)
-	Next
+	CameraFogFar = ReadFloat(f)
+	StoredCameraFogFar = ReadFloat(f)
+	If CameraFogFar = 0 Then
+		CameraFogFar = 6
+	EndIf
 	
-	temp = ReadInt(f)
-	For i = 1 To temp
-		Local NPCtype% = ReadByte(f)
-		x = ReadFloat(f)
-		y = ReadFloat(f)
-		z = ReadFloat(f)
-		
-		n.NPCs = CreateNPC(NPCtype, x, y, z)
-		Select NPCtype
-			Case NPCtype173
-				Curr173 = n
-			Case NPCtypeOldMan
-				Curr106 = n
-			Case NPCtype096
-				Curr096 = n
-		End Select
-		
-		x = ReadFloat(f)
-		y = ReadFloat(f)
-		z = ReadFloat(f)
-		RotateEntity(n\Collider, x, y, z)
-		
-		n\State = ReadFloat(f)
-		n\State2 = ReadFloat(f)
-		n\State3 = ReadFloat(f)
-		n\PrevState = ReadInt(f)
-		
-		n\Idle = ReadByte(f)
-		n\LastDist = ReadFloat(f)
-		n\LastSeen = ReadInt(f)
-		
-		n\CurrSpeed = ReadInt(f)
-		n\Angle = ReadFloat(f)
-		n\Reload = ReadFloat(f)
-		
-		ForceSetNPCID(n, ReadInt(f))
-		n\TargetID = ReadInt(f)
-		
-		n\EnemyX = ReadFloat(f)
-		n\EnemyY = ReadFloat(f)
-		n\EnemyZ = ReadFloat(f)
-		
-		n\texture = ReadString(f)
-		If n\texture <> "" Then
-			tex = LoadTexture_Strict (n\texture)
-			EntityTexture n\obj, tex
-		EndIf
-		
-		Local frame# = ReadFloat(f)
-		Select NPCtype
-			Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk
-				SetAnimTime(n\obj, frame)
-		End Select		
-		
-		n\Frame = frame
-		
-		n\IsDead = ReadInt(f)
-		n\PathX = ReadFloat(f)
-		n\PathZ = ReadFloat(f)
-		n\HP = ReadInt(f)
-		n\Model = ReadString(f)
-		n\ModelScaleX# = ReadFloat(f)
-		n\ModelScaleY# = ReadFloat(f)
-		n\ModelScaleZ# = ReadFloat(f)
-		If n\Model <> ""
-			FreeEntity n\obj
-			n\obj = LoadAnimMesh_Strict(n\Model)
-			ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
-			SetAnimTime n\obj,frame
-		EndIf
-		n\TextureID = ReadInt(f)
-		If n\TextureID > 0
-			ChangeNPCTextureID(n.NPCs,n\TextureID-1)
-			SetAnimTime(n\obj,frame)
-		EndIf
-	Next
+	Local I_427.SCP427 = First SCP427
+	I_427\Using = ReadByte(f)
+	I_427\Timer = ReadFloat(f)
 	
-	For n.NPCs = Each NPCs
-		If n\TargetID <> 0 Then
-			For n2.npcs = Each NPCs
-				If n2<>n Then
-					If n2\id = n\TargetID Then n\Target = n2
-				EndIf
-			Next
-		EndIf
-	Next
-	
-	MTFtimer = ReadFloat(f)
-	For i = 0 To 6
-		strtemp =  ReadString(f)
-		If strtemp <> "a" Then
-			For r.Rooms = Each Rooms
-				If r\RoomTemplate\Name = strtemp Then
-					MTFrooms[i]=r
-				EndIf
-			Next
-		EndIf
-		MTFroomState[i]=ReadInt(f)
-	Next
-	
-	If ReadInt(f) <> 632 Then RuntimeError("Couldn't load the game, save file corrupted (error 1)")
-	
-	room2gw_brokendoor = ReadInt(f)
-	room2gw_x = ReadFloat(f)
-	room2gw_z = ReadFloat(f)
-	
-	temp = ReadInt(f)
-	For i = 1 To temp
-		Local roomtemplateID% = ReadInt(f)
-		Local angle% = ReadInt(f)
-		x = ReadFloat(f)
-		y = ReadFloat(f)
-		z = ReadFloat(f)
-		
-		found = ReadByte(f)
-		
-		level = ReadInt(f)
-		
-		temp2 = ReadByte(f)	
-		
-		If angle >= 360
-			angle = angle-360
-		EndIf
-		
-		For r.Rooms = Each Rooms
-			If r\x = x And r\z = z Then
-				Exit
-			EndIf
-		Next
-		
-		For x = 0 To 11
-			id = ReadInt(f)
-			If id > 0 Then
-				For n.NPCs = Each NPCs
-					If n\ID = id Then r\NPC[x]=n : Exit
-				Next
-			EndIf
-		Next
-		
-		For x=0 To 11
-			id = ReadByte(f)
-			If id=2 Then
-				Exit
-			ElseIf id=1 Then
-				RotateEntity(r\Levers[x], 78, EntityYaw(r\Levers[x]), 0)
-			Else
-				RotateEntity(r\Levers[x], -78, EntityYaw(r\Levers[x]), 0)
-			EndIf
-		Next
-		
-		If ReadByte(f)=1 Then ;this room has a grid
-			For y=0 To gridsz-1
-				For x=0 To gridsz-1
-					ReadByte(f) : ReadByte(f)
-				Next
-			Next
-		Else ;this grid doesn't exist in the save
-			If r\grid<>Null Then
-				For x=0 To gridsz-1
-					For y=0 To gridsz-1
-						If r\grid\Entities[x+(y*gridsz)]<>0 Then
-							FreeEntity r\grid\Entities[x+(y*gridsz)]
-							r\grid\Entities[x+(y*gridsz)]=0
-						EndIf
-						If r\grid\waypoints[x+(y*gridsz)]<>Null Then
-							RemoveWaypoint(r\grid\waypoints[x+(y*gridsz)])
-							r\grid\waypoints[x+(y*gridsz)]=Null
-						EndIf
-					Next
-				Next
-				For x=0 To 5
-					If r\grid\Meshes[x]<>0 Then
-						FreeEntity r\grid\Meshes[x]
-						r\grid\Meshes[x]=0
-					EndIf
-				Next
-				Delete r\grid
-				r\grid=Null
-			EndIf
-		EndIf
-		
-		If ReadByte(f)>0 Then ;this room has a forest
-			For y=0 To gridsize-1
-				For x=0 To gridsize-1
-					ReadByte(f)
-				Next
-			Next
-			lx# = ReadFloat(f)
-			ly# = ReadFloat(f)
-			lz# = ReadFloat(f)
-		ElseIf r\fr<>Null Then ;remove the old forest
-			DestroyForest(r\fr)
-			Delete r\fr
-		EndIf
-		
-		If temp2 = 1 Then PlayerRoom = r.Rooms
-	Next
-	
-	For r.Rooms = Each Rooms
-		If r\x = r1499_x# And r\z = r1499_z#
-			NTF_1499PrevRoom = r
-			Exit
-		EndIf
-	Next
-	
-	;InitWayPoints()
-	
-	If ReadInt(f) <> 954 Then RuntimeError("Couldn't load the game, save file may be corrupted (error 2)")
-	
-	temp = ReadInt (f)
-	
-	For i = 1 To temp
-		x = ReadFloat(f)
-		y = ReadFloat(f)
-		z = ReadFloat(f)
-		
-		Local open% = ReadByte(f)
-		Local openstate# = ReadFloat(f)
-		Local locked% = ReadByte(f)
-		Local autoclose% = ReadByte(f)
-		
-		Local objX# = ReadFloat(f)
-		Local objZ# = ReadFloat(f)
-		
-		Local obj2X# = ReadFloat(f)
-		Local obj2Z# = ReadFloat(f)
-		
-		Local timer% = ReadFloat(f)
-		Local timerstate# = ReadFloat(f)
-		
-		Local IsElevDoor = ReadByte(f)
-		Local MTFClose = ReadByte(f)
-		
-		For do.Doors = Each Doors
-			If EntityX(do\frameobj,True) = x Then 
-				If EntityZ(do\frameobj,True) = z Then	
-					If EntityY(do\frameobj,True) = y 
-						do\open = open
-						do\openstate = openstate
-						do\locked = locked
-						do\AutoClose = autoclose
-						do\timer = timer
-						do\timerstate = timerstate
-						do\IsElevatorDoor = IsElevDoor
-						do\MTFClose = MTFClose
-						
-						PositionEntity(do\obj, objX, EntityY(do\obj), objZ, True)
-						If do\obj2 <> 0 Then PositionEntity(do\obj2, obj2X, EntityY(do\obj2), obj2Z, True)
-						
-						Exit
-					EndIf
-				EndIf
-			EndIf
-		Next		
-	Next
-	
-	If ReadInt(f) <> 1845 Then RuntimeError("Couldn't load the game, save file corrupted (error 3)")
-	
-	Local d.Decals
-	For d.Decals = Each Decals
-		FreeEntity d\obj
-		Delete d
-	Next
-	
-	temp = ReadInt(f)
-	For i = 1 To temp
-		id% = ReadInt(f)
-		x = ReadFloat(f)
-		y = ReadFloat(f)
-		z = ReadFloat(f)
-		Local pitch# = ReadFloat(f)
-		Local yaw# = ReadFloat(f)
-		Local roll# = ReadFloat(f)
-		d.Decals = CreateDecal(id, x, y, z, pitch, yaw, roll)
-		d\blendmode = ReadByte (f)
-		d\fx = ReadInt(f)
-		
-		d\Size = ReadFloat(f)
-		d\Alpha = ReadFloat(f)
-		d\AlphaChange = ReadFloat(f)
-		d\Timer = ReadFloat(f)
-		d\lifetime = ReadFloat(f)
-		
-		ScaleSprite(d\obj, d\Size, d\Size)
-		EntityBlend d\obj, d\blendmode
-		EntityFX d\obj, d\fx
-		
-		DebugLog "Created Decal @"+x+","+y+","+z
-	Next
-	UpdateDecals()
-	
-	Local e.Events
-	For e.Events = Each Events
-		If e\Sound <> 0 Then FreeSound_Strict e\Sound
-		Delete e
-	Next
-	
-	temp = ReadInt(f)
-	For i = 1 To temp
-		e.Events = New Events
-		e\EventName = ReadString(f)
-		
-		e\EventState = ReadFloat(f)
-		e\EventState2 = ReadFloat(f)
-		e\EventState3 = ReadFloat(f)		
-		x = ReadFloat(f)
-		y = ReadFloaT(f)
-		z = ReadFloat(f)
-		For r.Rooms = Each Rooms
-			If EntityX(r\obj) = x And EntityY(r\obj) = y And EntityZ(r\obj) = z Then
-				;If e\EventName = "room2servers" Then Stop
-				e\room = r
-				Exit
-			EndIf
-		Next	
-		e\EventStr = ReadString(f)
-		If e\EventName = "alarm"
-			;A hacky fix for the case that the intro objects aren't loaded when they should
-			;Altough I'm too lazy to add those objects there because at the time where you can save, those objects are already in the ground anyway - ENDSHN
-			If e\room\Objects[0]=0
-				e\room\Objects[0]=CreatePivot()
-				e\room\Objects[1]=CreatePivot()
-			EndIf
-		ElseIf e\EventName = "room860" Then
-			If e\EventState = 1.0 Then
-				ShowEntity e\room\fr\Forest_Pivot
-			EndIf
-		EndIf
-	Next
+	Wearing714 = ReadByte(f)
 	
 	Local it.Items
 	For it.Items = Each Items
-		RemoveItem(it)
+		If it\Picked > 0 Then RemoveItem(it)
 	Next
 	
 	temp = ReadInt(f)
@@ -1757,6 +1590,7 @@ Function LoadGameQuick(file$)
 		a = ReadFloat(f)
 		
 		it.Items = CreateItem(tempName, x, y, z, ittName, red, green, blue, a)
+		
 		it\state2 = ReadFloat(f)
 		
 		EntityType it\collider, HIT_ITEM
@@ -1767,7 +1601,7 @@ Function LoadGameQuick(file$)
 		
 		it\state = ReadFloat(f)
 		it\Picked = ReadByte(f)
-		If it\Picked > 0 Then HideEntity(it\collider)
+		HideEntity(it\collider)
 		
 		nt = ReadByte(f)
 		If nt = True Then SelectedItem = it
@@ -1818,65 +1652,471 @@ Function LoadGameQuick(file$)
 		Next
 		;OtherInv End
 	Next
-	For itt.ItemTemplates = Each ItemTemplates
-		itt\found = ReadByte(f)
-	Next
 	
-	For do.Doors = Each Doors
-		If do\room <> Null Then
-			dist# = 20.0
-			Local closestroom.Rooms
-			For r.Rooms = Each Rooms
-				dist2# = EntityDistance(r\obj, do\obj)
-				If dist2 < dist Then
-					dist = dist2
-					closestroom = r.Rooms
-				EndIf
+	CurrentZone = ReadInt(f)
+	
+	CloseFile(f)
+	
+	If loadzone Then
+		f% = ReadFile(SavePath + file + "\" + CurrentZone + ".zone")
+		
+		For x = 0 To MapWidth
+			For y = 0 To MapHeight
+				MapTemp(x, y) = ReadInt(f)
+				MapFound(x, y) = ReadByte(f)
 			Next
-			do\room = closestroom
-		EndIf
-	Next
-	
-	;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
-	
-	If ReadInt(f)<>994
-		UsedConsole = True
-		DebugLog "Used Console"
-	EndIf
-	
-	If 0 Then 
-		closestroom = Null
-		dist = 30
-		For r.Rooms = Each Rooms
-			dist2# = EntityDistance(r\obj, Collider)
-			If dist2 < dist Then
-				dist = dist2
-				closestroom = r
+		Next
+		
+		If ReadInt(f) <> 113 Then RuntimeError("Couldn't load the game, save file corrupted (error 2.5)")
+		
+		For n.NPCs = Each NPCs
+			RemoveNPC(n)
+		Next
+		
+		temp = ReadInt(f)
+		For i = 1 To temp
+			Local NPCtype% = ReadByte(f)
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			z = ReadFloat(f)
+			
+			n.NPCs = CreateNPC(NPCtype, x, y, z)
+			Select NPCtype
+				Case NPCtype173
+					Curr173 = n
+				Case NPCtypeOldMan
+					Curr106 = n
+				Case NPCtype096
+					Curr096 = n
+			End Select
+			
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			z = ReadFloat(f)
+			RotateEntity(n\Collider, x, y, z)
+			
+			n\State = ReadFloat(f)
+			n\State2 = ReadFloat(f)
+			n\State3 = ReadFloat(f)
+			n\PrevState = ReadInt(f)
+			
+			n\Idle = ReadByte(f)
+			n\LastDist = ReadFloat(f)
+			n\LastSeen = ReadInt(f)
+			
+			n\CurrSpeed = ReadInt(f)
+			n\Angle = ReadFloat(f)
+			n\Reload = ReadFloat(f)
+			
+			ForceSetNPCID(n, ReadInt(f))
+			n\TargetID = ReadInt(f)
+			
+			n\EnemyX = ReadFloat(f)
+			n\EnemyY = ReadFloat(f)
+			n\EnemyZ = ReadFloat(f)
+			
+			n\texture = ReadString(f)
+			If n\texture <> "" Then
+				tex = LoadTexture_Strict (n\texture)
+				EntityTexture n\obj, tex
+			EndIf
+			
+			Local frame# = ReadFloat(f)
+			Select NPCtype
+				Case NPCtypeOldMan, NPCtypeD, NPCtype096, NPCtypeMTF, NPCtypeGuard, NPCtype049, NPCtypeZombie, NPCtypeClerk
+					SetAnimTime(n\obj, frame)
+			End Select		
+			
+			n\Frame = frame
+			
+			n\IsDead = ReadInt(f)
+			n\PathX = ReadFloat(f)
+			n\PathZ = ReadFloat(f)
+			n\HP = ReadInt(f)
+			n\Model = ReadString(f)
+			n\ModelScaleX# = ReadFloat(f)
+			n\ModelScaleY# = ReadFloat(f)
+			n\ModelScaleZ# = ReadFloat(f)
+			If n\Model <> ""
+				FreeEntity n\obj
+				n\obj = LoadAnimMesh_Strict(n\Model)
+				ScaleEntity n\obj,n\ModelScaleX,n\ModelScaleY,n\ModelScaleZ
+				SetAnimTime n\obj,frame
+			EndIf
+			n\TextureID = ReadInt(f)
+			If n\TextureID > 0
+				ChangeNPCTextureID(n.NPCs,n\TextureID-1)
+				SetAnimTime(n\obj,frame)
 			EndIf
 		Next
 		
-		If closestroom<>Null Then PlayerRoom = closestroom
+		For n.NPCs = Each NPCs
+			If n\TargetID <> 0 Then
+				For n2.npcs = Each NPCs
+					If n2<>n Then
+						If n2\id = n\TargetID Then n\Target = n2
+					EndIf
+				Next
+			EndIf
+		Next
+		
+		MTFtimer = ReadFloat(f)
+		For i = 0 To 6
+			strtemp =  ReadString(f)
+			If strtemp <> "a" Then
+				For r.Rooms = Each Rooms
+					If r\RoomTemplate\Name = strtemp Then
+						MTFrooms[i]=r
+					EndIf
+				Next
+			EndIf
+			MTFroomState[i]=ReadInt(f)
+		Next
+		
+		If ReadInt(f) <> 632 Then RuntimeError("Couldn't load the game, save file corrupted (error 1)")
+		
+		room2gw_brokendoor = ReadInt(f)
+		room2gw_x = ReadFloat(f)
+		room2gw_z = ReadFloat(f)
+		
+		temp = ReadInt(f)
+		For i = 1 To temp
+			Local roomtemplateID% = ReadInt(f)
+			Local angle% = ReadInt(f)
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			z = ReadFloat(f)
+			
+			found = ReadByte(f)
+			
+			level = ReadInt(f)
+			
+			temp2 = ReadByte(f)	
+			
+			If angle >= 360
+				angle = angle-360
+			EndIf
+			
+			For r.Rooms = Each Rooms
+				If r\x = x And r\z = z Then
+					Exit
+				EndIf
+			Next
+			
+			For x = 0 To 11
+				id = ReadInt(f)
+				If id > 0 Then
+					For n.NPCs = Each NPCs
+						If n\ID = id Then r\NPC[x]=n : Exit
+					Next
+				EndIf
+			Next
+			
+			For x=0 To 11
+				id = ReadByte(f)
+				If id=2 Then
+					Exit
+				ElseIf id=1 Then
+					RotateEntity(r\Levers[x], 78, EntityYaw(r\Levers[x]), 0)
+				Else
+					RotateEntity(r\Levers[x], -78, EntityYaw(r\Levers[x]), 0)
+				EndIf
+			Next
+			
+			If ReadByte(f)=1 Then ;this room has a grid
+				For y=0 To gridsz-1
+					For x=0 To gridsz-1
+						ReadByte(f) : ReadByte(f)
+					Next
+				Next
+			Else ;this grid doesn't exist in the save
+				If r\grid<>Null Then
+					For x=0 To gridsz-1
+						For y=0 To gridsz-1
+							If r\grid\Entities[x+(y*gridsz)]<>0 Then
+								FreeEntity r\grid\Entities[x+(y*gridsz)]
+								r\grid\Entities[x+(y*gridsz)]=0
+							EndIf
+							If r\grid\waypoints[x+(y*gridsz)]<>Null Then
+								RemoveWaypoint(r\grid\waypoints[x+(y*gridsz)])
+								r\grid\waypoints[x+(y*gridsz)]=Null
+							EndIf
+						Next
+					Next
+					For x=0 To 5
+						If r\grid\Meshes[x]<>0 Then
+							FreeEntity r\grid\Meshes[x]
+							r\grid\Meshes[x]=0
+						EndIf
+					Next
+					Delete r\grid
+					r\grid=Null
+				EndIf
+			EndIf
+			
+			If ReadByte(f)>0 Then ;this room has a forest
+				For y=0 To gridsize-1
+					For x=0 To gridsize-1
+						ReadByte(f)
+					Next
+				Next
+				lx# = ReadFloat(f)
+				ly# = ReadFloat(f)
+				lz# = ReadFloat(f)
+			ElseIf r\fr<>Null Then ;remove the old forest
+				DestroyForest(r\fr)
+				Delete r\fr
+			EndIf
+			
+			If temp2 = 1 Then PlayerRoom = r.Rooms
+		Next
+		
+		For r.Rooms = Each Rooms
+			If r\x = r1499_x# And r\z = r1499_z#
+				NTF_1499PrevRoom = r
+				Exit
+			EndIf
+		Next
+		
+		;InitWayPoints()
+		
+		If ReadInt(f) <> 954 Then RuntimeError("Couldn't load the game, save file may be corrupted (error 2)")
+		
+		temp = ReadInt (f)
+		
+		For i = 1 To temp
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			z = ReadFloat(f)
+			
+			Local open% = ReadByte(f)
+			Local openstate# = ReadFloat(f)
+			Local locked% = ReadByte(f)
+			Local autoclose% = ReadByte(f)
+			
+			Local objX# = ReadFloat(f)
+			Local objZ# = ReadFloat(f)
+			
+			Local obj2X# = ReadFloat(f)
+			Local obj2Z# = ReadFloat(f)
+			
+			Local timer% = ReadFloat(f)
+			Local timerstate# = ReadFloat(f)
+			
+			Local IsElevDoor = ReadByte(f)
+			Local MTFClose = ReadByte(f)
+			
+			For do.Doors = Each Doors
+				If EntityX(do\frameobj,True) = x Then 
+					If EntityZ(do\frameobj,True) = z Then	
+						If EntityY(do\frameobj,True) = y 
+							do\open = open
+							do\openstate = openstate
+							do\locked = locked
+							do\AutoClose = autoclose
+							do\timer = timer
+							do\timerstate = timerstate
+							do\IsElevatorDoor = IsElevDoor
+							do\MTFClose = MTFClose
+							
+							PositionEntity(do\obj, objX, EntityY(do\obj), objZ, True)
+							If do\obj2 <> 0 Then PositionEntity(do\obj2, obj2X, EntityY(do\obj2), obj2Z, True)
+							
+							Exit
+						EndIf
+					EndIf
+				EndIf
+			Next		
+		Next
+		
+		If ReadInt(f) <> 1845 Then RuntimeError("Couldn't load the game, save file corrupted (error 3)")
+		
+		Local d.Decals
+		For d.Decals = Each Decals
+			FreeEntity d\obj
+			Delete d
+		Next
+		
+		temp = ReadInt(f)
+		For i = 1 To temp
+			id% = ReadInt(f)
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			z = ReadFloat(f)
+			Local pitch# = ReadFloat(f)
+			Local yaw# = ReadFloat(f)
+			Local roll# = ReadFloat(f)
+			d.Decals = CreateDecal(id, x, y, z, pitch, yaw, roll)
+			d\blendmode = ReadByte (f)
+			d\fx = ReadInt(f)
+			
+			d\Size = ReadFloat(f)
+			d\Alpha = ReadFloat(f)
+			d\AlphaChange = ReadFloat(f)
+			d\Timer = ReadFloat(f)
+			d\lifetime = ReadFloat(f)
+			
+			ScaleSprite(d\obj, d\Size, d\Size)
+			EntityBlend d\obj, d\blendmode
+			EntityFX d\obj, d\fx
+			
+			DebugLog "Created Decal @"+x+","+y+","+z
+		Next
+		UpdateDecals()
+		
+		Local e.Events
+		For e.Events = Each Events
+			If e\Sound <> 0 Then FreeSound_Strict e\Sound
+			Delete e
+		Next
+		
+		temp = ReadInt(f)
+		For i = 1 To temp
+			e.Events = New Events
+			e\EventName = ReadString(f)
+			
+			e\EventState = ReadFloat(f)
+			e\EventState2 = ReadFloat(f)
+			e\EventState3 = ReadFloat(f)		
+			x = ReadFloat(f)
+			y = ReadFloaT(f)
+			z = ReadFloat(f)
+			For r.Rooms = Each Rooms
+				If EntityX(r\obj) = x And EntityY(r\obj) = y And EntityZ(r\obj) = z Then
+					;If e\EventName = "room2servers" Then Stop
+					e\room = r
+					Exit
+				EndIf
+			Next	
+			e\EventStr = ReadString(f)
+			If e\EventName = "alarm"
+				;A hacky fix for the case that the intro objects aren't loaded when they should
+				;Altough I'm too lazy to add those objects there because at the time where you can save, those objects are already in the ground anyway - ENDSHN
+				If e\room\Objects[0]=0
+					e\room\Objects[0]=CreatePivot()
+					e\room\Objects[1]=CreatePivot()
+				EndIf
+			ElseIf e\EventName = "room860" Then
+				If e\EventState = 1.0 Then
+					ShowEntity e\room\fr\Forest_Pivot
+				EndIf
+			EndIf
+		Next
+		
+		temp = ReadInt(f)
+		For i = 1 To temp
+			ittName$ = ReadString(f)
+			tempName$ = ReadString(f)
+			
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			z = ReadFloat(f)
+			
+			red = ReadByte(f)
+			green = ReadByte(f)
+			blue = ReadByte(f)		
+			a = ReadFloat(f)
+			
+			it.Items = CreateItem(tempName, x, y, z, ittName, red, green, blue, a)
+			it\state2 = ReadFloat(f)
+			
+			EntityType it\collider, HIT_ITEM
+			
+			x = ReadFloat(f)
+			y = ReadFloat(f)
+			RotateEntity(it\collider, x, y, 0)
+			
+			it\state = ReadFloat(f)
+			it\Picked = ReadByte(f)
+			
+			nt = ReadByte(f)
+			If nt = True Then SelectedItem = it
+			
+			nt = ReadByte(f)
+			If nt < 66
+				Inventory(nt) = it
+				ItemAmount = ItemAmount + 1
+			EndIf
+			
+			For itt.ItemTemplates = Each ItemTemplates
+				If itt\tempname = tempName Then
+					If itt\isAnim<>0 Then SetAnimTime it\model,ReadFloat(f) : Exit
+				EndIf
+			Next
+			it\invSlots = ReadByte(f)
+			it\ID = ReadInt(f)
+			
+			If it\ID>LastItemID Then LastItemID=it\ID
+			
+			If ReadByte(f)=0 Then
+				it\invimg=it\itemtemplate\invimg
+			Else
+				it\invimg=it\itemtemplate\invimg2
+			EndIf
+		Next
+		
+		temp = ReadInt(f)
+		For i=1 To temp
+			;OtherInv
+			o_i=ReadInt(f)
+			
+			For ij.Items = Each Items
+				If ij\ID=o_i Then it.Items=ij : Exit
+			Next
+			For j%=0 To it\invSlots-1
+				o_i=ReadInt(f)
+				If o_i<>-1 Then
+					For ij.Items=Each Items
+						If ij\ID=o_i Then
+							it\SecondInv[j]=ij
+							Exit
+						EndIf
+					Next
+				EndIf
+			Next
+			;OtherInv End
+		Next
+		
+		For do.Doors = Each Doors
+			If do\room <> Null Then
+				dist# = PowTwo(20.0)
+				Local closestroom.Rooms
+				For r.Rooms = Each Rooms
+					dist2# = EntityDistanceSquared(r\obj, do\obj)
+					If dist2 < dist Then
+						dist = dist2
+						closestroom = r.Rooms
+					EndIf
+				Next
+				do\room = closestroom
+			EndIf
+		Next
+		
+		;If ReadInt(f) <> 994 Then RuntimeError("Couldn't load the game, save file corrupted (error 4)")
+		
+		If 0 Then 
+			closestroom = Null
+			dist = PowTwo(30)
+			For r.Rooms = Each Rooms
+				dist2# = EntityDistanceSquared(r\obj, Collider)
+				If dist2 < dist Then
+					dist = dist2
+					closestroom = r
+				EndIf
+			Next
+			
+			If closestroom<>Null Then PlayerRoom = closestroom
+		EndIf
+		
+		;This will hopefully fix the 895 crash bug after the player died by it's sanity effect and then quickloaded the game - ENDSHN
+		For sc.SecurityCams = Each SecurityCams
+			sc\PlayerState = 0
+		Next
+		EntityTexture NVOverlay,NVTexture
+		RestoreSanity = True
+		
+		CloseFile f
 	EndIf
-	
-	;This will hopefully fix the 895 crash bug after the player died by it's sanity effect and then quickloaded the game - ENDSHN
-	For sc.SecurityCams = Each SecurityCams
-		sc\PlayerState = 0
-	Next
-	EntityTexture NVOverlay,NVTexture
-	RestoreSanity = True
-	
-	CameraFogFar = ReadFloat(f)
-	StoredCameraFogFar = ReadFloat(f)
-	If CameraFogFar = 0 Then
-		CameraFogFar = 6
-	EndIf
-	
-	Local I_427.SCP427 = First SCP427
-	I_427\Using = ReadByte(f)
-	I_427\Timer = ReadFloat(f)
-	
-	Wearing714 = ReadByte(f)
-	CloseFile f
 	
 	If Collider <> 0 Then
 		If PlayerRoom<>Null Then
@@ -1949,9 +2189,9 @@ End Function
 
 Function DeleteGame(I_SAV.Save)
 	I_SAV\Name = SavePath + I_SAV\Name + "\"
-	delDir% = ReadDir(I_SAV\Name)
+	Local delDir% = ReadDir(I_SAV\Name)
 	NextFile(delDir) : NextFile(delDir) ;Skipping "." and ".."
-	file$=NextFile(delDir) ;B3D doesn't have footcontrolled while :(
+	Local file$=NextFile(delDir)
 	While file<>""
 		DeleteFile(I_SAV\Name + file)
 		file=NextFile$(delDir)
@@ -1984,9 +2224,9 @@ Function LoadSaveGames()
 	;CatchErrors("LoadSaveGames")
 	If FileType(SavePath)=1 Then RuntimeError "Can't create dir "+Chr(34)+SavePath+Chr(34)
 	If FileType(SavePath)=0 Then CreateDir(SavePath)
-	myDir=ReadDir(SavePath)
+	Local myDir=ReadDir(SavePath)
 	NextFile(myDir) : NextFile(myDir) ;Skipping "." and ".."
-	file$=NextFile$(myDir) ;B3D doesn't have footcontrolled while :(
+	Local file$=NextFile$(myDir)
 	While file<>""
 		If FileType(SavePath + file) = 2 Then 
 			Local NEW_SAV.Save = New Save

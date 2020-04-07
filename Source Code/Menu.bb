@@ -28,7 +28,7 @@ Global MainMenuTab%
 
 Global IntroEnabled% = GetINIInt(OptionFile, "options", "intro enabled")
 
-Global SelectedInputBox%
+Global SelectedInputBox%, CursorPos% = -1
 
 Global RandSeedAmount% = 1
 While GetLocalString("Menu", "randseed" + RandSeedAmount) <> ""
@@ -239,18 +239,19 @@ Function UpdateMainMenu()
 				
 				Text (x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Menu", "name")+":")
 				CurrSave\Name = InputBox(x + 150 * MenuScale, y + 15 * MenuScale, 200 * MenuScale, 30 * MenuScale, CurrSave\Name, 1, 15)
-				CurrSave\Name = Replace(CurrSave\Name,":","")
-				CurrSave\Name = Replace(CurrSave\Name,".","")
-				CurrSave\Name = Replace(CurrSave\Name,"/","")
-				CurrSave\Name = Replace(CurrSave\Name,"\","")
-				CurrSave\Name = Replace(CurrSave\Name,"<","")
-				CurrSave\Name = Replace(CurrSave\Name,">","")
-				CurrSave\Name = Replace(CurrSave\Name,"|","")
-				CurrSave\Name = Replace(CurrSave\Name,"?","")
-				CurrSave\Name = Replace(CurrSave\Name,Chr(34),"")
-				CurrSave\Name = Replace(CurrSave\Name,"*","")
-				
-				If Int(CurrSave\Name) >= 0 And Int(CurrSave\Name) <= 2 Then DO_DA_ZONE = Int(CurrSave\Name)
+				If SelectedInputBox = 1 Then
+					CurrSave\Name = Replace(CurrSave\Name,":","")
+					CurrSave\Name = Replace(CurrSave\Name,".","")
+					CurrSave\Name = Replace(CurrSave\Name,"/","")
+					CurrSave\Name = Replace(CurrSave\Name,"\","")
+					CurrSave\Name = Replace(CurrSave\Name,"<","")
+					CurrSave\Name = Replace(CurrSave\Name,">","")
+					CurrSave\Name = Replace(CurrSave\Name,"|","")
+					CurrSave\Name = Replace(CurrSave\Name,"?","")
+					CurrSave\Name = Replace(CurrSave\Name,Chr(34),"")
+					CurrSave\Name = Replace(CurrSave\Name,"*","")
+					CursorPos = Min(CursorPos, Len(CurrSave\Name))
+				EndIf
 				
 				Color 255,255,255
 				Text (x + 20 * MenuScale, y + 60 * MenuScale, GetLocalString("Menu", "seed")+":")
@@ -348,8 +349,6 @@ Function UpdateMainMenu()
 						
 					If SameFound Then CurrSave\Name = CurrSave\Name + " (" + LowestPossible + ")"
 					
-					LoadEntities()
-					LoadAllSounds()
 					InitNewGame(I_Opt)
 					MainMenuOpen = False
 					FlushKeys()
@@ -1264,7 +1263,14 @@ Function DrawLoading(percent%, shortloading=False)
 		temp = Rand(1,LoadingScreenAmount)
 		For ls.loadingscreens = Each LoadingScreens
 			If ls\id = temp Then
-				If ls\img=0 Then ls\img = LoadImage_Strict("Loadingscreens\"+ls\imgpath)
+				If ls\img=0 Then
+					Local scale# = Max(I_Opt\GraphicWidth/1920.0, I_Opt\GraphicHeight/1080.0)
+					ls\img = LoadImage_Strict("Loadingscreens\"+ls\imgpath)
+					ScaleImage(ls\img, scale, scale)
+					If (Not disablebackground) Then
+						ScaleImage(LoadingBack, scale, scale)
+					EndIf
+				EndIf
 				SelectedLoadingScreen = ls 
 				Exit
 			EndIf
@@ -1471,25 +1477,43 @@ Function DrawLoading(percent%, shortloading=False)
 	Until (GetKey()<>0 Lor MouseHit(1))
 End Function
 
+Global ttest%
 
-
-Function rInput$(aString$)
+Function rInput$(aString$, MaxChr%)
 	Local value% = GetKey()
 	Local length% = Len(aString$)
 	
-	If value = 8 Then
-		value = 0
-		If length > 0 Then aString$ = Left(aString, length - 1)
+	If CursorPos = -1 Then CursorPos = length
+	
+	If KeyDown(29) Then
+		If value = 30 Then CursorPos = length
+		If value = 31 Then CursorPos = 0
+		If value = 127 Then aString = "" : CursorPos = 0
+		If value = 22 Then
+			aString = Left(aString, CursorPos) + GetClipboardContents() + Right(aString, length - CursorPos)
+			CursorPos = CursorPos + Len(aString) - length
+			If MaxChr > 0 And MaxChr < Len(aString) Then aString = Left(aString, maxChr) : CursorPos = MaxChr
+		EndIf
+		Return aString
 	EndIf
 	
-	If value = 13 Lor value = 0 Then
-		Return aString$
-	ElseIf value > 0 And value < 7 Lor value > 26 And value < 32 Lor value = 9
-		Return aString$
-	Else
-		aString$ = aString$ + Chr(value)
-		Return aString$
+	If value = 8 Then
+		If CursorPos > 0 Then
+			aString = Left(aString, CursorPos - 1) + Right(aString, length - CursorPos)
+			CursorPos = CursorPos - 1
+		EndIf
+	ElseIf value = 30
+		CursorPos = Min(CursorPos + 1, length)
+	ElseIf value = 31
+		CursorPos = Max(CursorPos - 1, 0)
+	ElseIf value <> 127 And value >= 32 And value <= 254
+		If MaxChr = 0 Lor MaxChr > length + 1 Then
+			aString = Left(aString, CursorPos) + Chr(value) + Right(aString, length - CursorPos)
+			CursorPos = CursorPos + 1
+		EndIf
 	EndIf
+	
+	Return aString
 End Function
 
 Function InputBox$(x%, y%, width%, height%, Txt$, ID% = 0, MaxChr% = 0)
@@ -1503,18 +1527,17 @@ Function InputBox$(x%, y%, width%, height%, Txt$, ID% = 0, MaxChr% = 0)
 	If MouseOn(x, y, width, height) Then
 		Color(50, 50, 50)
 		MouseOnBox = True
-		If MouseHit1 Then SelectedInputBox = ID : FlushKeys
+		If MouseHit1 And SelectedInputBox <> ID Then SelectedInputBox = ID : FlushKeys : CursorPos = -1
 	EndIf
 	
 	Rect(x + 2, y + 2, width - 4, height - 4)
 	Color (255, 255, 255)	
 	
-	If (Not MouseOnBox) And MouseHit1 And SelectedInputBox = ID Then SelectedInputBox = 0
+	If (Not MouseOnBox) And MouseHit1 And SelectedInputBox = ID Then SelectedInputBox = 0 : CursorPos = -1
 	
 	If SelectedInputBox = ID Then
-		Txt = rInput(Txt)
-		If MaxChr > 0 Then Txt = Left(Txt, MaxChr)
-		If (MilliSecs() Mod 800) < 400 Then Rect (x + width / 2 + StringWidth(Txt) / 2 + 2, y + height / 2 - 5, 2, 12)
+		Txt = rInput(Txt, MaxChr)
+		If (MilliSecs() Mod 800) < 400 Then Rect (x + width / 2 - (StringWidth(Txt)) / 2 + StringWidth(Left(Txt, CursorPos)), y + height / 2 - 5, 2, 12)
 	EndIf	
 	
 	Text(x + width / 2, y + height / 2, Txt, True, True)

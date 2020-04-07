@@ -240,7 +240,7 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 				Case FINE, VERY_FINE
 					For it.Items = Each Items
 						If it<>item And it\collider <> 0 And it\Picked = 0 Then
-							If Distance(EntityX(it\collider,True), x, EntityZ(it\collider,True), z) < (180.0 * RoomScale)
+							If DistanceSquared(EntityX(it\collider,True), x, EntityZ(it\collider,True), z) < PowTwo(180.0 * RoomScale)
 								Select it\itemtemplate\tempname
 									Case "badgasmask", "gasmask", "supergasmask"
 										it2 = CreateItem("heavygasmask", x, y, z)

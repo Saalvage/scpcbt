@@ -111,6 +111,7 @@ Function UpdateConsole()
 			If ConsoleReissue<>Null Then
 				ConsoleInput = ConsoleReissue\txt
 				ConsoleScroll = reissuePos+(height/2)
+				CursorPos = Len(ConsoleInput)
 			EndIf
 		EndIf
 		
@@ -154,11 +155,8 @@ Function UpdateConsole()
 			If ConsoleReissue<>Null Then
 				ConsoleInput = ConsoleReissue\txt
 				ConsoleScroll = reissuePos+(height/2)
+				CursorPos = Len(ConsoleInput)
 			EndIf
-		EndIf
-		
-		If KeyHit(14) And KeyDown(29) Then
-			ConsoleInput = ""
 		EndIf
 		
 		If ConsoleScroll<-consoleHeight+height Then ConsoleScroll = -consoleHeight+height
@@ -355,7 +353,6 @@ Function UpdateConsole()
 							CreateConsoleMsg("There is no help available for that command.",255,150,0)
 					End Select
 					
-
 				Case "asd"
 
 					WireFrame 1
@@ -652,7 +649,7 @@ Function UpdateConsole()
 						CreateConsoleMsg("Death by SCP-173 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 						Curr173\Idle = False
-					ElseIf EntityDistanceSquared(Collider, Curr106\Collider) < 1.0 Then
+					ElseIf EntityDistanceSquared(Collider, Curr106\Collider) < PowTwo(1.0) Then
 						CreateConsoleMsg("Death by SCP-106 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 					EndIf
@@ -1092,13 +1089,46 @@ Function UpdateConsole()
 				Case "jorge"
 	
 					CreateConsoleMsg(Chr(74)+Chr(79)+Chr(82)+Chr(71)+Chr(69)+Chr(32)+Chr(72)+Chr(65)+Chr(83)+Chr(32)+Chr(66)+Chr(69)+Chr(69)+Chr(78)+Chr(32)+Chr(69)+Chr(88)+Chr(80)+Chr(69)+Chr(67)+Chr(84)+Chr(73)+Chr(78)+Chr(71)+Chr(32)+Chr(89)+Chr(79)+Chr(85)+Chr(46))
+				
+				Case "up"
+					If CurrentZone > 0
+						SaveGame(CurrSave\Name, -1)
+						NullGame(False)
+						If FileType(SavePath + CurrSave\Name + "\" + (CurrentZone - 1) + ".zone") = 1 Then
+							LoadEntities()
+							LoadAllSounds()
+							LoadGame(CurrSave\Name)
+							InitLoadGame(I_Opt)
+						Else
+							InitNewGame(I_Opt, CurrentZone - 1)
+							LoadGameQuick(CurrSave\Name, False)
+						EndIf
+						SaveGame(CurrSave\Name)
+					EndIf
+				
+				Case "down"
+					If CurrentZone < 2
+						SaveGame(CurrSave\Name, +1)
+						NullGame(False)
+						If FileType(SavePath + CurrSave\Name + "\" + (CurrentZone + 1) + ".zone") = 1 Then
+							LoadEntities()
+							LoadAllSounds()
+							LoadGame(CurrSave\Name)
+							InitLoadGame(I_Opt)
+						Else
+							InitNewGame(I_Opt, CurrentZone + 1)
+							LoadGameQuick(CurrSave\Name, False)
+						EndIf
+						SaveGame(CurrSave\Name)
+					EndIf
+				
 				Default
-
 					CreateConsoleMsg("Command not found.",255,0,0)
 
 			End Select
 			
 			ConsoleInput = ""
+			CursorPos = 0
 		EndIf
 		
 		Local TempY% = y + height - 25*MenuScale - ConsoleScroll

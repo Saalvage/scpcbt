@@ -68,7 +68,7 @@ Function CreateItemTemplate.ItemTemplates(tempname$, objpath$, invimgpath$, imgp
 				Exit
 			EndIf
 		Next
-		If texture=0 Then texture=LoadTexture_Strict(texturepath,texflags%,1) : it\texpath = texturepath; : DebugLog texturepath
+		If texture=0 Then texture=LoadTexture_Strict(texturepath,texflags%) : it\texpath = texturepath; : DebugLog texturepath
 		EntityTexture it\obj, texture
 		it\tex = texture
 	EndIf  
@@ -175,6 +175,7 @@ Function InitItemTemplates()
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc939.jpg", 0.003, 0, "d939")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc966.jpg", 0.003, 0, "d966")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc970.jpg", 0.003, 0, "d970")
+	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc990.jpg", 0.003, 0, "d990")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048.jpg", 0.003, 0, "d1048")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1048a.jpg", 0.003, 0, "ir1048a")
 	CreateItemTemplate("paper", "GFX\items\paper.b3d", "GFX\items\INVpaper.jpg", "GFX\items\doc1123.jpg", 0.003, 0, "d1123")
@@ -334,7 +335,7 @@ Type Items
 	
 	Field SoundChn%
 	
-	Field dist#, disttimer#
+	Field distsquared#, disttimer#
 	
 	Field state#, state2#
 	
@@ -379,7 +380,7 @@ Function CreateItem.Items(tempname$, x#, y#, z#, namespec$="", r%=0,g%=0,b%=0,a#
 	ResetEntity i\collider		
 	PositionEntity(i\collider, x, y, z, True)
 	RotateEntity (i\collider, 0, Rand(360), 0)
-	i\dist = EntityDistance(Collider, i\collider)
+	i\distsquared = EntityDistanceSquared(Collider, i\collider)
 	i\DropSpeed = 0.0
 	
 	If tempname = "cup" Then
@@ -484,7 +485,6 @@ Function UpdateItems()
 	Local temp%, np.NPCs
 	Local pick%
 	
-	Local HideDist = HideDistance*0.5
 	Local deletedItem% = False
 	
 	ClosestItem = Null
@@ -492,23 +492,24 @@ Function UpdateItems()
 		i\Dropped = 0
 		
 		If (i\Picked = 0) Then
+			Local HideDist = PowTwo(HideDistance*0.5)
 			If i\disttimer < MilliSecs() Then
-				i\dist = EntityDistance(Camera, i\collider)
+				i\distsquared = EntityDistanceSquared(Camera, i\collider)
 				i\disttimer = MilliSecs() + 700
-				If i\dist < HideDist Then ShowEntity i\collider
+				If i\distsquared < HideDist Then ShowEntity i\collider
 			EndIf
 			
-			If i\dist < HideDist Then
+			If i\distsquared < HideDist Then
 				ShowEntity i\collider
 				
-				If i\dist < 1.2 Then
+				If i\distsquared < PowTwo(1.2) Then
 					If ClosestItem = Null Then
 						If EntityInView(i\model, Camera) Then
 							If EntityVisible(i\collider,Camera) Then
 								ClosestItem = i
 							EndIf
 						EndIf
-					ElseIf ClosestItem = i Lor i\dist < EntityDistance(Camera, ClosestItem\collider) Then 
+					ElseIf ClosestItem = i Lor i\distsquared < EntityDistanceSquared(Camera, ClosestItem\collider) Then
 						If EntityInView(i\model, Camera) Then
 							If EntityVisible(i\collider,Camera) Then
 								ClosestItem = i
@@ -517,9 +518,10 @@ Function UpdateItems()
 					EndIf
 				EndIf
 				
-				If i\dist<HideDist*0.2 Then
+				Local HideDistPointTwo = PowTwo(HideDistance*0.5*0.2)
+				If i\distsquared<HideDistPointTwo Then
 					For i2.Items = Each Items
-						If i<>i2 And (i2\Picked = 0) And i2\dist<HideDist*0.2 Then
+						If i<>i2 And (i2\Picked = 0) And i2\distsquared<HideDistPointTwo Then
 							
 							xtemp# = (EntityX(i2\collider,True)-EntityX(i\collider,True))
 							ytemp# = (EntityY(i2\collider,True)-EntityY(i\collider,True))

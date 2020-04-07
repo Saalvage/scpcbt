@@ -7,8 +7,6 @@
 
 ;	See Credits.txt for a list of contributors
 
-Global DO_DA_ZONE = 1
-
 Local InitErrorStr$ = ""
 If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 
@@ -414,7 +412,7 @@ Global DropSpeed#, HeadDropSpeed#, CurrSpeed#
 Global user_camera_pitch#, side#
 Global Crouch%, CrouchState#
 
-Global PlayerZone%, PlayerRoom.Rooms, CurrentZone% = 0
+Global PlayerZone%, PlayerRoom.Rooms, CurrentZone%
 
 Global GrabbedEntity%
 
@@ -1035,13 +1033,12 @@ End Function
 
 Function UpdateDoors()
 	
-	Local i%, d.Doors, x#, z#, dist#
+	Local i%, d.Doors
 	If UpdateDoorsTimer =< 0 Then
 		For d.Doors = Each Doors
-			Local xdist# = Abs(EntityX(Collider)-EntityX(d\obj,True))
-			Local zdist# = Abs(EntityZ(Collider)-EntityZ(d\obj,True))
 			
-			d\dist = xdist+zdist
+			;TODO why the fuck?
+			d\dist = Abs(EntityX(Collider)-EntityX(d\obj,True)) + Abs(EntityZ(Collider)-EntityZ(d\obj,True))
 			
 			If d\dist > HideDistance*2 Then
 				If d\obj <> 0 Then HideEntity d\obj
@@ -1084,8 +1081,8 @@ Function UpdateDoors()
 					If d\buttons[i] <> 0 Then
 						If Abs(EntityX(Collider)-EntityX(d\buttons[i],True)) < 1.0 Then 
 							If Abs(EntityZ(Collider)-EntityZ(d\buttons[i],True)) < 1.0 Then 
-								dist# = Distance(EntityX(Collider, True), EntityX(d\buttons[i], True), EntityZ(Collider, True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
-								If dist < 0.7 Then
+								Local dist# = DistanceSquared(EntityX(Collider, True), EntityX(d\buttons[i], True), EntityZ(Collider, True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
+								If dist < PowTwo(0.7) Then
 									Local temp% = CreatePivot()
 									PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
 									PointEntity temp,d\buttons[i]
@@ -1095,12 +1092,11 @@ Function UpdateDoors()
 											ClosestButton = d\buttons[i]
 											ClosestDoor = d
 										Else
-											If dist < EntityDistance(Collider, ClosestButton) Then ClosestButton = d\buttons[i] : ClosestDoor = d
+											If dist < EntityDistanceSquared(Collider, ClosestButton) Then ClosestButton = d\buttons[i] : ClosestDoor = d
 										EndIf							
 									EndIf
 									
 									FreeEntity temp
-									
 								EndIf							
 							EndIf
 						EndIf
@@ -1145,7 +1141,7 @@ Function UpdateDoors()
 						If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
 					EndIf
 					If d\AutoClose And RemoteDoorOn = True Then
-						If EntityDistanceSquared(Camera, d\obj) < 4.41 Then ;2.1
+						If EntityDistanceSquared(Camera, d\obj) < PowTwo(2.1) Then
 							If (Not Wearing714) Then PlaySound_Strict HorrorSFX(7)
 							d\open = False : d\SoundCHN = PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
 						EndIf
@@ -1201,15 +1197,13 @@ Function UpdateDoors()
 					If d\angle = 0 Lor d\angle=180 Then
 						If Abs(EntityZ(d\frameobj, True)-EntityZ(Collider))<0.15 Then
 							If Abs(EntityX(d\frameobj, True)-EntityX(Collider))<0.7*(d\dir*2+1) Then
-								z# = CurveValue(EntityZ(d\frameobj,True)+0.15*Sgn(EntityZ(Collider)-EntityZ(d\frameobj, True)), EntityZ(Collider), 5)
-								PositionEntity Collider, EntityX(Collider), EntityY(Collider), z
+								PositionEntity Collider, EntityX(Collider), EntityY(Collider), CurveValue(EntityZ(d\frameobj,True)+0.15*Sgn(EntityZ(Collider)-EntityZ(d\frameobj, True)), EntityZ(Collider), 5)
 							EndIf
 						EndIf
 					Else
 						If Abs(EntityX(d\frameobj, True)-EntityX(Collider))<0.15 Then	
 							If Abs(EntityZ(d\frameobj, True)-EntityZ(Collider))<0.7*(d\dir*2+1) Then
-								x# = CurveValue(EntityX(d\frameobj,True)+0.15*Sgn(EntityX(Collider)-EntityX(d\frameobj, True)), EntityX(Collider), 5)
-								PositionEntity Collider, x, EntityY(Collider), EntityZ(Collider)
+								PositionEntity Collider, CurveValue(EntityX(d\frameobj,True)+0.15*Sgn(EntityX(Collider)-EntityX(d\frameobj, True)), EntityX(Collider), 5), EntityY(Collider), EntityZ(Collider)
 							EndIf
 						EndIf
 					EndIf
@@ -3471,7 +3465,7 @@ Function MouseLook()
 		For n.NPCs = Each NPCs
 			If (n\NPCtype = NPCtype178) Then
 				If n\State3>0 Then canSpawn178=1
-				If (n\State<=0) And (n\State3=0) Lor EntityDistance(Collider,n\Collider)>HideDistance*1.5 Then
+				If (n\State<=0) And (n\State3=0) Lor EntityDistanceSquared(Collider,n\Collider) > PowTwo(HideDistance*1.5) Then
 					RemoveNPC(n)
 				EndIf
 			EndIf
@@ -3483,7 +3477,7 @@ Function MouseLook()
 		For n.NPCs = Each NPCs
 			If (n\NPCtype = NPCtype178) Then
 				tempint=tempint+1
-				If EntityDistance(Collider,n\Collider)>HideDistance*1.5 Then
+				If EntityDistanceSquared(Collider,n\Collider) > PowTwo(HideDistance*1.5) Then
 					RemoveNPC(n)
 				EndIf
 				;If n\State<=0 Then RemoveNPC(n)
@@ -3491,13 +3485,12 @@ Function MouseLook()
 		Next
 		If tempint<10 Then ;create the npcs
 			For w.WayPoints = Each WayPoints
-				Local dist#
-				dist=EntityDistance(Collider,w\obj)
-				If (dist<HideDistance*1.5) And (dist>1.2) And (w\door = Null) And (Rand(Wearing178=2,1)=1) Then
+				Local dist# = EntityDistanceSquared(Collider,w\obj)
+				If (dist<PowTwo(HideDistance*1.5)) And (dist>PowTwo(1.2)) And (w\door = Null) And (Rand(Wearing178=2,1)=1) Then
 					tempint2=True
 					For n.NPCs = Each NPCs
 						If n\NPCtype=NPCtype178 Then
-							If EntityDistanceSquared(n\Collider,w\obj)<0.25 ;0.5
+							If EntityDistanceSquared(n\Collider,w\obj) < PowTwo(0.5) Then
 								tempint2=False
 								Exit
 							EndIf
@@ -3863,6 +3856,7 @@ Function DrawGUI()
 			Else
 				Text x + 350, 350, "Current monitor: NULL"
 			EndIf
+			Text x + 350, 370, "Current Zone: " + CurrentZone
 			
 			SetFont I_Opt\Fonts[1]
 		EndIf
@@ -5736,36 +5730,40 @@ Function DrawGUI()
 							
 							Color 100, 0, 0
 							If (SelectedItem\itemtemplate\tempname = "navulti" Lor SelectedItem\itemtemplate\tempname = "nav") And (MilliSecs() Mod 600) < 400 Then
+								Local dist#
 								Local SCPs_found% = 0
 								If Curr173<>Null Then
-									Local dist# = EntityDistance(Camera, Curr173\obj)
-									dist = Ceil(dist / 8.0) * 8.0
-									If dist < 8.0 * 4 Then
+									dist# = EntityDistanceSquared(Camera, Curr173\obj)
+									If dist < 8.0 * 4.0 Then
+										dist = Sqr(Ceil(dist / 8.0) * 8.0) ;This is probably done to disguise 173's teleporting behavior
 										Oval(x - dist * 3, y - 7 - dist * 3, dist * 3 * 2, dist * 3 * 2, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30, "SCP-173")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
 								If Curr106<>Null Then
-									dist# = EntityDistance(Camera, Curr106\obj)
-									If dist < 8.0 * 4 Then
+									dist# = EntityDistanceSquared(Camera, Curr106\obj)
+									If dist < PowTwo(8.0 * 4.0) Then
+										dist = Sqr(dist)
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-106")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
 								If Curr096<>Null Then 
-									dist# = EntityDistance(Camera, Curr096\obj)
-									If dist < 8.0 * 4 Then
+									dist# = EntityDistanceSquared(Camera, Curr096\obj)
+									If dist < PowTwo(8.0 * 4.0) Then
+										dist = Sqr(dist)
 										Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 										Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-096")
 										SCPs_found% = SCPs_found% + 1
 									EndIf
 								EndIf
-								For np.NPCs = Each NPCs
+								For np.NPCs = Each NPCs ;TODO make Curr049
 									If np\NPCtype = NPCtype049
-										dist# = EntityDistance(Camera, np\obj)
-										If dist < 8.0 * 4 Then
+										dist# = EntityDistanceSquared(Camera, np\obj)
+										If dist < PowTwo(8.0 * 4.0) Then
+											dist = Sqr(dist)
 											If (Not np\HideFromNVG) Then
 												Oval(x - dist * 1.5, y - 7 - dist * 1.5, dist * 3, dist * 3, False)
 												Text(x - NAV_WIDTH / 2 + 10, y - NAV_HEIGHT / 2 + 30 + (20*SCPs_found), "SCP-049")
@@ -5884,7 +5882,7 @@ Function DrawGUI()
 										EndIf
 										For e.Events = Each Events
 											If e\EventName = "dimension1499" Then
-												If EntityDistance(e\room\obj,Collider)>8300.0*RoomScale Then
+												If EntityDistanceSquared(e\room\obj,Collider) > PowTwo(8300.0*RoomScale) Then
 													If e\EventState2 < 5 Then
 														e\EventState2 = e\EventState2 + 1
 													EndIf
@@ -6116,7 +6114,7 @@ Function DrawMenu()
 		
 		If PlayerRoom\RoomTemplate\Name$ <> "gateb" And PlayerRoom\RoomTemplate\Name$ <> "gatea"
 			If StopHidingTimer = 0 Then
-				If EntityDistanceSquared(Curr173\Collider, Collider)<16.0 Lor EntityDistanceSquared(Curr106\Collider, Collider)<16.0 Then ;4 4
+				If EntityDistanceSquared(Curr173\Collider, Collider) < PowTwo(4.0) Lor EntityDistanceSquared(Curr106\Collider, Collider) < PowTwo(4.0) Then
 					StopHidingTimer = 1
 				EndIf	
 			ElseIf StopHidingTimer < 40
@@ -7346,13 +7344,14 @@ Function LoadEntities()
 	;CatchErrors("Uncaught LoadEntities")
 End Function
 
-Function InitNewGame(I_Opt.Options)
+Function InitNewGame(I_Opt.Options, zone%=0)
 	;CatchErrors("InitNewGame")
 	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
-	DrawLoading(45)
+	LoadEntities()
+	LoadAllSounds()
 	
-	HideDistance# = 15.0
+	DrawLoading(45)
 	
 	HeartBeatRate = 70
 	
@@ -7361,7 +7360,7 @@ Function InitNewGame(I_Opt.Options)
 		AccessCode = AccessCode + Rand(1,9)*(10^i)
 	Next	
 	
-	CreateMap()
+	CreateMap(zone)
 	InitWayPoints()
 	
 	DrawLoading(79)
@@ -7426,6 +7425,7 @@ Function InitNewGame(I_Opt.Options)
 	Local rt.RoomTemplates
 	For rt.RoomTemplates = Each RoomTemplates
 		FreeEntity (rt\obj)
+		rt\obj = 0
 	Next	
 	
 	Local tw.TempWayPoints
@@ -7868,12 +7868,11 @@ Function PlaySound2%(SoundHandle%, cam%, entity%, range# = 10, volume# = 1.0)
 	
 	If volume > 0 Then 
 		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
+		If 1 > dist And 0 < dist Then
 			soundchn% = PlaySound_Strict (SoundHandle)
 			
 			ChannelVolume(soundchn, volume# * (1 - dist#)*SFXVolume#)
-			ChannelPan(soundchn, panvalue)			
+			ChannelPan(soundchn, Sin(-DeltaYaw(cam,entity)))			
 		EndIf
 	EndIf
 	
@@ -7884,11 +7883,7 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 	range# = Max(range,1.0)
 	
 	If volume>0 Then
-		
-		Local dist# = EntityDistance(cam, entity) / range#
-		;If 1 - dist# > 0 And 1 - dist# < 1 Then
-			
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
+		;If 1 > dist And 0 < dist Then
 			
 			If Chn = 0 Then
 				Chn% = PlaySound_Strict (SoundHandle)
@@ -7896,8 +7891,8 @@ Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1
 				If (Not ChannelPlaying(Chn)) Then Chn% = PlaySound_Strict (SoundHandle)
 			EndIf
 			
-			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
-			ChannelPan(Chn, panvalue)
+			ChannelVolume(Chn, volume# * (1 - (EntityDistance(cam, entity) / range#))*SFXVolume#)
+			ChannelPan(Chn, Sin(-DeltaYaw(cam,entity)))
 		;EndIf
 	Else
 		If Chn <> 0 Then
@@ -8238,12 +8233,10 @@ Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
 	If volume>0 Then
 		
 		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
-			
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
+		If 1 > dist And 0 < dist Then
 			
 			ChannelVolume(Chn, volume# * (1 - dist#))
-			ChannelPan(Chn, panvalue)
+			ChannelPan(Chn, Sin(-DeltaYaw(cam,entity)))
 		EndIf
 	Else
 		If Chn <> 0 Then
@@ -8258,12 +8251,9 @@ Function UpdateSoundOrigin(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
 	If volume>0 Then
 		
 		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 - dist# > 0 And 1 - dist# < 1 Then
-			
-			Local panvalue# = Sin(-DeltaYaw(cam,entity))
-			
+		If 1 > dist And 0 < dist Then
 			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
-			ChannelPan(Chn, panvalue)
+			ChannelPan(Chn, Sin(-DeltaYaw(cam,entity)))
 		EndIf
 	Else
 		If Chn <> 0 Then
@@ -9468,7 +9458,7 @@ Global SMALLEST_POWER_TWO_HALF#
 Function Graphics3DExt%(width%,height%,mode%=2)
 	Graphics3D width,height,32,mode
 	TextureFilter "", 8192 ;This turns on Anisotropic filtering for textures. Use TextureAnisotropic to change anisotropic level.
-	TextureAnisotropic 16 ;TODO prob make this an option
+	TextureAnisotropic 16
 	SMALLEST_POWER_TWO = 512
 	While SMALLEST_POWER_TWO < width Lor SMALLEST_POWER_TWO < height
 		SMALLEST_POWER_TWO = SMALLEST_POWER_TWO * 2
@@ -9611,8 +9601,7 @@ Function RenderWorld2()
 			For np.NPCs = Each NPCs
 				If np\NVName<>"" And (Not np\HideFromNVG) Then ;don't waste your time if the string is empty
 					PositionEntity temp2,np\NVX,np\NVY,np\NVZ
-					dist# = EntityDistance(temp2,Collider)
-					If dist<23.5 Then ;don't draw text if the NPC is too far away
+					If EntityDistanceSquared(temp2,Collider) < PowTwo(23.5) Then ;don't draw text if the NPC is too far away
 						PointEntity temp, temp2
 						yawvalue# = WrapAngle(EntityYaw(Camera) - EntityYaw(temp))
 						xvalue# = 0.0
@@ -9871,41 +9860,6 @@ Function UpdateDeafPlayer()
 		SFXVolume# = PrevSFXVolume#
 		If DeafPlayer Then ControlSoundVolume()
 		DeafPlayer = False
-	EndIf
-	
-End Function
-
-Function CheckTriggers$()
-	Local i%,sx#,sy#,sz#
-	Local inside% = -1
-	
-	If PlayerRoom\TriggerboxAmount = 0
-		Return ""
-	Else
-		For i = 0 To PlayerRoom\TriggerboxAmount-1
-			EntityAlpha PlayerRoom\Triggerbox[i],1.0
-			sx# = EntityScaleX(PlayerRoom\Triggerbox[i], 1)
-			sy# = Max(EntityScaleY(PlayerRoom\Triggerbox[i], 1), 0.001)
-			sz# = EntityScaleZ(PlayerRoom\Triggerbox[i], 1)
-			GetMeshExtents(PlayerRoom\Triggerbox[i])
-			If DebugHUD
-				EntityColor PlayerRoom\Triggerbox[i],255,255,0
-				EntityAlpha PlayerRoom\Triggerbox[i],0.2
-			Else
-				EntityColor PlayerRoom\Triggerbox[i],255,255,255
-				EntityAlpha PlayerRoom\Triggerbox[i],0.0
- 			EndIf
-			If EntityX(Collider)>((sx#*Mesh_MinX)+PlayerRoom\x) And EntityX(Collider)<((sx#*Mesh_MaxX)+PlayerRoom\x)
-				If EntityY(Collider)>((sy#*Mesh_MinY)+PlayerRoom\y) And EntityY(Collider)<((sy#*Mesh_MaxY)+PlayerRoom\y)
-					If EntityZ(Collider)>((sz#*Mesh_MinZ)+PlayerRoom\z) And EntityZ(Collider)<((sz#*Mesh_MaxZ)+PlayerRoom\z)
-						inside% = i%
-						Exit
-					EndIf
-				EndIf
-			EndIf
-		Next
-		
-		If inside% > -1 Then Return PlayerRoom\TriggerboxName[inside%]
 	EndIf
 	
 End Function

@@ -15,6 +15,8 @@
 	- Including coarse, fine and very fine variants.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
+- Added Apollyon difficulty; can be unlocked by beating the game on Keter.
+- Added inventory size scaling with difficulty and custom inventory options.
 - Rebalanced the S-NAVs, making the S-NAV 5000 (S-NAV Ultimate) less overpowered, the S-NAV 400 (formerly S-NAV 310) less useless and the S-LOC (formerly S-NAV) more interesting.
 - (Re-)Added SCP-173's head rotating.
 - Added bloody SCP-096 texture after killing someone.
@@ -23,9 +25,8 @@
 - Added improved Pizza Day poster.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
-- Added Apollyon difficulty; can be unlocked by beating the game on Keter.
-- Added inventory size scaling with difficulty and custom inventory options.
-- Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A and the radio.
+- Added loading screen scaling.
+- Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A, the radio and the keycards.
 - Improved the SCP-682 and Night Vision Goggles loading screen.
 - Added new achievment image for SCP-1048.
 - Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the game size will be the screen size.
@@ -61,10 +62,10 @@
 - Much improved SCP-205 chamber.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Slightly improved SCP-372 model.
+- Added better text editing.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
 - Added some space between the page indicator and the next/previous page buttons on the load game screen.
-- Added a tooltip that tells the user what is causing a save to be invalid.
 - SCP-1123 can now be picked up using SCP-714.
 - Updated SCP-294's loading screen units to metric (as per wiki page).
 - Changed the name of the Custom difficulty to "Esoteric".
@@ -114,6 +115,7 @@ Bug Fixes:
 	- Fixed messages being visible in the pause menu.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
+	- Fixed the triggers in the SCP-939 infested area.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.
 	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
