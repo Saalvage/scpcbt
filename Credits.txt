@@ -1,9 +1,9 @@
 ﻿
 *Programmers
 
-		Joonas Rikkonen ("Regalis")
 		CommanderMark
 		Jesse Ludtke ("MonocleBios")
+		Joonas Rikkonen ("Regalis")
 		Juan Pablo Arce ("juanjp600")
 		Luggs123
 		Ryan Stillings ("Risingstar64")
@@ -15,10 +15,10 @@
 
 *3D Modellers
 
-		Joonas Rikkonen ("Regalis")
 		Apocryphos
 		Atomicsneak
 		Brandon Smith
+		C45
 		Cpt. Hazama
 		Dawid Mleczko ("Mleczyk76")
 		EternalError
@@ -26,9 +26,11 @@
 		Hakkla
 		Ivan Mikhailov ("Redbull.Ivan")
 		James Bear ("Moonsaber")
+		Joonas Rikkonen ("Regalis")
 		Kenneth Crooker
 		Lionel Ruskin ("Cridone")
 		Micro
+		Muniera Thomas ("Mellows")
 		Night
 		Prosth
 		TheKMan
@@ -44,11 +46,11 @@
 
 *Sound Effects and Music
 
-		Joonas Rikkonen ("Regalis")
 		Caleb Yu ("Omniary")
 		Class401
 		FireFox
 		gmodfan11
+		Joonas Rikkonen ("Regalis")
 		Kevin MacLeod
 		phlip45
 		revo794
@@ -75,11 +77,12 @@
 
 *Graphics and Sprites
 
-		Joonas Rikkonen ("Regalis")
+		André Pari "ADMClef"
 		Anon4743
 		Balzac
 		Brokami
 		Caleb Yu ("Omniary")
+		Joonas Rikkonen ("Regalis")
 		KyoteeWilliams
 		Manuel (Aesthetical#8028)
 		Orgil Pount ("Destructoid")

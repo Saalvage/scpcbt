@@ -35,7 +35,7 @@ Function SaveGame(file$, zonemod%=0)
 	WriteFloat f, EntityPitch(Collider)
 	WriteFloat f, EntityYaw(Collider)
 	
-	WriteByte f, InvertMouseComplete
+	WriteByte f, InvertCam
 	
 	WriteFloat f, BlinkTimer
 	WriteFloat f, BlinkEffect
@@ -573,7 +573,7 @@ Function LoadGame(file$)
 	y = ReadFloat(f)
 	RotateEntity(Collider, x, y, 0, 0)
 	
-	InvertMouseComplete = ReadByte(f)
+	InvertCam = ReadByte(f)
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	
@@ -1466,7 +1466,7 @@ Function LoadGameQuick(file$, loadzone%=1)
 	y = ReadFloat(f)
 	RotateEntity(Collider, x, y, 0, 0)
 	
-	InvertMouseComplete = ReadByte(f)
+	InvertCam = ReadByte(f)
 	
 	BlinkTimer = ReadFloat(f)
 	BlinkEffect = ReadFloat(f)	

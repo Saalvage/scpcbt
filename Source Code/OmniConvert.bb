@@ -344,7 +344,7 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 		classname$=Lower(KeyValue(node,"classname"))
 		
 		Select classname
-			Case "screen","waypoint","light","spotlight","soundemitter","playerstart","model"
+			Case "screen","waypoint","light","spotlight","soundemitter","playerstart","model","model_vis","flu_light"
 				temp1i=temp1i+1
 		End Select
 		
@@ -413,7 +413,7 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 				WriteFloat f,EntityZ(node)
 				
 				WriteString f,KeyValue(node,"angles","0 0 0")
-			Case "model"
+			Case "model", "model_vis"
 				WriteString f,classname
 				
 				WriteString f,KeyValue(node,"file","")
@@ -429,6 +429,18 @@ Function SaveRoomMesh(BaseMesh%,filename$) ;base mesh should be a 3D World Studi
 				WriteFloat f,EntityScaleX(node)
 				WriteFloat f,EntityScaleY(node)
 				WriteFloat f,EntityScaleZ(node)
+			Case "flu_light"
+				WriteString f,classname
+				
+				WriteFloat f,EntityX(node)
+				WriteFloat f,EntityY(node)
+				WriteFloat f,EntityZ(node)
+				
+				WriteFloat f,EntityPitch(node)
+				WriteFloat f,EntityYaw(node)
+				WriteFloat f,EntityRoll(node)
+				
+				WriteInt f,KeyValue(node,"id","0")
 		End Select
 		
 	Next

@@ -639,7 +639,7 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					PositionEntity cam,temp1,temp2,temp3
 					RotateEntity cam,pitch,yaw,roll
 				EndIf
-			Case "model"
+			Case "model", "model_vis"
 				file = ReadString(f)
 				If file<>""
 					If Right(file, 1) = "x" Then file = Left(file, Len(file)-1) + "b3d" ;all b3d now!
@@ -655,15 +655,27 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					ScaleEntity model,temp1,temp2,temp3
 					
 					EntityParent model,Opaque
-					EntityType model,HIT_MAP
+					If temp1s = "model_vis" Lor (Not newType) Then
+						EntityType model,HIT_MAP
+					Else
+						EntityType model,0
+					EndIf
 					EntityPickMode model,2
 				Else
 					DebugLog "file = 0"
 					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
 					DebugLog temp1+", "+temp2+", "+temp3
-					
-					;Stop
 				EndIf
+			Case "flu_light"
+				Local tfll.TempFluLight = New TempFluLight
+				tfll\roomtemplate = rt
+				tfll\x=ReadFloat(f)*RoomScale
+				tfll\y=ReadFloat(f)*RoomScale
+				tfll\z=ReadFloat(f)*RoomScale
+				tfll\pitch=ReadFloat(f)
+				tfll\yaw=ReadFloat(f)
+				tfll\roll=ReadFloat(f)
+				tfll\id = ReadInt(f)
 		End Select
 	Next
 	
@@ -1544,7 +1556,7 @@ Type Triggerbox
 	Field maxZ#
 End Type
 
-Const gridsz%=13 ;Same size as the main map itself (better for the map creator)
+Const gridsz%=19
 
 Type Grids
 	Field grid%[gridsz*gridsz]
@@ -1631,7 +1643,23 @@ Function FillRoom(r.Rooms)
 	Local it.Items, i%
 	Local xtemp%, ytemp%, ztemp%
 	
-	Local t1;, Bump	
+	Local t1;, Bump
+	
+	Local tfll.TempFluLight,fll.FluLight
+	For tfll.TempFluLight = Each TempFluLight
+		If tfll\roomtemplate = r\RoomTemplate Then
+			fll = CreateFluLight(tfll\id)
+			PositionEntity fll\obj,r\x+tfll\x,r\y+tfll\y,r\z+tfll\z
+			RotateEntity fll\obj,tfll\pitch,tfll\yaw,tfll\roll
+			EntityPickMode fll\obj,2
+			EntityParent fll\obj,r\obj
+			PositionEntity fll\lightobj,r\x+tfll\x,r\y+tfll\y,r\z+tfll\z
+			EntityParent fll\lightobj,fll\obj
+			PositionEntity fll\flashsprite,r\x+tfll\x,r\y+tfll\y-0.07,r\z+tfll\z
+			EntityParent fll\flashsprite,fll\obj
+			fll\room = r
+		EndIf
+	Next
 	
 	Select r\RoomTemplate\Name
 		Case "room860"
@@ -2412,11 +2440,10 @@ Function FillRoom(r.Rooms)
 		Case "room2nuke"
 
 			;"tuulikaapin" ovi
-			d = CreateDoor(r\zone, r\x + 576.0 * RoomScale, r\y, r\z + 152.0 * RoomScale, 90, r, False, False, 5)
+			d = CreateDoor(r\zone, r\x + 576.0 * RoomScale, r\y, r\z + 152.0 * RoomScale, 90, r, False, 5, 5)
 			d\AutoClose = False : d\open = False
 			PositionEntity(d\buttons[0], r\x + 602.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 20.0 * RoomScale,True)
 			PositionEntity(d\buttons[1], r\x + 550.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 20.0 * RoomScale,True)
-			FreeEntity d\obj2 : d\obj2 = 0
 			
 			d = CreateDoor(r\zone, r\x - 544.0 * RoomScale, r\y + 1504.0*RoomScale, r\z + 738.0 * RoomScale, 90, r, False, False, 5)
 			d\AutoClose = False : d\open = False			
@@ -2473,7 +2500,7 @@ Function FillRoom(r.Rooms)
 			PositionEntity r\Objects[6],r\x+1110.0*RoomScale,r\y+36.0*RoomScale,r\z-208.0*RoomScale
 			EntityParent r\Objects[6],r\obj
 
-		Case "room2tunnel"
+		Case "room2mtunnels"
 
 			r\Objects[0] = CreatePivot()
 			PositionEntity(r\Objects[0], r\x + 2640.0 * RoomScale, r\y - 2496.0 * RoomScale, r\z + 400.0 * RoomScale)
@@ -3408,6 +3435,16 @@ Function FillRoom(r.Rooms)
 			PositionEntity r\RoomDoors[0]\buttons[0], EntityX(r\RoomDoors[0]\buttons[0],True),EntityY(r\RoomDoors[0]\buttons[0],True),r\z + 161.0 * RoomScale,True
 			PositionEntity r\RoomDoors[0]\buttons[1], EntityX(r\RoomDoors[0]\buttons[1],True),EntityY(r\RoomDoors[0]\buttons[1],True),r\z + 161.0 * RoomScale,True
 
+		Case "room2offices5"
+		
+			InitFluLight(1, FLU_STATE_ON, r)
+			
+			it = CreateItem("eyedrops", r\x + 364.0 * RoomScale, r\y + 160.0 * RoomScale, r\z - 708.0 * RoomScale)
+			EntityParent(it\collider, r\obj)
+			
+			it = CreateItem("paper", r\x + 340.0 * RoomScale, r\y + 160.0 * RoomScale, r\z + 202.0 * RoomScale, "gois")
+			EntityParent(it\collider, r\obj)
+
 		Case "start"
 
 			;the containment doors
@@ -4143,53 +4180,65 @@ Function FillRoom(r.Rooms)
 			PositionEntity (r\Objects[10], r\x, r\y, r\z - 720.0 * RoomScale, True)
 
 		Case "room1archive"
-
-			Local tempstr$, tempstr2$, chance%
+		
+			Local level = Rand(3)
+			
+			; locked behind 1 - 3
+			d.Doors = CreateDoor(r\zone, r\x, r\y, r\z - 528.0 * RoomScale, 0, r, False, 5, level)
+			TranslateEntity(d\buttons[0], 0, 0, +10.0 * RoomScale, 1)
+			TranslateEntity(d\buttons[1], 0, 0, -10.0 * RoomScale, 1)
+			
+			If Rand(4) = 1 Then
+				d\open = True
+				; 1 - 2 when door open
+				level = 1
+			EndIf
+			
+			; 1 - 4 keycard
+			level = level + 1
 
 			For xtemp = 0 To 1
 				For ytemp = 0 To 2
 					For ztemp = 0 To 2
-						
-						tempstr$ = "" : tempstr2$ = ""
-						chance% = Rand(0,100)
-						If (chance<40) ;40% chance for a document
-							tempstr=GetPaper(Null)
-							tempstr2="paper"
-						ElseIf (chance<45) ;5% chance for a key card
-							tempstr2="key"+Str(Rand(1,2))
-						ElseIf (chance<50) ;5% chance for a medkit
-							tempstr2="firstaid"
-						ElseIf (chance<60) ;10% chance for a battery
-							tempstr2="bat"
-						ElseIf (chance<70) ;10% chance for an SNAV
-							tempstr2="nav300"
-						ElseIf (chance<85) ;15% chance for a radio
-							tempstr2="radio"
-						ElseIf (chance<95) ;10% chance for a clipboard
-							tempstr2="clipboard"
-						Else ;5% chance for misc
-							Select Rand(1,3)
-								Case 1 ;playing card
-									tempstr="keyplay"
-								Case 2 ;Mastercard
-									tempstr="keymaster"
-								Case 3 ;origami
-									tempstr="origami"
-							End Select
-							tempstr2="misc"
-						EndIf
-						
-						x# = (-672.0 + 864.0 * xtemp)* RoomScale
-						y# = (96.0  + 96.0 * ytemp) * RoomScale
-						z# = (480.0 - 352.0*ztemp + Rnd(-96.0,96.0)) * RoomScale
-						
-						it = CreateItem(tempstr2,r\x+x,r\y+y,r\z+z,tempstr)
-						EntityParent it\collider, r\obj
+						i = 3
+						While Rand(i) = 1
+							it = CreateRandomItem(level, r\x+((-672.0 + 864.0 * xtemp) * RoomScale), r\y+((96.0  + 96.0 * ytemp) * RoomScale), r\z+((480.0 - 352.0*ztemp + Rnd(-96.0,96.0)) * RoomScale))
+							EntityParent(it\collider, r\obj)
+							i = i + 1
+						Wend
 					Next
 				Next
 			Next
 			
-			r\RoomDoors[0] = CreateDoor(r\zone,r\x,r\y,r\z - 528.0 * RoomScale,0,r,False,False,6)
+			If Rand(5) = 1 Then
+				it = CreateRandomItem(level, r\x+((-176.0 + Rand(0, 10) - 5) * RoomScale), r\y+(288.0 * RoomScale), r\z+((-128.0 + Rand(0, 10) - 5) * RoomScale))
+				EntityParent(it\collider, r\obj)
+			EndIf
+			
+			If Rand(5) = 1 Then
+				it = CreateRandomItem(level, r\x+((-176.0 + Rand(0, 10) - 5) * RoomScale), r\y+(288.0 * RoomScale), r\z+((256.0 + Rand(0, 10) - 5) * RoomScale))
+				EntityParent(it\collider, r\obj)
+			EndIf
+			
+			If Rand(5) = 1 Then
+				it = CreateRandomItem(level, r\x+((-336.0 + Rand(0, 10) - 5) * RoomScale), r\y+(288.0 * RoomScale), r\z+((-128.0 + Rand(0, 10) - 5) * RoomScale))
+				EntityParent(it\collider, r\obj)
+			EndIf
+			
+			If Rand(5) = 1 Then
+				it = CreateRandomItem(level, r\x+((-336.0 + Rand(0, 10) - 5) * RoomScale), r\y+(288.0 * RoomScale), r\z+((256.0 + Rand(0, 10) - 5) * RoomScale))
+				EntityParent(it\collider, r\obj)
+			EndIf
+			
+			If Rand(5) = 1 Then
+				it = CreateRandomItem(level, r\x+((-416.0 + Rand(0, 10) - 5) * RoomScale), r\y+(288.0 * RoomScale), r\z+((608.0 + Rand(0, 10) - 5) * RoomScale))
+				EntityParent(it\collider, r\obj)
+			EndIf
+			
+			If Rand(5) = 1 Then
+				it = CreateRandomItem(level, r\x+((-96.0 + Rand(0, 10) - 5) * RoomScale), r\y+(288.0 * RoomScale), r\z+((608.0 + Rand(0, 10) - 5) * RoomScale))
+				EntityParent(it\collider, r\obj)
+			EndIf
 			
 			sc.SecurityCams = CreateSecurityCam(r\x-256.0*RoomScale, r\y+384.0*RoomScale, r\z+640.0*RoomScale, r)
 			sc\angle = 180
@@ -4210,10 +4259,9 @@ Function FillRoom(r.Rooms)
 			it = CreateItem("gasmask", r\x + 457.0 * RoomScale, r\y + 150.0 * RoomScale, r\z + 960.0 * RoomScale)
 			EntityParent(it\collider, r\obj)
 			
-			d.Doors = CreateDoor(r\zone, r\x + 832.0 * RoomScale, r\y, r\z + 367.0 * RoomScale, 0, r, False, False, 3)
+			d.Doors = CreateDoor(r\zone, r\x + 832.0 * RoomScale, r\y, r\z + 367.0 * RoomScale, 0, r, False, 5, 3)
 			PositionEntity(d\buttons[0], r\x + 956.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 352.0 * RoomScale, True)
 			PositionEntity(d\buttons[1], r\x + 713.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 384.0 * RoomScale, True)
-			FreeEntity d\obj2 : d\obj2 = 0
 			d.Doors = CreateDoor(r\zone, r\x + 280.0 * RoomScale, r\y, r\z - 607.0 * RoomScale, 90, r, False, False)
 			PositionEntity(d\buttons[0], EntityX(d\buttons[0],True), EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
 			PositionEntity(d\buttons[1], EntityX(d\buttons[1],True), EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
@@ -4632,10 +4680,9 @@ Function FillRoom(r.Rooms)
 
 		Case "room3offices"
 			
-			d.Doors = CreateDoor(r\zone, r\x + 736.0 * RoomScale, r\y, r\z + 240.0 * RoomScale, 0, r, False, False, 3)
+			d.Doors = CreateDoor(r\zone, r\x + 736.0 * RoomScale, r\y, r\z + 240.0 * RoomScale, 0, r, False, 5, 3)
 			PositionEntity(d\buttons[0], r\x + 892.0 * RoomScale, EntityY(d\buttons[0],True), r\z + 224.0 * RoomScale, True)
 			PositionEntity(d\buttons[1], r\x + 892.0 * RoomScale, EntityY(d\buttons[1],True), r\z + 255.0 * RoomScale, True)
-			FreeEntity d\obj2 : d\obj2 = 0
 			
 			r\Objects[0] = LoadMesh_Strict("GFX\map\room3offices_hb.b3d",r\obj)
 			EntityPickMode r\Objects[0],2
@@ -4742,9 +4789,8 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[0]\AutoClose = False
 			PositionEntity r\RoomDoors[0]\buttons[0],r\x+576.0*RoomScale,EntityY(r\RoomDoors[0]\buttons[0],True),r\z-480*RoomScale,True
 			RotateEntity r\RoomDoors[0]\buttons[0],0,270,0
-			r\RoomDoors[1] = CreateDoor(r\zone,r\x+544.0*RoomScale,r\y+480.0*RoomScale,r\z+256.0*RoomScale,270,r,False,False,3)
+			r\RoomDoors[1] = CreateDoor(r\zone,r\x+544.0*RoomScale,r\y+480.0*RoomScale,r\z+256.0*RoomScale,270,r,False,5,3)
 			r\RoomDoors[1]\AutoClose = False
-			FreeEntity r\RoomDoors[1]\obj2 : r\RoomDoors[1]\obj2 = 0
 			d = CreateDoor(r\zone,r\x+1504.0*RoomScale,r\y+480.0*RoomScale,r\z+960.0*RoomScale,0,r)
 			d\AutoClose = False : d\locked = True
 			
@@ -4951,6 +4997,8 @@ Function FillRoom(r.Rooms)
 		For i = 0 To r\TriggerboxAmount-1
 			r\Triggerboxes[i] = New Triggerbox
 			r\Triggerboxes[i]\obj = CopyEntity(r\RoomTemplate\TempTriggerbox[i],r\obj)
+			EntityColor(r\Triggerboxes[i]\obj, 255, 255, 0)
+			EntityAlpha(r\Triggerboxes[i]\obj, 0.0)
 			r\Triggerboxes[i]\Name = r\RoomTemplate\TempTriggerboxName[i]
 			DebugLog "Triggerbox found: "+i
 			DebugLog "Triggerbox "+i+" name: "+r\Triggerboxes[i]\Name
@@ -4986,11 +5034,11 @@ Function SetupTriggerBoxes(r.Rooms)
 		
 		GetMeshExtents(t\obj)
 		
-		pxmin = cos(r\angle) * (((sx#*Mesh_MinX)+r\x)-r\x) - sin(r\angle) * (((sz#*Mesh_MinZ)+r\z)-r\z) + r\x
-		pzmin = sin(r\angle) * (((sx#*Mesh_MinX)+r\x)-r\x) + cos(r\angle) * (((sz#*Mesh_MinZ)+r\z)-r\z) + r\z
+		pxmin = cos(r\angle) * sx*Mesh_MinX - sin(r\angle) * sz*Mesh_MinZ + r\x
+		pzmin = sin(r\angle) * sx*Mesh_MinX + cos(r\angle) * sz*Mesh_MinZ + r\z
 		
-		pxmax = cos(r\angle) * (((sx#*Mesh_MaxX)+r\x)-r\x) - sin(r\angle) * (((sz#*Mesh_MaxZ)+r\z)-r\z) + r\x
-		pzmax = sin(r\angle) * (((sx#*Mesh_MaxX)+r\x)-r\x) + cos(r\angle) * (((sz#*Mesh_MaxZ)+r\z)-r\z) + r\z
+		pxmax = cos(r\angle) * sx*Mesh_MaxX - sin(r\angle) * sz*Mesh_MaxZ + r\x
+		pzmax = sin(r\angle) * sx*Mesh_MaxX + cos(r\angle) * sz*Mesh_MaxZ + r\z
 		
 		If pxmin > pxmax Then
 			t\minX = pxmax
@@ -5008,8 +5056,8 @@ Function SetupTriggerBoxes(r.Rooms)
 			t\maxZ = pzmax
 		EndIf
 		
-		t\minY = ((sy#*Mesh_MinY)+r\y)
-		t\maxY = ((sy#*Mesh_MaxY)+r\y)
+		t\minY = ((sy*Mesh_MinY)+r\y)
+		t\maxY = ((sy*Mesh_MaxY)+r\y)
 	Next
 End Function
 
@@ -5019,11 +5067,9 @@ Function CheckTriggers$()
 	Else
 		For i = 0 To PlayerRoom\TriggerboxAmount-1
 			If DebugHUD
-				EntityColor PlayerRoom\Triggerboxes[i]\obj,255,255,0
-				EntityAlpha PlayerRoom\Triggerboxes[i]\obj,0.2
+				EntityAlpha(PlayerRoom\Triggerboxes[i]\obj, 0.2)
 			Else
-				EntityColor PlayerRoom\Triggerboxes[i]\obj,255,255,255
-				EntityAlpha PlayerRoom\Triggerboxes[i]\obj,0.0
+				EntityAlpha(PlayerRoom\Triggerboxes[i]\obj, 0.0)
  			EndIf
 			
 			If EntityX(Collider)>PlayerRoom\Triggerboxes[i]\minX And EntityX(Collider)<PlayerRoom\Triggerboxes[i]\maxX
@@ -5086,7 +5132,7 @@ Function UpdateRooms()
 		
 		x = Abs(r\x-EntityX(Collider,True))
 		z = Abs(r\z-EntityZ(Collider,True))
-		r\dist = Max(x,z) ;TODO ThIS
+		r\dist = Max(x,z)
 		
 		
 		If x < 16 And z < 16 Then
@@ -5397,7 +5443,7 @@ Function InitWayPoints(loadingstart=45)
 			
 			If (w\room=w2\room Lor w\door<>Null Lor w2\door<>Null)
 				
-				dist# = EntityDistance(w\obj, w2\obj);;Sqr(x*x+y*y+z*z) ;TODO WAYPOINT P2?
+				dist# = EntityDistance(w\obj, w2\obj)
 				
 				If w\room\MaxWayPointY# = 0.0 Lor w2\room\MaxWayPointY# = 0.0
 					canCreateWayPoint = True
@@ -6827,7 +6873,6 @@ Function CreateMap(zone%)
 			SetRoom("room3storage", ROOM3, Room3Amount[zone], zone)
 			
 			SetRoom("room4info", ROOM4, Room4Amount[zone], zone)
-	
 		Case 1
 			SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
 			SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
@@ -6838,7 +6883,7 @@ Function CreateMap(zone%)
 			SetRoom("room895", ROOM1, Room1Amount[zone], zone)
 			
 			SetRoom("room2nuke", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2tunnel", ROOM2, Room2Amount[zone], zone)
+			SetRoom("room2mtunnels", ROOM2, Room2Amount[zone], zone)
 			SetRoom("room049", ROOM2, Room2Amount[zone], zone)
 			SetRoom("room2shaft",ROOM2,Room2Amount[zone], zone)
 			SetRoom("testroom", ROOM2, Room2Amount[zone], zone)
@@ -6848,7 +6893,6 @@ Function CreateMap(zone%)
 			SetRoom("room966", ROOM3, Room3Amount[zone], zone)
 			
 			SetRoom("room2cpit", ROOM2C, Room2CAmount[zone], zone)
-			
 		Case 2
 			SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
 			SetRoom("gateb", ROOM1, Room1Amount[zone], zone)
@@ -6865,6 +6909,7 @@ Function CreateMap(zone%)
 			SetRoom("medibay", ROOM2, Room2Amount[2], zone)
 			SetRoom("room2poffices2", ROOM2, Room2Amount[2], zone)
 			SetRoom("room2offices2", ROOM2, Room2Amount[2], zone)
+			SetRoom("room2offices5", ROOM2, Room2Amount[2], zone)
 			
 			SetRoom("room2ccont", ROOM2C, Room2CAmount[zone], zone)
 			SetRoom("lockroom2", ROOM2C, Room2CAmount[zone], zone)
@@ -6875,19 +6920,18 @@ Function CreateMap(zone%)
 			SetRoom("room3offices", ROOM3, Room3Amount[zone], zone)
 	End Select
 	
-	;----------------------- Laden der Karte -------------------------------- (Loading the map, for you international peeps <3)
+	;----------------------- Loading the map --------------------------------
 	
 	temp = 0
 	Local tempzone = zone + 1
 	Local r.Rooms, spacing# = 8.0
 	For y = MapHeight - 1 To 1 Step - 1
-		
 		For x = 1 To MapWidth - 2
 			If MapTemp(x, y) > 0
 				
 				temp = Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1) + Min(MapTemp(x, y + 1),1) + Min(MapTemp(x, y - 1),1)
 				
-				Select temp ;amount of bordering rooms
+				Select temp ; amount of bordering rooms
 					Case 1
 						If MapRoomID(ROOM1) < MaxRooms And MapName(x,y) = "" Then
 							If MapRoom(ROOM1, MapRoomID(ROOM1)) <> "" Then MapName(x, y) = MapRoom(ROOM1, MapRoomID(ROOM1))	
@@ -8103,4 +8147,194 @@ Function PreventRoomOverlap(r.Rooms)
 	
 	DebugLog "Couldn't fix overlap issue for room "+r\RoomTemplate\Name
 	Return False
+End Function
+
+;Flu-Light constants, type and functions
+Const MaxFluTextures=3
+Const FluState_Off=0
+Const FluState_Between=1
+Const FluState_On=2
+Const MaxFluSounds=7
+Const FLU_STATE_OFF=0
+Const FLU_STATE_ON=1
+Const FLU_STATE_FLICKER=2
+
+Type TempFluLight
+	Field x#, y#, z#
+	Field pitch#, yaw#, roll#
+	Field roomtemplate.RoomTemplates
+	Field id%
+End Type
+
+Type FluLight
+	Field id%
+	Field obj%
+	Field tex%[MaxFluTextures-1]
+	Field time#
+	Field sfx%[MaxFluSounds-1]
+	Field flashsprite%
+	Field lightobj%
+	Field room.Rooms
+	Field state%
+End Type
+
+Function CreateFluLight.FluLight(id%)
+	Local fll.FluLight = New FluLight
+	Local fll2.FluLight
+	Local i
+	
+	fll\id = id
+	For fll2 = Each FluLight
+		If fll2 <> fll Then
+			EntityParent fll2\flashsprite,0
+			EntityParent fll2\lightobj,0
+			fll\obj = CopyEntity(fll2\obj)
+			EntityParent fll2\flashsprite,fll2\obj
+			EntityParent fll2\lightobj,fll2\obj
+			For i = 0 To MaxFluTextures-1
+				fll\tex[i] = fll2\tex[i]
+			Next
+			For i = 0 To MaxFluSounds-1
+				fll\sfx[i] = fll2\sfx[i]
+			Next
+			Exit
+		EndIf
+	Next
+	
+	If fll\obj=0 Then
+		fll\obj = LoadMesh_Strict("GFX\map\Props\light_flu.b3d")
+	EndIf
+	ScaleEntity fll\obj,RoomScale,RoomScale,RoomScale
+	
+	If fll\tex[FluState_Off]=0 Then
+		For i = 0 To MaxFluTextures-1
+			fll\tex[i] = LoadTexture_Strict("GFX\map\light_flu"+(i+1)+".jpg",1)
+		Next
+	EndIf
+	EntityTexture fll\obj,fll\tex[FluState_Off]
+	HideEntity fll\obj
+	
+	If fll\sfx[0]=0 Then
+		For i = 0 To MaxFluSounds-1
+			fll\sfx[i] = LoadSound_Strict("SFX\Room\FluLight"+(i+1)+".ogg")
+		Next
+	EndIf
+	
+	fll\flashsprite = CreateSprite()
+	Local tex = LoadTexture_Strict("GFX\particle2.png",1+2)
+	SpriteViewMode fll\flashsprite,2
+	ScaleSprite fll\flashsprite,1.0,1.0
+	EntityFX fll\flashsprite,1
+	EntityBlend fll\flashsprite,3
+	RotateEntity fll\flashsprite,-90,0,0
+	;PositionEntity fll\flashsprite,0,-0.07,0,True
+	;EntityParent fll\flashsprite,fll\obj
+	EntityTexture fll\flashsprite,tex
+	FreeTexture tex
+	HideEntity fll\flashsprite
+	
+	fll\lightobj = CreateLight(2) ;fll\flashsprite
+	LightColor fll\lightobj,1275,1275,1275
+	LightRange fll\lightobj,0.1
+	
+	Return fll
+End Function
+
+Function UpdateFluLights()
+	Local fll.FluLight
+	
+	For fll = Each FluLight
+		If fll\room = PlayerRoom Lor IsRoomAdjacent(fll\room,PlayerRoom) Then
+			ShowEntity fll\obj
+			Select fll\state
+				Case FLU_STATE_OFF
+					EntityFX fll\obj,0
+					HideEntity fll\flashsprite
+					HideEntity fll\lightobj
+					EntityTexture fll\obj,fll\tex[FluState_Off]
+				Case FLU_STATE_ON
+					EntityFX fll\obj,1
+					ShowEntity fll\flashsprite
+					ShowEntity fll\lightobj
+					EntityTexture fll\obj,fll\tex[FluState_On]
+				Case FLU_STATE_FLICKER
+					If fll\time = 0.0 Then
+						EntityFX fll\obj,0
+						HideEntity fll\flashsprite
+						HideEntity fll\lightobj
+						EntityTexture fll\obj,fll\tex[FluState_Off]
+						If Rand(100)=1 Then
+							fll\time = FPSfactor
+							PlaySound2(fll\sfx[Rand(0,MaxFluSounds-4)],Camera,fll\obj)
+						EndIf
+					ElseIf fll\time > 0.0 Then
+						EntityFX fll\obj,0
+						HideEntity fll\flashsprite
+						HideEntity fll\lightobj
+						EntityTexture fll\obj,fll\tex[FluState_Between]
+						fll\time = fll\time + FPSfactor
+						If fll\time > 70*Rnd(1.0,3.0) Then
+							fll\time = -70*0.2
+							PlaySound2(fll\sfx[Rand(4,MaxFluSounds-1)],Camera,fll\obj)
+						EndIf
+					Else
+						EntityFX fll\obj,1
+						ShowEntity fll\flashsprite
+						ShowEntity fll\lightobj
+						EntityTexture fll\obj,fll\tex[FluState_On]
+						fll\time = Min(fll\time + FPSfactor,0.0)
+					EndIf
+			End Select
+		Else
+			HideEntity fll\obj
+		EndIf
+	Next
+	
+End Function
+
+Function InitFluLight(ID%,state%,room.Rooms)
+	Local fll.FluLight
+	
+	For fll = Each FluLight
+		If fll\room = room Then
+			If fll\id = ID Then
+				fll\state = state
+			EndIf
+		EndIf
+	Next
+	
+End Function
+
+Function CreateRandomItem.Items(maxlevel%, x#, y#, z#)
+	Local tempstr$ = "", tempstr2$ = ""
+	Local chance% = Rand(0,100)
+	If (chance<40) ;40% chance for a document
+		tempstr=GetPaper(Null)
+		tempstr2="paper"
+	ElseIf (chance<55) ;15% chance for a key card
+		tempstr2="key"+Str(Rand(maxlevel))
+	ElseIf (chance<60) ;5% chance for a medkit
+		tempstr2="firstaid"
+	ElseIf (chance<75) ;15% chance for a battery
+		tempstr2="bat"
+	ElseIf (chance<80) ;5% chance for an SNAV
+		tempstr2="nav300"
+	ElseIf (chance<90) ;10% chance for a radio
+		tempstr2="radio"
+	ElseIf (chance<95) ;5% chance for a clipboard
+		tempstr2="clipboard"
+	Else ;5% chance for misc
+		Select Rand(4)
+			Case 1 ;playing card
+				tempstr="keyplay"
+			Case 2 ;Mastercard
+				tempstr="keymaster"
+			Case 3 ;origami
+				tempstr="origami"
+			Case 4 ;electronical components
+				tempstr="electronical"
+		End Select
+		tempstr2="misc"
+	EndIf
+	Return CreateItem(tempstr2, x, y, z, tempstr)
 End Function

@@ -882,6 +882,7 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 						item\state2 = 2
 					EndIf
 			End Select
+			CreateConsoleMsg(item\state2)
 		Case "nav300", "nav"
 			Select setting
 				Case ROUGH
@@ -1360,7 +1361,7 @@ Function GetPaper$(item.Items)
 			Return "burnt"
 		EndIf
 	EndIf
-	Select Rand(25)
+	Select Rand(26)
 		Case 1
 			Return "d008"
 		Case 2
@@ -1404,12 +1405,14 @@ Function GetPaper$(item.Items)
 		Case 21
 			Return "d970"
 		Case 22
-			Return "d1048"
+			Return "d990"
 		Case 23
-			Return "d1123"
+			Return "d1048"
 		Case 24
-			Return "d1162"
+			Return "d1123"
 		Case 25
+			Return "d1162"
+		Case 26
 			Return "d1499"
 	End Select
 End Function

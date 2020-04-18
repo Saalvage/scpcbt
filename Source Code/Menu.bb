@@ -343,13 +343,19 @@ Function UpdateMainMenu()
 					Local LowestPossible% = 2
 					
 					For  I_SAV.Save = Each Save
-						If (CurrSave <> I_SAV And CurrSave\Name = I_SAV\Name) Then SameFound = 1
-						If (I_SAV\Name = (CurrSave\Name + " (" + LowestPossible + ")")) Then LowestPossible = LowestPossible + 1
+						If (CurrSave <> I_SAV And CurrSave\Name = I_SAV\Name) Then SameFound = 1 : Exit
 					Next
 						
-					If SameFound Then CurrSave\Name = CurrSave\Name + " (" + LowestPossible + ")"
+					While SameFound = 1
+						SameFound = 2
+						For I_SAV.Save = Each Save
+							If (I_SAV\Name = (CurrSave\Name + " (" + LowestPossible + ")")) Then LowestPossible = LowestPossible + 1 : SameFound = True : Exit
+						Next
+					Wend
 					
-					InitNewGame(I_Opt)
+					If SameFound = 2 Then CurrSave\Name = CurrSave\Name + " (" + LowestPossible + ")"
+					
+					InitNewGame(I_Opt, Clamp(Int(Left(CurrSave\Name, 1)), 0, 2)) ;ONLY FOR DEBUGGING
 					MainMenuOpen = False
 					FlushKeys()
 					FlushMouse()

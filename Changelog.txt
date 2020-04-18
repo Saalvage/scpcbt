@@ -5,7 +5,7 @@
 	- It now increases blinking time.
 	- Better refinements.
 	- Improved inventory icon.
-- Added localization/mod support with built in support for Englisch (due), German, Spanish (South America),
+- Added localization/mod support with built in support for Englisch (due), German, 
 - Added FOV option.
 	- Decreased default FOV to 60.
 	- Fixed float values being allowed in the menus.
@@ -13,11 +13,18 @@
 - Added anisotropic filtering.
 - Added SCRAMBLE gear.
 	- Including coarse, fine and very fine variants.
+- Much improved SCP-205.
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
+- Added actual crouching.
+- Added room2tunnel3 (HCZ), room2offices5 (EZ).
+- Redesigned room1archive.
+- Added a new door type.
 - Added Apollyon difficulty; can be unlocked by beating the game on Keter.
 - Added inventory size scaling with difficulty and custom inventory options.
 - Rebalanced the S-NAVs, making the S-NAV 5000 (S-NAV Ultimate) less overpowered, the S-NAV 400 (formerly S-NAV 310) less useless and the S-LOC (formerly S-NAV) more interesting.
+- Added documents for SCP-990 and GoIs.
+- Added an additional SCP-1162 nostalgia item.
 - (Re-)Added SCP-173's head rotating.
 - Added bloody SCP-096 texture after killing someone.
 - Added vehicle in the intro sequence.
@@ -54,12 +61,11 @@
 	- Added a weird vest.
 	- Added consistency.
 	- Fixed SCP-148's refinements.
-	- Improved player view invertion.
+	- Improved 1:1 humans.
 	- And a lot of other improvements!
 - Improved boxfile models.
 - Added EZ endroom version.
 - Added SCP-106 endroom event to all threee endrooms.
-- Much improved SCP-205 chamber.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Slightly improved SCP-372 model.
 - Added better text editing.
@@ -120,6 +126,7 @@ Bug Fixes:
 	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
 	- Fixed certain item attributes not being saved.
+	- Fixed intro movies being laggy.
 	- Fixed z-fighting on monitor model.
 	- Fixed vest model.
 	- Fixed keycard model.

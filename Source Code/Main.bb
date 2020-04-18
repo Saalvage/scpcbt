@@ -342,7 +342,9 @@ Global CanSave% = True
 
 AppTitle GetLocalString("Menu", "title") + " v" + VersionNumber
 
-PlayStartupVideos()
+If GetINIInt(OptionFile, "options", "play startup video")
+	PlayStartupVideos()
+EndIf
 
 ;---------------------------------------------------------------------------------------------------------------------
 
@@ -417,7 +419,7 @@ Global PlayerZone%, PlayerRoom.Rooms, CurrentZone%
 Global GrabbedEntity%
 
 Global InvertMouse% = GetINIInt(OptionFile, "options", "invert mouse y")
-Global InvertMouseComplete%
+Global InvertCam%
 Global MouseHit1%, MouseDown1%, MouseHit2%, DoubleClick%, LastMouseHit1%, MouseUp1%, DoubleClickSlot%
 
 Global CoffinDistance# = 100.0
@@ -897,6 +899,19 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 			ScaleEntity d\obj2, RoomScale, RoomScale, RoomScale
 		EndIf
 		d\frameobj = CopyEntity(DoorFrameOBJ)
+	ElseIf big=5 Then
+		For d2 = Each Doors
+			If d2 <> d And d2\dir = 5 Then
+				d\obj = CopyEntity(d2\obj)
+				ScaleEntity d\obj, RoomScale, RoomScale, RoomScale
+				Exit
+			EndIf
+		Next
+		If d\obj=0 Then
+			d\obj = LoadMesh_Strict("GFX\map\DoorWindowed.b3d")
+			ScaleEntity d\obj, RoomScale, RoomScale, RoomScale
+		EndIf
+		d\frameobj = CopyEntity(DoorFrameOBJ)
 	Else
 		d\obj = CopyEntity(DoorOBJ)
 		ScaleEntity(d\obj, (204.0 * RoomScale) / MeshWidth(d\obj), 312.0 * RoomScale / MeshHeight(d\obj), 16.0 * RoomScale / MeshDepth(d\obj))
@@ -913,7 +928,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	ScaleEntity(d\frameobj, (8.0 / 2048.0), (8.0 / 2048.0), (8.0 / 2048.0))
 	EntityPickMode d\frameobj,2
 	EntityType d\obj, HIT_MAP
-	EntityType d\obj2, HIT_MAP
+	If d\obj2 <> 0 Then EntityType d\obj2, HIT_MAP
 	
 	d\ID = DoorTempID
 	DoorTempID=DoorTempID+1
@@ -985,7 +1000,7 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	EntityPickMode d\frameobj,2
 	
 	If d\open And big = False And Rand(8) = 1 Then d\AutoClose = True
-	d\dir=big
+	If big = 5 Then d\dir = 0 Else d\dir = big
 	d\room=room
 	
 	d\MTFClose = True
@@ -1037,7 +1052,6 @@ Function UpdateDoors()
 	If UpdateDoorsTimer =< 0 Then
 		For d.Doors = Each Doors
 			
-			;TODO why the fuck?
 			d\dist = Abs(EntityX(Collider)-EntityX(d\obj,True)) + Abs(EntityZ(Collider)-EntityZ(d\obj,True))
 			
 			If d\dist > HideDistance*2 Then
@@ -1074,7 +1088,7 @@ Function UpdateDoors()
 	ClosestDoor = Null
 	
 	For d.Doors = Each Doors
-		If d\dist < HideDistance*2 Lor d\IsElevatorDoor>0 Then ;Make elevator doors update everytime because if not, this can cause a bug where the elevators suddenly won't work, most noticeable in room2tunnel - ENDSHN
+		If d\dist < HideDistance*2 Lor d\IsElevatorDoor>0 Then ;Make elevator doors update everytime because if not, this can cause a bug where the elevators suddenly won't work, most noticeable in room2mtunnels - ENDSHN
 			
 			If (d\openstate >= 180 Lor d\openstate <= 0) And GrabbedEntity = 0 Then
 				For i% = 0 To 1
@@ -1108,7 +1122,7 @@ Function UpdateDoors()
 			If d\open Then
 				If d\openstate < 180 Then
 					Select d\dir
-						Case 0
+						Case 0, 5
 							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 80.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen+1) * FPSfactor / 80.0, 0, 0)		
@@ -1150,7 +1164,7 @@ Function UpdateDoors()
 			Else
 				If d\openstate > 0 Then
 					Select d\dir
-						Case 0
+						Case 0, 5
 							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
 							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 80.0, 0, 0)
 							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 80.0, 0, 0)	
@@ -1263,7 +1277,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 					temp = 5
 				Case "keyomni"
 					temp = 6
-				Default 
+				Default
 					temp = -1
 			End Select
 			
@@ -1521,8 +1535,11 @@ Function InitEvents()
 	CreateEvent("room3storage", "room3storage", 0, 0)
 	
 	CreateEvent("tunnel2smoke", "tunnel2", 0, 0.2)
-	CreateEvent("tunnel2", "tunnel2", Rand(0,2), 0)
-	CreateEvent("tunnel2", "tunnel2", 0, (0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("173spawn", "tunnel2", Rand(0,2), 0)
+	CreateEvent("173spawn", "tunnel2", 0, (0.15*SelectedDifficulty\aggressiveNPCs))
+	
+	CreateEvent("173spawn", "room2tunnel3", Rand(0, 1), 0)
+	CreateEvent("173spawn", "room2tunnel3", 0, (0.15*SelectedDifficulty\aggressiveNPCs))
 	
 	;173 appears in half of the "room2doors" -rooms
 	CreateEvent("room2doors173", "room2doors", 0, 0.5 + (0.4*SelectedDifficulty\aggressiveNPCs))
@@ -1534,8 +1551,8 @@ Function InitEvents()
 	
 	CreateEvent("room2cafeteria", "room2cafeteria", 0)	
 	
-	CreateEvent("room3pitduck", "room3pit", 0)
-	CreateEvent("room3pit1048", "room3pit", 1)
+	CreateEvent("room3pit1048", "room3pit", 0)
+	CreateEvent("room3pitduck", "room3pit", 1)
 	
 	;the event that causes the door to open by itself in room2offices3
 	CreateEvent("room2offices3", "room2offices3", 0, 1.0)	
@@ -1580,7 +1597,7 @@ Function InitEvents()
 	CreateEvent("checkpoint", "checkpoint2", 0, 1.0)
 	
 	CreateEvent("room3door", "room3", 0, 0.1)
-	CreateEvent("room3door", "room3tunnel", 0, 0.1)	
+	CreateEvent("room3door", "room3tunnel", 0, 0.1)
 	
 	If Rand(2)=1 Then
 		CreateEvent("106victim", "room3", Rand(1,2))
@@ -1616,7 +1633,7 @@ Function InitEvents()
 	
 	CreateEvent("testroom", "testroom", 0)
 	
-	CreateEvent("room2tunnel", "room2tunnel", 0)
+	CreateEvent("room2mtunnels", "room2mtunnels", 0)
 	
 	CreateEvent("room2ccont", "room2ccont", 0)
 	
@@ -1654,6 +1671,7 @@ Function InitEvents()
 	CreateEvent("096spawn","room4tunnels",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
 	CreateEvent("096spawn","tunnel",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
 	CreateEvent("096spawn","tunnel2",0,0.4+(0.2*SelectedDifficulty\aggressiveNPCs))
+	CreateEvent("096spawn","room2tunnel3",0,0.3+(0.2*SelectedDifficulty\aggressiveNPCs))
 	CreateEvent("096spawn","room3z2",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
 	
 	CreateEvent("room2pit","room2_4",0,0.4 + (0.4*SelectedDifficulty\aggressiveNPCs))
@@ -1690,10 +1708,10 @@ DrawLoading(90, True)
 Global FogTexture%, Fog%
 Global GasMaskTexture%, GasMaskOverlay%
 Global InfectTexture%, InfectOverlay%
-Global DarkTexture%, Dark%
-Global Collider%, Head%
-
 Global GlassesTexture%, GlassesOverlay%
+Global DarkTexture%, Dark%
+Global Collider%
+Global Head%
 
 Global FogNVTexture%
 Global NVTexture%, NVOverlay%
@@ -1936,6 +1954,7 @@ Repeat
 				Update294()
 				UpdateRoomLights(Camera)
 			EndIf
+			UpdateFluLights()
 			UpdateDecals()
 			UpdateMTF()
 			UpdateNPCs()
@@ -2489,7 +2508,7 @@ Function QuickLoadEvents()
 					Next
 					e\EventStr = "load6"
 				ElseIf e\EventStr = "load6"
-					n.NPCs = CreateNPC(NPCtypeD,e\room\x+3.8,e\room\y,e\room\z-2.3)
+					n.NPCs = CreateNPC(NPCtypeD,e\room\x+3.8,e\room\y+0.5,e\room\z-2.3)
 					RotateEntity n\Collider,0,e\room\angle+155,0
 					n\State = 3
 					SetNPCFrame(n,20)
@@ -3076,14 +3095,26 @@ Function MovePlayer()
 			EndIf	
 		EndIf
 	Else ;noclip on
-		If (KeyDown(I_Keys\SPRINT)) Then 
+		If (KeyDown(I_Keys\SPRINT)) Then
 			Sprint = 2.5
 		ElseIf KeyDown(I_Keys\CROUCH)
 			Sprint = 0.5
 		EndIf
 	EndIf
 	
-	If KeyHit(I_Keys\CROUCH) And Playable Then Crouch = (Not Crouch)
+	If KeyHit(I_Keys\CROUCH) And Playable Then
+		If Crouch Then
+			If LinePick(EntityX(Collider), EntityY(Collider), EntityZ(Collider), 0, 0.3, 0, 0.15) = 0 Then
+				EntityRadius Collider, 0.15, 0.60
+				TeleportEntity Collider, EntityX(Collider), EntityY(Collider), EntityZ(Collider), 0.6
+				Crouch = False
+			EndIf
+		Else
+			EntityRadius Collider, 0.15, 0.30
+			TeleportEntity Collider, EntityX(Collider), EntityY(Collider)-0.3, EntityZ(Collider), 0.3
+			Crouch = True
+		EndIf
+	EndIf
 	
 	Local temp2# = (Speed * Sprint) / (1.0+CrouchState)
 	
@@ -3293,7 +3324,7 @@ Function MouseLook()
 	CameraShake = Max(CameraShake - (FPSfactor / 10), 0)
 	
 	;CameraZoomTemp = CurveValue(CurrCameraZoom,CameraZoomTemp, 5.0)
-	CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan(Float(FOV)/2)*RealGraphicWidth/RealGraphicHeight))/2.0))
+	CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan(Float(FOV * (InvertCam*-2+1))/2)*RealGraphicWidth/RealGraphicHeight))/2.0))
 	CurrCameraZoom = Max(CurrCameraZoom - FPSfactor, 0)
 	
 	If KillTimer >= 0 And FallTimer >=0 Then
@@ -3305,10 +3336,8 @@ Function MouseLook()
 		
 		;käännetään kameraa sivulle jos pelaaja on vammautunut
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Clamp(up*30*Injuries,-50,50)
-		PositionEntity Camera, EntityX(Collider), EntityY(Collider), EntityZ(Collider)
+		PositionEntity Camera, EntityX(Collider) + side, EntityY(Collider) + up + 0.6 + CrouchState * -0.3 - (Not Crouch) * 0.3, EntityZ(Collider)
 		RotateEntity Camera, 0, EntityYaw(Collider), roll*0.5
-		
-		MoveEntity Camera, side, up + 0.6 + CrouchState * -0.3, 0
 		
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), 0
 		;moveentity player, side, up, 0	
@@ -3331,11 +3360,6 @@ Function MouseLook()
 		
 		Local the_yaw# = ((mouse_x_speed_1#)) * mouselook_x_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
 		Local the_pitch# = ((mouse_y_speed_1#)) * mouselook_y_inc# / (1.0+WearingVest+(WearingVest=-1)*0.6)
-		
-		If InvertMouseComplete Then
-			the_yaw = -the_yaw
-			the_pitch = -the_pitch
-		EndIf
 		
 		TurnEntity Collider, 0.0, -the_yaw#, 0.0 ; Turn the user on the Y (yaw) axis.
 		user_camera_pitch# = user_camera_pitch# + the_pitch#
@@ -3857,6 +3881,7 @@ Function DrawGUI()
 				Text x + 350, 350, "Current monitor: NULL"
 			EndIf
 			Text x + 350, 370, "Current Zone: " + CurrentZone
+			Text x + 350, 390, "CurrentTrigger: " + CheckTriggers()
 			
 			SetFont I_Opt\Fonts[1]
 		EndIf
@@ -4650,7 +4675,6 @@ Function DrawGUI()
 					SelectedItem = Null
 					MsgTimer = 70 * 5
 				Case "scp1123"
-
 					If Not (Wearing714 = 1) Then
 						If PlayerRoom\RoomTemplate\Name <> "room1123" Then
 							ShowEntity Light
@@ -4665,18 +4689,16 @@ Function DrawGUI()
 								If e\EventState = 0 Then
 									ShowEntity Light
 									LightFlash = 3
-									PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))		
+									PlaySound_Strict(LoadTempSound("SFX\SCP\1123\Touch.ogg"))
 								EndIf
 								e\EventState = Max(1, e\EventState)
+								RemoveItem(SelectedItem)
 								Exit
 							EndIf
 						Next
 					EndIf
-
 				Case "key1", "key2", "key3", "key4", "key5", "keyomni", "keyomni", "scp860", "hand", "hand2", "hand3", "quarter"
-
 					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-
 				Case "scp513"
 				
 					Local npc513.NPCs
@@ -4832,7 +4854,7 @@ Function DrawGUI()
 												I_Cheats\SuperMan = True
 												Msg = GetLocalString("Messagse", "faidwoo")
 											Case 2
-												InvertMouseComplete = (Not InvertMouseComplete)
+												InvertCam = (Not InvertCam)
 												Msg = GetLocalString("Messagse", "faidturn")
 											Case 3
 												BlurTimer = 5000
@@ -4917,13 +4939,25 @@ Function DrawGUI()
 								SetBuffer BackBuffer()
 							Case "ticket"
 								;don't resize because it messes up the masking
-								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+								SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								
 								If (SelectedItem\state = 0) Then
 									Msg = GetLocalString("Messages", "nostalgiamovie")
 									MsgTimer = 70*10
 									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
 									SelectedItem\state = 1
+								EndIf
+							Case "d990"
+								; Resizing does mess with masking!
+								SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)
+							Case "970ds"
+								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+								SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
+								If (SelectedItem\state = 1) Then
+									Msg = GetLocalString("Messages", "nostalgiadoc")
+									MsgTimer = 70*10
+									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
+									SelectedItem\state = 0
 								EndIf
 							Case "hearing"
 								If SelectedItem\itemtemplate\img = 0 Then
@@ -4941,8 +4975,8 @@ Function DrawGUI()
 									PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 									SelectedItem\state = 1
 								EndIf
-							Default 
-								SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
+							Default
+								SelectedItem\itemtemplate\img = LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
 								SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
 						End Select
 						
@@ -6007,18 +6041,16 @@ Function DrawGUI()
 					EndIf
 
 				Default
-
-					;check if the item is an inventory-type object
+					; check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
 						DoubleClick = 0
 						MouseHit1 = 0
 						MouseDown1 = 0
 						LastMouseHit1 = 0
 						OtherOpen = SelectedItem
-						SelectedItem = Null
 					EndIf
 					
-
+					SelectedItem = Null
 			End Select
 			
 			If SelectedItem <> Null Then
@@ -6319,7 +6351,8 @@ Function DrawMenu()
 					If MouseOn(x+270*MenuScale,y+6*MenuScale,100*MenuScale+14,20)
 						DrawOptionsTooltip(tx,ty,tw,th,"fov")
 					EndIf
-					CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan(Float(FOV)/2)*RealGraphicWidth/RealGraphicHeight))/2.0))					
+					
+					MouseLook()
 
 				Case 2 ;Audio
 					SetFont I_Opt\Fonts[1]
@@ -6790,11 +6823,11 @@ End Function
 
 Include "Source Code\LoadAllSounds.bb"
 Function LoadEntities()
+	;CatchErrors("LoadEntities")
+	
+	DrawLoading(0)
 	
 	Local I_Opt.Options = First Options
-
-	;CatchErrors("LoadEntities")
-	DrawLoading(0)
 	
 	Local i%
 	
@@ -6938,7 +6971,7 @@ Function LoadEntities()
 	HideEntity Light
 	
 	Collider = CreatePivot()
-	EntityRadius Collider, 0.15, 0.30
+	EntityRadius Collider, 0.15, 0.60
 	EntityPickMode(Collider, 1)
 	EntityType Collider, HIT_PLAYER
 	
@@ -6954,30 +6987,6 @@ Function LoadEntities()
 	MTFObj = LoadAnimMesh_Strict("GFX\npcs\MTF2.b3d") ;optimized MTFs
 	GuardObj = LoadAnimMesh_Strict("GFX\npcs\guard.b3d") ;optimized Guards
 	;GuardTex = LoadTexture_Strict("GFX\npcs\body.jpg") ;optimized the Guards even more
-	
-	;If BumpEnabled Then
-	;	bump1 = LoadTexture_Strict("GFX\npcs\mtf_newnormal01.png")
-	;	;TextureBlend bump1, FE_BUMP ;USE DOT3
-	;		
-	;	For i = 2 To CountSurfaces(MTFObj)
-	;		sf = GetSurface(MTFObj,i)
-	;		b = GetSurfaceBrush( sf )
-	;		t1 = GetBrushTexture(b,0)
-	;		
-	;		Select Lower(StripPath(TextureName(t1)))
-	;			Case "MTF_newdiffuse02.png"
-	;				
-	;				BrushTexture b, bump1, 0, 0
-	;				BrushTexture b, t1, 0, 1
-	;				PaintSurface sf,b
-	;		End Select
-	;		FreeBrush b
-	;		FreeTexture t1
-	;	Next
-	;	FreeTexture bump1	
-	;EndIf
-	
-	
 	
 	ClassDObj = LoadAnimMesh_Strict("GFX\npcs\classd.b3d") ;optimized Class-D's and scientists/researchers
 	ApacheObj = LoadAnimMesh_Strict("GFX\apache.b3d") ;optimized Apaches (helicopters)
@@ -7626,7 +7635,7 @@ Function NullGame(playbuttonsfx%=True)
 		itt\found = False
 	Next
 	
-	InvertMouseComplete = 0
+	InvertCam = 0
 	
 	DropSpeed = 0
 	Shake = 0
@@ -7757,7 +7766,10 @@ Function NullGame(playbuttonsfx%=True)
 	
 	For twp.TempWayPoints = Each TempWayPoints
 		Delete twp
-	Next	
+	Next
+	
+	Delete Each TempFluLight
+	Delete Each FluLight
 	
 	For r.Rooms = Each Rooms
 		Delete r
@@ -9961,17 +9973,7 @@ End Function
 
 Function PlayStartupVideos()
 	
-	If GetINIInt(OptionFile,"options","play startup video")=0 Then Return
-	
-	Local Cam = CreateCamera() 
-	CameraClsMode Cam, 0, 1
-	Local Quad = CreateQuad()
-	Local Texture = CreateTexture(2048, 2048, 256 + 16 + 32)
-	EntityTexture Quad, Texture
-	EntityFX Quad, 1
-	CameraRange Cam, 0.01, 100
-	TranslateEntity Cam, 1.0 / 2048 ,-1.0 / 2048 ,-1.0
-	EntityParent Quad, Cam, 1
+	HidePointer()
 	
 	Local ScaledGraphicHeight%
 	Local Ratio# = Float(RealGraphicWidth)/Float(RealGraphicHeight)
@@ -9983,52 +9985,35 @@ Function PlayStartupVideos()
 		DebugLog "Scaled: "+ScaledGraphicHeight
 	EndIf
 	
-	Local moviefile$ = "GFX\menu\startup_Undertow"
-	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
-	Local moview = BlitzMovie_GetWidth()
-	Local movieh = BlitzMovie_GetHeight()
-	BlitzMovie_Close()
-	Local image = CreateImage(moview, movieh)
-	Local SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
-	SplashScreenVideo = BlitzMovie_Play()
-	Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
-	Repeat
+	Local i, moviefile$
+	For i = 0 To 1
+		Select i
+			Case 0
+				moviefile$ = "GFX\menu\startup_Undertow"
+			Case 1
+				moviefile$ = "GFX\menu\startup_TSS"
+		End Select
+		Local SplashScreenVideo = BlitzMovie_OpenD3D(moviefile$+".avi", SystemProperty("Direct3DDevice7"), SystemProperty("DirectDraw7"))
+		If SplashScreenVideo = 0 Then
+			PutINIValue(OptionFile, "options", "play startup video", "false")
+			Return
+		EndIf
+		SplashScreenVideo = BlitzMovie_Play()
+		Local SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
+		Repeat
+			Cls
+			BlitzMovie_DrawD3D(0, (RealGraphicHeight/2-ScaledGraphicHeight/2), RealGraphicWidth, ScaledGraphicHeight)
+			Flip
+		Until (GetKey() Lor (Not IsStreamPlaying_Strict(SplashScreenAudio)))
+		StopStream_Strict(SplashScreenAudio)
+		BlitzMovie_Stop()
+		BlitzMovie_Close()
+		
 		Cls
-		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
 		Flip
-	Until (GetKey() Lor (Not IsStreamPlaying_Strict(SplashScreenAudio)))
-	StopStream_Strict(SplashScreenAudio)
-	BlitzMovie_Stop()
-	BlitzMovie_Close()
-	FreeImage image
+	Next
 	
-	Cls
-	Flip
-	
-	moviefile$ = "GFX\menu\startup_TSS"
-	BlitzMovie_Open(moviefile$+".avi") ;Get movie size
-	moview = BlitzMovie_GetWidth()
-	movieh = BlitzMovie_GetHeight()
-	BlitzMovie_Close()
-	image = CreateImage(moview, movieh)
-	SplashScreenVideo = BlitzMovie_OpenDecodeToImage(moviefile$+".avi", image, False)
-	SplashScreenVideo = BlitzMovie_Play()
-	SplashScreenAudio = StreamSound_Strict(moviefile$+".ogg",SFXVolume,0)
-	Repeat
-		Cls
-		ProjectImage(image, RealGraphicWidth, ScaledGraphicHeight, Quad, Texture)
-		Flip
-	Until (GetKey() Lor (Not IsStreamPlaying_Strict(SplashScreenAudio)))
-	StopStream_Strict(SplashScreenAudio)
-	BlitzMovie_Stop()
-	BlitzMovie_Close()
-	
-	FreeTexture Texture
-	FreeEntity Quad
-	FreeEntity Cam
-	FreeImage image
-	Cls
-	Flip
+	ShowPointer()
 	
 End Function
 

@@ -67,7 +67,6 @@ Type NPCs
 	Field CollRadius#
 	Field IdleTimer#
 	Field SoundChn_IsStream%,SoundChn2_IsStream%
-	Field FallingPickDistance# ;TODO CHCEK WHTT HIS DONES
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
@@ -82,7 +81,6 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 	n\GravityMult = 1.0
 	n\MaxGravity = 0.2
 	n\CollRadius = 0.2
-	n\FallingPickDistance = 10
 	Select NPCtype
 		Case NPCtype173
 
@@ -1264,10 +1262,10 @@ Function UpdateNPCs()
 			
 				Local I_Opt.Options = First Options
 				
-				If Abs(WearingScramble > 50) And n\BlinkTimer = 0 Then ;I am using a variable outside of its intended use
+				If Abs(WearingScramble) > 50 And n\BlinkTimer = 0 Then ;I am using this variable outside of its intended use
 					EntityTexture n\obj2, LightTexture
 					n\BlinkTimer = 1
-				ElseIf Abs(WearingScramble < 50) And n\Blinktimer = 1 Then
+				ElseIf Abs(WearingScramble) < 50 And n\Blinktimer = 1 Then
 					EntityTexture n\obj2, DarkTexture
 					n\BlinkTimer = 0
 				EndIf
@@ -4256,8 +4254,9 @@ Function UpdateNPCs()
 				; Idle = 1 - 199
 				; IdleToWalk = 200 - 260
 				; Walk = 261 - 310
-			
-				AnimateNPC(n, 1, 199, 20.0/70.0)
+				; Battle = 312 - 1813
+				
+				AnimateNPC(n, 312, 1813, 30.0/70.0, False)
 				PositionEntity(n\obj, EntityX(n\Collider), EntityY(n\Collider)-0.2, EntityZ(n\Collider))
 
 			Case NPCtype966
@@ -5161,16 +5160,6 @@ Function UpdateNPCs()
 					n\DropSpeed# = 0
 				Else
 					If ShouldEntitiesFall
-;						If n\FallingPickDistance>0
-;							Local pick = LinePick(EntityX(n\Collider),EntityY(n\Collider),EntityZ(n\Collider),0,-n\FallingPickDistance,0)
-;							If pick
-;								n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
-;							Else
-;								n\DropSpeed# = 0
-;							EndIf
-;						Else
-;							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
-;						EndIf
 						Local UpdateGravity% = False
 						Local MaxX#,MinX#,MaxZ#,MinZ#
 						If n\InFacility=1
@@ -5225,11 +5214,7 @@ Function UpdateNPCs()
 						If UpdateGravity
 							n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
 						Else
-							If n\FallingPickDistance>0
-								n\DropSpeed = 0.0
-							Else
-								n\DropSpeed# = Max(n\DropSpeed - 0.005*FPSfactor*n\GravityMult,-n\MaxGravity)
-							EndIf
+							n\DropSpeed = 0.0
 						EndIf
 					Else
 						n\DropSpeed# = 0.0
