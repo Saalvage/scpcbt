@@ -331,6 +331,7 @@ Function UpdateMainMenu()
 				SetFont I_Opt\Fonts[2]
 				
 				If DrawButton(x + 420 * MenuScale, y + height + 20 * MenuScale, 160 * MenuScale, 70 * MenuScale, GetLocalString("Menu", "start"), False) Then
+					
 					If CurrSave\Name = "" Then CurrSave\Name = GetLocalString("Menu", "untitled")
 					
 					If RandomSeed = "" Then
@@ -1091,9 +1092,7 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 	
 	Repeat
 		
-		;Cls
-		Color 0,0,0
-		Rect 0,0,L_WIDTH,L_HEIGHT,True
+		Cls
 		
 		MouseHit1 = MouseHit(1)
 		
@@ -1270,12 +1269,10 @@ Function DrawLoading(percent%, shortloading=False)
 		For ls.loadingscreens = Each LoadingScreens
 			If ls\id = temp Then
 				If ls\img=0 Then
-					Local scale# = Max(I_Opt\GraphicWidth/1920.0, I_Opt\GraphicHeight/1080.0)
+					Cls
+					Flip False
 					ls\img = LoadImage_Strict("Loadingscreens\"+ls\imgpath)
-					ScaleImage(ls\img, scale, scale)
-					If (Not disablebackground) Then
-						ScaleImage(LoadingBack, scale, scale)
-					EndIf
+					If LoadingScreenScale <> 1.0 Then ScaleImage(ls\img, LoadingScreenScale, LoadingScreenScale)
 				EndIf
 				SelectedLoadingScreen = ls 
 				Exit
@@ -1286,13 +1283,8 @@ Function DrawLoading(percent%, shortloading=False)
 	firstloop = True
 	Repeat 
 		
-		;Color 0,0,0
-		;Rect 0,0,I_Opt\GraphicWidth,I_Opt\GraphicHeight,True
-		;Color 255, 255, 255
 		ClsColor 0,0,0
 		Cls
-		
-		;Cls(True,False)
 		
 		If percent > 20 Then
 			UpdateMusic()
@@ -1322,7 +1314,7 @@ Function DrawLoading(percent%, shortloading=False)
 			y = I_Opt\GraphicHeight - ImageHeight(SelectedLoadingScreen\img)
 		Else
 			y = 0
-		EndIf	
+		EndIf
 		
 		DrawImage SelectedLoadingScreen\img, x, y
 		

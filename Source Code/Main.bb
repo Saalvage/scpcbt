@@ -8,7 +8,7 @@
 ;	See Credits.txt for a list of contributors
 
 Local InitErrorStr$ = ""
-If FileSize("fmod.dll")=0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
+If FileSize("fmod.dll") = 0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
 
 If Len(InitErrorStr)>0 Then
 	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
@@ -177,7 +177,7 @@ Function ReloadFonts(I_Opt.Options)
 	;0: Console
 	;1 - 5: 1 - 5
 	;6 + 7: Credit 1 + 2
-	I_Opt\Fonts[0] = LoadFont_Strict("Blitz", Int(20 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[0] = LoadLocalFont("Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
 	I_Opt\Fonts[1] = LoadLocalFont("Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
 	I_Opt\Fonts[2] = LoadLocalFont("Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
 	I_Opt\Fonts[3] = LoadLocalFont("Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
@@ -297,6 +297,7 @@ Type Cheats
 	Field NoClip%, NoClipSpeed#
 	Field Enabled173%, Enabled106%
 	Field SuperMan%, SuperManTimer#
+	Field Speed%
 	Field WireframeState%
 End Type
 
@@ -308,6 +309,7 @@ Function ClearCheats(I_Cheats.Cheats)
 	I_Cheats\Enabled106 = 1
 	I_Cheats\SuperMan = 0
 	I_Cheats\SuperManTimer = 0
+	I_Cheats\Speed = 0
 	I_Cheats\WireframeState = 0
 End Function
 
@@ -355,6 +357,8 @@ Global CursorIMG% = LoadImage_Strict("GFX\cursor.png")
 
 Global SelectedLoadingScreen.LoadingScreens, LoadingScreenAmount%, LoadingScreenText%
 Global LoadingBack% = LoadImage_Strict("Loadingscreens\loadingback.jpg")
+Global LoadingScreenScale# = Max(I_Opt\GraphicWidth/1920.0, I_Opt\GraphicHeight/1080.0)
+If LoadingScreenScale <> 1.0 Then ScaleImage(LoadingBack, LoadingScreenScale, LoadingScreenScale)
 InitLoadingScreens("Loadingscreens\loadingscreens.ini")
 
 Global BlinkMeterIMG% = LoadImage_Strict("GFX\blinkmeter.jpg")
@@ -555,7 +559,7 @@ Global TempSoundCHN%
 Global TempSoundIndex% = 0
 
 ;The Music now has to be pre-defined, as the new system uses streaming instead of the usual sound loading system Blitz3D has
-Global Music$[25]
+Global Music$[26]
 Music[0] = "The Dread"
 Music[1] = "HeavyContainment"
 Music[2] = "EntranceZone"
@@ -582,6 +586,7 @@ Music[22] = "914"
 Music[23] = "Ending"
 Music[24] = "Credits"
 Music[25] = "SaveMeFrom"
+Music[26] = "Room106"
 
 Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music[2]+".ogg", MusicVolume, CurrMusicStream)
@@ -821,10 +826,12 @@ Include "Source Code\Particles.bb"
 
 Global ClosestButton%, ClosestDoor.Doors
 Global SelectedDoor.Doors, UpdateDoorsTimer#
+Global ButtonTexture% = LoadTexture_Strict("GFX\map\KeyPad.jpg", 1)
+Global ButtonTextureLocked% = LoadTexture_Strict("GFX\map\KeyPadLocked.jpg", 1)
 Global DoorTempID%
 Type Doors
 	Field obj%, obj2%, frameobj%, buttons%[2]
-	Field locked%, open%, angle%, openstate#, fastopen%
+	Field locked%, lockedupdated%, open%, angle%, openstate#, fastopen%
 	Field dir%
 	Field timer%, timerstate#
 	Field KeyCard%
@@ -1237,6 +1244,19 @@ Function UpdateDoors()
 						HideEntity d\DoorHitOBJ
 					EndIf
 				EndIf
+			EndIf
+			
+			If d\locked <> d\lockedupdated Then
+				If d\locked Then
+					For i = 0 To 2
+						If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTextureLocked)
+					Next
+				Else
+					For i = 0 To 2
+						If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTexture)
+					Next
+				EndIf
+				d\lockedupdated = d\locked
 			EndIf
 			
 		EndIf
@@ -1680,8 +1700,6 @@ Function InitEvents()
 	
 	CreateEvent("room2pit106", "room2pit", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
 	
-	CreateEvent("room1archive", "room1archive", 0, 1.0)
-	
 End Function
 
 Include "Source Code\UpdateEvents.bb"
@@ -1706,15 +1724,16 @@ DrawLoading(90, True)
 ;----------------------------------- meshes and textures ----------------------------------------------------------------
 
 Global FogTexture%, Fog%
-Global GasMaskTexture%, GasMaskOverlay%
-Global InfectTexture%, InfectOverlay%
-Global GlassesTexture%, GlassesOverlay%
+Global GasMaskOverlay%
+Global HazmatOverlay%
+Global InfectOverlay%
+Global NVTexture%, NVOverlay%
+Global GlassesOverlay%
 Global DarkTexture%, Dark%
 Global Collider%
 Global Head%
 
 Global FogNVTexture%
-Global NVTexture%, NVOverlay%
 
 Global TeslaTexture%
 
@@ -2952,9 +2971,11 @@ Function MovePlayer()
 	
 	Local Sprint# = 1.0, Speed# = 0.018, i%, angle#
 	
-	If I_Cheats\SuperMan Then
+	If I_Cheats\Speed Lor I_Cheats\SuperMan Then
 		Speed = Speed * 3
-		
+	EndIf
+	
+	If I_Cheats\SuperMan Then	
 		I_Cheats\SuperManTimer=I_Cheats\SuperManTimer+FPSfactor
 		
 		CameraShake = Sin(I_Cheats\SuperManTimer / 5.0) * (I_Cheats\SuperManTimer / 1500.0)
@@ -3102,19 +3123,7 @@ Function MovePlayer()
 		EndIf
 	EndIf
 	
-	If KeyHit(I_Keys\CROUCH) And Playable Then
-		If Crouch Then
-			If LinePick(EntityX(Collider), EntityY(Collider), EntityZ(Collider), 0, 0.3, 0, 0.15) = 0 Then
-				EntityRadius Collider, 0.15, 0.60
-				TeleportEntity Collider, EntityX(Collider), EntityY(Collider), EntityZ(Collider), 0.6
-				Crouch = False
-			EndIf
-		Else
-			EntityRadius Collider, 0.15, 0.30
-			TeleportEntity Collider, EntityX(Collider), EntityY(Collider)-0.3, EntityZ(Collider), 0.3
-			Crouch = True
-		EndIf
-	EndIf
+	If KeyHit(I_Keys\CROUCH) And Playable Then Crouch = (Not Crouch)
 	
 	Local temp2# = (Speed * Sprint) / (1.0+CrouchState)
 	
@@ -3336,7 +3345,7 @@ Function MouseLook()
 		
 		;käännetään kameraa sivulle jos pelaaja on vammautunut
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), Clamp(up*30*Injuries,-50,50)
-		PositionEntity Camera, EntityX(Collider) + side, EntityY(Collider) + up + 0.6 + CrouchState * -0.3 - (Not Crouch) * 0.3, EntityZ(Collider)
+		PositionEntity Camera, EntityX(Collider) + side, EntityY(Collider) + up + 0.6 + CrouchState * -0.3, EntityZ(Collider)
 		RotateEntity Camera, 0, EntityYaw(Collider), roll*0.5
 		
 		;RotateEntity Collider, EntityPitch(Collider), EntityYaw(Collider), 0
@@ -3436,21 +3445,34 @@ Function MouseLook()
 		MoveMouse viewport_center_x, viewport_center_y
 	EndIf
 	
-	If WearingGasMask Lor WearingHazmat Lor Wearing1499 Then
+	If WearingGasMask Lor Wearing1499 Then
 		If Wearing714 = False Then
-			If WearingGasMask = 2 Lor Wearing1499 = 2 Lor WearingHazmat = 2 Then
+			If WearingGasMask = 2 Lor Wearing1499 = 2 Then
 				Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
-			ElseIf WearingGasMask = -1 Lor Wearing1499 = -1 Lor WearingHazmat = -1 Then
+			ElseIf WearingGasMask = -1 Lor Wearing1499 = -1 Then
+				Stamina = Max(0, Min(80, Stamina - 0.1*FPSfactor))
+			EndIf
+		EndIf
+		
+		ShowEntity(GasMaskOverlay)
+	Else
+		HideEntity(GasMaskOverlay)
+	EndIf
+	
+	If WearingHazmat Then
+		If Wearing714 = False Then
+			If WearingHazmat = 2 Then
+				Stamina = Min(100, Stamina + (100.0-Stamina)*0.01*FPSfactor)
+			ElseIf WearingHazmat = -1
 				Stamina = Max(0, Min(80, Stamina - 0.1*FPSfactor))
 			EndIf
 		EndIf
 		If WearingHazmat = 1 Then
 			Stamina = Min(60, Stamina)
 		EndIf
-		
-		ShowEntity(GasMaskOverlay)
+		ShowEntity(HazmatOverlay)
 	Else
-		HideEntity(GasMaskOverlay)
+		HideEntity(HazmatOverlay)
 	EndIf
 	
 	If (WearingNightVision<>0 Lor WearingScramble<>0) Then
@@ -5936,13 +5958,9 @@ Function DrawGUI()
 						Msg = GetLocalString("Messages", "1499double")
 						MsgTimer = 70 * 10
 					EndIf
-
 				Case "badge"
-
 					If SelectedItem\itemtemplate\img=0 Then
-						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)	
-						;SelectedItem\itemtemplate\img = ResizeImage2(SelectedItem\itemtemplate\img, ImageWidth(SelectedItem\itemtemplate\img) * MenuScale, ImageHeight(SelectedItem\itemtemplate\img) * MenuScale)
-						
+						SelectedItem\itemtemplate\img=LoadImage_Strict(SelectedItem\itemtemplate\imgpath)
 						MaskImage(SelectedItem\itemtemplate\img, 255, 0, 255)
 					EndIf
 					
@@ -5958,30 +5976,25 @@ Function DrawGUI()
 						
 						SelectedItem\state = 1
 					EndIf
-
 				Case "key"
-
 					If SelectedItem\state = 0 Then
 						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(6,10)+".ogg")
 						
 						Msg = GetLocalString("Messages", "nostalgiakey")
-						MsgTimer = 70*10						
+						MsgTimer = 70*10			
+						SelectedItem\state = 1
 					EndIf
 					
-					SelectedItem\state = 1
 					SelectedItem = Null
-
 				Case "coin"
-					
 					If SelectedItem\state = 0
 						PlaySound_Strict LoadTempSound("SFX\SCP\1162\NostalgiaCancer"+Rand(1,5)+".ogg")
+						Msg = GetLocalString("Messages", "nostalgiacoin")
+						MsgTimer = 70*10
+						SelectedItem\state = 1
 					EndIf
 					
-					Msg = ""
-					
-					SelectedItem\state = 1
 					DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-
 				Case "scp427"
 					
 					If SelectedItem\Picked = 2 Then
@@ -6212,7 +6225,11 @@ Function DrawMenu()
 		If AchievementsMenu <= 0 And OptionsMenu <= 0 And QuitMSG <= 0
 			SetFont I_Opt\Fonts[1]
 			Text x, y, GetLocalString("Menu", "difficulty")+": "+SelectedDifficulty\name
-			Text x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+CurrSave\Name
+			If CurrSave = Null Then
+				Text x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+GetLocalString("Deaths", "redacted")
+			Else
+				Text x, y+20*MenuScale, GetLocalString("Menu", "save")+": "+CurrSave\Name
+			EndIf
 			Text x, y+40*MenuScale, GetLocalString("Menu", "seed")+": "+RandomSeed
 		ElseIf AchievementsMenu <= 0 And OptionsMenu > 0 And QuitMSG <= 0 And KillTimer >= 0
 			If DrawButton(x + 101 * MenuScale, y + 390 * MenuScale, 230 * MenuScale, 60 * MenuScale, GetLocalString("Menu", "back")) Then
@@ -6725,8 +6742,7 @@ Function DrawMenu()
 						Text(x + (390*MenuScale) / 2, y + (60*MenuScale) / 2, GetLocalString("Menu", "loadgame"), True, True)
 					EndIf
 					y = y + 75*MenuScale
-			EndIf
-				
+				EndIf
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, GetLocalString("Menu", "ach")) Then AchievementsMenu = 1
 				y = y + 75*MenuScale
 				If DrawButton(x, y, 390*MenuScale, 60*MenuScale, GetLocalString("Menu", "options")) Then OptionsMenu = 1
@@ -6887,38 +6903,40 @@ Function LoadEntities()
 	;Listener = CreateListener(Camera)
 	
 	FogTexture = LoadTexture_Strict("GFX\fog.jpg", 1)
-	
 	Fog = CreateSprite(ark_blur_cam)
-	ScaleSprite(Fog, Max(I_Opt\GraphicWidth / 1240.0, 1.0), Max(I_Opt\GraphicHeight / 960.0 * 0.8, 0.8))
+	ScaleSprite(Fog, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
 	EntityTexture(Fog, FogTexture)
 	EntityBlend (Fog, 2)
 	EntityOrder Fog, -1000
 	MoveEntity(Fog, 0, 0, 1.0)
 	
-	GasMaskTexture = LoadTexture_Strict("GFX\GasmaskOverlay.jpg", 1)
-	GasMaskOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(GasMaskOverlay, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
-	EntityTexture(GasMaskOverlay, GasMaskTexture)
-	EntityBlend (GasMaskOverlay, 2)
+	GasMaskOverlay = LoadSprite("GFX\GasmaskOverlay.jpg", 1, ark_blur_cam)
+	ScaleSprite(GasMaskOverlay, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
+	EntityBlend(GasMaskOverlay, 2)
 	EntityFX(GasMaskOverlay, 1)
 	EntityOrder GasMaskOverlay, -1003
 	MoveEntity(GasMaskOverlay, 0, 0, 1.0)
 	HideEntity(GasMaskOverlay)
 	
-	InfectTexture = LoadTexture_Strict("GFX\InfectOverlay.jpg", 1)
-	InfectOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(InfectOverlay, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
-	EntityTexture(InfectOverlay, InfectTexture)
+	HazmatOverlay = LoadSprite("GFX\HazmatOverlay.jpg", 1, ark_blur_cam)
+	ScaleSprite(HazmatOverlay, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
+	EntityBlend (HazmatOverlay, 2)
+	EntityFX(HazmatOverlay, 1)
+	EntityOrder HazmatOverlay, -1003
+	MoveEntity(HazmatOverlay, 0, 0, 1.0)
+	HideEntity(HazmatOverlay)
+	
+	InfectOverlay = LoadSprite("GFX\InfectOverlay.jpg", 1, ark_blur_cam)
+	ScaleSprite(InfectOverlay, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
 	EntityBlend (InfectOverlay, 3)
 	EntityFX(InfectOverlay, 1)
 	EntityOrder InfectOverlay, -1003
 	MoveEntity(InfectOverlay, 0, 0, 1.0)
-	;EntityAlpha (InfectOverlay, 255.0)
 	HideEntity(InfectOverlay)
 	
 	NVTexture = LoadTexture_Strict("GFX\NightVisionOverlay.jpg", 1)
 	NVOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(NVOverlay, Max(I_Opt\GraphicWidth / 1024.0, 1.0), Max(I_Opt\GraphicHeight / 1024.0 * 0.8, 0.8))
+	ScaleSprite(NVOverlay, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
 	EntityTexture(NVOverlay, NVTexture)
 	EntityBlend (NVOverlay, 2)
 	EntityFX(NVOverlay, 1)
@@ -6926,10 +6944,8 @@ Function LoadEntities()
 	MoveEntity(NVOverlay, 0, 0, 1.0)
 	HideEntity(NVOverlay)
 	
-	GlassesTexture = LoadTexture_Strict("GFX\GlassesOverlay.jpg",1)
-	GlassesOverlay = CreateSprite(ark_blur_cam)
-	ScaleSprite(GlassesOverlay, Max(GraphicWidth / 1024.0, 1.0), Max(GraphicHeight / 1024.0 * 0.8, 0.8))
-	EntityTexture(GlassesOverlay, GlassesTexture)
+	GlassesOverlay = LoadSprite("GFX\GlassesOverlay.jpg",1,ark_blur_cam)
+	ScaleSprite(GlassesOverlay, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
 	EntityBlend (GlassesOverlay, 2)
 	EntityFX(GlassesOverlay, 1)
 	EntityOrder GlassesOverlay, -1003
@@ -6944,9 +6960,8 @@ Function LoadEntities()
 	SetBuffer TextureBuffer(DarkTexture)
 	Cls
 	SetBuffer BackBuffer()
-	
 	Dark = CreateSprite(ark_blur_cam)
-	ScaleSprite(Dark, Max(I_Opt\GraphicWidth / 1240.0, 1.0), Max(I_Opt\GraphicHeight / 960.0 * 0.8, 0.8))
+	ScaleSprite(Dark, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
 	EntityTexture(Dark, DarkTexture)
 	EntityBlend (Dark, 1)
 	EntityOrder Dark, -1002
@@ -6963,7 +6978,7 @@ Function LoadEntities()
 	TeslaTexture = LoadTexture_Strict("GFX\map\tesla.jpg", 1+2)
 	
 	Light = CreateSprite(ark_blur_cam)
-	ScaleSprite(Light, Max(I_Opt\GraphicWidth / 1240.0, 1.0), Max(I_Opt\GraphicHeight / 960.0 * 0.8, 0.8))
+	ScaleSprite(Light, 1.0, Float(I_Opt\GraphicHeight)/Float(I_Opt\GraphicWidth))
 	EntityTexture(Light, LightTexture)
 	EntityBlend (Light, 1)
 	EntityOrder Light, -1002
@@ -6971,7 +6986,7 @@ Function LoadEntities()
 	HideEntity Light
 	
 	Collider = CreatePivot()
-	EntityRadius Collider, 0.15, 0.60
+	EntityRadius Collider, 0.15, 0.30
 	EntityPickMode(Collider, 1)
 	EntityType Collider, HIT_PLAYER
 	
@@ -7056,13 +7071,13 @@ Function LoadEntities()
 	DoorColl = LoadMesh_Strict("GFX\map\doorcoll.x")
 	HideEntity DoorColl
 	
-	ButtonOBJ = LoadMesh_Strict("GFX\map\Button.x")
+	ButtonOBJ = LoadMesh_Strict("GFX\map\Button.b3d")
 	HideEntity ButtonOBJ
-	ButtonKeyOBJ = LoadMesh_Strict("GFX\map\ButtonKeycard.x")
+	ButtonKeyOBJ = LoadMesh_Strict("GFX\map\ButtonKeycard.b3d")
 	HideEntity ButtonKeyOBJ
-	ButtonCodeOBJ = LoadMesh_Strict("GFX\map\ButtonCode.x")
+	ButtonCodeOBJ = LoadMesh_Strict("GFX\map\ButtonCode.b3d")
 	HideEntity ButtonCodeOBJ	
-	ButtonScannerOBJ = LoadMesh_Strict("GFX\map\ButtonScanner.x")
+	ButtonScannerOBJ = LoadMesh_Strict("GFX\map\ButtonScanner.b3d")
 	HideEntity ButtonScannerOBJ	
 	
 	BigDoorOBJ(0) = LoadMesh_Strict("GFX\map\ContDoorLeft.x")
@@ -7397,7 +7412,7 @@ Function InitNewGame(I_Opt.Options, zone%=0)
 	Next
 	
 	DrawLoading(80)
-	For sc.SecurityCams= Each SecurityCams
+	For sc.SecurityCams = Each SecurityCams
 		sc\angle = EntityYaw(sc\obj) + sc\angle
 		EntityParent(sc\obj, 0)
 	Next	
@@ -7600,8 +7615,6 @@ Function NullGame(playbuttonsfx%=True)
 	
 	KillSounds()
 	If playbuttonsfx Then PlaySound_Strict ButtonSFX
-	
-	DeleteTextures_Cache(1)
 	
 	FreeParticles()
 	

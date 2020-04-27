@@ -2679,7 +2679,7 @@ Function FillRoom(r.Rooms)
 			PositionEntity(r\Objects[4], r\x - 576 * RoomScale, r\y + 0.5, r\z + 640.0 * RoomScale, True)
 			
 			For i = 0 To 1
-				em.Emitters = CreateEmitter(r\x - 272.0 * RoomScale, r\y + 10, r\z + (624.0-i*512) * RoomScale, 0)
+				em.Emitters = CreateEmitter(r\x - 272.0 * RoomScale, 20, r\z + (624.0-i*512) * RoomScale, 0)
 				TurnEntity(em\Obj, 90, 0, 0, True)
 				EntityParent(em\Obj, r\obj)
 				em\RandAngle = 15
@@ -2738,7 +2738,7 @@ Function FillRoom(r.Rooms)
 			;PositionEntity (d\buttons[0], EntityX(d\buttons[0],True), EntityY(d\buttons[0],True), r\z + 288.0 * RoomScale, True)
 			;PositionEntity (d\buttons[1], EntityX(d\buttons[1],True), EntityY(d\buttons[1],True), r\z + 320.0 * RoomScale, True)
 			
-			sc.SecurityCams = CreateSecurityCam(r\x-312.0 * RoomScale, r\y + 414*RoomScale, r\z + 656*RoomScale, r)
+			sc.SecurityCams = CreateSecurityCam(r\x-312.0 * RoomScale, r\y + 450*RoomScale, r\z + 656*RoomScale, r)
 			sc\angle = 225
 			sc\turn = 45
 			TurnEntity(sc\CameraObj, 20, 0, 0)
@@ -3495,7 +3495,7 @@ Function FillRoom(r.Rooms)
 			de.Decals = CreateDecal(0, r\x + 456.0 * RoomScale, r\y + 0.005, r\z + 135.0 * RoomScale, 90, Rand(360), 0)
 			EntityParent(de\obj, r\obj)
 			
-			sc.SecurityCams = CreateSecurityCam(r\x - 336.0 * RoomScale, r\y + 352 * RoomScale, r\z + 48.0 * RoomScale, r, True)
+			sc.SecurityCams = CreateSecurityCam(r\x - 336.0 * RoomScale, r\y + 356.0 * RoomScale, r\z + 48.0 * RoomScale, r, True)
 			sc\angle = 270
 			sc\turn = 45
 			sc\room = r
@@ -3770,7 +3770,7 @@ Function FillRoom(r.Rooms)
 			it\state = 400
 			
 			r\Objects[1] = CreatePivot(r\obj)
-			PositionEntity(r\Objects[1], r\x + 96.0*RoomScale, r\y-1532.0 * RoomScale, r\z + 2016.0 * RoomScale,True)
+			PositionEntity(r\Objects[1], r\x, r\y - 1228.0 * RoomScale, r\z + 2306.0 * RoomScale,True)
 			
 			;de.Decals = CreateDecal(0, r\x + 96.0*RoomScale, r\y-1535.0 * RoomScale, r\z + 32.0 * RoomScale, 90, Rand(360), 0)
 			;EntityParent de\obj, r\obj
@@ -4013,7 +4013,7 @@ Function FillRoom(r.Rooms)
 			
 			CreateItem("paper", r\x-(2914+1024)*RoomScale, r\y+170.0*RoomScale, r\z+40*RoomScale, "classd")
 			
-			sc.SecurityCams = CreateSecurityCam(r\x - 4048.0 * RoomScale, r\y - 32.0 * RoomScale, r\z - 1232.0 * RoomScale, r, True)
+			sc.SecurityCams = CreateSecurityCam(r\x - 4048.0 * RoomScale, r\y - 29.0 * RoomScale, r\z - 1232.0 * RoomScale, r, True)
 			sc\angle = 270
 			sc\turn = 45
 			sc\room = r
@@ -5804,7 +5804,7 @@ Global CoffinCam.SecurityCams
 Type SecurityCams
 	Field MonitorObj%
 	
-	Field obj%, CameraObj%
+	Field obj%, CameraObj%, pvt%
 	
 	Field ScrObj%, ScrWidth#, ScrHeight#
 	Field Screen%, Cam%, ScrTexture%, ScrOverlay%
@@ -5916,16 +5916,12 @@ Function UpdateSecurityCams()
 							EndIf
 						EndIf
 					EndIf
-					PointEntity(sc\CameraObj, Camera)
-					Local temp# = EntityPitch(sc\CameraObj)
-					RotateEntity(sc\obj, 0, CurveAngle(EntityYaw(sc\CameraObj), EntityYaw(sc\obj), 75.0), 0)
+					If sc\pvt = 0 Then sc\pvt = CreatePivot(sc\obj) : EntityParent(sc\pvt, 0) ; Sets position and rotation of the pivot to the cam object
+					PointEntity(sc\pvt, Camera)
 					
-					If temp < 40.0 Then temp = 40
-					If temp > 70.0 Then temp = 70
-					RotateEntity(sc\CameraObj, CurveAngle(temp, EntityPitch(sc\CameraObj), 75.0), EntityYaw(sc\obj), 0)
+					RotateEntity(sc\CameraObj, CurveAngle(Clamp(EntityPitch(sc\pvt), 40, 70), EntityPitch(sc\CameraObj), 75), CurveAngle(EntityYaw(sc\pvt), EntityYaw(sc\CameraObj), 75), 0)
 					
 					PositionEntity(sc\CameraObj, EntityX(sc\obj, True), EntityY(sc\obj, True) - 0.083, EntityZ(sc\obj, True))
-					RotateEntity(sc\CameraObj, EntityPitch(sc\CameraObj), EntityYaw(sc\obj), 0)
 				Else
 					If sc\turn > 0 Then
 						If sc\dir = 0 Then
@@ -5937,10 +5933,8 @@ Function UpdateSecurityCams()
 						EndIf
 					EndIf
 					
-					RotateEntity(sc\obj, 0, sc\room\angle + sc\angle + Max(Min(sc\CurrAngle, sc\turn), -sc\turn), 0)
-					
 					PositionEntity(sc\CameraObj, EntityX(sc\obj, True), EntityY(sc\obj, True) - 0.083, EntityZ(sc\obj, True))
-					RotateEntity(sc\CameraObj, EntityPitch(sc\CameraObj), EntityYaw(sc\obj), 0)
+					RotateEntity(sc\CameraObj, EntityPitch(sc\CameraObj), sc\room\angle + sc\angle + Max(Min(sc\CurrAngle, sc\turn), -sc\turn), 0)
 					
 					If sc\Cam<>0 Then 
 						PositionEntity(sc\Cam, EntityX(sc\CameraObj, True), EntityY(sc\CameraObj, True), EntityZ(sc\CameraObj, True))
@@ -7043,7 +7037,7 @@ Function CreateMap(zone%)
 	
 	Local I_Opt.Options = First Options
 	
-	If I_Opt\DebugMode Then 
+	If I_Opt\DebugMode Then
 		Repeat
 			Cls
 			i = MapWidth - 1

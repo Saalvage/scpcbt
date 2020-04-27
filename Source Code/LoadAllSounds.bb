@@ -120,6 +120,8 @@ Function LoadAllSounds()
 	;IntroSFX(13) = LoadSound_Strict("SFX\intro\shoot1.ogg")
 	;IntroSFX(14) = LoadSound_Strict("SFX\intro\shoot2.ogg")
 	IntroSFX(15) = LoadSound_Strict("SFX\Room\Intro\173Vent.ogg")
+	
+	IntroSFX(19) = LoadSound_Strict("SFX\Room\Intro\GetUp.ogg")
 
 	;Dim AlarmSFX%(5)
 	AlarmSFX(0) = LoadSound_Strict("SFX\Alarm\Alarm.ogg")

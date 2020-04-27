@@ -151,6 +151,7 @@ Function SaveGame(file$, zonemod%=0)
 		If it\Picked <> 0 Then temp=temp+1
 	Next
 	WriteInt f, temp
+	
 	For it.items = Each Items
 		If it\Picked <> 0 Then
 			WriteString f, it\itemtemplate\namespec
@@ -2133,7 +2134,7 @@ Function LoadGameQuick(file$, loadzone%=1)
 	
 	;Free some entities that could potentially cause memory leaks (for the endings)
 	;This is only required for the LoadGameQuick function, as the other one is from the menu where everything is already deleted anyways
-	Local xtemp#,ztemp#
+	Local xtemp#, ztemp#
 	If Sky <> 0 Then
 		FreeEntity Sky
 		Sky = 0
@@ -2190,14 +2191,16 @@ End Function
 Function DeleteGame(I_SAV.Save)
 	I_SAV\Name = SavePath + I_SAV\Name + "\"
 	Local delDir% = ReadDir(I_SAV\Name)
-	NextFile(delDir) : NextFile(delDir) ;Skipping "." and ".."
-	Local file$=NextFile(delDir)
-	While file<>""
-		DeleteFile(I_SAV\Name + file)
-		file=NextFile$(delDir)
-	Wend
-	CloseDir(delDir)
-	DeleteDir(I_SAV\Name)
+	If delDir <> 0 Then
+		NextFile(delDir) : NextFile(delDir) ;Skipping "." and ".."
+		Local file$=NextFile(delDir)
+		While file<>""
+			DeleteFile(I_SAV\Name + file)
+			file=NextFile$(delDir)
+		Wend
+		CloseDir(delDir)
+		DeleteDir(I_SAV\Name)
+	EndIf
 	Delete I_SAV
 End Function
 

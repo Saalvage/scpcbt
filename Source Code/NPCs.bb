@@ -493,7 +493,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			Next
 			
 			If n\obj = 0 Then 
-				n\obj = LoadAnimMesh_Strict("GFX\npcs\178_npc.b3d")
+				n\obj = LoadMesh_Strict("GFX\npcs\178_npc.b3d")
 			EndIf
 			
 			EntityFX n\obj,1
@@ -501,7 +501,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			temp# = Rnd(0.6,0.8) / GetINIFloat("DATA\NPCs.ini", "SCP-178", "scale")
 			ScaleEntity n\obj, temp, temp, temp
 			
-			SetAnimTime n\obj,15.0
+			;SetAnimTime n\obj,15.0
 			
 			EntityType n\Collider,HIT_178
 			
@@ -886,8 +886,7 @@ Function UpdateNPCs()
 												EndIf
 											Else
 												PointEntity(n\Collider, Collider)
-												RotateEntity n\Collider, 0, EntityYaw(n\Collider), EntityRoll(n\Collider)
-												;MoveEntity(n\Collider, 0, 0, n\Speed * FPSfactor)
+												RotateEntity n\Collider, 0, EntityYaw(n\Collider), 0
 												TranslateEntity n\Collider,Cos(EntityYaw(n\Collider)+90.0)*n\Speed*FPSfactor,0.0,Sin(EntityYaw(n\Collider)+90.0)*n\Speed*FPSfactor
 											EndIf
 											
@@ -4126,13 +4125,13 @@ Function UpdateNPCs()
 				
 				If n\State = 0 Then
 					If n\Reload = 0 Then
-						AnimateNPC(n, 206, 240, 0.1)
+						;AnimateNPC(n, 206, 240, 0.1)
 						If n\Frame>=240 Then n\Reload = 1
 						
 						;Animate2(n\obj, AnimTime(n\obj), 206, 240, 0.1)
 						;If AnimTime(n\obj)>=240 Then n\Reload = 1
 					Else
-						AnimateNPC(n, 206, 240, -0.1)
+						;AnimateNPC(n, 206, 240, -0.1)
 						If n\Frame<=206 Then n\Reload = 0					
 						
 						;Animate2(n\obj, AnimTime(n\obj), 206, 240, -0.1)
@@ -4218,7 +4217,7 @@ Function UpdateNPCs()
 					
 					If dist>PowTwo(0.3) Then
 						MoveEntity n\Collider, 0, 0, n\CurrSpeed * FPSfactor
-						AnimateNPC(n, 64, 91, n\CurrSpeed*10.0)
+						;AnimateNPC(n, 64, 91, n\CurrSpeed*10.0)
 						;Animate2(n\obj, AnimTime(n\obj), 64, 91, n\CurrSpeed*10.0)
 						
 						For d.Doors = Each Doors
@@ -4583,7 +4582,7 @@ Function UpdateNPCs()
 							For n2.NPCs = Each NPCs
 								If n2\NPCtype = n\NPCtype And n2 <> n Then
 									If n2\State <> 0 And n2\State <> 2 Then
-										If n2\PrevState = 0 Then
+										If n2\PrevState = 0 And n2\State3 <> 1 Then
 											n\State = 1
 											n\State2 = 0
 											Exit

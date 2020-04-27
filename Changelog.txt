@@ -1,22 +1,27 @@
 ﻿v1.4.0
 
-- Added SCP-682.
+SCPs:
 - (Re-)Added SCP-178 with improved mechanics.
 	- It now increases blinking time.
 	- Better refinements.
 	- Improved inventory icon.
+- (Re-)Added SCP-173's head rotating.	
+- Much improved SCP-205.
+- Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
+- Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
+	- Also overhauled the design of its pages.
+General:
 - Added localization/mod support with built in support for Englisch (due), German, 
 - Added FOV option.
 	- Decreased default FOV to 60.
 	- Fixed float values being allowed in the menus.
 - Added support for resolutions of up to 4k.
 - Added anisotropic filtering.
+Items:
 - Added SCRAMBLE gear.
 	- Including coarse, fine and very fine variants.
-- Much improved SCP-205.
-- Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
-	- Also overhauled the design of its pages.
-- Added actual crouching.
+- Added unique hazmat suit overlay.
+Rooms:
 - Added room2tunnel3 (HCZ), room2offices5 (EZ).
 - Redesigned room1archive.
 - Added a new door type.
@@ -25,16 +30,16 @@
 - Rebalanced the S-NAVs, making the S-NAV 5000 (S-NAV Ultimate) less overpowered, the S-NAV 400 (formerly S-NAV 310) less useless and the S-LOC (formerly S-NAV) more interesting.
 - Added documents for SCP-990 and GoIs.
 - Added an additional SCP-1162 nostalgia item.
-- (Re-)Added SCP-173's head rotating.
 - Added bloody SCP-096 texture after killing someone.
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
-- Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
+- Added a new sound when getting up from the bed in the intro sequence.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
 - Added loading screen scaling.
 - Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A, the radio and the keycards.
 - Improved the SCP-682 and Night Vision Goggles loading screen.
+- Improved application icon.
 - Added new achievment image for SCP-1048.
 - Changed some standard settings; e.g.: when starting the game for the first time, fullscreen will be active and the game size will be the screen size.
 - Added button to restore all settings to standard values.
@@ -43,7 +48,7 @@
 - Many changes to SCP-914:
 	- Added Bad Gas Mask.
 	- Added Bad SCP-1499.
-	- Added version of SCP-1499 that is faster to put on.
+	- Added version of SCP-1499 that is faster to put on (with a challenge!).
 	- Added Blank Document.
 	- Added ability to downgrade Keycards.
 	- Added "Super" SCP-427 and refinements for SCP-427.
@@ -63,17 +68,21 @@
 	- Fixed SCP-148's refinements.
 	- Improved 1:1 humans.
 	- And a lot of other improvements!
+- Much improved SCP-970.
+- Added glow to buttons and improved them a bit.
 - Improved boxfile models.
 - Added EZ endroom version.
-- Added SCP-106 endroom event to all threee endrooms.
+- Added SCP-106 endroom event to all three endrooms.
+- Added new ambiance music to SCP-106's room.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Slightly improved SCP-372 model.
-- Added better text editing.
+- Added much better text editing.
 - Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
 - Added some space between the page indicator and the next/previous page buttons on the load game screen.
 - SCP-1123 can now be picked up using SCP-714.
-- Updated SCP-294's loading screen units to metric (as per wiki page).
+- Made a coin more special.
+- Updated SCP-294's loading screen units to metric.
 - Changed the name of the Custom difficulty to "Esoteric".
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
@@ -82,7 +91,6 @@
 - The hazmat suit is now hunched over when put off.
 - Increased size of the SCP-148 ingot.
 - Increased size of Electronical Components.
-- Added ability to clear current console input via Ctrl + Backspace.
 - Added "clear" command, which clears the console.
 - Added "ulti" command, which spawns a set of ultimate tools.
 - Reworked the disable/enable commands for SCP-173 and SCP-106 and adjusted the teleport commands accordingly.
@@ -117,14 +125,19 @@ Bug Fixes:
 	- Fixed godmode not protecting against all injuries.
 	- Fixed inventory single clicks being recognized as double clicks.
 	- Fixed message being moved down if selecting a document, while a clipboard/wallet is open.
+	- Fixed SCP-895 and NVG interaction.
 	- Fixed launcher options not saving when quitting.
 	- Fixed messages being visible in the pause menu.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
-	- Fixed the triggers in the SCP-939 infested area.
+	- Fixed security camera bases rotating with the cameras.
+	- Fixed security camera positions in room173 and start.
+	- Fixed the emitters in SCP-035's room sometimes clipping into the maintenance tunnels.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.
-	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed button positions in SCP-079 and SCP-035's room.
+	- Fixed the triggers in the SCP-939 infested area.
+	- Fixed the security camera's position in SCP-966's room.
+	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed certain item attributes not being saved.
 	- Fixed intro movies being laggy.
 	- Fixed z-fighting on monitor model.
@@ -135,6 +148,7 @@ Bug Fixes:
 	- Fixed SCP-513-1 model.
 	- Fixed tank models.
 	- Fixed and reworked the "revive" command.
+	- Fixed "sanic" command causing death and other unwanted sideeffects.
 	- Fixed untitled save files not correctly being named after the second one.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.
 

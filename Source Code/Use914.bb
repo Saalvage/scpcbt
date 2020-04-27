@@ -491,15 +491,13 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 				Case FINE
 					it2 = CreateItem("super1499", x, y, z)
 				Case VERY_FINE
-					If Rand(3)=1 Then
-						n.NPCs = CreateNPC(NPCtype1499,x,y,z)
-						n\State = 1
-						n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
-						n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
-						n\State3 = 1
-					Else
-						it2 = CreateItem("fine1499", x, y, z)
-					EndIf
+					n.NPCs = CreateNPC(NPCtype1499,x,y,z)
+					n\State = 1
+					n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
+					n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
+					n\State3 = 1
+					n\Speed = 0.01
+					it2 = CreateItem("fine1499", x, y, z)
 			End Select
 		Case "super1499"
 			Select setting
@@ -510,15 +508,13 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 				Case ONETOONE
 					it2 = CreateItem("supergasmask", x, y, z)
 				Case FINE, VERY_FINE
-					If Rand(5)=1 Then
-						n.NPCs = CreateNPC(NPCtype1499,x,y,z)
-						n\State = 1
-						n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
-						n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
-						n\State3 = 1
-					Else
-						it2 = CreateItem("fine1499", x, y, z)
-					EndIf
+					n.NPCs = CreateNPC(NPCtype1499,x,y,z)
+					n\State = 1
+					n\Sound = LoadSound_Strict("SFX\SCP\1499\Triggered.ogg")
+					n\SoundChn = PlaySound2(n\Sound, Camera, n\Collider,20.0)
+					n\State3 = 1
+					n\Speed = 0.01
+					it2 = CreateItem("fine1499", x, y, z)
 			End Select
 		Case "fine1499"
 			Select setting

@@ -165,6 +165,7 @@ Function UpdateEvents()
 					If e\EventState < 850
 						PositionEntity Curr173\Collider, e\room\x+32*RoomScale, 0.31, e\room\z+1072*RoomScale, True
 						HideEntity Curr173\obj
+						HideEntity Curr173\obj2
 					EndIf
 					
 					If e\EventState >= 500 Then
@@ -173,6 +174,7 @@ Function UpdateEvents()
 						If e\EventState2 = 0 Then
 							;CanSave = False
 							ShowEntity Curr173\obj
+							ShowEntity Curr173\obj2
 							If e\EventState > 900 And e\room\RoomDoors[5]\open Then
 								If e\EventState - FPSfactor <= 900 Then 
 									e\room\NPC[1]\Sound = LoadSound_Strict("SFX\Room\Intro\WhatThe.ogg")
@@ -386,6 +388,8 @@ Function UpdateEvents()
 							EndIf
 							
 							If e\EventState3 < 15 Then
+							
+								If e\EventState3 - FPSfactor/30.0 < 3.7 And e\EventState3 > 3.7 Then PlaySound_Strict(IntroSFX(19))
 								
 								x = EntityX(e\room\obj)-(3224.0+1024.0)*RoomScale
 								y = 136.0*RoomScale
@@ -452,6 +456,7 @@ Function UpdateEvents()
 							EndIf							
 							
 						ElseIf e\EventState3 => 150.0 And e\EventState3 < 700
+							FreeSound_Strict(IntroSFX(19)) : IntroSFX(19) = 0
 							If e\room\NPC[3]\State = 7 Then
 								If e\room\NPC[3]\Sound2 = 0
 									e\room\NPC[3]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\BeforeDoorOpen.ogg")
@@ -4039,7 +4044,7 @@ Function UpdateEvents()
 						Local itt.ItemTemplates
 						For itt.ItemTemplates = Each ItemTemplates
 							If itt\namespec = "drawing" Then
-								If itt\img<>0 Then FreeImage itt\img	
+								If itt\img<>0 Then FreeImage itt\img
 								itt\img = LoadImage_Strict(imgPath)
 								MaskImage(itt\img, 255,0,255)
 								itt\imgpath = imgPath
@@ -4080,10 +4085,10 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 						ElseIf e\EventState=1
-							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 487, 636, 0.5, False)
+							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 488, 636, 0.5, False)
 							If AnimTime(e\room\Objects[2])=636 Then e\EventState=2
 						ElseIf e\EventState = 2
-							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 338, 487, 1.0)	
+							Animate2(e\room\Objects[2], AnimTime(e\room\Objects[2]), 339, 487, 1.0)
 							If EntityDistanceSquared(Collider, e\room\Objects[2])<PowTwo(1.5) Then
 								DrawHandIcon = True
 								
@@ -4092,7 +4097,7 @@ Function UpdateEvents()
 										Msg = GetLocalString("Messages", "cantcarrymore")
 										MsgTimer = 70 * 5
 									Else
-										SelectedItem = CreateItem("paper", 0.0, 0.0, 0.0, drawing)
+										SelectedItem = CreateItem("paper", 0.0, 0.0, 0.0, "drawing")
 										EntityType SelectedItem\collider,HIT_ITEM
 										
 										PickItem(SelectedItem)
@@ -4588,31 +4593,29 @@ Function UpdateEvents()
 						
 						Select e\EventState 
 							Case 2
-								i = Rand(MaxItemAmount)
-								If Inventory(i)<>Null Then RemoveItem(Inventory(i))								
+								For it.Items = Each Items
+									If it\Picked = 0 And EntityDistanceSquared(e\room\obj, it\collider) < 20 And Rand(3) = 1 Then RemoveItem(it)
+								Next
 							Case 5
 								Injuries = Injuries + 0.3
 							Case 10
 								de.Decals = CreateDecal(3, EntityX(e\room\obj)+Cos(e\room\angle-90)*760*RoomScale, 0.0005, EntityZ(e\room\obj)+Sin(e\room\angle-90)*760*RoomScale,90,Rnd(360),0)
 							Case 14
-								For i = 0 To MaxItemAmount-1
-									If Inventory(i)<> Null Then
-										If Inventory(i)\itemtemplate\tempname = "paper" Then
-											RemoveItem(Inventory(i))
-											For itt.ItemTemplates = Each ItemTemplates
-												If itt\tempname = "paper" And Rand(6)=1 Then
-													Inventory(i) = CreateItem(itt\tempname, 1,1,1, itt\namespec)
-													HideEntity Inventory(i)\collider
-													Inventory(i)\Picked = 1
-													Exit
-												EndIf
-											Next
-											Exit
-										EndIf
+								For it.Items = Each Items
+									If it\Picked = 0 And it\itemtemplate\tempname = "paper" And Rand(50) = 1 Then
+										For itt.ItemTemplates = Each ItemTemplates
+											If itt\tempname = "paper" And Rand(6)=1 Then
+												it2.Items = CreateItem(itt\tempname, EntityX(it\collider), EntityY(it\collider), EntityZ(it\collider), itt\namespec)
+												EntityParent(it2\collider, e\room\obj)
+												Insert it2 Before it
+												RemoveItem(it)
+												Exit
+											EndIf
+										Next
 									EndIf
 								Next
 							Case 18
-								TFormPoint -344,176, 272, e\room\obj,0
+								TFormPoint -344,176,272, e\room\obj,0
 								it.Items = CreateItem("paper", TFormedX(), TFormedY(), TFormedZ(), "strange")
 								EntityType(it\collider, HIT_ITEM)
 							Case 25
@@ -4624,12 +4627,6 @@ Function UpdateEvents()
 								FreeTexture tex
 								SetAnimTime(e\room\NPC[0]\obj,80)
 								e\room\NPC[0]\State=10
-							Case 30
-								i = Rand(0,MaxItemAmount-1)
-								If Inventory(i)<>Null Then RemoveItem(Inventory(i))
-								Inventory(i) = CreateItem("paper", 1,1,1, "strange")
-								HideEntity Inventory(i)\collider
-								Inventory(i)\Picked = 1
 							Case 35
 								For i = 0 To 3
 									de.Decals = CreateDecal(17, e\room\x+Rnd(-2,2), 700*RoomScale, e\room\z+Rnd(-2,2), 270, Rand(360), 0)
@@ -4919,7 +4916,7 @@ Function UpdateEvents()
 					Else
 						
 						If e\Sound=0 Then LoadEventSound(e,"SFX\Music\012Golgotha.ogg")
-						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[3], 5.0)
+						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\Objects[3], 5.0*(EntityY(Collider)/-2.7)) ; -2.7 is the bottom of the ground
 						
 						If e\Sound2=0 Then LoadEventSound(e,"SFX\Music\012.ogg",1)
 						
@@ -4942,10 +4939,8 @@ Function UpdateEvents()
 						If Wearing714=False And WearingGasMask<3 And WearingHazmat<3 Then
 							;temp = False
 							If EntityVisible(e\room\Objects[2],Camera) Then 							
-							;012 not visible, walk to the door														
-								
-								
-							;DebugLog "WHERE IS IT?!"	
+								;012 not visible, walk to the door
+								;DebugLog "WHERE IS IT?!"
 								e\SoundCHN2 = LoopSound2(e\Sound2, e\SoundCHN2, Camera, e\room\Objects[3], 10, e\EventState3/(86.0*70.0))
 								
 								pvt% = CreatePivot()
@@ -5046,7 +5041,7 @@ Function UpdateEvents()
 									ElseIf angle > 310.0
 										ForceMove = (40.0-Abs(360.0-angle))*0.008
 									EndIf
-									FreeEntity pvt	
+									FreeEntity pvt
 									
 								EndIf
 								DebugLog Distance(EntityX(Collider), EntityX(e\room\RoomDoors[0]\frameobj), EntityZ(Collider), EntityZ(e\room\RoomDoors[0]\frameobj))
@@ -5132,8 +5127,8 @@ Function UpdateEvents()
 										PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 424.0*RoomScale, EntityZ(e\room\Objects[5],True),True)
 										PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 424.0*RoomScale, EntityZ(e\room\Objects[6],True),True)
 									Else
-										PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 10, EntityZ(e\room\Objects[5],True),True)
-										PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 10, EntityZ(e\room\Objects[6],True),True)
+										PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 20, EntityZ(e\room\Objects[5],True),True)
+										PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 20, EntityZ(e\room\Objects[6],True),True)
 										
 									EndIf
 									
@@ -5187,8 +5182,8 @@ Function UpdateEvents()
 										EndIf	
 									EndIf
 									
-									PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 10, EntityZ(e\room\Objects[5],True),True)
-									PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 10, EntityZ(e\room\Objects[6],True),True)
+									PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 20, EntityZ(e\room\Objects[5],True),True)
+									PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 20, EntityZ(e\room\Objects[6],True),True)
 									
 									If e\room\NPC[0]\State = 0 Then
 										PointEntity e\room\NPC[0]\obj, Collider
@@ -5390,8 +5385,8 @@ Function UpdateEvents()
 							PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 424.0*RoomScale, EntityZ(e\room\Objects[5],True),True)
 							PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 424.0*RoomScale, EntityZ(e\room\Objects[6],True),True)
 						Else
-							PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 10, EntityZ(e\room\Objects[5],True),True)
-							PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 10, EntityZ(e\room\Objects[6],True),True)
+							PositionEntity(e\room\Objects[5], EntityX(e\room\Objects[5],True), 20, EntityZ(e\room\Objects[5],True),True)
+							PositionEntity(e\room\Objects[6], EntityX(e\room\Objects[6],True), 20, EntityZ(e\room\Objects[6],True),True)
 						EndIf
 						
 						;If UpdateLever(e\room\Levers[0]) Then
@@ -5871,7 +5866,7 @@ Function UpdateEvents()
 					
 					;ShowEntity e\room\NPC[0]\obj
 					
-					ShouldPlay = 66
+					ShouldPlay = 26
 					
 					e\room\NPC[0]\State=6
 					If e\room\NPC[0]\Idle = 0 Then

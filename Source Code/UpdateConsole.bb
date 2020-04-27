@@ -575,12 +575,12 @@ Function UpdateConsole()
 					EndIf
 
 				Case "sanic"
-
-					I_Cheats\SuperMan = Not I_Cheats\SuperMan
-					If I_Cheats\SuperMan = True Then
-						CreateConsoleMsg("GOTTA GO FAST")
-					Else
+					If I_Cheats\Speed Then
 						CreateConsoleMsg("WHOA SLOW DOWN")
+						I_Cheats\Speed = False
+					Else
+						CreateConsoleMsg("GOTTA GO FAST")
+						I_Cheats\Speed = True
 					EndIf
 
 				Case "scp-420-j","420","weed"
@@ -663,6 +663,8 @@ Function UpdateConsole()
 					ShowEntity Collider
 					
 					MoveEntity(Collider, 0, 2, 0)
+					
+					ResetEntity(Collider)
 					
 					KillTimer = 0
 					KillAnim = 0
@@ -752,6 +754,7 @@ Function UpdateConsole()
 							PositionEntity Curr173\Collider, 0,0,0
 							ResetEntity Curr173\Collider
 							ShowEntity Curr173\obj
+							ShowEntity Curr173\obj2
 							RemoveEvent(e)
 							Exit
 						EndIf
@@ -835,6 +838,7 @@ Function UpdateConsole()
 							PositionEntity Curr173\Collider, 0,0,0
 							ResetEntity Curr173\Collider
 							ShowEntity Curr173\obj
+							ShowEntity Curr173\obj2
 							RemoveEvent(e)
 							Exit
 						EndIf

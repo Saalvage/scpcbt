@@ -22,8 +22,8 @@ Global AchievementsMenu%
 Global AchvMSGenabled% = GetINIInt(OptionFile, "options", "achievement popup enabled")
 For i = 0 To MAXACHIEVEMENTS
 	Local loc2 = GetINISectionLocation(AchvIni, "s"+Str(i))
-	AchievementStrings[i] = GetINIString2(AchvIni, loc2, "string1")
-	AchievementDescs[i] = GetINIString2(AchvIni, loc2, "AchvDesc")
+	AchievementStrings[i] = GetINIString2(AchvIni, loc2, "name")
+	AchievementDescs[i] = GetINIString2(AchvIni, loc2, "desc")
 	
 	Local image$ = GetINIString2(AchvIni, loc2, "image")
 	
@@ -39,7 +39,7 @@ Function GiveAchievement(achvname%, showMessage%=True)
 		Achievements[achvname]=True
 		If AchvMSGenabled And showMessage Then
 			Local loc2% = GetINISectionLocation(AchvIni, "s"+achvname)
-			Local AchievementName$ = GetINIString2(AchvIni, loc2, "string1")
+			Local AchievementName$ = GetINIString2(AchvIni, loc2, "name")
 			CreateAchievementMsg(achvname,AchievementName)
 		EndIf
 	EndIf
