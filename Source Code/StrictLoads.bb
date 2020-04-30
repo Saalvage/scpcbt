@@ -14,8 +14,6 @@
 ;likely to cause more crashes than 'clean' CB, as this prevents anyone from loading any assets that don't exist, regardless if they are ever used
 ;added zero checks since blitz load functions return zero sometimes even if the filetype exists
 Function LoadImage_Strict(file$)
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		Return LoadImage(I_Loc\LangPath + file$)
 	EndIf
@@ -61,7 +59,6 @@ Function AutoReleaseSounds()
 End Function
 
 Function PlaySound_Strict%(sndHandle%)
-	Local I_Opt.Options = First Options
 	Local snd.Sound = Object.Sound(sndHandle)
 	If snd <> Null Then
 		Local shouldPlay% = True
@@ -127,8 +124,6 @@ Function PlaySound_Strict%(sndHandle%)
 End Function
 
 Function LoadSound_Strict(file$)
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		file = I_Loc\LangPath + file
 	EndIf
@@ -161,10 +156,6 @@ Type Stream
 End Type
 
 Function StreamSound_Strict(file$,volume#=1.0,custommode=2)
-	
-	Local I_Opt.Options = First Options
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		file = I_Loc\LangPath + file
 	EndIf
@@ -302,8 +293,6 @@ Function UpdateStreamSoundOrigin(streamHandle%,cam%,entity%,range#=10,volume#=1.
 End Function
 
 Function LoadMesh_Strict(File$,parent=0)
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		Return LoadMesh(I_Loc\LangPath + File$, parent)
 	EndIf
@@ -314,8 +303,6 @@ Function LoadMesh_Strict(File$,parent=0)
 End Function
 
 Function LoadAnimMesh_Strict(File$,parent=0)
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		Return LoadAnimMesh(I_Loc\LangPath + File$, parent)
 	EndIf
@@ -327,7 +314,6 @@ End Function
 
 ;don't use in LoadRMesh, as Reg does this manually there. If you wanna fuck around with the logic in that function, be my guest ; I fucked around in it, and it works nandy dandy ~ Salvage
 Function LoadTexture_Strict(File$,flags=1)
-	Local I_Loc.Loc = First Loc
 	Local tmp%
 	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
@@ -342,8 +328,6 @@ Function LoadTexture_Strict(File$,flags=1)
 End Function
 
 Function LoadBrush_Strict(file$,flags,u#=1.0,v#=1.0)
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		Return LoadBrush(I_Loc\LangPath + file$, flags, u, v)
 	EndIf
@@ -351,10 +335,4 @@ Function LoadBrush_Strict(file$,flags,u#=1.0,v#=1.0)
 	tmp = LoadBrush(file$, flags, u, v)
 	If tmp = 0 Then RuntimeError "Failed to load Brush: " + file$ 
 	Return tmp 
-End Function
-
-Function LoadFont_Strict(file$="Tahoma", height=13, bold=0, italic=0, underline=0)
-	tmp = LoadFont(file, height, bold, italic, underline)
-	If tmp = 0 Then RuntimeError "Failed to load Font: " + file$ 
-	Return tmp
 End Function

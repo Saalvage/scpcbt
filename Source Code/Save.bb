@@ -1,9 +1,6 @@
 Function SaveGame(file$, zonemod%=0)
 	;CatchErrors("SaveGame")
 	
-	Local I_Cheats.Cheats = First Cheats
-	Local I_Loc.Loc = First Loc
-	
 	GameSaved = True
 	
 	Local x%, y%, i%, temp%
@@ -140,7 +137,6 @@ Function SaveGame(file$, zonemod%=0)
 	WriteFloat f, CameraFogFar
 	WriteFloat f, StoredCameraFogFar
 	
-	Local I_427.SCP427 = First SCP427
 	WriteByte f, I_427\Using
 	WriteFloat f, I_427\Timer
 	
@@ -537,9 +533,6 @@ Function LoadGame(file$)
 	;CatchErrors("LoadGame")
 	DebugLog "---------------------------------------------------------------------------"
 	
-	Local I_Cheats.Cheats = First Cheats
-	Local I_Loc.Loc = First Loc
-	
 	DropSpeed=0.0
 	
 	DebugHUD = False
@@ -672,7 +665,6 @@ Function LoadGame(file$)
 		CameraFogFar = 6
 	EndIf
 	
-	Local I_427.SCP427 = First SCP427
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	
@@ -1398,9 +1390,6 @@ Function LoadGameQuick(file$, loadzone%=1)
 	;CatchErrors("LoadGameQuick")
 	DebugLog "---------------------------------------------------------------------------"
 	
-	Local I_Cheats.Cheats = First Cheats
-	Local I_Loc.Loc = First Loc
-	
 	DebugHUD = False
 	GameSaved = True
 	NoTarget = False
@@ -1565,7 +1554,6 @@ Function LoadGameQuick(file$, loadzone%=1)
 		CameraFogFar = 6
 	EndIf
 	
-	Local I_427.SCP427 = First SCP427
 	I_427\Using = ReadByte(f)
 	I_427\Timer = ReadFloat(f)
 	

@@ -4,7 +4,7 @@ Type Keys
 	Field KeyName$[211]
 End Type
 
-Local I_Keys.Keys = New Keys
+Global I_Keys.Keys = New Keys
 
 I_Keys\RIGHT = GetINIInt(OptionFile, "binds", "Right key")
 I_Keys\LEFT = GetINIInt(OptionFile, "binds", "Left key")

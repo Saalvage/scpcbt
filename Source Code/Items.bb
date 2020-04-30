@@ -296,8 +296,8 @@ Function InitItemTemplates()
 	CreateItemTemplate("veryfinesyringe", "GFX\items\Syringe\syringe.b3d", "GFX\items\Syringe\inv.png", "", 0.005, 2)
 	
 	CreateItemTemplate("hand", "GFX\items\severedhand.b3d", "GFX\items\INVhand.jpg", "", 0.04, 2)
-	CreateItemTemplate("hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.04, 2, "", "GFX\items\shand2.png")
-	CreateItemTemplate("hand3", "GFX\items\severedhand.b3d", "GFX\items\INVhand3.jpg", "", 0.04, 2, "", "GFX\items\shand3.png")
+	CreateItemTemplate("hand2", "GFX\items\severedhand.b3d", "GFX\items\INVhand2.jpg", "", 0.041, 2, "", "GFX\items\shand2.png")
+	CreateItemTemplate("hand3", "GFX\items\severedhand.b3d", "GFX\items\INVhand3.jpg", "", 0.039, 2, "", "GFX\items\shand3.png")
 	
 	CreateItemTemplate("key", "GFX\items\key.b3d", "GFX\items\INV1162_1.jpg", "", 0.001, 3, "lkey", "GFX\items\key2.png","",0,1+2+8)
 	CreateItemTemplate("coin", "GFX\items\key.b3d", "GFX\items\INVcoinrust.jpg", "", 0.0005, 3, "", "GFX\items\coinrust.png","",0,1+2+8)
@@ -457,14 +457,13 @@ Function RemoveItem(i.Items)
 				WearingGasMask = False
 			Case "badvest", "vest", "finevest"
 				WearingVest = False
-			Case "hazmat0","hazmat","hazmat2","hazmat3"
+			Case "hazmat0", "hazmat", "hazmat2", "hazmat3"
 				WearingHazmat = False
 			Case "scp714"
 				Wearing714 = False
-			Case "bad1499","scp1499","super1499","fine1499"
+			Case "bad1499", "scp1499", "super1499", "fine1499"
 				Wearing1499 = False
 			Case "scp427", "super427"
-				Local I_427.SCP427 = First SCP427
 				I_427\Using = 0
 		End Select
 		
@@ -796,7 +795,6 @@ Function DropItem(item.Items,playdropsound%=True)
 			Case "scp178"
 				Wearing178 = 0
 			Case "scp427", "super427"
-				Local I_427.SCP427 = First SCP427
 				I_427\Using = 0
 			Case "scp714"
 				Wearing714 = False

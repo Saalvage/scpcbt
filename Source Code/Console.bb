@@ -2,9 +2,6 @@ Function UpdateConsole()
 	
 	Local e.Events
 	
-	Local I_Opt.Options = First Options
-	Local I_Cheats.Cheats = First Cheats
-	
 	If I_Opt\ConsoleEnabled = False Then
 		ConsoleOpen = False
 		Return
@@ -47,17 +44,17 @@ Function UpdateConsole()
 		If Not MouseDown(1) Then
 			ConsoleScrollDragging=False
 		ElseIf ConsoleScrollDragging Then
-			ConsoleScroll = ConsoleScroll+((ScaledMouseY(I_Opt)-ConsoleMouseMem)*height/scrollbarHeight)
-			ConsoleMouseMem = ScaledMouseY(I_Opt)
+			ConsoleScroll = ConsoleScroll+((ScaledMouseY()-ConsoleMouseMem)*height/scrollbarHeight)
+			ConsoleMouseMem = ScaledMouseY()
 		EndIf
 		
 		If (Not ConsoleScrollDragging) Then
 			If MouseHit1 Then
 				If inBox Then
 					ConsoleScrollDragging=True
-					ConsoleMouseMem = ScaledMouseY(I_Opt)
+					ConsoleMouseMem = ScaledMouseY()
 				ElseIf inBar Then
-					ConsoleScroll = ConsoleScroll+((ScaledMouseY(I_Opt)-(y+height))*consoleHeight/height+(height/2))
+					ConsoleScroll = ConsoleScroll+((ScaledMouseY()-(y+height))*consoleHeight/height+(height/2))
 					ConsoleScroll = ConsoleScroll/2
 				EndIf
 			EndIf
@@ -394,45 +391,24 @@ Function UpdateConsole()
 					CreateConsoleMsg("Bloodloss: "+Bloodloss)
 					CreateConsoleMsg("******************************")
 				Case "fov"
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					FOV = Int(StrTemp)
-
+					FOV = Int(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 				Case "hidedistance"
-
 					HideDistance = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					CreateConsoleMsg("Hidedistance set to "+HideDistance)
-
+					CreateConsoleMsg("Hidedistance set to " + HideDistance)
 				Case "ending"
-
 					SelectedEnding = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					KillTimer = -0.1
 					;EndingTimer = -0.1
-
 				Case "noclipspeed"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					
-					I_Cheats\NoClipSpeed = Float(StrTemp)
-
+					I_Cheats\NoClipSpeed = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 				Case "injure"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					
-					Injuries = Float(StrTemp)
-
+					Injuries = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 				Case "infect"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					
-					Infect = Float(StrTemp)
-
+					Infect = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 				Case "heal"
-
 					Injuries = 0
 					Bloodloss = 0
-
 				Case "teleport"
-
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					For r.Rooms = Each Rooms
@@ -451,9 +427,7 @@ Function UpdateConsole()
 					Next
 					
 					If PlayerRoom\RoomTemplate\Name <> StrTemp Then CreateConsoleMsg("Room not found.",255,150,0)
-
 				Case "spawnitem"
-
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					temp = False 
@@ -480,19 +454,8 @@ Function UpdateConsole()
 					Next
 					
 					If temp = False Then CreateConsoleMsg("Item not found.",255,150,0)
-
 				Case "wireframe"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					
-					Select StrTemp
-						Case "on", "1", "true"
-							I_Cheats\WireframeState = True							
-						Case "off", "0", "false"
-							I_Cheats\WireframeState = False
-						Default
-							I_Cheats\WireframeState = Not I_Cheats\WireframeState
-					End Select
+					I_Cheats\WireframeState = Not I_Cheats\WireframeState
 					
 					If I_Cheats\WireframeState Then
 						CreateConsoleMsg("WIREFRAME ON")
@@ -501,37 +464,25 @@ Function UpdateConsole()
 					EndIf
 					
 					WireFrame I_Cheats\WireframeState
-
 				Case "173speed"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Curr173\Speed = Float(StrTemp)
-					CreateConsoleMsg("173's speed set to " + StrTemp)
-
+					Curr173\Speed = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					CreateConsoleMsg("173's speed set to " + Curr173\Speed)
 				Case "106speed"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Curr106\Speed = Float(StrTemp)
-					CreateConsoleMsg("106's speed set to " + StrTemp)
-
+					Curr106\Speed = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					CreateConsoleMsg("106's speed set to " + Curr106\Speed)
 				Case "173state"
-
 					CreateConsoleMsg("SCP-173")
 					CreateConsoleMsg("Position: " + EntityX(Curr173\obj) + ", " + EntityY(Curr173\obj) + ", " + EntityZ(Curr173\obj))
 					CreateConsoleMsg("Idle: " + Curr173\Idle)
 					CreateConsoleMsg("State: " + Curr173\State)
 					CreateConsoleMsg("Enabled: " + Enabled106)
-
 				Case "106state"
-
 					CreateConsoleMsg("SCP-106")
 					CreateConsoleMsg("Position: " + EntityX(Curr106\obj) + ", " + EntityY(Curr106\obj) + ", " + EntityZ(Curr106\obj))
 					CreateConsoleMsg("Idle: " + Curr106\Idle)
 					CreateConsoleMsg("State: " + Curr106\State)
 					CreateConsoleMsg("Enabled: " + Enabled106)
-
 				Case "reset096"
-
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
 							n\State = 0
@@ -542,25 +493,15 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
-
 				Case "disable173"
-
 					I_Cheats\Enabled173 = False
-
 				Case "enable173"
-
 					I_Cheats\Enabled173 = True
-
 				Case "disable106"
-
 					I_Cheats\Enabled106 = False
-
 				Case "enable106"
-
 					I_Cheats\Enabled106 = True
-
 				Case "halloween"
-
 					I_Opt\HalloweenTex = Not I_Opt\HalloweenTex
 					If I_Opt\HalloweenTex Then
 						Local tex = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
@@ -573,18 +514,15 @@ Function UpdateConsole()
 						FreeTexture tex2
 						CreateConsoleMsg("173 JACK-O-LANTERN OFF")
 					EndIf
-
-				Case "sanic"
+				Case "speed", "sanic"
+					I_Cheats\Speed = Not I_Cheats\Speed
+					
 					If I_Cheats\Speed Then
-						CreateConsoleMsg("WHOA SLOW DOWN")
-						I_Cheats\Speed = False
-					Else
 						CreateConsoleMsg("GOTTA GO FAST")
-						I_Cheats\Speed = True
+					Else
+						CreateConsoleMsg("WHOA SLOW DOWN")
 					EndIf
-
 				Case "scp-420-j","420","weed"
-
 					For i = 1 To 20
 						If Rand(2)=1 Then
 							it.Items = CreateItem("scp420j", EntityX(Collider,True)+Cos((360.0/20.0)*i)*Rnd(0.3,0.5), EntityY(Camera,True), EntityZ(Collider,True)+Sin((360.0/20.0)*i)*Rnd(0.3,0.5))
@@ -594,27 +532,15 @@ Function UpdateConsole()
 						EntityType (it\collider, HIT_ITEM)
 					Next
 					PlaySound_Strict LoadTempSound("SFX\Music\420J.ogg")
-
 				Case "godmode", "god"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					I_Cheats\GodMode = Not I_Cheats\GodMode
 					
-					Select StrTemp
-						Case "on", "1", "true"
-							I_Cheats\GodMode = True						
-						Case "off", "0", "false"
-							I_Cheats\GodMode = False
-						Default
-							I_Cheats\GodMode = Not I_Cheats\GodMode
-					End Select	
 					If I_Cheats\GodMode Then
 						CreateConsoleMsg("GODMODE ON")
 					Else
 						CreateConsoleMsg("GODMODE OFF")
 					EndIf
-
-				Case "revive","undead","resurrect"
-
+				Case "revive", "undead", "resurrect"
 					DropSpeed = -0.1
 					HeadDropSpeed = 0.0
 					Shake = 0
@@ -646,12 +572,12 @@ Function UpdateConsole()
 					
 					;If death by 173 and 106, enable GodMode to prevent instant death again ~ Salvage
 					If DeathMSG = GetLocalString("Deaths", "173") Lor DeathMSG = GetLocalString("Deaths", "173intro") Lor DeathMSG = GetLocalString("Deaths", "173lock") Lor DeathMSG = GetLocalString("Deaths", "173doors") Then
-						CreateConsoleMsg("Death by SCP-173 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
 						Curr173\Idle = False
+						CreateConsoleMsg("Death by SCP-173 causes GodMode to be enabled!")
 					ElseIf EntityDistanceSquared(Collider, Curr106\Collider) < PowTwo(1.0) Then
-						CreateConsoleMsg("Death by SCP-106 causes GodMode to be enabled!")
 						I_Cheats\GodMode = 1
+						CreateConsoleMsg("Death by SCP-106 causes GodMode to be enabled!")
 					EndIf
 					
 					For np.NPCs = Each NPCs
@@ -668,42 +594,22 @@ Function UpdateConsole()
 					
 					KillTimer = 0
 					KillAnim = 0
-
-				Case "noclip","fly"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					
-					Select StrTemp
-						Case "on", "1", "true"
-							I_Cheats\NoClip = True
-							Playable = True
-						Case "off", "0", "false"
-							I_Cheats\NoClip = False	
-							RotateEntity Collider, 0, EntityYaw(Collider), 0
-						Default
-							I_Cheats\NoClip = Not I_Cheats\NoClip
-							If I_Cheats\NoClip = False Then		
-								RotateEntity Collider, 0, EntityYaw(Collider), 0
-							Else
-								Playable = True
-							EndIf
-					End Select
+				Case "noclip", "fly"
+					I_Cheats\NoClip = Not I_Cheats\NoClip
 					
 					If I_Cheats\NoClip Then
+						Playable = True
 						CreateConsoleMsg("NOCLIP ON")
 					Else
+						RotateEntity Collider, 0, EntityYaw(Collider), 0
 						CreateConsoleMsg("NOCLIP OFF")
 					EndIf
 					
 					DropSpeed = 0
-
 				Case "showfps"
-
 					I_Opt\ShowFPS = Not I_Opt\ShowFPS
-					CreateConsoleMsg("ShowFPS: "+Str(I_Opt\ShowFPS))
-
+					CreateConsoleMsg("ShowFPS: " + I_Opt\ShowFPS)
 				Case "096state"
-
 					For n.NPCs = Each NPCs
 						If n\NPCtype = NPCtype096 Then
 							CreateConsoleMsg("SCP-096")
@@ -713,28 +619,17 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
+					
 					CreateConsoleMsg("SCP-096 has not spawned.")
-
 				Case "debughud"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
-					Select StrTemp
-						Case "on", "1", "true"
-							DebugHUD = True
-						Case "off", "0", "false"
-							DebugHUD = False
-						Default
-							DebugHUD = Not DebugHUD
-					End Select
+					DebugHUD = Not DebugHUD
 					
 					If DebugHUD Then
-						CreateConsoleMsg("Debug Mode On")
+						CreateConsoleMsg("Debug HUD On")
 					Else
-						CreateConsoleMsg("Debug Mode Off")
+						CreateConsoleMsg("Debug HUD Off")
 					EndIf
-
 				Case "stopsound", "stfu"
-
 					For snd.Sound = Each Sound
 						For i = 0 To 31
 							If snd\channels[i]<>0 Then
@@ -742,6 +637,11 @@ Function UpdateConsole()
 							EndIf
 						Next
 					Next
+					
+					If IntercomStreamCHN <> 0 Then
+						StopStream_Strict(IntercomStreamCHN)
+						IntercomStreamCHN = 0
+					EndIf
 					
 					For e.Events = Each Events
 						If e\EventName = "alarm" Then 
@@ -759,15 +659,13 @@ Function UpdateConsole()
 							Exit
 						EndIf
 					Next
+					
 					CreateConsoleMsg("Stopped all sounds.")
-
 				Case "camerafog"
-
 					args$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					CameraFogNear = Float(Left(args, Len(args) - Instr(args, " ")))
 					CameraFogFar = Float(Right(args, Len(args) - Instr(args, " ")))
 					CreateConsoleMsg("Near set to: " + CameraFogNear + ", far set to: " + CameraFogFar)
-
 				Case "gamma"
 
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
@@ -826,6 +724,11 @@ Function UpdateConsole()
 							EndIf
 						Next
 					Next
+					
+					If IntercomStreamCHN <> 0 Then
+						StopStream_Strict(IntercomStreamCHN)
+						IntercomStreamCHN = 0
+					EndIf
 					
 					For e.Events = Each Events
 						If e\EventName = "alarm" Then 
@@ -1062,7 +965,6 @@ Function UpdateConsole()
 
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
-					Local I_427.SCP427 = First SCP427
 					I_427\Timer = Float(StrTemp)*70.0
 
 				Case "teleport106"
@@ -1102,9 +1004,9 @@ Function UpdateConsole()
 							LoadEntities()
 							LoadAllSounds()
 							LoadGame(CurrSave\Name)
-							InitLoadGame(I_Opt)
+							InitLoadGame()
 						Else
-							InitNewGame(I_Opt, CurrentZone - 1)
+							InitNewGame(CurrentZone - 1)
 							LoadGameQuick(CurrSave\Name, False)
 						EndIf
 						SaveGame(CurrSave\Name)
@@ -1118,9 +1020,9 @@ Function UpdateConsole()
 							LoadEntities()
 							LoadAllSounds()
 							LoadGame(CurrSave\Name)
-							InitLoadGame(I_Opt)
+							InitLoadGame()
 						Else
-							InitNewGame(I_Opt, CurrentZone + 1)
+							InitNewGame(CurrentZone + 1)
 							LoadGameQuick(CurrSave\Name, False)
 						EndIf
 						SaveGame(CurrSave\Name)
@@ -1161,7 +1063,7 @@ Function UpdateConsole()
 		
 		Color 255,255,255
 		
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	EndIf
 	
 	SetFont I_Opt\Fonts[1]

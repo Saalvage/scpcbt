@@ -1,8 +1,6 @@
 Function UpdateEvents()
 	;CatchErrors("UpdateEvents")
 	
-	Local I_Keys.Keys = First Keys
-	
 	Local dist#, i%, temp%, pvt%, strtemp$, j%, k%
 	
 	Local p.Particles, n.NPCs, r.Rooms, e.Events, e2.Events, it.Items, it2.Items, em.Emitters, sc.SecurityCams, sc2.SecurityCams
@@ -14,8 +12,6 @@ Function UpdateEvents()
 	Local angle#
 	
 	CurrStepSFX = 0
-	
-	Local I_Cheats.Cheats = First Cheats
 	
 	UpdateRooms()
 	
@@ -513,6 +509,10 @@ Function UpdateEvents()
 										;e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
 										e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
 										e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+										
+										e\room\RoomDoors[6]\locked = False		
+										UseDoor(e\room\RoomDoors[6], False)
+										e\room\RoomDoors[6]\locked = True
 										
 										e\EventState3 = 710
 									EndIf
@@ -4130,6 +4130,7 @@ Function UpdateEvents()
 						EndIf
 					Else
 						If EntityDistanceSquared(e\room\Objects[0], Collider) < PowTwo(2.0) Then
+							CurrStepSFX = 1
 							HeartBeatVolume = CurveValue(0.5, HeartBeatVolume, 5)
 							HeartBeatRate = CurveValue(120, HeartBeatRate, 150) 
 							e\SoundCHN = LoopSound2(OldManSFX(4), e\SoundCHN, Camera, e\room\obj, 5.0, 0.3)
@@ -4643,7 +4644,6 @@ Function UpdateEvents()
 									e\room\NPC[1]=Null
 								EndIf
 							Case 60
-								Local I_Opt.Options = First Options
 								If (Not I_Opt\HalloweenTex) Then
 									Local tex970 = LoadTexture_Strict("GFX\npcs\173h.pt", 1)
 									EntityTexture Curr173\obj, tex970, 0, 0
@@ -6073,7 +6073,7 @@ Function UpdateEvents()
 								e\room\RoomDoors[0]\open = Not e\room\RoomDoors[0]\open
 							EndIf 
 							
-							If CheckTriggers() = "205scene_enter" Then
+							If CheckTriggers() = "205scene_enter" And (Not NoTarget) Then
 								PlaySound_Strict(LoadTempSound("SFX\SCP\205\Enter.ogg"))
 								
 								e\EventState = 65
@@ -6686,22 +6686,21 @@ Function UpdateEvents()
 				
 			Case "testroom"
 
-				If e <> Null Then
-					If PlayerRoom = e\room Then
-						If e\EventState = 0 Then
-							e\room\Objects[7]=LoadAnimMesh_Strict("GFX\npcs\1048.b3d")
-							ScaleEntity e\room\Objects[7], 0.05,0.05,0.05
-							
-							TFormPoint EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,e\room\obj
-							If TFormedZ()=0 Then temp = -1 Else temp = -Sgn(TFormedZ())
-							TFormPoint -720,0,816*temp,e\room\obj,0
-							PositionEntity(e\room\Objects[7],TFormedX(),0,TFormedZ())
-							
-							RotateEntity e\room\Objects[7],-90,e\room\angle-90,0
-							SetAnimTime e\room\Objects[7],297
-							e\EventState = 1
-						EndIf
-						If EntityDistanceSquared(Collider, e\room\Objects[6]) < PowTwo(2.5) And e\EventState > 0 Then
+				If PlayerRoom = e\room Then
+					If e\EventState = 0 Then
+						e\room\Objects[7]=LoadAnimMesh_Strict("GFX\npcs\1048.b3d")
+						ScaleEntity e\room\Objects[7], 0.05,0.05,0.05
+						
+						TFormPoint EntityX(Collider),EntityY(Collider),EntityZ(Collider),0,e\room\obj
+						If TFormedZ()=0 Then temp = -1 Else temp = -Sgn(TFormedZ())
+						TFormPoint -720,0,816*temp,e\room\obj,0
+						PositionEntity(e\room\Objects[7],TFormedX(),0,TFormedZ())
+						
+						RotateEntity e\room\Objects[7],-90,e\room\angle-90,0
+						SetAnimTime e\room\Objects[7],297
+						e\EventState = 1
+					Else
+						If EntityDistanceSquared(Collider, e\room\Objects[6]) < PowTwo(2.5) Then
 							PlaySound_Strict(LoadTempSound("SFX\SCP\079\TestroomWarning.ogg"))
 							For i = 0 To 5
 								em.Emitters = CreateEmitter(EntityX(e\room\Objects[i], True), EntityY(e\room\Objects[i], True), EntityZ(e\room\Objects[i], True), 0)
@@ -6711,24 +6710,25 @@ Function UpdateEvents()
 								em\Speed = 0.042
 								em\SizeChange = 0.0025									
 							Next
-							;Delete e
 							e\EventState = e\EventState * -1
 						EndIf
-						If e\room\Objects[7]<>0 Then
-							Animate2(e\room\Objects[7],AnimTime(e\room\Objects[7]),284,295,0.3)
-							MoveEntity e\room\Objects[7],0,-0.008*FPSfactor,0
-							TFormPoint EntityX(e\room\Objects[7]),EntityY(e\room\Objects[7]),EntityZ(e\room\Objects[7]),0,e\room\obj
-							
-							If Abs(TFormedX())>725 Then
-								FreeEntity(e\room\Objects[7])
-								e\room\Objects[7]=0
-								e\EventState = e\EventState *2
-							EndIf
-						EndIf
-						If e\EventState = -2 Then RemoveEvent(e)
 					EndIf
 				EndIf
-
+				
+				If e\room\Objects[7]<>0 Then
+					Animate2(e\room\Objects[7],AnimTime(e\room\Objects[7]),284,295,0.3)
+					MoveEntity e\room\Objects[7],0,-0.008*FPSfactor,0
+					TFormPoint EntityX(e\room\Objects[7]),EntityY(e\room\Objects[7]),EntityZ(e\room\Objects[7]),0,e\room\obj
+					
+					If Abs(TFormedX())>725 Lor e\room\RoomDoors[0]\open Then
+						FreeEntity(e\room\Objects[7])
+						e\room\Objects[7]=0
+						e\EventState = e\EventState *2
+					EndIf
+				EndIf
+				
+				If e\EventState = -2 Then RemoveEvent(e)
+				
 			Case "tunnel2smoke"
 
 				If PlayerRoom = e\room Then
@@ -6912,7 +6912,7 @@ Function UpdateEvents()
 								e\EventState = Max(e\EventState, 70*12)
 							ElseIf dist > PowTwo(1.4) Then
 								;if the player moves a bit further and blinks, 173 attacks
-								If e\EventState > 70*12 And BlinkTimer =< -10 Then
+								If e\EventState > 70*12 And BlinkTimer =< -10 Lor (Not EntityInView(Curr173\obj, Camera)) Then
 									If EntityDistanceSquared(Curr173\Collider, e\room\Objects[0]) > PowTwo(5) Then
 										;if 173 is far away from the room (perhaps because the player 
 										;left and 173 moved to some other room?) -> disable the event
@@ -7396,8 +7396,6 @@ Function UpdateEvents()
 				UpdateSoundOrigin(e\SoundCHN,Camera,e\room\Objects[1])
 
 			Case "1048a"
-
-				
 				If e\room\Objects[0]=0 Then
 					If PlayerRoom<>e\room And BlinkTimer<-10 Then
 						If (DistanceSquared(EntityX(Collider), EntityX(e\room\obj), EntityZ(Collider), EntityZ(e\room\obj))<PowTwo(16)) Then
@@ -7432,7 +7430,7 @@ Function UpdateEvents()
 						Case 1
 							Animate2(e\room\Objects[0], AnimTime(e\room\Objects[0]), 2.0, 395.0, 1.0)
 							
-							If (EntityDistanceSquared(Collider, e\room\Objects[0])<PowTwo(2.5)) Then e\EventState = 2
+							If (EntityDistanceSquared(Collider, e\room\Objects[0])<PowTwo(2.5) And (Not NoTarget)) Then e\EventState = 2
 						Case 2
 							Local prevFrame# = AnimTime(e\room\Objects[0]) 
 							Animate2(e\room\Objects[0], prevFrame, 2.0, 647.0, 1.0, False)
@@ -8975,8 +8973,6 @@ End Function
 Function UpdateEndings()
 	Local e.Events,n.NPCs,r.Rooms,i,pvt,p.Particles
 	
-	Local I_Cheats.Cheats = First Cheats
-	
 	For e.Events = Each Events
 		Select e\EventName
 			Case "exit1"
@@ -9373,13 +9369,13 @@ Function UpdateEndings()
 						EndIf
 						
 						;Helicopter spots or player is within range. --> Start shooting.
-						If (e\room\NPC[1]\State <> 1) And ((EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(15)) Lor EntityVisible(e\room\NPC[0]\Collider,Collider)) Then
+						If (Not NoTarget) And ((e\room\NPC[1]\State <> 1) And ((EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(15)) Lor EntityVisible(e\room\NPC[0]\Collider,Collider))) Then
 							e\room\NPC[1]\State = 1
 							e\room\NPC[1]\State3 = 1
 						EndIf
 						
 						;Below roof or inside catwalk. --> Stop shooting.
-						If (EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(8.9)) Lor (EntityDistanceSquared(e\room\Objects[5],Collider) < PowTwo(16.9)) Then
+						If (EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(8.9)) Lor (EntityDistanceSquared(e\room\Objects[5],Collider) < PowTwo(16.9)) Lor (Not NoTarget) Then
 							e\room\NPC[1]\State3 = 0
 						Else
 							e\room\NPC[1]\State3 = 1

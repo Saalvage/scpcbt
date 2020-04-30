@@ -5,13 +5,14 @@ SCPs:
 	- It now increases blinking time.
 	- Better refinements.
 	- Improved inventory icon.
-- (Re-)Added SCP-173's head rotating.	
+- (Re-)Added SCP-173's head rotating.
 - Much improved SCP-205.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
 General:
 - Added localization/mod support with built in support for Englisch (due), German, 
+	- Added Unicode support and made font loading dynamic.
 - Added FOV option.
 	- Decreased default FOV to 60.
 	- Fixed float values being allowed in the menus.
@@ -25,6 +26,7 @@ Rooms:
 - Added room2tunnel3 (HCZ), room2offices5 (EZ).
 - Redesigned room1archive.
 - Added a new door type.
+- Added and improved some bumpmaps.
 - Added Apollyon difficulty; can be unlocked by beating the game on Keter.
 - Added inventory size scaling with difficulty and custom inventory options.
 - Rebalanced the S-NAVs, making the S-NAV 5000 (S-NAV Ultimate) less overpowered, the S-NAV 400 (formerly S-NAV 310) less useless and the S-LOC (formerly S-NAV) more interesting.
@@ -76,8 +78,8 @@ Rooms:
 - Added new ambiance music to SCP-106's room.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Slightly improved SCP-372 model.
+- Added appropriate step sounds to Dr. L's office.
 - Added much better text editing.
-- Made fonts dynamic and optimized and improved them.
 - Changed the New Game screen to feature Euclid as the standard difficulty.
 - Added some space between the page indicator and the next/previous page buttons on the load game screen.
 - SCP-1123 can now be picked up using SCP-714.
@@ -85,12 +87,12 @@ Rooms:
 - Updated SCP-294's loading screen units to metric.
 - Changed the name of the Custom difficulty to "Esoteric".
 - User tracks and FPS limit options now collapse their related fields when disabled.
-- Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
+- Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "testroom" -> "room682", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
 - Flipped vest around.
 - The hazmat suit is now hunched over when put off.
-- Increased size of the SCP-148 ingot.
-- Increased size of Electronical Components.
+- Increased size of the SCP-148 ingot and Electronical Components.
+- Disabled saving in SCP-1499's dimension.
 - Added "clear" command, which clears the console.
 - Added "ulti" command, which spawns a set of ultimate tools.
 - Reworked the disable/enable commands for SCP-173 and SCP-106 and adjusted the teleport commands accordingly.
@@ -120,8 +122,11 @@ Bug Fixes:
 	- Fixed SCP-049 spam-closing the door behind it, if the player tries to open it.
 	- Fixed SCP-106's eyes glowing in the dark and flying in midair while he is emerging.
 	- Fixed SCP-173's head poking out of its box when recontained by the MTF.
+	- Fixed SCP-173 not breaking the glass in the testroom event if the player looked away.
+	- Fixed SCP-966's walking animations.
 	- Fixed SCP-1025's appendicitis messages not showing up.
 	- Fixed SCP-1074-A's scream being able to be heard anywhere.
+	- Fixed being able to see SCP-1048 disappearing in room682 when using the keycard scanner.
 	- Fixed godmode not protecting against all injuries.
 	- Fixed inventory single clicks being recognized as double clicks.
 	- Fixed message being moved down if selecting a document, while a clipboard/wallet is open.
@@ -149,7 +154,10 @@ Bug Fixes:
 	- Fixed tank models.
 	- Fixed and reworked the "revive" command.
 	- Fixed "sanic" command causing death and other unwanted sideeffects.
+	- Fixed tentacles, SCP-205, SCP-966, SCP-1048-A and guards at some points not respecting the "notarget" command.
+	- Fixed stopsound not stopping the MTF announcements.
 	- Fixed untitled save files not correctly being named after the second one.
+	- Cell door in the intro now closes, fixing a bug where the guards could get stuck in it.
 	- Various other (sometimes small) fixes, improvements and optimizations, that are either too small or too distant from actual gameplay to be mentioned here.
 
 ----------------------------------------------------------------------------------

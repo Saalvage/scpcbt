@@ -368,7 +368,6 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 				Case ONETOONE
 					it2 = CreateItem("pill", x, y, z)
 				Case FINE
-					Local I_427.SCP427 = First SCP427
 					If (Rand(I_427\Amount + 1) = 1) Then
 						it2 = CreateItem("scp427", x, y, z)
 						I_427\Amount = I_427\Amount + 1

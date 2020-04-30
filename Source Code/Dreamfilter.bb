@@ -1,7 +1,7 @@
 Global ark_blur_image%, ark_blur_texture%, ark_sw%, ark_sh%
 Global ark_blur_cam%
 
-Function CreateBlurImage(I_Opt.Options)
+Function CreateBlurImage()
 	;Create blur Camera
 	Local cam% = CreateCamera()
 	CameraProjMode cam,2
@@ -36,7 +36,7 @@ Function CreateBlurImage(I_Opt.Options)
 	EntityTexture spr, ark_blur_texture
 End Function
 
-Function UpdateBlur(power#, I_Opt.Options)
+Function UpdateBlur(power#)
 	
 	EntityAlpha ark_blur_image, power#
 	

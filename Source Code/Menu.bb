@@ -38,9 +38,6 @@ Wend
 Global CurrLoadGamePage% = 0
 
 Function UpdateMainMenu()
-
-	Local I_Opt.Options = First Options
-	Local I_Keys.Keys = First Keys
 	
 	Local x%, y%, width%, height%, temp%
 	
@@ -293,7 +290,7 @@ Function UpdateMainMenu()
 					DrawImage ArrowIMG[1],x + 405 * MenuScale, y+251*MenuScale
 					
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG[3],x + 405 * MenuScale, y+251*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
+						If ImageRectOverlap(ArrowIMG[3],x + 405 * MenuScale, y+251*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 							SelectedDifficulty\items = SelectedDifficulty\items + 2
 							If SelectedDifficulty\items = 3 Then
 								SelectedDifficulty\items = 2
@@ -301,7 +298,7 @@ Function UpdateMainMenu()
 								SelectedDifficulty\items = 1
 							EndIf
 							PlaySound_Strict(ButtonSFX)
-						ElseIf ImageRectOverlap(ArrowIMG[1],x + 155 * MenuScale, y+251*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
+						ElseIf ImageRectOverlap(ArrowIMG[1],x + 155 * MenuScale, y+251*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 							SelectedDifficulty\items = SelectedDifficulty\items - 2
 							If SelectedDifficulty\items = 0 Then
 								SelectedDifficulty\items = 1
@@ -317,7 +314,7 @@ Function UpdateMainMenu()
 					;Other factor's difficulty
 					DrawImage ArrowIMG[1],x + 155 * MenuScale, y+281*MenuScale
 					If MouseHit1
-						If ImageRectOverlap(ArrowIMG[1],x + 155 * MenuScale, y+281*MenuScale, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt),0,0)
+						If ImageRectOverlap(ArrowIMG[1],x + 155 * MenuScale, y+281*MenuScale, ScaledMouseX(),ScaledMouseY(),0,0)
 							SelectedDifficulty\otherFactors = (SelectedDifficulty\otherFactors + 1) Mod (3 + ApolUnlocked)
 							PlaySound_Strict(ButtonSFX)
 						EndIf
@@ -356,7 +353,7 @@ Function UpdateMainMenu()
 					
 					If SameFound = 2 Then CurrSave\Name = CurrSave\Name + " (" + LowestPossible + ")"
 					
-					InitNewGame(I_Opt, Clamp(Int(Left(CurrSave\Name, 1)), 0, 2)) ;ONLY FOR DEBUGGING
+					InitNewGame(Clamp(Int(Left(CurrSave\Name, 1)), 0, 2)) ;ONLY FOR DEBUGGING
 					MainMenuOpen = False
 					FlushKeys()
 					FlushMouse()
@@ -367,10 +364,6 @@ Function UpdateMainMenu()
 				
 
 			Case 2 ;load game
-
-				
-				Local I_Loc.Loc = First Loc
-				
 				y = y + height + 20 * MenuScale
 				width = 580 * MenuScale
 				height = 430 * MenuScale
@@ -461,7 +454,7 @@ Function UpdateMainMenu()
 										LoadEntities()
 										LoadAllSounds()
 										LoadGame(CurrSave\Name)
-										InitLoadGame(I_Opt)
+										InitLoadGame()
 										MainMenuOpen = False
 										Exit
 									EndIf
@@ -649,7 +642,7 @@ Function UpdateMainMenu()
 						
 						y=y+50*MenuScale
 						
-						Local SlideBarFOV = FOV-40
+						Local SlideBarFOV% = FOV-40
 						SlideBarFOV = (SlideBar(x + 310*MenuScale, y+6*MenuScale,150*MenuScale, SlideBarFOV*2.0)/2.0)
 						FOV = SlideBarFOV+40
 						Color 255,255,255
@@ -1014,11 +1007,11 @@ Function UpdateMainMenu()
 	
 	Color 255,255,255
 	SetFont I_Opt\Fonts[0]
-	Text 20,I_Opt\GraphicHeight-30,"v"+VersionNumber
+	Text 10, I_Opt\GraphicHeight-40, "v"+VersionNumber
 	
 	;DrawTiledImageRect(MenuBack, 985 * MenuScale, 860 * MenuScale, 200 * MenuScale, 20 * MenuScale, 1200 * MenuScale, 866 * MenuScale, 300, 20 * MenuScale)
 	
-	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	SetFont I_Opt\Fonts[1]
 End Function
@@ -1026,9 +1019,7 @@ End Function
 Const L_WIDTH = 640
 Const L_HEIGHT = 480
 
-Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
-	
-	Local I_Opt.Options = First Options
+Function UpdateLauncher(I_LOpt.LauncherOptions)
 	
 	MenuScale = 1
 	
@@ -1041,7 +1032,7 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 	RealGraphicWidth = I_Opt\GraphicWidth
 	RealGraphicHeight = I_Opt\GraphicHeight
 	
-	I_Opt\Fonts[1] = LoadLocalFont("Font1", 18)
+	I_Opt\Fonts[1] = LoadLocalFont("Font1", 1)
 	SetFont I_Opt\Fonts[1]
 	MenuWhite = LoadImage_Strict("GFX\menu\menuwhite.jpg")
 	MenuBlack = LoadImage_Strict("GFX\menu\menublack.jpg")
@@ -1128,7 +1119,7 @@ Function UpdateLauncher(I_LOpt.LauncherOptions, I_Loc.Loc)
 		
 		If DrawButton(x + 100, y, 150, 30, GetLocalString("Launcher", "cycle"), False, False, False) Then
 			I_LOpt\SelectedLoc = (I_LOpt\SelectedLoc + 1) Mod I_LOpt\TotalLocs
-			UpdateLang(First Loc, I_LOpt\Locs[I_LOpt\SelectedLoc])
+			UpdateLang(I_LOpt\Locs[I_LOpt\SelectedLoc])
 		EndIf
 		
 		Text(x, y + 5, I_LOpt\Locs[I_LOpt\SelectedLoc])
@@ -1201,8 +1192,6 @@ Type LoadingScreens
 End Type
 
 Function InitLoadingScreens(file$)
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file$)=1 Then
 		file = I_Loc\LangPath + file
 	EndIf
@@ -1257,8 +1246,6 @@ End Function
 
 
 Function DrawLoading(percent%, shortloading=False)
-
-	Local I_Opt.Options = First Options
 	
 	Local x%, y%
 	
@@ -1272,7 +1259,7 @@ Function DrawLoading(percent%, shortloading=False)
 					Cls
 					Flip False
 					ls\img = LoadImage_Strict("Loadingscreens\"+ls\imgpath)
-					If LoadingScreenScale <> 1.0 Then ScaleImage(ls\img, LoadingScreenScale, LoadingScreenScale)
+					If LoadingScreenScale <> 1.0 Then ls\img = ResizeImage2(ls\img, LoadingScreenScale * ImageWidth(ls\img), LoadingScreenScale * ImageHeight(ls\img))
 				EndIf
 				SelectedLoadingScreen = ls 
 				Exit
@@ -1552,8 +1539,6 @@ End Function
 
 Function DrawButton%(x%, y%, width%, height%, txt$, bigfont% = True, waitForMouseUp%=False, usingAA%=True)
 
-	Local I_Opt.Options = First Options
-
 	Local clicked% = False
 	DrawFrame (x, y, width, height)
 	If MouseOn(x, y, width, height) Then
@@ -1613,12 +1598,10 @@ Function DrawTick%(x%, y%, selected%, locked% = False)
 End Function
 
 Function SlideBar#(x%, y%, width%, value#)
-
-	Local I_Opt.Options = First Options
 	
 	If MouseDown1 And OnSliderID=0 Then
-		If ScaledMouseX(I_Opt) >= x And ScaledMouseX(I_Opt) <= x + width + 14 And ScaledMouseY(I_Opt) >= y And ScaledMouseY(I_Opt) <= y + 20 Then
-			value = Min(Max((ScaledMouseX(I_Opt) - x) * 100 / width, 0), 100)
+		If ScaledMouseX() >= x And ScaledMouseX() <= x + width + 14 And ScaledMouseY() >= y And ScaledMouseY() <= y + 20 Then
+			value = Min(Max((ScaledMouseX() - x) * 100 / width, 0), 100)
 		EndIf
 	EndIf
 	
@@ -1724,8 +1707,6 @@ Function GetLineAmount(A$, W, H, Leading#=1)
 End Function
 
 Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
-	
-	Local I_Opt.Options = First Options
 
 	option = Lower(option)
 	Local fx# = x+6*MenuScale
@@ -1805,7 +1786,6 @@ Function DrawOptionsTooltip(x%,y%,width%,height%,option$,value#=0,ingame%=False)
 			txt2 = Replace(txt2, "%s", Int(value*100))
 		;Advanced options	
 		Case "consoleenable"
-			Local I_Keys.Keys = First Keys
 			txt = Replace(txt, "%s", I_Keys\KeyName[I_Keys\CONSOLE])
 		Case "framelimit"
 			If value > 0 And value < 60
@@ -1834,11 +1814,9 @@ End Function
 Global OnSliderID% = 0
 
 Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
-
-	Local I_Opt.Options = First Options
 	
 	If MouseDown1 Then
-		If (ScaledMouseX(I_Opt) >= x) And (ScaledMouseX(I_Opt) <= x+width+14) And (ScaledMouseY(I_Opt) >= y-8) And (ScaledMouseY(I_Opt) <= y+10)
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
 			OnSliderID = ID
 		EndIf
 	EndIf
@@ -1850,17 +1828,17 @@ Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
 	Rect(x+width+10,y-8,4,14,True)
 	
 	If ID = OnSliderID
-		If (ScaledMouseX(I_Opt) <= x+8)
+		If (ScaledMouseX() <= x+8)
 			value = 0
-		ElseIf (ScaledMouseX(I_Opt) >= x+width/2) And (ScaledMouseX(I_Opt) <= x+(width/2)+8)
+		ElseIf (ScaledMouseX() >= x+width/2) And (ScaledMouseX() <= x+(width/2)+8)
 			value = 1
-		ElseIf (ScaledMouseX(I_Opt) >= x+width)
+		ElseIf (ScaledMouseX() >= x+width)
 			value = 2
 		EndIf
 		Color 0,255,0
 		Rect(x,y,width+14,10,True)
 	Else
-		If (ScaledMouseX(I_Opt) >= x) And (ScaledMouseX(I_Opt) <= x+width+14) And (ScaledMouseY(I_Opt) >= y-8) And (ScaledMouseY(I_Opt) <= y+10)
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
 			Color 0,200,0
 			Rect(x,y,width+14,10,False)
 		EndIf
@@ -1888,11 +1866,9 @@ Function Slider3(x%,y%,width%,value%,ID%,val1$,val2$,val3$)
 End Function
 
 Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
-
-	Local I_Opt.Options = First Options
 	
 	If MouseDown1 Then
-		If (ScaledMouseX(I_Opt) >= x) And (ScaledMouseX(I_Opt) <= x+width+14) And (ScaledMouseY(I_Opt) >= y-8) And (ScaledMouseY(I_Opt) <= y+10)
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
 			OnSliderID = ID
 		EndIf
 	EndIf
@@ -1906,21 +1882,21 @@ Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
 	Rect(x+width+10,y-8,4,14,True) ;5
 	
 	If ID = OnSliderID
-		If (ScaledMouseX(I_Opt) <= x+8)
+		If (ScaledMouseX() <= x+8)
 			value = 0
-		ElseIf (ScaledMouseX(I_Opt) >= x+width/4) And (ScaledMouseX(I_Opt) <= x+(width/4)+8)
+		ElseIf (ScaledMouseX() >= x+width/4) And (ScaledMouseX() <= x+(width/4)+8)
 			value = 1
-		ElseIf (ScaledMouseX(I_Opt) >= x+width/2) And (ScaledMouseX(I_Opt) <= x+(width/2)+8)
+		ElseIf (ScaledMouseX() >= x+width/2) And (ScaledMouseX() <= x+(width/2)+8)
 			value = 2
-		ElseIf (ScaledMouseX(I_Opt) >= x+width*0.75) And (ScaledMouseX(I_Opt) <= x+(width*0.75)+8)
+		ElseIf (ScaledMouseX() >= x+width*0.75) And (ScaledMouseX() <= x+(width*0.75)+8)
 			value = 3
-		ElseIf (ScaledMouseX(I_Opt) >= x+width)
+		ElseIf (ScaledMouseX() >= x+width)
 			value = 4
 		EndIf
 		Color 0,255,0
 		Rect(x,y,width+14,10,True)
 	Else
-		If (ScaledMouseX(I_Opt) >= x) And (ScaledMouseX(I_Opt) <= x+width+14) And (ScaledMouseY(I_Opt) >= y-8) And (ScaledMouseY(I_Opt) <= y+10)
+		If (ScaledMouseX() >= x) And (ScaledMouseX() <= x+width+14) And (ScaledMouseY() >= y-8) And (ScaledMouseY() <= y+10)
 			Color 0,200,0
 			Rect(x,y,width+14,10,False)
 		EndIf

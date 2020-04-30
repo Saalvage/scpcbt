@@ -38,7 +38,7 @@ Type Options
 	Field Fonts%[8]
 End Type
 
-Local I_Opt.Options = New Options
+Global I_Opt.Options = New Options
 
 I_Opt\LauncherEnabled = GetINIInt(OptionFile, "options", "launcher enabled")
 I_Opt\GraphicWidth = GetINIInt(OptionFile, "options", "width")
@@ -61,7 +61,7 @@ Type LocalString
 	Field value$
 End Type
 
-Function UpdateLang(I_Loc.Loc, Lang$)
+Function UpdateLang(Lang$)
 	If I_Loc\LangPath <> "" Then ;Only need to delete local and fonts, because this line is only ever called twice in the launcher
 		DeleteINIFile(I_Loc\LangPath + "Data\local.ini")
 		DeleteINIFile(I_Loc\LangPath + "GFX\font\fonts.ini")
@@ -98,12 +98,12 @@ Function UpdateLang(I_Loc.Loc, Lang$)
 	SetLocalString("Menu", "options")
 	SetLocalString("Menu", "back")
 	SetLocalString("Menu", "quit")
-	ReloadFonts(First Options)
+	ReloadFonts()
 End Function
 
-Local I_Loc.Loc = New Loc
+Global I_Loc.Loc = New Loc
 
-UpdateLang(I_Loc.Loc, GetINIString(OptionFile, "options", "pack"))
+UpdateLang(GetINIString(OptionFile, "options", "pack"))
 
 Function SetLocalString(Section$, Parameter$)
 	Local l.LocalString = New LocalString
@@ -125,8 +125,6 @@ Function GetLocalString$(Section$, Parameter$)
 	
 	;CreateConsoleMsg("YES DADDY" + Section + Parameter)
 	
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
 		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
 		If temp <> "" Then
@@ -145,9 +143,7 @@ Function GetLocalStringR$(Section$, Parameter$, Replace$)
 	
 End Function
 
-Function LoadLocalFont(Font$, Size%)
-
-	Local I_Loc.Loc = First Loc
+Function LoadLocalFont(Font$, IgnoreScaling%=0)
 	
 	path$ = I_Loc\LangPath + "GFX\font\"
 	file$ = path + "fonts.ini"
@@ -164,11 +160,18 @@ Function LoadLocalFont(Font$, Size%)
 		name = GetINIString(file, Font, "name")
 	EndIf
 	
-	Return LoadFont_Strict(path + name + ".ttf", size, GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
+	name = path + name + ".ttf"
+	
+	If FileType(name) <> 1 Then RuntimeError("Font not found: " + Font + " : " + name)
+	
+	; Font size is handled via a budget ternary operator
+	Local temp% = LoadFont(name, (Int(GetIniInt(file, Font, "size") * (I_Opt\GraphicHeight / 1024.0))) * (Not IgnoreScaling) + IgnoreScaling * GetIniInt(file, Font, "size"), GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
+	If temp = 0 Then RuntimeError("Failed to load Font: " + Font + " : " + name)
+	Return temp
 	
 End Function
 
-Function ReloadFonts(I_Opt.Options)
+Function ReloadFonts()
 	;For some reason, Blitz3D doesn't load fonts that have filenames that
 	;don't match their "internal name" (i.e. their display name in applications
 	;like Word and such). As a workaround, I moved the files and renamed them so they
@@ -177,12 +180,12 @@ Function ReloadFonts(I_Opt.Options)
 	;0: Console
 	;1 - 5: 1 - 5
 	;6 + 7: Credit 1 + 2
-	I_Opt\Fonts[0] = LoadLocalFont("Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[1] = LoadLocalFont("Font1", Int(18 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[2] = LoadLocalFont("Font2", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[3] = LoadLocalFont("Font3", Int(22 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[4] = LoadLocalFont("Font4", Int(60 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[5] = LoadLocalFont("Font5", Int(58 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[0] = LoadLocalFont("Font0")
+	I_Opt\Fonts[1] = LoadLocalFont("Font1")
+	I_Opt\Fonts[2] = LoadLocalFont("Font2")
+	I_Opt\Fonts[3] = LoadLocalFont("Font3")
+	I_Opt\Fonts[4] = LoadLocalFont("Font4")
+	I_Opt\Fonts[5] = LoadLocalFont("Font5")
 	
 	SetFont I_Opt\Fonts[1]
 End Function
@@ -262,7 +265,7 @@ If I_Opt\LauncherEnabled Then
 	
 	AppTitle GetLocalString("Menu", "titlelauncher")
 	
-	UpdateLauncher(I_LOpt, I_Loc)
+	UpdateLauncher(I_LOpt)
 	
 	Delete I_LOpt
 EndIf
@@ -313,7 +316,7 @@ Function ClearCheats(I_Cheats.Cheats)
 	I_Cheats\WireframeState = 0
 End Function
 
-Local I_Cheats.Cheats = New Cheats
+Global I_Cheats.Cheats = New Cheats
 ClearCheats(I_Cheats)
 
 Global MenuScale# = (I_Opt\GraphicHeight / 1024.0)
@@ -350,7 +353,7 @@ EndIf
 
 ;---------------------------------------------------------------------------------------------------------------------
 
-ReloadFonts(I_Opt)
+ReloadFonts()
 SetFont I_Opt\Fonts[2]
 
 Global CursorIMG% = LoadImage_Strict("GFX\cursor.png")
@@ -408,7 +411,7 @@ Global Injuries#, Bloodloss#, Infect#, HealTimer#
 
 Include "Source Code\Achievements.bb"
 
-Include "Source Code\UpdateConsole.bb"
+Include "Source Code\Console.bb"
 Include "Source Code\Use914.bb"
 
 Global RefinedItems%
@@ -826,8 +829,7 @@ Include "Source Code\Particles.bb"
 
 Global ClosestButton%, ClosestDoor.Doors
 Global SelectedDoor.Doors, UpdateDoorsTimer#
-Global ButtonTexture% = LoadTexture_Strict("GFX\map\KeyPad.jpg", 1)
-Global ButtonTextureLocked% = LoadTexture_Strict("GFX\map\KeyPadLocked.jpg", 1)
+Global ButtonTexture%, ButtontextureLocked%
 Global DoorTempID%
 Type Doors
 	Field obj%, obj2%, frameobj%, buttons%[2]
@@ -1440,7 +1442,7 @@ End Function
 
 DrawLoading(40,True)
 
-Include "Source Code\MapSystem.bb"
+Include "Source Code\Map.bb"
 Include "Source Code\Save.bb"
 
 DrawLoading(80,True)
@@ -1702,7 +1704,7 @@ Function InitEvents()
 	
 End Function
 
-Include "Source Code\UpdateEvents.bb"
+Include "Source Code\Events.bb"
 
 Function RemoveEvent(e.Events)
 	If e\Sound<>0 Then FreeSound_Strict e\Sound
@@ -1789,7 +1791,7 @@ Type SCP427
 	Field Amount%
 End Type
 
-Local I_427.SCP427 = New SCP427
+Global I_427.SCP427 = New SCP427
 
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ; MAIN LOOP
@@ -2006,9 +2008,7 @@ Repeat
 			BlurTimer = Max(BlurTimer - FPSfactor, 0.0)
 		EndIf
 		
-		UpdateBlur(BlurVolume, I_Opt)
-		
-
+		UpdateBlur(BlurVolume)
 		
 		Local darkA# = 0.0
 		If (Not MenuOpen)  Then
@@ -2167,7 +2167,8 @@ Repeat
 		If KeyHit(I_Keys\SAVE) Then
 			If SelectedDifficulty\saveType = SAVEANYWHERE Then
 				RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ = "room173" Lor RN$ = "gatea" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale)
+				CreateConsoleMsg(RN)
+				If RN$ = "room173" Lor RN$ = "dimension1499" Lor RN$ = "gatea" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale) Then
 					Msg = GetLocalString("Messages", "savecantloc")
 					MsgTimer = 70 * 4
 				ElseIf (Not CanSave) Lor QuickLoad_CurrEvent <> Null
@@ -2185,7 +2186,7 @@ Repeat
 					MsgTimer = 70 * 4
 				Else
 					RN$ = PlayerRoom\RoomTemplate\Name$
-					If RN$ = "room173" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale) Lor RN$ = "gatea"
+					If RN$ = "room173" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale) Lor RN$ = "gatea" Then
 						Msg = GetLocalString("Messages", "savecantloc")
 						MsgTimer = 70 * 4
 					ElseIf (Not CanSave) Lor QuickLoad_CurrEvent <> Null
@@ -2268,23 +2269,17 @@ Repeat
 			If (Not temp%)
 				Text((I_Opt\GraphicWidth / 2)+1, (I_Opt\GraphicHeight * 0.5) + 201, Msg, True)
 				Color temp2, temp2, temp2
-				If Left(Msg,14)="Blitz3D Error!" Then
-					Color 255,0,0
-				EndIf
 				Text((I_Opt\GraphicWidth / 2), (I_Opt\GraphicHeight / 2) + 200, Msg, True)
 			Else
 				Text((I_Opt\GraphicWidth / 2)+1, (I_Opt\GraphicHeight * 0.94) + 1, Msg, True)
 				Color temp2, temp2, temp2
-				If Left(Msg,14)="Blitz3D Error!" Then
-					Color 255,0,0
-				EndIf
 				Text((I_Opt\GraphicWidth / 2), (I_Opt\GraphicHeight * 0.94), Msg, True)
 			EndIf
 			MsgTimer=MsgTimer-FPSfactor2
 		EndIf
 		
 		Color 255, 255, 255
-		If I_Opt\ShowFPS Then SetFont I_Opt\Fonts[0] : Text 20, 20, "FPS: " + FPS : SetFont I_Opt\Fonts[1]
+		If I_Opt\ShowFPS Then SetFont I_Opt\Fonts[0] : Text(0, 0, "FPS: " + FPS) : SetFont I_Opt\Fonts[1]
 		
 		If QuickLoad_CurrEvent <> Null
 			QuickLoadEvents()
@@ -2631,7 +2626,6 @@ Function QuickLoadEvents()
 End Function
 
 Function Kill()
-	Local I_Cheats.Cheats = First Cheats
 	If I_Cheats\GodMode Then Return
 	
 	If BreathCHN <> 0 Then
@@ -2689,8 +2683,6 @@ Function DrawEnding()
 	Cls
 	
 	If EndingTimer<-200 Then
-	
-		Local I_Opt.Options = First Options
 		
 		If BreathCHN <> 0 Then
 			If ChannelPlaying(BreathCHN) Then StopChannel BreathCHN : Stamina = 100
@@ -2823,7 +2815,7 @@ Function DrawEnding()
 		
 	EndIf
 	
-	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	SetFont I_Opt\Fonts[1]
 End Function
@@ -2839,14 +2831,12 @@ Global CreditsScreen%
 
 Function InitCredits()
 
-	Local I_Opt.Options = First Options
-
 	Local cl.CreditsLine
 	Local file% = OpenFile("Credits.txt")
 	Local l$
 	
-	I_Opt\Fonts[6] = LoadLocalFont("CreditsFont1", Int(21 * (I_Opt\GraphicHeight / 1024.0)))
-	I_Opt\Fonts[7] = LoadLocalFont("CreditsFont2", Int(35 * (I_Opt\GraphicHeight / 1024.0)))
+	I_Opt\Fonts[6] = LoadLocalFont("CreditsFont1")
+	I_Opt\Fonts[7] = LoadLocalFont("CreditsFont2")
 	
 	If CreditsScreen = 0
 		CreditsScreen = LoadImage_Strict("GFX\creditsscreen.pt")
@@ -2864,8 +2854,6 @@ Function InitCredits()
 End Function
 
 Function DrawCredits()
-	
-	Local I_Opt.Options = First Options
 	
 	Local credits_Y# = (EndingTimer+2000)/2+(I_Opt\GraphicHeight+10)
 	Local cl.CreditsLine
@@ -2965,9 +2953,6 @@ End Function
 
 Function MovePlayer()
 	;CatchErrors("MovePlayer")
-	
-	Local I_Cheats.Cheats = First Cheats
-	Local I_Keys.Keys = First Keys
 	
 	Local Sprint# = 1.0, Speed# = 0.018, i%, angle#
 	
@@ -3088,11 +3073,11 @@ Function MovePlayer()
 					
 					If Sprint = 1.0 Then
 						PlayerSoundVolume = Max(4.0,PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 0, Rand(0, 7)))
+						tempchn% = PlaySound_Strict(StepSFX(GetStepSound(Collider), 0, Rand(0, 7)))
 						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					Else
 						PlayerSoundVolume = Max(2.5-(Crouch*0.6),PlayerSoundVolume)
-						tempchn% = PlaySound_Strict(StepSFX(temp, 1, Rand(0, 7)))
+						tempchn% = PlaySound_Strict(StepSFX(GetStepSound(Collider), 1, Rand(0, 7)))
 						ChannelVolume tempchn, (1.0-(Crouch*0.6))*SFXVolume#
 					EndIf
 				ElseIf CurrStepSFX=1
@@ -3255,7 +3240,6 @@ Function MovePlayer()
 	If Injuries > 1.0 Then
 		temp2 = Bloodloss
 		BlurTimer = Max(Max(Sin(MilliSecs()/100.0)*Bloodloss*30.0,Bloodloss*2*(2.0-CrouchState)),BlurTimer)
-		Local I_427.SCP427 = First SCP427
 		If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 			Bloodloss = Min(Bloodloss + (Min(Injuries,3.5)/300.0)*FPSfactor,100)
 		EndIf
@@ -3550,8 +3534,6 @@ Function MouseLook()
 		EndIf
 	EndIf
 	
-	Local I_427.SCP427 = First SCP427
-	
 	Local factor1025# = FPSfactor * SCP1025state[7]
 	For i = 0 To 6
 		If SCP1025state[i]>0 Then
@@ -3647,10 +3629,6 @@ Const NAV_HEIGHT = 256
 
 Function DrawGUI()
 	;CatchErrors("DrawGUI")
-	
-	Local I_Opt.Options = First Options
-	Local I_Cheats.Cheats = First Cheats
-	Local I_427.SCP427 = First SCP427
 	
 	Local temp%, x%, y%, z%, i%, yawvalue#, pitchvalue#
 	Local x2#,y2#,z2#
@@ -4016,7 +3994,7 @@ Function DrawGUI()
 				Next
 			Next
 			
-			If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+			If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 			
 			If MouseHit2 Then
 				SelectedDoor = Null
@@ -4108,8 +4086,8 @@ Function DrawGUI()
 		ItemAmount = 0
 		isMouseOn = -1
 		For  n% = 0 To OtherSize - 1
-			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + INVENTORY_GFX_SIZE Then
-				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + INVENTORY_GFX_SIZE Then
+			If ScaledMouseX() > x And ScaledMouseX() < x + INVENTORY_GFX_SIZE Then
+				If ScaledMouseY() > y And ScaledMouseY() < y + INVENTORY_GFX_SIZE Then
 					isMouseOn = n
 				EndIf
 			EndIf
@@ -4175,9 +4153,9 @@ Function DrawGUI()
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
 				If MouseSlot = 66 Then
-					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				ElseIf SelectedItem <> PrevOtherOpen\SecondInv[MouseSlot]
-					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				EndIf
 			Else
 				If MouseSlot = 66 Then
@@ -4271,7 +4249,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG,ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG,ScaledMouseX(),ScaledMouseY()
 		If (closedInv) And (Not InvOpen) Then 
 			ResumeSounds() 
 			OtherOpen=Null
@@ -4308,8 +4286,8 @@ Function DrawGUI()
 		ItemAmount = 0
 		isMouseOn = -1
 		For  n% = 0 To MaxItemAmount - 1
-			If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + INVENTORY_GFX_SIZE Then
-				If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + INVENTORY_GFX_SIZE Then
+			If ScaledMouseX() > x And ScaledMouseX() < x + INVENTORY_GFX_SIZE Then
+				If ScaledMouseY() > y And ScaledMouseY() < y + INVENTORY_GFX_SIZE Then
 					isMouseOn = n
 				EndIf
 			EndIf
@@ -4391,9 +4369,9 @@ Function DrawGUI()
 		If SelectedItem <> Null Then
 			If MouseDown1 Then
 				If MouseSlot = 66 Then
-					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				ElseIf SelectedItem <> Inventory(MouseSlot)
-					DrawImage(SelectedItem\invimg, ScaledMouseX(I_Opt) - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY(I_Opt) - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+					DrawImage(SelectedItem\invimg, ScaledMouseX() - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, ScaledMouseY() - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 				EndIf
 			Else
 				If MouseSlot = 66 Then
@@ -4634,7 +4612,7 @@ Function DrawGUI()
 			EndIf
 		EndIf
 		
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 		
 		If InvOpen = False Then 
 			ResumeSounds() 
@@ -6142,9 +6120,6 @@ End Function
 Function DrawMenu()
 	;CatchErrors("DrawMenu")
 	
-	Local I_Opt.Options = First Options
-	Local I_Keys.Keys = First Keys
-	
 	Local x%, y%, width%, height%
 	If InFocus() = 0 Then ;Game is out of focus -> pause the game
 		If (Not Using294) Then
@@ -6369,7 +6344,7 @@ Function DrawMenu()
 						DrawOptionsTooltip(tx,ty,tw,th,"fov")
 					EndIf
 					
-					MouseLook()
+					CameraZoom(Camera, Min(1.0+(CurrCameraZoom/400.0),1.1) / Tan((2*ATan(Tan(Float(FOV * (InvertCam*-2+1))/2)*RealGraphicWidth/RealGraphicHeight))/2.0))
 
 				Case 2 ;Audio
 					SetFont I_Opt\Fonts[1]
@@ -6604,7 +6579,7 @@ Function DrawMenu()
 			If SelectedDifficulty\saveType = SAVEONQUIT Lor SelectedDifficulty\saveType = SAVEANYWHERE Then
 				Local RN$ = PlayerRoom\RoomTemplate\Name$
 				Local AbleToSave% = True
-				If RN$ = "room173" Lor RN$ = "gateb" Lor RN$ = "gatea" Then AbleToSave = False
+				If RN$ = "room173" Lor RN$ = "dimension1499" Lor RN$ = "gatea" Lor (RN$ = "gateb" And EntityY(Collider)>1040.0*RoomScale) Then AbleToSave = False
 				If (Not CanSave) Then AbleToSave = False
 				If AbleToSave
 					QuitButton = 140
@@ -6816,7 +6791,7 @@ Function DrawMenu()
 			If KillTimer < 0 Then RowText(DeathMSG$, x, y + 80*MenuScale, 390*MenuScale, 600*MenuScale)
 		EndIf
 
-		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+		If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 		
 	EndIf
 	
@@ -6826,9 +6801,8 @@ Function DrawMenu()
 End Function
 
 Function MouseOn%(x%, y%, width%, height%)
-	Local I_Opt.Options = First Options
-	If ScaledMouseX(I_Opt) > x And ScaledMouseX(I_Opt) < x + width Then
-		If ScaledMouseY(I_Opt) > y And ScaledMouseY(I_Opt) < y + height Then
+	If ScaledMouseX() > x And ScaledMouseX() < x + width Then
+		If ScaledMouseY() > y And ScaledMouseY() < y + height Then
 			Return True
 		EndIf
 	EndIf
@@ -6842,8 +6816,6 @@ Function LoadEntities()
 	;CatchErrors("LoadEntities")
 	
 	DrawLoading(0)
-	
-	Local I_Opt.Options = First Options
 	
 	Local i%
 	
@@ -6862,6 +6834,9 @@ Function LoadEntities()
 	HandIcon2% = LoadImage_Strict("GFX\handsymbol2.png")
 
 	StaminaMeterIMG% = LoadImage_Strict("GFX\staminameter.jpg")
+	
+	Buttontexture = LoadTexture_Strict("GFX\map\KeyPad.jpg")
+	ButtonTextureLocked = LoadTexture_Strict("GFX\map\KeyPadLocked.jpg")
 
 	KeypadHUD =  LoadImage_Strict("GFX\keypadhud.jpg")
 	MaskImage(KeypadHUD, 255,0,255)
@@ -6898,7 +6873,7 @@ Function LoadEntities()
 	ScreenTexs[0] = CreateTexture(512, 512, 1+256)
 	ScreenTexs[1] = CreateTexture(512, 512, 1+256)
 	
-	CreateBlurImage(I_Opt)
+	CreateBlurImage()
 	CameraProjMode ark_blur_cam,0
 	;Listener = CreateListener(Camera)
 	
@@ -7368,7 +7343,7 @@ Function LoadEntities()
 	;CatchErrors("Uncaught LoadEntities")
 End Function
 
-Function InitNewGame(I_Opt.Options, zone%=0)
+Function InitNewGame(zone%=0)
 	;CatchErrors("InitNewGame")
 	Local i%, de.Decals, d.Doors, it.Items, r.Rooms, sc.SecurityCams, e.Events
 	
@@ -7513,7 +7488,7 @@ Function InitNewGame(I_Opt.Options, zone%=0)
 	;CatchErrors("Uncaught InitNewGame")
 End Function
 
-Function InitLoadGame(I_Opt.Options)
+Function InitLoadGame()
 	;CatchErrors("InitLoadGame")
 	Local d.Doors, sc.SecurityCams, rt.RoomTemplates, e.Events
 	
@@ -7679,7 +7654,7 @@ Function NullGame(playbuttonsfx%=True)
 	Shake = 0
 	LightFlash = 0
 	
-	ClearCheats(First Cheats)
+	ClearCheats(I_Cheats)
 	WireFrame 0
 	WearingGasMask = 0
 	WearingHazmat = 0
@@ -7692,7 +7667,6 @@ Function NullGame(playbuttonsfx%=True)
 		WearingNightVision = 0
 	EndIf
 	
-	Local I_427.SCP427 = First SCP427
 	Delete I_427 ;Just delete it and create it anew as all values have a default of 0
 	I_427 = New SCP427
 	
@@ -8376,8 +8350,6 @@ End Function
 
 Function Use294()
 	
-	Local I_Opt.Options = First Options
-	
 	Local x#,y#, xtemp%,ytemp%, strtemp$, temp%
 	
 	ShowPointer()
@@ -8386,7 +8358,7 @@ Function Use294()
 	y = I_Opt\GraphicHeight/2 - (ImageHeight(Panel294)/2)
 	DrawImage Panel294, x, y
 	
-	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(I_Opt),ScaledMouseY(I_Opt)
+	If I_Opt\GraphicMode = 0 Then DrawImage CursorIMG, ScaledMouseX(),ScaledMouseY()
 	
 	temp = True
 	If PlayerRoom\SoundCHN<>0 Then temp = False
@@ -8395,8 +8367,8 @@ Function Use294()
 	
 	If temp Then
 		If MouseHit1 Then
-			xtemp = Floor((ScaledMouseX(I_Opt)-x-228) / 35.5)
-			ytemp = Floor((ScaledMouseY(I_Opt)-y-342) / 36.5)
+			xtemp = Floor((ScaledMouseX()-x-228) / 35.5)
+			ytemp = Floor((ScaledMouseY()-y-342) / 36.5)
 			
 			If ytemp => 0 And ytemp < 5 Then
 				If xtemp => 0 And xtemp < 10 Then PlaySound_Strict ButtonSFX
@@ -8570,7 +8542,6 @@ End Function
 
 Function Use427()
 	Local i%,pvt%,de.Decals,tempchn%
-	Local I_427.SCP427 = First SCP427
 	Local prevI427Timer# = I_427\Timer
 	
 	If I_427\Timer < 70*360
@@ -8777,7 +8748,6 @@ Function UpdateInfect()
 		
 		If Infect < 93.0 Then
 			temp=Infect
-			Local I_427.SCP427 = First SCP427
 			If (I_427\Using = 0 And I_427\Timer < 70*360) Then
 				Infect = Min(Infect+FPSfactor*0.002,100)
 			EndIf
@@ -9340,9 +9310,6 @@ End Function
 
 ;Save options to .ini.
 Function SaveOptionsINI()
-
-	Local I_Opt.Options = First Options
-	Local I_Keys.Keys = First Keys
 	
 	PutINIValue(OptionFile, "options", "mouse sensitivity", MouseSens)
 	PutINIValue(OptionFile, "options", "invert mouse y", InvertMouse)
@@ -9511,8 +9478,6 @@ End Function
 
 
 Function RenderWorld2()
-	
-	Local I_Opt.Options = First Options
 	
 	CameraProjMode ark_blur_cam,0
 	CameraProjMode Camera,1
@@ -9690,7 +9655,6 @@ End Function
 
 
 Function ScaleRender(x#,y#,hscale#=1.0,vscale#=1.0)
-	Local I_Cheats.Cheats = First Cheats
 	If Camera<>0 Then HideEntity Camera
 	WireFrame 0
 	ShowEntity fresize_image
@@ -9889,11 +9853,11 @@ Function UpdateDeafPlayer()
 	
 End Function
 
-Function ScaledMouseX%(I_Opt.Options)
+Function ScaledMouseX%()
 	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(I_Opt\GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
 
-Function ScaledMouseY%(I_Opt.Options)
+Function ScaledMouseY%()
 	Return Float(MouseY())*Float(I_Opt\GraphicHeight)/Float(RealGraphicHeight)
 End Function
 

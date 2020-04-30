@@ -70,8 +70,6 @@ Type NPCs
 End Type
 
 Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
-
-	Local I_Opt.Options = First Options
 	
 	Local n.NPCs = New NPCs, n2.NPCs
 	Local temp#, i%, diff1, bump1, spec1
@@ -702,8 +700,6 @@ Function UpdateNPCs()
 	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
 	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
-	Local I_Cheats.Cheats = First Cheats
-	
 	Local target
 	
 	For n.NPCs = Each NPCs
@@ -1258,8 +1254,6 @@ Function UpdateNPCs()
 				EndIf
 
 			Case NPCtype096
-			
-				Local I_Opt.Options = First Options
 				
 				If Abs(WearingScramble) > 50 And n\BlinkTimer = 0 Then ;I am using this variable outside of its intended use
 					EntityTexture n\obj2, LightTexture
@@ -3270,7 +3264,7 @@ Function UpdateNPCs()
 							EndIf
 							n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\Collider)
 							
-							If dist < PowTwo(1.8) Then 
+							If dist < PowTwo(1.8) And (Not NoTarget) Then 
 								If Abs(DeltaYaw(n\Collider, Collider))<20 Then 
 									n\State = 2
 									If n\Sound<>0 Then FreeSound_Strict n\Sound : n\Sound = 0 
@@ -4283,7 +4277,7 @@ Function UpdateNPCs()
 					
 					If (WearingNightVision<=0) Then
 						HideEntity n\obj
-						If dist<PowTwo(1.0) And n\Reload <= 0 And MsgTimer <= 0 Then
+						If dist<PowTwo(1.0) And n\Reload <= 0 And MsgTimer <= 0 And (Not NoTarget) Then
 							Msg = GetLocalString("Messages", "966" + Rand(6))
 							n\Reload = 20*70
 							MsgTimer=8*70
@@ -4332,7 +4326,7 @@ Function UpdateNPCs()
 								;echo/stare/walk around periodically
 								;If n\Frame>1014.0 Then
 								If n\Frame>213.0
-									If Rand(3)=1 And dist<PowTwo(4.0) Then
+									If Rand(3)=1 And dist<PowTwo(4.0) And (Not NoTarget) Then
 										n\State = Rand(1,4)
 									Else
 										n\State = Rand(5,6)								
@@ -4340,7 +4334,7 @@ Function UpdateNPCs()
 								EndIf
 								
 								;echo if player gets close
-								If dist<PowTwo(2.0) Then 
+								If dist<PowTwo(2.0) And (Not NoTarget) Then 
 									n\State=Rand(1,4)
 								EndIf 							
 							EndIf
@@ -4406,14 +4400,14 @@ Function UpdateNPCs()
 								AnimateNPC(n, 556, 580, 0.25, False)
 							Else
 								;AnimateNPC(n, 2343, 2391, n\CurrSpeed*25.0)
-								If n\CurrSpeed >= 0.005 Then
+								If n\CurrSpeed >= 0.0 Then
 									AnimateNPC(n, 580, 628, n\CurrSpeed*25.0)
 								Else
 									AnimateNPC(n, 2, 214, 0.25)
 								EndIf
 								
 								;chasing the player
-								If n\State = 8 And dist<PowTwo(32.0) Then
+								If n\State = 8 And dist<PowTwo(32.0) And (Not NoTarget) Then
 									If n\PathTimer <= 0 Then
 										n\PathStatus = FindPath (n, EntityX(Collider,True), EntityY(Collider,True), EntityZ(Collider,True))
 										n\PathTimer = 40*10
@@ -6897,8 +6891,6 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 	
 	LightVolume = TempLightVolume*1.2
 	
-	Local I_Cheats.Cheats = First Cheats
-	
 	If ((Not I_Cheats\GodMode)) Then 
 		
 		If instaKill Then Kill() : PlaySound_Strict BullethitSFX : Return
@@ -7430,8 +7422,6 @@ Function FinishWalking(n.NPCs,startframe#,endframe#,speed#)
 End Function
 
 Function ChangeNPCTextureID(n.NPCs,textureid%) ;TODO check wtf this is
-
-	Local I_Opt.Options = First Options
 	
 	If (n=Null) Then
 		CreateConsoleMsg("Tried to change the texture of an invalid NPC")

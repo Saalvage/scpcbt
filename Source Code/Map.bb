@@ -1374,8 +1374,6 @@ End Type
 Function CreateRoomTemplate.RoomTemplates(meshpath$)
 	Local rt.RoomTemplates = New RoomTemplates
 	
-	Local I_Loc.Loc = First Loc
-	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + meshpath)=1 Then
 		rt\objPath = I_Loc\LangPath + meshpath
 	Else
@@ -1389,8 +1387,6 @@ Function CreateRoomTemplate.RoomTemplates(meshpath$)
 End Function
 
 Function LoadRoomTemplates(file$)
-	Local I_Loc.Loc = First Loc
-	
 	;CatchErrors("LoadRoomTemplates")
 	If I_Loc\Localized And FileType(I_Loc\LangPath + file)=1 Then
 		file = I_Loc\LangPath + file
@@ -3291,7 +3287,7 @@ Function FillRoom(r.Rooms)
 			sc.SecurityCams = CreateSecurityCam(r\x + 744.0 * RoomScale, r\y - 856.0 * RoomScale, r\z + 236.0 * RoomScale, r)
 			sc\FollowPlayer = True
 			
-			CreateDoor(0, r\x + 720.0 * RoomScale, r\y, r\z, 0, r, False, 2, -1)
+			r\RoomDoors[0] = CreateDoor(0, r\x + 720.0 * RoomScale, r\y, r\z, 0, r, False, 2, -1)
 			
 			CreateDoor(0, r\x - 624.0 * RoomScale, r\y-1280.0 * RoomScale, r\z, 90, r, True)			
 			
@@ -7034,8 +7030,6 @@ Function CreateMap(zone%)
 	For r.Rooms = Each Rooms
 		PreventRoomOverlap(r)
 	Next
-	
-	Local I_Opt.Options = First Options
 	
 	If I_Opt\DebugMode Then
 		Repeat

@@ -46,8 +46,6 @@ Function GiveAchievement(achvname%, showMessage%=True)
 End Function
 
 Function AchievementTooltip(achvno%)
-	
-	Local I_Opt.Options = First Options
 
 	Local scale# = I_Opt\GraphicHeight/768.0
 	
@@ -62,18 +60,16 @@ Function AchievementTooltip(achvno%)
 	Local height = 38*scale
 	
 	Color 25,25,25
-	Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height,True)
+	Rect(ScaledMouseX()+(20*MenuScale),ScaledMouseY()+(20*MenuScale),width,height,True)
 	Color 150,150,150
-	Rect(ScaledMouseX(I_Opt)+(20*MenuScale),ScaledMouseY(I_Opt)+(20*MenuScale),width,height,False)
+	Rect(ScaledMouseX()+(20*MenuScale),ScaledMouseY()+(20*MenuScale),width,height,False)
 	SetFont I_Opt\Fonts[3]
-	Text(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(35*MenuScale), AchievementStrings[achvno], True, True)
+	Text(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(35*MenuScale), AchievementStrings[achvno], True, True)
 	SetFont I_Opt\Fonts[1]
-	Text(ScaledMouseX(I_Opt)+(20*MenuScale)+(width/2),ScaledMouseY(I_Opt)+(55*MenuScale), AchievementDescs[achvno], True, True)
+	Text(ScaledMouseX()+(20*MenuScale)+(width/2),ScaledMouseY()+(55*MenuScale), AchievementDescs[achvno], True, True)
 End Function
 
 Function DrawAchvIMG(x%, y%, achvno%)
-
-	Local I_Opt.Options = First Options
 	
 	Local row%
 	Local scale# = I_Opt\GraphicHeight/768.0
@@ -115,8 +111,6 @@ Function CreateAchievementMsg.AchievementMsg(id%,txt$)
 End Function
 
 Function UpdateAchievementMsg()
-	
-	Local I_Opt.Options = First Options
 
 	Local amsg.AchievementMsg,amsg2.AchievementMsg
 	Local scale# = I_Opt\GraphicHeight/768.0
