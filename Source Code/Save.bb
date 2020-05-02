@@ -17,6 +17,8 @@ Function SaveGame(file$, zonemod%=0)
 	
 	WriteString f, CompatibleNumber
 	
+	SavePlayTime()
+	
 	WriteInt f, PlayTime
 	
 	WriteFloat f, EntityX(Collider)
@@ -2199,6 +2201,7 @@ Type Save
 	Field Time$
 	Field Date$
 	Field Version$
+	Field PlayTime%
 End Type
 
 Global CurrSave.Save
@@ -2226,6 +2229,7 @@ Function LoadSaveGames()
 			NEW_SAV\Time = ReadString(f)
 			NEW_SAV\Date = ReadString(f)
 			NEW_SAV\Version = ReadString(f)
+			NEW_SAV\PlayTime = ReadInt(f)
 			CloseFile f
 			SaveGameAmount = SaveGameAmount + 1
 		EndIf

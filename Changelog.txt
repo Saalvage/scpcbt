@@ -7,6 +7,7 @@ SCPs:
 	- Improved inventory icon.
 - (Re-)Added SCP-173's head rotating.
 - Much improved SCP-205.
+- Improved SCP-012 room.
 - Added a new SCP-895 image and made its loading of images dynamic, making it easy to mod (just add/remove images from the folder).
 - Added two new diseases to SCP-1025: Secondary Polycythemia (increased stamina) and the "Cannibal Plague" (SCP-008).
 	- Also overhauled the design of its pages.
@@ -36,6 +37,8 @@ Rooms:
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
+- Added idle gasmask breathing. ???
+- Added crouch sound.
 - Added a new sound when getting up from the bed in the intro sequence.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
 - Added loading screen scaling.
@@ -93,6 +96,7 @@ Rooms:
 - The hazmat suit is now hunched over when put off.
 - Increased size of the SCP-148 ingot and Electronical Components.
 - Disabled saving in SCP-1499's dimension.
+- Added "freeze" command, very fun!
 - Added "clear" command, which clears the console.
 - Added "ulti" command, which spawns a set of ultimate tools.
 - Reworked the disable/enable commands for SCP-173 and SCP-106 and adjusted the teleport commands accordingly.
@@ -104,9 +108,10 @@ Rooms:
 - Removed scene in which Guard Ulgrin provides D-9341 with classified information (the document will now be found just after the initial intro).
 - Removed orientation document in inventory when disabling the intro.
 - Removed 16-Bit mode.
-- Removed Antialiased Text (the implementation was very inconsistent and caused a lot of problems, if enough people request it, I will look towards reimplementation).
+- Removed Antialiased Text (the implementation was very inconsistent and caused a lot of problems, the new B3D text implementation should look good in all resolutions).
 - Removed and renamed a few commands.
 - Removed Graphics Driver Selection, which did not change anything anyways.
+- Removed one SCP-939 sound.
 - Removed unused and duplicate files.
 
 
@@ -152,6 +157,7 @@ Bug Fixes:
 	- Fixed radio model (mostly).
 	- Fixed SCP-513-1 model.
 	- Fixed tank models.
+	- Fixed breath sound while wearing SCP-714.
 	- Fixed and reworked the "revive" command.
 	- Fixed "sanic" command causing death and other unwanted sideeffects.
 	- Fixed tentacles, SCP-205, SCP-966, SCP-1048-A and guards at some points not respecting the "notarget" command.

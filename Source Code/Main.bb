@@ -219,6 +219,8 @@ Global AchvIni$ = "Data\achievements.ini"
 Global fresize_image%, fresize_texture%, fresize_texture2%
 Global fresize_cam%
 
+Global Freeze%
+
 Global RealGraphicWidth%,RealGraphicHeight%
 Global AspectRatioRatio#
 
@@ -420,6 +422,7 @@ Global RefinedItems%
 Global DropSpeed#, HeadDropSpeed#, CurrSpeed#
 Global user_camera_pitch#, side#
 Global Crouch%, CrouchState#
+Global CrouchSFX%
 
 Global PlayerZone%, PlayerRoom.Rooms, CurrentZone%
 
@@ -468,7 +471,15 @@ Global RadioCHN%[6]
 
 Global OldAiPics%[1]
 
+; Handlded in DrawGUI
 Global PlayTime%
+Global PlayingSince% ; = 0 means Paused
+
+Function SavePlayTime()
+	PlayTime = PlayTime + (MilliSecs() - PlayingSince)
+	PlayingSince = 0
+End Function
+
 Global ConsoleFlush%
 Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0, ConsoleMusPlay% = 0
 
@@ -650,9 +661,9 @@ Global ButtGhostSFX%
 
 Dim RadioSFX(5,10) 
 
-Global RadioSquelch 
-Global RadioStatic 
-Global RadioBuzz 
+Global RadioSquelch%
+Global RadioStatic%
+Global RadioBuzz%
 
 Global ElevatorBeepSFX, ElevatorMoveSFX  
 
@@ -693,6 +704,8 @@ Global HeartBeatSFX
 Global VomitSFX%
 
 Dim BreathSFX(2,5)
+Global BreathRelaxedSFX%
+Global BreathRelaxedPlaying% = False
 Global BreathCHN%
 
 
@@ -1093,185 +1106,187 @@ Function UpdateDoors()
 		UpdateDoorsTimer = Max(UpdateDoorsTimer-FPSfactor,0)
 	EndIf
 	
-	ClosestButton = 0
-	ClosestDoor = Null
-	
-	For d.Doors = Each Doors
-		If d\dist < HideDistance*2 Lor d\IsElevatorDoor>0 Then ;Make elevator doors update everytime because if not, this can cause a bug where the elevators suddenly won't work, most noticeable in room2mtunnels - ENDSHN
-			
-			If (d\openstate >= 180 Lor d\openstate <= 0) And GrabbedEntity = 0 Then
-				For i% = 0 To 1
-					If d\buttons[i] <> 0 Then
-						If Abs(EntityX(Collider)-EntityX(d\buttons[i],True)) < 1.0 Then 
-							If Abs(EntityZ(Collider)-EntityZ(d\buttons[i],True)) < 1.0 Then 
-								Local dist# = DistanceSquared(EntityX(Collider, True), EntityX(d\buttons[i], True), EntityZ(Collider, True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
-								If dist < PowTwo(0.7) Then
-									Local temp% = CreatePivot()
-									PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
-									PointEntity temp,d\buttons[i]
-									
-									If EntityPick(temp, 0.6) = d\buttons[i] Then
-										If ClosestButton = 0 Then
-											ClosestButton = d\buttons[i]
-											ClosestDoor = d
-										Else
-											If dist < EntityDistanceSquared(Collider, ClosestButton) Then ClosestButton = d\buttons[i] : ClosestDoor = d
-										EndIf							
+	If (Not Freeze) Then
+		ClosestButton = 0
+		ClosestDoor = Null
+		
+		For d.Doors = Each Doors
+			If d\dist < HideDistance*2 Lor d\IsElevatorDoor>0 Then ;Make elevator doors update everytime because if not, this can cause a bug where the elevators suddenly won't work, most noticeable in room2mtunnels - ENDSHN
+				
+				If (d\openstate >= 180 Lor d\openstate <= 0) And GrabbedEntity = 0 Then
+					For i% = 0 To 1
+						If d\buttons[i] <> 0 Then
+							If Abs(EntityX(Collider)-EntityX(d\buttons[i],True)) < 1.0 Then 
+								If Abs(EntityZ(Collider)-EntityZ(d\buttons[i],True)) < 1.0 Then 
+									Local dist# = DistanceSquared(EntityX(Collider, True), EntityX(d\buttons[i], True), EntityZ(Collider, True), EntityZ(d\buttons[i], True));entityDistance(collider, d\buttons[i])
+									If dist < PowTwo(0.7) Then
+										Local temp% = CreatePivot()
+										PositionEntity temp, EntityX(Camera), EntityY(Camera), EntityZ(Camera)
+										PointEntity temp,d\buttons[i]
+										
+										If EntityPick(temp, 0.6) = d\buttons[i] Then
+											If ClosestButton = 0 Then
+												ClosestButton = d\buttons[i]
+												ClosestDoor = d
+											Else
+												If dist < EntityDistanceSquared(Collider, ClosestButton) Then ClosestButton = d\buttons[i] : ClosestDoor = d
+											EndIf							
+										EndIf
+										
+										FreeEntity temp
+									EndIf							
+								EndIf
+							EndIf
+							
+						EndIf
+					Next
+				EndIf
+				
+				If d\open Then
+					If d\openstate < 180 Then
+						Select d\dir
+							Case 0, 5
+								d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
+								MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 80.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen+1) * FPSfactor / 80.0, 0, 0)		
+							Case 1
+								d\openstate = Min(180, d\openstate + FPSfactor * 0.8)
+								MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, -Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
+							Case 2
+								d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
+								MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen+1) * FPSfactor / 85.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 120.0, 0, 0)
+							Case 3
+								d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
+								MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
+							Case 4 ;Used for 914 only
+								d\openstate = Min(180, d\openstate + FPSfactor * 1.4)
+								MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 114.0, 0, 0)
+						End Select
+					Else
+						d\fastopen = 0
+						ResetEntity(d\obj)
+						If d\obj2 <> 0 Then ResetEntity(d\obj2)
+						If d\timerstate > 0 Then
+							d\timerstate = Max(0, d\timerstate - FPSfactor)
+							If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then d\SoundCHN = PlaySound2(CautionSFX, Camera, d\obj)
+							;If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
+							Local sound%
+							If d\dir = 1 Then sound% = Rand(0, 1) Else sound% = Rand(0, 2)
+							If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
+						EndIf
+						If d\AutoClose And RemoteDoorOn = True Then
+							If EntityDistanceSquared(Camera, d\obj) < PowTwo(2.1) Then
+								If (Not Wearing714) Then PlaySound_Strict HorrorSFX(7)
+								d\open = False : d\SoundCHN = PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
+							EndIf
+						EndIf				
+					EndIf
+				Else
+					If d\openstate > 0 Then
+						Select d\dir
+							Case 0, 5
+								d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
+								MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 80.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 80.0, 0, 0)	
+							Case 1
+								d\openstate = Max(0, d\openstate - FPSfactor*0.8)
+								MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 180.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
+								If d\openstate < 15 And d\openstate+FPSfactor => 15
+									If ParticleAmount=2
+										For i = 0 To Rand(75,99)
+											Local pvt% = CreatePivot()
+											PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+Rnd(0.0,1.2), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
+											RotateEntity(pvt, 0, Rnd(360), 0)
+											
+											Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
+											p\speed = 0.005
+											RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
+											
+											p\SizeChange = -0.00001
+											p\size = 0.01
+											ScaleSprite p\obj,p\size,p\size
+											
+											p\Achange = -0.01
+											
+											EntityOrder p\obj,-1
+											
+											FreeEntity pvt
+										Next
 									EndIf
-									
-									FreeEntity temp
-								EndIf							
+								EndIf
+							Case 2
+								d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
+								MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 85.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 120.0, 0, 0)
+							Case 3
+								d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
+								MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 162.0, 0, 0)
+								If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 162.0, 0, 0)
+							Case 4 ;Used for 914 only
+								d\openstate = Min(180, d\openstate - FPSfactor * 1.4)
+								MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 114.0, 0, 0)
+						End Select
+						
+						If d\angle = 0 Lor d\angle=180 Then
+							If Abs(EntityZ(d\frameobj, True)-EntityZ(Collider))<0.15 Then
+								If Abs(EntityX(d\frameobj, True)-EntityX(Collider))<0.7*(d\dir*2+1) Then
+									PositionEntity Collider, EntityX(Collider), EntityY(Collider), CurveValue(EntityZ(d\frameobj,True)+0.15*Sgn(EntityZ(Collider)-EntityZ(d\frameobj, True)), EntityZ(Collider), 5)
+								EndIf
+							EndIf
+						Else
+							If Abs(EntityX(d\frameobj, True)-EntityX(Collider))<0.15 Then	
+								If Abs(EntityZ(d\frameobj, True)-EntityZ(Collider))<0.7*(d\dir*2+1) Then
+									PositionEntity Collider, CurveValue(EntityX(d\frameobj,True)+0.15*Sgn(EntityX(Collider)-EntityX(d\frameobj, True)), EntityX(Collider), 5), EntityY(Collider), EntityZ(Collider)
+								EndIf
 							EndIf
 						EndIf
 						
-					EndIf
-				Next
-			EndIf
-			
-			If d\open Then
-				If d\openstate < 180 Then
-					Select d\dir
-						Case 0, 5
-							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
-							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 80.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen+1) * FPSfactor / 80.0, 0, 0)		
-						Case 1
-							d\openstate = Min(180, d\openstate + FPSfactor * 0.8)
-							MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, -Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
-						Case 2
-							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
-							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen+1) * FPSfactor / 85.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 120.0, 0, 0)
-						Case 3
-							d\openstate = Min(180, d\openstate + FPSfactor * 2 * (d\fastopen+1))
-							MoveEntity(d\obj, Sin(d\openstate) * (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate)* (d\fastopen*2+1) * FPSfactor / 162.0, 0, 0)
-						Case 4 ;Used for 914 only
-							d\openstate = Min(180, d\openstate + FPSfactor * 1.4)
-							MoveEntity(d\obj, Sin(d\openstate) * FPSfactor / 114.0, 0, 0)
-					End Select
-				Else
-					d\fastopen = 0
-					ResetEntity(d\obj)
-					If d\obj2 <> 0 Then ResetEntity(d\obj2)
-					If d\timerstate > 0 Then
-						d\timerstate = Max(0, d\timerstate - FPSfactor)
-						If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then d\SoundCHN = PlaySound2(CautionSFX, Camera, d\obj)
-						;If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
-						Local sound%
-						If d\dir = 1 Then sound% = Rand(0, 1) Else sound% = Rand(0, 2)
-						If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
-					EndIf
-					If d\AutoClose And RemoteDoorOn = True Then
-						If EntityDistanceSquared(Camera, d\obj) < PowTwo(2.1) Then
-							If (Not Wearing714) Then PlaySound_Strict HorrorSFX(7)
-							d\open = False : d\SoundCHN = PlaySound2(CloseDoorSFX(Min(d\dir,1), Rand(0, 2)), Camera, d\obj) : d\AutoClose = False
-						EndIf
-					EndIf				
-				EndIf
-			Else
-				If d\openstate > 0 Then
-					Select d\dir
-						Case 0, 5
-							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
-							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 80.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 80.0, 0, 0)	
-						Case 1
-							d\openstate = Max(0, d\openstate - FPSfactor*0.8)
-							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 180.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * FPSfactor / 180.0, 0, 0)
-							If d\openstate < 15 And d\openstate+FPSfactor => 15
-								If ParticleAmount=2
-									For i = 0 To Rand(75,99)
-										Local pvt% = CreatePivot()
-										PositionEntity(pvt, EntityX(d\frameobj,True)+Rnd(-0.2,0.2), EntityY(d\frameobj,True)+Rnd(0.0,1.2), EntityZ(d\frameobj,True)+Rnd(-0.2,0.2))
-										RotateEntity(pvt, 0, Rnd(360), 0)
-										
-										Local p.Particles = CreateParticle(EntityX(pvt), EntityY(pvt), EntityZ(pvt), 2, 0.002, 0, 300)
-										p\speed = 0.005
-										RotateEntity(p\pvt, Rnd(-20, 20), Rnd(360), 0)
-										
-										p\SizeChange = -0.00001
-										p\size = 0.01
-										ScaleSprite p\obj,p\size,p\size
-										
-										p\Achange = -0.01
-										
-										EntityOrder p\obj,-1
-										
-										FreeEntity pvt
-									Next
-								EndIf
-							EndIf
-						Case 2
-							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
-							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 85.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 120.0, 0, 0)
-						Case 3
-							d\openstate = Max(0, d\openstate - FPSfactor * 2 * (d\fastopen+1))
-							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor * (d\fastopen+1) / 162.0, 0, 0)
-							If d\obj2 <> 0 Then MoveEntity(d\obj2, Sin(d\openstate) * (d\fastopen+1) * -FPSfactor / 162.0, 0, 0)
-						Case 4 ;Used for 914 only
-							d\openstate = Min(180, d\openstate - FPSfactor * 1.4)
-							MoveEntity(d\obj, Sin(d\openstate) * -FPSfactor / 114.0, 0, 0)
-					End Select
-					
-					If d\angle = 0 Lor d\angle=180 Then
-						If Abs(EntityZ(d\frameobj, True)-EntityZ(Collider))<0.15 Then
-							If Abs(EntityX(d\frameobj, True)-EntityX(Collider))<0.7*(d\dir*2+1) Then
-								PositionEntity Collider, EntityX(Collider), EntityY(Collider), CurveValue(EntityZ(d\frameobj,True)+0.15*Sgn(EntityZ(Collider)-EntityZ(d\frameobj, True)), EntityZ(Collider), 5)
-							EndIf
+						If d\DoorHitOBJ <> 0 Then
+							ShowEntity d\DoorHitOBJ
 						EndIf
 					Else
-						If Abs(EntityX(d\frameobj, True)-EntityX(Collider))<0.15 Then	
-							If Abs(EntityZ(d\frameobj, True)-EntityZ(Collider))<0.7*(d\dir*2+1) Then
-								PositionEntity Collider, CurveValue(EntityX(d\frameobj,True)+0.15*Sgn(EntityX(Collider)-EntityX(d\frameobj, True)), EntityX(Collider), 5), EntityY(Collider), EntityZ(Collider)
-							EndIf
+						d\fastopen = 0
+						PositionEntity(d\obj, EntityX(d\frameobj, True), EntityY(d\frameobj, True), EntityZ(d\frameobj, True))
+						If d\obj2 <> 0 Then PositionEntity(d\obj2, EntityX(d\frameobj, True), EntityY(d\frameobj, True), EntityZ(d\frameobj, True))
+						If d\obj2 <> 0 And d\dir = 0 Then
+							MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
+							MoveEntity(d\obj2, 0, 0, 8.0 * RoomScale)
+						EndIf
+						If d\DoorHitOBJ <> 0 Then
+							HideEntity d\DoorHitOBJ
 						EndIf
 					EndIf
-					
-					If d\DoorHitOBJ <> 0 Then
-						ShowEntity d\DoorHitOBJ
+				EndIf
+				
+				If d\locked <> d\lockedupdated Then
+					If d\locked Then
+						For i = 0 To 2
+							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTextureLocked)
+						Next
+					Else
+						For i = 0 To 2
+							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTexture)
+						Next
 					EndIf
+					d\lockedupdated = d\locked
+				EndIf
+				
+			EndIf
+			UpdateSoundOrigin(d\SoundCHN,Camera,d\frameobj)
+			
+			If d\DoorHitOBJ<>0 Then
+				If DebugHUD Then
+					EntityAlpha d\DoorHitOBJ,0.5
 				Else
-					d\fastopen = 0
-					PositionEntity(d\obj, EntityX(d\frameobj, True), EntityY(d\frameobj, True), EntityZ(d\frameobj, True))
-					If d\obj2 <> 0 Then PositionEntity(d\obj2, EntityX(d\frameobj, True), EntityY(d\frameobj, True), EntityZ(d\frameobj, True))
-					If d\obj2 <> 0 And d\dir = 0 Then
-						MoveEntity(d\obj, 0, 0, 8.0 * RoomScale)
-						MoveEntity(d\obj2, 0, 0, 8.0 * RoomScale)
-					EndIf
-					If d\DoorHitOBJ <> 0 Then
-						HideEntity d\DoorHitOBJ
-					EndIf
+					EntityAlpha d\DoorHitOBJ,0.0
 				EndIf
 			EndIf
-			
-			If d\locked <> d\lockedupdated Then
-				If d\locked Then
-					For i = 0 To 2
-						If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTextureLocked)
-					Next
-				Else
-					For i = 0 To 2
-						If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTexture)
-					Next
-				EndIf
-				d\lockedupdated = d\locked
-			EndIf
-			
-		EndIf
-		UpdateSoundOrigin(d\SoundCHN,Camera,d\frameobj)
-		
-		If d\DoorHitOBJ<>0 Then
-			If DebugHUD Then
-				EntityAlpha d\DoorHitOBJ,0.5
-			Else
-				EntityAlpha d\DoorHitOBJ,0.0
-			EndIf
-		EndIf
-	Next
+		Next
+	EndIf
 End Function
 
 Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
@@ -1872,8 +1887,6 @@ Repeat
 		RestoreSanity = True
 		ShouldEntitiesFall = True
 		
-		If FPSfactor > 0 And PlayerRoom\RoomTemplate\Name <> "dimension1499" Then UpdateSecurityCams()
-		
 		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
 			
 			If Rand(1500) = 1 Then
@@ -1952,43 +1965,49 @@ Repeat
 				ShouldEntitiesFall = False
 			EndIf
 			MovePlayer()
-			InFacility = CheckForPlayerInFacility()
-			If PlayerRoom\RoomTemplate\Name = "dimension1499"
-				If QuickLoad_CurrEvent = Null Then
-					UpdateDimension1499()
+			If (Not Freeze)
+				InFacility = CheckForPlayerInFacility()
+				If PlayerRoom\RoomTemplate\Name = "dimension1499"
+					If QuickLoad_CurrEvent = Null Then
+						UpdateDimension1499()
+					EndIf
+					UpdateLeave1499()
+				ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Lor (PlayerRoom\RoomTemplate\Name="gateb" And EntityY(Collider)>1040.0*RoomScale-2000)
+					UpdateDoors()
+					If QuickLoad_CurrEvent = Null Then
+						UpdateEndings()
+					EndIf
+					UpdateScreens()
+					UpdateRoomLights(Camera)
+				Else
+					UpdateSecurityCams()
+					UpdateDoors()
+					If QuickLoad_CurrEvent = Null Then
+						UpdateEvents()
+					EndIf
+					UpdateScreens()
+					TimeCheckpointMonitors()
+					Update294()
+					UpdateRoomLights(Camera)
 				EndIf
-				UpdateLeave1499()
-			ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Lor (PlayerRoom\RoomTemplate\Name="gateb" And EntityY(Collider)>1040.0*RoomScale-2000)
-				UpdateDoors()
-				If QuickLoad_CurrEvent = Null Then
-					UpdateEndings()
+				UpdateFluLights()
+				UpdateDecals()
+				UpdateMTF()
+				UpdateNPCs()
+				UpdateItems()
+				UpdateParticles()
+				Use427()
+				UpdateMonitorSaving()
+				;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
+				UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
+				If UpdateParticles_Time#=1
+					UpdateDevilEmitters()
+					UpdateParticles_Devil()
+					UpdateParticles_Time#=0
 				EndIf
-				UpdateScreens()
-				UpdateRoomLights(Camera)
 			Else
 				UpdateDoors()
-				If QuickLoad_CurrEvent = Null Then
-					UpdateEvents()
-				EndIf
-				UpdateScreens()
-				TimeCheckpointMonitors()
-				Update294()
-				UpdateRoomLights(Camera)
-			EndIf
-			UpdateFluLights()
-			UpdateDecals()
-			UpdateMTF()
-			UpdateNPCs()
-			UpdateItems()
-			UpdateParticles()
-			Use427()
-			UpdateMonitorSaving()
-			;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
-			UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
-			If UpdateParticles_Time#=1
-				UpdateDevilEmitters()
-				UpdateParticles_Devil()
-				UpdateParticles_Time#=0
+				UpdateRooms()
 			EndIf
 		EndIf
 		
@@ -2951,6 +2970,11 @@ End Function
 
 ;--------------------------------------- player controls -------------------------------------------
 
+Function SetCrouch(NewCrouch%)
+	If Crouch <> NewCrouch Then PlaySound_Strict(CrouchSFX)
+	Crouch = NewCrouch
+End Function
+
 Function MovePlayer()
 	;CatchErrors("MovePlayer")
 	
@@ -2994,30 +3018,30 @@ Function MovePlayer()
 		If StaminaEffect <> 1.0 Then StaminaEffect = 1.0
 	EndIf
 	
-	Local temp#
-	
 	If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then 
 		If KeyDown(I_Keys\SPRINT) Then
 			If Stamina < 5 Then
-				temp = 0
-				If WearingGasMask<>0 Lor Wearing1499<>0 Then temp=1
-				If ChannelPlaying(BreathCHN)=False Then BreathCHN = PlaySound_Strict(BreathSFX((temp), 0))
-			ElseIf Stamina < 50
-				If BreathCHN=0 Then
-					temp = 0
-					If WearingGasMask<>0 Lor Wearing1499<>0 Then temp=1
-					BreathCHN = PlaySound_Strict(BreathSFX((temp), Rand(1,3)))
+				If ChannelPlaying(BreathCHN)=False Then BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask<>0 Lor Wearing1499<>0), 0))
+			ElseIf Stamina < 50 And (Not I_Cheats\NoClip)
+				If BreathRelaxedPlaying Then BreathRelaxedPlaying = 0 : StopChannel(BreathCHN) : BreathCHN = 0
+				If BreathCHN=0 Lor (Not ChannelPlaying(BreathCHN)) Then
+					BreathCHN = PlaySound_Strict(BreathSFX((WearingGasMask<>0 Lor Wearing1499<>0), Rand(1,3)))
 					ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume
-				Else
-					If ChannelPlaying(BreathCHN)=False Then
-						temp = 0
-						If WearingGasMask<>0 Lor Wearing1499<>0 Then temp=1
-						BreathCHN = PlaySound_Strict(BreathSFX((temp), Rand(1,3)))
-						ChannelVolume BreathCHN, Min((70.0-Stamina)/70.0,1.0)*SFXVolume			
-					EndIf
+					BreathRelaxedPlaying = False
 				EndIf
 			EndIf
 		EndIf
+	EndIf
+	
+	If (WearingGasMask<>0 Lor Wearing1499<>0) Then
+		If (BreathCHN=0 Lor (Not ChannelPlaying(BreathCHN))) Then
+			BreathCHN = PlaySound_Strict(BreathRelaxedSFX)
+			ChannelVolume(BreathCHN, SFXVolume)
+			BreathRelaxedPlaying = True
+		EndIf
+	ElseIf BreathRelaxedPlaying
+		StopChannel(BreathCHN)
+		BreathRelaxedPlaying = False
 	EndIf
 	
 	For i = 0 To MaxItemAmount-1
@@ -3031,7 +3055,9 @@ Function MovePlayer()
 		Sanity = Max(-850, Sanity)
 	EndIf
 	
-	If IsZombie Then Crouch = False
+	If IsZombie Then
+		SetCrouch(False)
+	EndIf
 	
 	If Abs(CrouchState-Crouch)<0.001 Then 
 		CrouchState = Crouch
@@ -3108,7 +3134,7 @@ Function MovePlayer()
 		EndIf
 	EndIf
 	
-	If KeyHit(I_Keys\CROUCH) And Playable Then Crouch = (Not Crouch)
+	If KeyHit(I_Keys\CROUCH) And Playable Then SetCrouch(Not Crouch)
 	
 	Local temp2# = (Speed * Sprint) / (1.0+CrouchState)
 	
@@ -3116,7 +3142,7 @@ Function MovePlayer()
 		Shake = 0
 		CurrSpeed = 0
 		CrouchState = 0
-		Crouch = 0
+		SetCrouch(False)
 		
 		RotateEntity Collider, WrapAngle(EntityPitch(Camera)), WrapAngle(EntityYaw(Camera)), 0
 		
@@ -3269,7 +3295,9 @@ Function MovePlayer()
 		
 		CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0)*Bloodloss*0.2)
 		
-		If Bloodloss > 60 Then Crouch = True
+		If Bloodloss > 60 Then
+			SetCrouch(True)
+		EndIf
 		If Bloodloss => 100 Then 
 			Kill()
 			HeartBeatVolume = 0.0
@@ -3638,8 +3666,10 @@ Function DrawGUI()
 	
 	If MenuOpen Lor ConsoleOpen Lor SelectedDoor <> Null Lor InvOpen Lor OtherOpen<>Null Lor EndingTimer < 0 Then
 		ShowPointer()
+		If PlayingSince <> 0 Then SavePlayTime()
 	Else
 		HidePointer()
+		IF PlayingSince = 0 Then PlayingSince = MilliSecs()
 	EndIf 	
 	
 	If PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
@@ -4798,7 +4828,7 @@ Function DrawGUI()
 					Else
 						If CanUseItem(False, True, True)
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-							Crouch = True
+							SetCrouch(True)
 							
 							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 							
@@ -7608,6 +7638,9 @@ Function NullGame(playbuttonsfx%=True)
 	DoorTempID = 0
 	RoomTempID = 0
 	
+	PlayTime = 0
+	PlayingSince = 0
+	
 	GameSaved = 0
 	
 	HideDistance# = 15.0
@@ -8628,7 +8661,7 @@ Function Use427()
 			Kill()
 			DeathMSG = GetLocalString("Deaths", "427")
 		ElseIf I_427\Timer >= 70*390 Then
-			Crouch = True
+			SetCrouch(True)
 		EndIf
 	EndIf
 	

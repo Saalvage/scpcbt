@@ -645,6 +645,8 @@ Function LoadRMesh(file$,rt.RoomTemplates)
 					If Right(file, 1) = "x" Then file = Left(file, Len(file)-1) + "b3d" ;all b3d now!
 					Local model = CreatePropObj("GFX\Map\Props\"+file);LoadMesh("GFX\Map\Props\"+file)
 					
+					DebugLog file
+					
 					temp1=ReadFloat(f) : temp2=ReadFloat(f) : temp3=ReadFloat(f)
 					PositionEntity model,temp1,temp2,temp3
 					
@@ -3093,7 +3095,7 @@ Function FillRoom(r.Rooms)
 			EntityParent(r\Objects[2], r\obj)
 			
 			r\Objects[3] = CreateSprite()
-			PositionEntity(r\Objects[3], r\x - 43.5 * RoomScale, r\y - 574 * RoomScale, r\z - 362.0 * RoomScale)
+			PositionEntity(r\Objects[3], r\x - 44.5 * RoomScale, r\y - 573.2 * RoomScale, r\z - 362.0 * RoomScale)
 			ScaleSprite(r\Objects[3], 0.015, 0.015)
 			EntityTexture(r\Objects[3], LightSpriteTex[1])
 			EntityBlend (r\Objects[3], 3)

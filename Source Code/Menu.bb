@@ -439,6 +439,7 @@ Function UpdateMainMenu()
 							Text(x + 20 * MenuScale, y + (10+18) * MenuScale, CurrSave\Time) ;y + (10+23) * MenuScale
 							Text(x + 120 * MenuScale, y + (10+18) * MenuScale, CurrSave\Date)
 							Text(x + 20 * MenuScale, y + (10+36) * MenuScale, CurrSave\Version)
+							Text(x + 120 * MenuScale, y + (10+36) * MenuScale, CurrSave\PlayTime)
 							
 							If DelSave = Null Then
 								If DrawButton(x + 400 * MenuScale, y + 20 * MenuScale, 100 * MenuScale, 30 * MenuScale, GetLocalString("Menu", "delete"), False) Then
@@ -1462,43 +1463,34 @@ Function DrawLoading(percent%, shortloading=False)
 	Until (GetKey()<>0 Lor MouseHit(1))
 End Function
 
-Global ttest%
-
 Function rInput$(aString$, MaxChr%)
 	Local value% = GetKey()
-	Local length% = Len(aString$)
+	Local length% = Len(aString)
 	
 	If CursorPos = -1 Then CursorPos = length
 	
 	If KeyDown(29) Then
 		If value = 30 Then CursorPos = length
 		If value = 31 Then CursorPos = 0
-		If value = 127 Then aString = "" : CursorPos = 0
 		If value = 22 Then
 			aString = Left(aString, CursorPos) + GetClipboardContents() + Right(aString, length - CursorPos)
 			CursorPos = CursorPos + Len(aString) - length
-			If MaxChr > 0 And MaxChr < Len(aString) Then aString = Left(aString, maxChr) : CursorPos = MaxChr
+			If MaxChr > 0 And MaxChr < Len(aString) Then aString = Left(aString, MaxChr) : CursorPos = MaxChr
 		EndIf
 		Return aString
 	EndIf
 	
-	If value = 8 Then
-		If CursorPos > 0 Then
-			aString = Left(aString, CursorPos - 1) + Right(aString, length - CursorPos)
-			CursorPos = CursorPos - 1
-		EndIf
-	ElseIf value = 30
+	If value = 30
 		CursorPos = Min(CursorPos + 1, length)
 	ElseIf value = 31
 		CursorPos = Max(CursorPos - 1, 0)
-	ElseIf value <> 127 And value >= 32 And value <= 254
-		If MaxChr = 0 Lor MaxChr > length + 1 Then
-			aString = Left(aString, CursorPos) + Chr(value) + Right(aString, length - CursorPos)
-			CursorPos = CursorPos + 1
-		EndIf
+	Else
+		aString = TextInput(Left(aString, CursorPos)) + Mid(aString, CursorPos+1)
+		CursorPos = CursorPos + Len(aString) - length
+		If MaxChr > 0 And MaxChr < Len(aString) Then aString = Left(aString, MaxChr) : CursorPos = MaxChr
 	EndIf
-	
 	Return aString
+	
 End Function
 
 Function InputBox$(x%, y%, width%, height%, Txt$, ID% = 0, MaxChr% = 0)

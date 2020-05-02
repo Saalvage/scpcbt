@@ -1,4 +1,7 @@
 Function LoadAllSounds()
+	
+	CrouchSFX = LoadSound_Strict("SFX\Character\D9341\Crouch.ogg")
+	
 	For i = 0 To 2
 		OpenDoorSFX(0,i) = LoadSound_Strict("SFX\Door\DoorOpen" + (i + 1) + ".ogg")
 		CloseDoorSFX(0,i) = LoadSound_Strict("SFX\Door\DoorClose" + (i + 1) + ".ogg")
@@ -144,6 +147,8 @@ Function LoadAllSounds()
 		BreathSFX(0,i)=LoadSound_Strict("SFX\Character\D9341\breath"+i+".ogg")
 		BreathSFX(1,i)=LoadSound_Strict("SFX\Character\D9341\breath"+i+"gas.ogg")
 	Next
+	
+	BreathRelaxedSFX = LoadSound_Strict("SFX\Character\D9341\BreathRelaxedGas.ogg")
 
 
 	;Dim NeckSnapSFX(3)

@@ -1027,6 +1027,9 @@ Function UpdateConsole()
 						EndIf
 						SaveGame(CurrSave\Name)
 					EndIf
+					
+				Case "freeze"
+					Freeze = Not Freeze
 				
 				Default
 					CreateConsoleMsg("Command not found.",255,0,0)

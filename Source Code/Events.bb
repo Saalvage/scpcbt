@@ -2204,7 +2204,7 @@ Function UpdateEvents()
 										BlinkTimer = -10
 										PositionEntity Collider, EntityX(e\room\Objects[8],True)-1344*RoomScale,2944*RoomScale,EntityZ(e\room\Objects[8],True)-1184*RoomScale
 										ResetEntity Collider
-										Crouch = False
+										SetCrouch(False)
 										
 										LoadEventSound(e,"SFX\Room\PocketDimension\Explosion.ogg")
 										LoadEventSound(e,"SFX\Room\PocketDimension\TrenchPlane.ogg",1)
@@ -5002,7 +5002,7 @@ Function UpdateEvents()
 										MsgTimer = 7*70
 										Injuries=Injuries+0.8
 										PlaySound_Strict LoadTempSound("SFX\SCP\012\Speech7.ogg")
-										Crouch = True
+										SetCrouch(True)
 										
 										de.Decals = CreateDecal(17,  EntityX(Collider), -768*RoomScale+0.01, EntityZ(Collider),90,Rnd(360),0)
 										de\Size = 0.1 : de\maxsize = 0.45 : de\sizechange = 0.0002 : UpdateDecals()
@@ -6663,7 +6663,7 @@ Function UpdateEvents()
 						PrevInjuries = 0
 						PrevBloodloss = 0
 						PrevSecondaryLightOn = 0.0
-						Crouch = False
+						SetCrouch(False)
 						CanSave = True
 						For i = 0 To MaxItemAmount-1
 							If Inventory(i) <> Null Then
