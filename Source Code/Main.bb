@@ -165,18 +165,13 @@ Function LoadLocalFont(Font$, IgnoreScaling%=0)
 	If FileType(name) <> 1 Then RuntimeError("Font not found: " + Font + " : " + name)
 	
 	; Font size is handled via a budget ternary operator
-	Local temp% = LoadFont(name, (Int(GetIniInt(file, Font, "size") * (I_Opt\GraphicHeight / 1024.0))) * (Not IgnoreScaling) + IgnoreScaling * GetIniInt(file, Font, "size"), GetIniInt(file, Font, "bold"),GetIniInt(file, Font, "italic"),GetIniInt(file, Font, "underline"))
+	Local temp% = LoadFont(name, (Int(GetIniInt(file, Font, "size") * (I_Opt\GraphicHeight / 1024.0))) * (Not IgnoreScaling) + IgnoreScaling * GetIniInt(file, Font, "size"))
 	If temp = 0 Then RuntimeError("Failed to load Font: " + Font + " : " + name)
 	Return temp
 	
 End Function
 
 Function ReloadFonts()
-	;For some reason, Blitz3D doesn't load fonts that have filenames that
-	;don't match their "internal name" (i.e. their display name in applications
-	;like Word and such). As a workaround, I moved the files and renamed them so they
-	;can load without FastText.
-	
 	;0: Console
 	;1 - 5: 1 - 5
 	;6 + 7: Credit 1 + 2
@@ -10024,31 +10019,6 @@ Function PlayStartupVideos()
 	Next
 	
 	ShowPointer()
-	
-End Function
-
-Function ProjectImage(img, w#, h#, Quad%, Texture%)
-	
-	Local img_w# = ImageWidth(img)
-	Local img_h# = ImageHeight(img)
-	If img_w > 2048 Then img_w = 2048
-	If img_h > 2048 Then img_h = 2048
-	If img_w < 1 Then img_w = 1
-	If img_h < 1 Then img_h = 1
-	
-	If w > 2048 Then w = 2048
-	If h > 2048 Then h = 2048
-	If w < 1 Then w = 1
-	If h < 1 Then h = 1
-	
-	Local w_rel# = w# / img_w#
-	Local h_rel# = h# / img_h#
-	Local g_rel# = 2048.0 / Float(RealGraphicWidth)
-	Local dst_x = 1024 - (img_w / 2.0)
-	Local dst_y = 1024 - (img_h / 2.0)
-	CopyRect 0, 0, img_w, img_h, dst_x, dst_y, ImageBuffer(img), TextureBuffer(Texture)
-	ScaleEntity Quad, w_rel * g_rel, h_rel * g_rel, 0.0001
-	RenderWorld()
 	
 End Function
 

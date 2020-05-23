@@ -1411,6 +1411,8 @@ Function LoadRoomTemplates(file$)
 			StrTemp = Lower(GetINIString(file, TemporaryString, "shape"))
 			
 			Select StrTemp
+				Case "-1"
+					rt\Shape = -1
 				Case "room1", "1"
 					rt\Shape = ROOM1
 				Case "room2", "2"
@@ -1421,7 +1423,6 @@ Function LoadRoomTemplates(file$)
 					rt\Shape = ROOM3
 				Case "room4", "4"
 					rt\Shape = ROOM4
-				Default
 			End Select
 			
 			rt\zone = GetINIInt(file, TemporaryString, "zone")
@@ -6611,7 +6612,13 @@ Function CreateMap(zone%)
 		y = y - height
 	Until y < 2
 	
-	Local Room1Amount%[3], Room2Amount%[3],Room2CAmount%[3],Room3Amount%[3],Room4Amount%[3]
+	Local RoomAmount[4]
+	;Room1Amount%[3], Room2Amount%[3],Room2CAmount%[3],Room3Amount%[3],Room4Amount%[3]
+	; Room1: 0
+	; Room2: 1
+	; Room2C: 2
+	; Room3: 3
+	; Room4: 4
 	
 	;count the amount of rooms
 	For y = 1 To MapHeight - 1
@@ -6623,19 +6630,19 @@ Function CreateMap(zone%)
 				If MapTemp(x,y)<255 Then MapTemp(x, y) = temp
 				Select MapTemp(x,y)
 					Case 1
-						Room1Amount[zone]=Room1Amount[zone]+1
+						RoomAmount[0]=RoomAmount[0]+1
 					Case 2
 						If Min(MapTemp(x + 1, y),1) + Min(MapTemp(x - 1, y),1)= 2 Then
-							Room2Amount[zone]=Room2Amount[zone]+1	
+							RoomAmount[1]=RoomAmount[1]+1	
 						ElseIf Min(MapTemp(x, y + 1),1) + Min(MapTemp(x , y - 1),1)= 2
-							Room2Amount[zone]=Room2Amount[zone]+1	
+							RoomAmount[1]=RoomAmount[1]+1	
 						Else
-							Room2CAmount[zone] = Room2CAmount[zone]+1
+							RoomAmount[2] = RoomAmount[2]+1
 						EndIf
 					Case 3
-						Room3Amount[zone]=Room3Amount[zone]+1
+						RoomAmount[3]=RoomAmount[3]+1
 					Case 4
-						Room4Amount[zone]=Room4Amount[zone]+1
+						RoomAmount[4]=RoomAmount[4]+1
 				End Select
 			EndIf
 		Next
@@ -6643,7 +6650,7 @@ Function CreateMap(zone%)
 	
 	;force more room1s (if needed)
 	;need more rooms if there are less than 3 of them
-	temp = -Room1Amount[zone]+3
+	temp = -RoomAmount[0]+3
 	
 	If temp > 0 Then
 		
@@ -6670,17 +6677,17 @@ Function CreateMap(zone%)
 							Select MapTemp(x2,y2)
 								Case 2
 									If Min(MapTemp(x2 + 1, y2),1) + Min(MapTemp(x2 - 1, y2),1)= 2 Then
-										Room2Amount[zone]=Room2Amount[zone]-1
-										Room3Amount[zone]=Room3Amount[zone]+1
+										RoomAmount[1]=RoomAmount[1]-1
+										RoomAmount[3]=RoomAmount[3]+1
 										placed = True
 									ElseIf Min(MapTemp(x2, y2 + 1),1) + Min(MapTemp(x2, y2 - 1),1)= 2
-										Room2Amount[zone]=Room2Amount[zone]-1
-										Room3Amount[zone]=Room3Amount[zone]+1
+										RoomAmount[1]=RoomAmount[1]-1
+										RoomAmount[3]=RoomAmount[3]+1
 										placed = True
 									EndIf
 								Case 3
-									Room3Amount[zone]=Room3Amount[zone]-1
-									Room4Amount[zone]=Room4Amount[zone]+1	
+									RoomAmount[3]=RoomAmount[3]-1
+									RoomAmount[4]=RoomAmount[4]+1	
 									placed = True
 							End Select
 							
@@ -6688,7 +6695,7 @@ Function CreateMap(zone%)
 								MapTemp(x2,y2)=MapTemp(x2,y2)+1
 								
 								MapTemp(x, y) = 1
-								Room1Amount[zone] = Room1Amount[zone]+1	
+								RoomAmount[0] = RoomAmount[0]+1	
 								
 								temp=temp-1
 							EndIf
@@ -6706,7 +6713,7 @@ Function CreateMap(zone%)
 	
 	
 	;force more room4s and room2Cs
-	If Room4Amount[zone]<1 Then ;we want at least 1 ROOM4
+	If RoomAmount[4]<1 Then ;we want at least 1 ROOM4
 		DebugLog "forcing a ROOM4 into zone "+i
 		temp=0
 		
@@ -6730,9 +6737,9 @@ Function CreateMap(zone%)
 					If temp=1 Then
 						MapTemp(x,y)=4 ;turn this room into a ROOM4
 						DebugLog "ROOM4 forced into slot ("+x+", "+y+")"
-						Room4Amount[zone]=Room4Amount[zone]+1
-						Room3Amount[zone]=Room3Amount[zone]-1
-						Room1Amount[zone]=Room1Amount[zone]+1
+						RoomAmount[4]=RoomAmount[4]+1
+						RoomAmount[3]=RoomAmount[3]-1
+						RoomAmount[0]=RoomAmount[0]+1
 					EndIf
 				EndIf
 				If temp=1 Then Exit
@@ -6743,7 +6750,7 @@ Function CreateMap(zone%)
 		If temp=0 Then DebugLog "Couldn't place ROOM4 in zone "+i
 	EndIf
 	
-	If Room2CAmount[zone]<1 Then ;we want at least 1 ROOM2C
+	If RoomAmount[2]<1 Then ;we want at least 1 ROOM2C
 		DebugLog "forcing a ROOM2C into zone "+i
 		temp=0
 		
@@ -6817,8 +6824,8 @@ Function CreateMap(zone%)
 							EndIf
 					End Select
 					If temp=1 Then
-						Room2CAmount[zone]=Room2CAmount[zone]+1
-						Room2Amount[zone]=Room2Amount[zone]+1
+						RoomAmount[2]=RoomAmount[2]+1
+						RoomAmount[1]=RoomAmount[1]+1
 					EndIf
 				EndIf
 				If temp=1 Then Exit
@@ -6828,94 +6835,30 @@ Function CreateMap(zone%)
 		
 		If temp=0 Then DebugLog "Couldn't place ROOM2C in zone "+i
 	EndIf
-
+	
+	Local tempzone = zone + 1
 	
 	Local MaxRooms% = 55*MapWidth/20
-	MaxRooms=Max(MaxRooms,Room1Amount[zone]+1)
-	MaxRooms=Max(MaxRooms,Room2Amount[zone]+1)
-	MaxRooms=Max(MaxRooms,Room2CAmount[zone]+1)
-	MaxRooms=Max(MaxRooms,Room3Amount[zone]+1)
-	MaxRooms=Max(MaxRooms,Room4Amount[zone]+1)
+	MaxRooms=Max(MaxRooms,RoomAmount[0]+1)
+	MaxRooms=Max(MaxRooms,RoomAmount[1]+1)
+	MaxRooms=Max(MaxRooms,RoomAmount[2]+1)
+	MaxRooms=Max(MaxRooms,RoomAmount[3]+1)
+	MaxRooms=Max(MaxRooms,RoomAmount[4]+1)
 	Dim MapRoom$(ROOM4 + 1, MaxRooms)
 	
 	MapRoom(ROOM1, 0) = "start"
 	
-	Select zone
-		Case 0	
-			SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
-			SetRoom("roompj", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room914", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room1archive", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room205", ROOM1, Room1Amount[zone], zone)
-			
-			SetRoom("lockroom", ROOM2C, Room2CAmount[zone], zone)
-			SetRoom("room1162", ROOM2C, Room2CAmount[zone], zone)
-			
-			SetRoom("room2closets", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2testroom2", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2scps", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2storage", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2gw_b", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2sl", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room012", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2scps2", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room1123", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2elevator", ROOM2, Room2Amount[zone], zone)
-			
-			SetRoom("room3storage", ROOM3, Room3Amount[zone], zone)
-			
-			SetRoom("room4info", ROOM4, Room4Amount[zone], zone)
-		Case 1
-			SetRoom("checkpoint1", ROOM1, Room1Amount[zone], zone)
-			SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room035", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room079", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room106", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room008", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room895", ROOM1, Room1Amount[zone], zone)
-			
-			SetRoom("room2nuke", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2mtunnels", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room049", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2shaft",ROOM2,Room2Amount[zone], zone)
-			SetRoom("testroom", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2servers", ROOM2, Room2Amount[zone], zone)
-			
-			SetRoom("room513", ROOM3, Room3Amount[zone], zone)
-			SetRoom("room966", ROOM3, Room3Amount[zone], zone)
-			
-			SetRoom("room2cpit", ROOM2C, Room2CAmount[zone], zone)
-		Case 2
-			SetRoom("checkpoint2", ROOM1, Room1Amount[zone], zone)
-			SetRoom("gateb", ROOM1, Room1Amount[zone], zone)
-			SetRoom("gateaentrance", ROOM1, Room1Amount[zone], zone)
-			SetRoom("room1lifts", ROOM1, Room1Amount[zone], zone)
-			
-			SetRoom("room2poffices", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2cafeteria", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2sroom", ROOM2, Room2Amount[zone], zone)
-			SetRoom("room2servers2", ROOM2, Room2Amount[2], zone)
-			SetRoom("room2offices", ROOM2, Room2Amount[2], zone)
-			SetRoom("room2offices4", ROOM2, Room2Amount[2], zone)
-			SetRoom("room860", ROOM2, Room2Amount[2], zone)
-			SetRoom("medibay", ROOM2, Room2Amount[2], zone)
-			SetRoom("room2poffices2", ROOM2, Room2Amount[2], zone)
-			SetRoom("room2offices2", ROOM2, Room2Amount[2], zone)
-			SetRoom("room2offices5", ROOM2, Room2Amount[2], zone)
-			
-			SetRoom("room2ccont", ROOM2C, Room2CAmount[zone], zone)
-			SetRoom("lockroom2", ROOM2C, Room2CAmount[zone], zone)
-			
-			SetRoom("room3servers", ROOM3, Room3Amount[zone], zone)
-			SetRoom("room3servers2", ROOM3, Room3Amount[zone], zone)
-			SetRoom("room3gw", ROOM3, Room3Amount[zone], zone)
-			SetRoom("room3offices", ROOM3, Room3Amount[zone], zone)
-	End Select
+	For rt.RoomTemplates = Each RoomTemplates
+		If (rt\zone = tempzone And rt\Commonness = 0 And rt\Shape > 0) Then
+			SetRoom(rt\Name, rt\Shape, RoomAmount[rt\Shape-1])
+		EndIf
+	Next
+	
+	;SetRoom("room3offices", ROOM3, Room3Amount[zone], zone)
 	
 	;----------------------- Loading the map --------------------------------
 	
 	temp = 0
-	Local tempzone = zone + 1
 	Local r.Rooms, spacing# = 8.0
 	For y = MapHeight - 1 To 1 Step - 1
 		For x = 1 To MapWidth - 2
@@ -7203,7 +7146,9 @@ Function CreateMap(zone%)
 	
 End Function
 
-Function SetRoom(room_name$,room_type%, room_amount%, zone%) ;place a room without overwriting others
+Function SetRoom(room_name$, room_type%, room_amount%) ;place a room without overwriting others
+
+	DebugLog("EPIC TRYING TO PLACE" + room_name + "  " + room_type + "  " + room_amount)
 
 	Local dir% = (Rand(2) = 1), posstep% = -1 + dir% * 2, reached% = False, valid% = True
 

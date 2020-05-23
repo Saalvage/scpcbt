@@ -37,12 +37,12 @@ Rooms:
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
 - Added improved Pizza Day poster.
-- Added idle gasmask breathing. ???
+- Added idle gasmask breathing.
 - Added crouch sound.
 - Added a new sound when getting up from the bed in the intro sequence.
 - Added a new random seed and made their loading dynamic, making them easy to mod (just add/change/remove seeds from local.ini).
 - Added loading screen scaling.
-- Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A, the radio and the keycards.
+- Added a loading screen for SCP-008, SCP-148, SCP-1048, SCP-1048-A, the radio, the gas mask and the keycards.
 - Improved the SCP-682 and Night Vision Goggles loading screen.
 - Improved application icon.
 - Added new achievment image for SCP-1048.
@@ -92,6 +92,7 @@ Rooms:
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "testroom" -> "room682", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
+- Improved gasmask model.
 - Flipped vest around.
 - The hazmat suit is now hunched over when put off.
 - Increased size of the SCP-148 ingot and Electronical Components.
