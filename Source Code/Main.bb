@@ -1807,18 +1807,30 @@ Global I_427.SCP427 = New SCP427
 ; MAIN LOOP
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 
+Const TICK_DURATION# = 70.0/60.0
+
+Type FixedTimesteps
+	Field accumulator#
+	Field prevTime%
+	Field currTime%
+	Field fps%
+	Field tempfps%
+	Field fpsgoal%
+End Type
+
+Global ft.FixedTimesteps = New FixedTimesteps
+
 Repeat
 	
 	Cls
 	
-	CurTime = MilliSecs()
-	ElapsedTime = (CurTime - PrevTime) / 1000.0
-	PrevTime = CurTime
-	PrevFPSFactor = FPSfactor
-	FPSfactor = Max(Min(ElapsedTime * 70, 5.0), 0.2)
-	FPSfactor2 = FPSfactor ;for use in menus etc, when the main game is paused.
-	
-	If MenuOpen Lor InvOpen Lor OtherOpen<>Null Lor ConsoleOpen Lor SelectedDoor <> Null Lor SelectedScreen <> Null Lor Using294 Then FPSfactor = 0
+	Local elapsedMilliseconds%
+	ft\currTime = MilliSecs()
+	elapsedMilliseconds = ft\currTime-ft\prevTime
+	If (elapsedMilliseconds>0 And elapsedMilliseconds<500) Then
+		ft\accumulator = ft\accumulator+Max(0,Float(elapsedMilliseconds)*70.0/1000.0)
+	EndIf
+	ft\prevTime = ft\currTime
 	
 	If Framelimit > 0 Then
 		;Framelimit
@@ -1828,13 +1840,10 @@ Repeat
 		LoopDelay = MilliSecs()
 	EndIf
 	
-	;Counting the fps
-	If CheckFPS < MilliSecs() Then
-		FPS = ElapsedLoops
-		ElapsedLoops = 0
-		CheckFPS = MilliSecs()+1000
-	EndIf
-	ElapsedLoops = ElapsedLoops + 1
+	FPSfactor = TICK_DURATION
+	FPSfactor2 = FPSfactor
+	
+	If MenuOpen Lor InvOpen Lor OtherOpen<>Null Lor ConsoleOpen Lor SelectedDoor <> Null Lor SelectedScreen <> Null Lor Using294 Then FPSfactor = 0
 	
 	If Input_ResetTime<=0.0
 		DoubleClick = False
@@ -1873,281 +1882,278 @@ Repeat
 		EndIf
 		UpdateMainMenu()
 	Else
-		UpdateStreamSounds()
-		
-		ShouldPlay = Min(PlayerZone,2)
-		
-		DrawHandIcon = False
-		
-		RestoreSanity = True
-		ShouldEntitiesFall = True
-		
-		If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
+		While (ft\accumulator>0.0)
+			ft\accumulator = ft\accumulator-TICK_DURATION
+			If (ft\accumulator<=0.0) Then CaptureWorld()
 			
-			If Rand(1500) = 1 Then
-				For i = 0 To 5
-					If AmbientSFX(i,CurrAmbientSFX)<>0 Then
-						If ChannelPlaying(AmbientSFXCHN)=0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
-					EndIf			
-				Next
+			UpdateStreamSounds()
+			
+			ShouldPlay = Min(PlayerZone,2)
+			
+			DrawHandIcon = False
+			
+			RestoreSanity = True
+			ShouldEntitiesFall = True
+			
+			If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
 				
-				PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
-				
-				If Rand(3)=1 Then PlayerZone = 3
-				
-				If PlayerRoom\RoomTemplate\Name = "room173" Then
-					PlayerZone = 4
-				ElseIf PlayerRoom\RoomTemplate\Name = "room860"
-					For e.Events = Each Events
-						If e\EventName = "room860"
-							If e\EventState = 1.0
-								PlayerZone = 5
-								PositionEntity (SoundEmitter, EntityX(SoundEmitter), 30.0, EntityZ(SoundEmitter))
-							EndIf
-							
-							Exit
-						EndIf
+				If Rand(1500) = 1 Then
+					For i = 0 To 5
+						If AmbientSFX(i,CurrAmbientSFX)<>0 Then
+							If ChannelPlaying(AmbientSFXCHN)=0 Then FreeSound_Strict AmbientSFX(i,CurrAmbientSFX) : AmbientSFX(i,CurrAmbientSFX) = 0
+						EndIf			
 					Next
+					
+					PositionEntity (SoundEmitter, EntityX(Camera) + Rnd(-1.0, 1.0), 0.0, EntityZ(Camera) + Rnd(-1.0, 1.0))
+					
+					If Rand(3)=1 Then PlayerZone = 3
+					
+					If PlayerRoom\RoomTemplate\Name = "room173" Then
+						PlayerZone = 4
+					ElseIf PlayerRoom\RoomTemplate\Name = "room860"
+						For e.Events = Each Events
+							If e\EventName = "room860"
+								If e\EventState = 1.0
+									PlayerZone = 5
+									PositionEntity (SoundEmitter, EntityX(SoundEmitter), 30.0, EntityZ(SoundEmitter))
+								EndIf
+								
+								Exit
+							EndIf
+						Next
+					EndIf
+					
+					CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
+					
+					Select PlayerZone
+						Case 0,1,2
+							If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Zone"+(PlayerZone+1)+"\ambient"+(CurrAmbientSFX+1)+".ogg")
+						Case 3
+							If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\General\ambient"+(CurrAmbientSFX+1)+".ogg")
+						Case 4
+							If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Pre-breach\ambient"+(CurrAmbientSFX+1)+".ogg")
+						Case 5
+							If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Forest\ambient"+(CurrAmbientSFX+1)+".ogg")
+					End Select
+					
+					AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
+				EndIf
+				UpdateSoundOrigin(AmbientSFXCHN,Camera, SoundEmitter)
+				
+				If Rand(50000) = 3 Then
+					Local RN$ = PlayerRoom\RoomTemplate\Name$
+					If RN$ <> "room860" And RN$ <> "room1123" And RN$ <> "room173" And RN$ <> "dimension1499" Then
+						If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
+						PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
+					EndIf 
+				EndIf
+			EndIf
+			
+			UpdateCheckpoint1 = False
+			UpdateCheckpoint2 = False
+			
+			If (Not MenuOpen) And (Not InvOpen) And (OtherOpen=Null) And (SelectedDoor = Null) And (ConsoleOpen = False) And (Using294 = False) And (SelectedScreen = Null) And EndingTimer=>0 Then
+				LightVolume = CurveValue(TempLightVolume, LightVolume, 50.0)
+				CameraFogRange(Camera, CameraFogNear*LightVolume,CameraFogFar*LightVolume)
+				CameraFogColor(Camera, 0,0,0)
+				CameraFogMode Camera,1
+				CameraRange(Camera, 0.05, Min(CameraFogFar*LightVolume*1.5,28))	
+				If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
+					CameraClsColor(Camera, 0,0,0)
 				EndIf
 				
-				CurrAmbientSFX = Rand(0,AmbientSFXAmount(PlayerZone)-1)
+				AmbientLight Brightness, Brightness, Brightness	
+				PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)
 				
-				Select PlayerZone
-					Case 0,1,2
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Zone"+(PlayerZone+1)+"\ambient"+(CurrAmbientSFX+1)+".ogg")
-					Case 3
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\General\ambient"+(CurrAmbientSFX+1)+".ogg")
-					Case 4
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Pre-breach\ambient"+(CurrAmbientSFX+1)+".ogg")
-					Case 5
-						If AmbientSFX(PlayerZone,CurrAmbientSFX)=0 Then AmbientSFX(PlayerZone,CurrAmbientSFX)=LoadSound_Strict("SFX\Ambient\Forest\ambient"+(CurrAmbientSFX+1)+".ogg")
-				End Select
-				
-				AmbientSFXCHN = PlaySound2(AmbientSFX(PlayerZone,CurrAmbientSFX), Camera, SoundEmitter)
-			EndIf
-			UpdateSoundOrigin(AmbientSFXCHN,Camera, SoundEmitter)
-			
-			If Rand(50000) = 3 Then
-				Local RN$ = PlayerRoom\RoomTemplate\Name$
-				If RN$ <> "room860" And RN$ <> "room1123" And RN$ <> "room173" And RN$ <> "dimension1499" Then
-					If FPSfactor > 0 Then LightBlink = Rnd(1.0,2.0)
-					PlaySound_Strict  LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,7)+".ogg")
-				EndIf 
-			EndIf
-		EndIf
-		
-		UpdateCheckpoint1 = False
-		UpdateCheckpoint2 = False
-		
-		If (Not MenuOpen) And (Not InvOpen) And (OtherOpen=Null) And (SelectedDoor = Null) And (ConsoleOpen = False) And (Using294 = False) And (SelectedScreen = Null) And EndingTimer=>0 Then
-			LightVolume = CurveValue(TempLightVolume, LightVolume, 50.0)
-			CameraFogRange(Camera, CameraFogNear*LightVolume,CameraFogFar*LightVolume)
-			CameraFogColor(Camera, 0,0,0)
-			CameraFogMode Camera,1
-			CameraRange(Camera, 0.05, Min(CameraFogFar*LightVolume*1.5,28))	
-			If PlayerRoom\RoomTemplate\Name<>"pocketdimension" Then
-				CameraClsColor(Camera, 0,0,0)
-			EndIf
-			
-			AmbientLight Brightness, Brightness, Brightness	
-			PlayerSoundVolume = CurveValue(0.0, PlayerSoundVolume, 5.0)
-			
-			CanSave% = True
-			UpdateDeafPlayer()
-			UpdateEmitters()
-			MouseLook()
-			If PlayerRoom\RoomTemplate\Name = "dimension1499" And QuickLoad_CurrEvent <> Null
-				ShouldEntitiesFall = False
-			EndIf
-			MovePlayer()
-			If (Not Freeze)
-				InFacility = CheckForPlayerInFacility()
-				If PlayerRoom\RoomTemplate\Name = "dimension1499"
-					If QuickLoad_CurrEvent = Null Then
-						UpdateDimension1499()
+				CanSave% = True
+				UpdateDeafPlayer()
+				UpdateEmitters()
+				MouseLook()
+				If PlayerRoom\RoomTemplate\Name = "dimension1499" And QuickLoad_CurrEvent <> Null
+					ShouldEntitiesFall = False
+				EndIf
+				MovePlayer()
+				If (Not Freeze)
+					InFacility = CheckForPlayerInFacility()
+					If PlayerRoom\RoomTemplate\Name = "dimension1499"
+						If QuickLoad_CurrEvent = Null Then
+							UpdateDimension1499()
+						EndIf
+						UpdateLeave1499()
+					ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Lor (PlayerRoom\RoomTemplate\Name="gateb" And EntityY(Collider)>1040.0*RoomScale-2000)
+						UpdateDoors()
+						If QuickLoad_CurrEvent = Null Then
+							UpdateEndings()
+						EndIf
+						UpdateScreens()
+						UpdateRoomLights(Camera)
+					Else
+						UpdateSecurityCams()
+						UpdateDoors()
+						If QuickLoad_CurrEvent = Null Then
+							UpdateEvents()
+						EndIf
+						UpdateScreens()
+						TimeCheckpointMonitors()
+						Update294()
+						UpdateRoomLights(Camera)
 					EndIf
-					UpdateLeave1499()
-				ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Lor (PlayerRoom\RoomTemplate\Name="gateb" And EntityY(Collider)>1040.0*RoomScale-2000)
+					UpdateFluLights()
+					UpdateDecals()
+					UpdateMTF()
+					UpdateNPCs()
+					UpdateItems()
+					UpdateParticles()
+					Use427()
+					UpdateMonitorSaving()
+					;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
+					UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
+					If UpdateParticles_Time#=1
+						UpdateDevilEmitters()
+						UpdateParticles_Devil()
+						UpdateParticles_Time#=0
+					EndIf
+				Else
 					UpdateDoors()
-					If QuickLoad_CurrEvent = Null Then
-						UpdateEndings()
-					EndIf
-					UpdateScreens()
-					UpdateRoomLights(Camera)
-				Else
-					UpdateSecurityCams()
-					UpdateDoors()
-					If QuickLoad_CurrEvent = Null Then
-						UpdateEvents()
-					EndIf
-					UpdateScreens()
-					TimeCheckpointMonitors()
-					Update294()
-					UpdateRoomLights(Camera)
+					UpdateRooms()
 				EndIf
-				UpdateFluLights()
-				UpdateDecals()
-				UpdateMTF()
-				UpdateNPCs()
-				UpdateItems()
-				UpdateParticles()
-				Use427()
-				UpdateMonitorSaving()
-				;Added a simple code for updating the Particles function depending on the FPSFactor (still WIP, might not be the final version of it) - ENDSHN
-				UpdateParticles_Time# = Min(1,UpdateParticles_Time#+FPSfactor)
-				If UpdateParticles_Time#=1
-					UpdateDevilEmitters()
-					UpdateParticles_Devil()
-					UpdateParticles_Time#=0
-				EndIf
+			EndIf
+			
+			If InfiniteStamina% Then Stamina = 100
+			
+			If FPSfactor=0
+				UpdateWorld(0)
 			Else
-				UpdateDoors()
-				UpdateRooms()
+				UpdateWorld()
+				ManipulateNPCBones()
 			EndIf
-		EndIf
 		
-		If InfiniteStamina% Then Stamina = 100
-		
-		If FPSfactor=0
-			UpdateWorld(0)
-		Else
-			UpdateWorld()
-			ManipulateNPCBones()
-		EndIf
-		RenderWorld2()
-		
-		BlurVolume = Min(CurveValue(0.0, BlurVolume, 20.0),0.95)
-		If BlurTimer > 0.0 Then
-			BlurVolume = Max(Min(0.95, BlurTimer / 1000.0), BlurVolume)
-			BlurTimer = Max(BlurTimer - FPSfactor, 0.0)
-		EndIf
-		
-		UpdateBlur(BlurVolume)
-		
-		Local darkA# = 0.0
-		If (Not MenuOpen)  Then
-			If Sanity < 0 Then
-				If RestoreSanity Then Sanity = Min(Sanity + FPSfactor, 0.0)
-				If Sanity < (-200) Then 
-					darkA = Max(Min((-Sanity - 200) / 700.0, 0.6), darkA)
-					If KillTimer => 0 Then 
-						HeartBeatVolume = Min(Abs(Sanity+200)/500.0,1.0)
-						HeartBeatRate = Max(70 + Abs(Sanity+200)/6.0,HeartBeatRate)
-					EndIf
-				EndIf
-			EndIf
-			
-			If EyeStuck > 0 Then 
-				BlinkTimer = BLINKFREQ
-				EyeStuck = Max(EyeStuck-FPSfactor,0)
-				
-				If EyeStuck < 9000 Then BlurTimer = Max(BlurTimer, (9000-EyeStuck)*0.5)
-				If EyeStuck < 6000 Then darkA = Min(Max(darkA, (6000-EyeStuck)/5000.0),1.0)
-				If EyeStuck < 9000 And EyeStuck+FPSfactor =>9000 Then 
-					Msg = GetLocalString("Messages", "eyedroptears")
-					MsgTimer = 70*6
-				EndIf
-			EndIf
-			
-			If BlinkTimer < 0 Then
-				If BlinkTimer > - 5 Then
-					darkA = Max(darkA, Sin(Abs(BlinkTimer * 18.0)))
-				ElseIf BlinkTimer > - 15
-					darkA = 1.0
-				Else
-					darkA = Max(darkA, Abs(Sin(BlinkTimer * 18.0)))
-				EndIf
-				
-				If BlinkTimer <= - 20 Then
-					;Randomizes the frequency of blinking. Scales with difficulty.
-					Select SelectedDifficulty\otherFactors
-						Case EASY
-							BLINKFREQ = Rnd(490,700)
-						Case NORMAL
-							BLINKFREQ = Rnd(455,665)
-						Case HARD
-							BLINKFREQ = Rnd(420,630)
-						Case EXTREME
-							BLINKFREQ = Rnd(200, 400)
-					End Select 
-					BlinkTimer = BLINKFREQ
-				EndIf
-				
-				BlinkTimer = BlinkTimer - FPSfactor
-			Else
-				If Wearing178 > 0
-					BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect / (Wearing178+1)
-				Else
-					BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
-				EndIf
-				If EyeIrritation > 0 Then BlinkTimer=BlinkTimer-Min(EyeIrritation / 100.0 + 1.0, 4.0) * FPSfactor
-				
-				darkA = Max(darkA, 0.0)
-			EndIf
-			
-			EyeIrritation = Max(0, EyeIrritation - FPSfactor)
-			
-			If BlinkEffectTimer > 0 Then
-				BlinkEffectTimer = BlinkEffectTimer - (FPSfactor/70)
-			Else
-				If BlinkEffect <> 1.0 Then BlinkEffect = 1.0
-			EndIf
-			
-			LightBlink = Max(LightBlink - (FPSfactor / 35.0), 0)
-			If LightBlink > 0 Then darkA = Min(Max(darkA, LightBlink * Rnd(0.3, 0.8)), 1.0)
-			
-			If Using294 Then darkA=1.0
-			
-			If (WearingNightVision > 0) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
-			
-			If KillTimer < 0 Then
-				InvOpen = False
-				SelectedItem = Null
-				SelectedScreen = Null
-				SelectedMonitor = Null
-				BlurTimer = Abs(KillTimer*5)
-				KillTimer=KillTimer-(FPSfactor*0.8)
-				If KillTimer < - 360 Then 
-					MenuOpen = True 
-					If SelectedEnding <> "" Then EndingTimer = Min(KillTimer,-0.1)
-				EndIf
-				darkA = Max(darkA, Min(Abs(KillTimer / 400.0), 1.0))
-			EndIf
-			
-			If FallTimer < 0 Then
-				If SelectedItem <> Null Then
-					If Instr(SelectedItem\itemtemplate\tempname,"hazmat") Lor Instr(SelectedItem\itemtemplate\tempname,"vest") Then
-						If WearingHazmat=0 And WearingVest=0 Then
-							DropItem(SelectedItem)
+			Local darkA# = 0.0
+			If (Not MenuOpen)  Then
+				If Sanity < 0 Then
+					If RestoreSanity Then Sanity = Min(Sanity + FPSfactor, 0.0)
+					If Sanity < (-200) Then 
+						darkA = Max(Min((-Sanity - 200) / 700.0, 0.6), darkA)
+						If KillTimer => 0 Then 
+							HeartBeatVolume = Min(Abs(Sanity+200)/500.0,1.0)
+							HeartBeatRate = Max(70 + Abs(Sanity+200)/6.0,HeartBeatRate)
 						EndIf
 					EndIf
 				EndIf
-				InvOpen = False
-				SelectedItem = Null
-				SelectedScreen = Null
-				SelectedMonitor = Null
-				BlurTimer = Abs(FallTimer*10)
-				FallTimer = FallTimer-FPSfactor
-				darkA = Max(darkA, Min(Abs(FallTimer / 400.0), 1.0))				
+				
+				If EyeStuck > 0 Then 
+					BlinkTimer = BLINKFREQ
+					EyeStuck = Max(EyeStuck-FPSfactor,0)
+					
+					If EyeStuck < 9000 Then BlurTimer = Max(BlurTimer, (9000-EyeStuck)*0.5)
+					If EyeStuck < 6000 Then darkA = Min(Max(darkA, (6000-EyeStuck)/5000.0),1.0)
+					If EyeStuck < 9000 And EyeStuck+FPSfactor =>9000 Then 
+						Msg = GetLocalString("Messages", "eyedroptears")
+						MsgTimer = 70*6
+					EndIf
+				EndIf
+				
+				If BlinkTimer < 0 Then
+					If BlinkTimer > - 5 Then
+						darkA = Max(darkA, Sin(Abs(BlinkTimer * 18.0)))
+					ElseIf BlinkTimer > - 15
+						darkA = 1.0
+					Else
+						darkA = Max(darkA, Abs(Sin(BlinkTimer * 18.0)))
+					EndIf
+					
+					If BlinkTimer <= - 20 Then
+						;Randomizes the frequency of blinking. Scales with difficulty.
+						Select SelectedDifficulty\otherFactors
+							Case EASY
+								BLINKFREQ = Rnd(490,700)
+							Case NORMAL
+								BLINKFREQ = Rnd(455,665)
+							Case HARD
+								BLINKFREQ = Rnd(420,630)
+							Case EXTREME
+								BLINKFREQ = Rnd(200, 400)
+						End Select 
+						BlinkTimer = BLINKFREQ
+					EndIf
+					
+					BlinkTimer = BlinkTimer - FPSfactor
+				Else
+					If Wearing178 > 0
+						BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect / (Wearing178+1)
+					Else
+						BlinkTimer = BlinkTimer - FPSfactor * 0.6 * BlinkEffect
+					EndIf
+					If EyeIrritation > 0 Then BlinkTimer=BlinkTimer-Min(EyeIrritation / 100.0 + 1.0, 4.0) * FPSfactor
+					
+					darkA = Max(darkA, 0.0)
+				EndIf
+				
+				EyeIrritation = Max(0, EyeIrritation - FPSfactor)
+				
+				If BlinkEffectTimer > 0 Then
+					BlinkEffectTimer = BlinkEffectTimer - (FPSfactor/70)
+				Else
+					If BlinkEffect <> 1.0 Then BlinkEffect = 1.0
+				EndIf
+				
+				LightBlink = Max(LightBlink - (FPSfactor / 35.0), 0)
+				If LightBlink > 0 Then darkA = Min(Max(darkA, LightBlink * Rnd(0.3, 0.8)), 1.0)
+				
+				If Using294 Then darkA=1.0
+				
+				If (WearingNightVision > 0) Then darkA = Max((1.0-SecondaryLightOn)*0.9, darkA)
+				
+				If KillTimer < 0 Then
+					InvOpen = False
+					SelectedItem = Null
+					SelectedScreen = Null
+					SelectedMonitor = Null
+					BlurTimer = Abs(KillTimer*5)
+					KillTimer=KillTimer-(FPSfactor*0.8)
+					If KillTimer < - 360 Then 
+						MenuOpen = True 
+						If SelectedEnding <> "" Then EndingTimer = Min(KillTimer,-0.1)
+					EndIf
+					darkA = Max(darkA, Min(Abs(KillTimer / 400.0), 1.0))
+				EndIf
+				
+				If FallTimer < 0 Then
+					If SelectedItem <> Null Then
+						If Instr(SelectedItem\itemtemplate\tempname,"hazmat") Lor Instr(SelectedItem\itemtemplate\tempname,"vest") Then
+							If WearingHazmat=0 And WearingVest=0 Then
+								DropItem(SelectedItem)
+							EndIf
+						EndIf
+					EndIf
+					InvOpen = False
+					SelectedItem = Null
+					SelectedScreen = Null
+					SelectedMonitor = Null
+					BlurTimer = Abs(FallTimer*10)
+					FallTimer = FallTimer-FPSfactor
+					darkA = Max(darkA, Min(Abs(FallTimer / 400.0), 1.0))				
+				EndIf
+				
+				If SelectedItem <> Null And (SelectedItem\itemtemplate\tempname = "badnav" Lor SelectedItem\itemtemplate\tempname = "nav" Lor SelectedItem\itemtemplate\tempname = "navulti" Lor SelectedItem\itemtemplate\tempname = "nav310" Lor SelectedItem\itemtemplate\tempname = "nav300") Lor SelectedScreen <> Null Then
+					darkA = Max(darkA, 0.5)
+				EndIf
+				
+				EntityAlpha(Dark, darkA)	
 			EndIf
 			
-			If SelectedItem <> Null And (SelectedItem\itemtemplate\tempname = "badnav" Lor SelectedItem\itemtemplate\tempname = "nav" Lor SelectedItem\itemtemplate\tempname = "navulti" Lor SelectedItem\itemtemplate\tempname = "nav310" Lor SelectedItem\itemtemplate\tempname = "nav300") Lor SelectedScreen <> Null Then
-				darkA = Max(darkA, 0.5)
+			If LightFlash > 0 Then
+				ShowEntity Light
+				EntityAlpha(Light, Max(Min(LightFlash + Rnd(-0.2, 0.2), 1.0), 0.0))
+				LightFlash = Max(LightFlash - (FPSfactor / 70.0), 0)
+			Else
+				HideEntity Light
+				;EntityAlpha(Light, LightFlash)
 			EndIf
 			
-			EntityAlpha(Dark, darkA)	
-		EndIf
-		
-		If LightFlash > 0 Then
-			ShowEntity Light
-			EntityAlpha(Light, Max(Min(LightFlash + Rnd(-0.2, 0.2), 1.0), 0.0))
-			LightFlash = Max(LightFlash - (FPSfactor / 70.0), 0)
-		Else
-			HideEntity Light
-			;EntityAlpha(Light, LightFlash)
-		EndIf
-		
-		EntityColor Light,255,255,255
+			EntityColor Light,255,255,255
+			
+		Wend
 		
 
 		
@@ -2245,6 +2251,16 @@ Repeat
 			EndIf
 		EndIf
 		
+		RenderWorld2(Max(0.0,1.0+(ft\accumulator/TICK_DURATION)))
+		
+		BlurVolume = Min(CurveValue(0.0, BlurVolume, 20.0),0.95)
+		If BlurTimer > 0.0 Then
+			BlurVolume = Max(Min(0.95, BlurTimer / 1000.0), BlurVolume)
+			BlurTimer = Max(BlurTimer - FPSfactor, 0.0)
+		EndIf
+		
+		UpdateBlur(BlurVolume)
+		
 		DrawGUI()
 		
 		If EndingTimer < 0 Then
@@ -2293,7 +2309,7 @@ Repeat
 		EndIf
 		
 		Color 255, 255, 255
-		If I_Opt\ShowFPS Then SetFont I_Opt\Fonts[0] : Text(0, 0, "FPS: " + FPS) : SetFont I_Opt\Fonts[1]
+		If I_Opt\ShowFPS Then SetFont I_Opt\Fonts[0] : Text(0, 0, "FPS: " + ft\fps) : SetFont I_Opt\Fonts[1]
 		
 		If QuickLoad_CurrEvent <> Null
 			QuickLoadEvents()
@@ -2349,6 +2365,16 @@ Repeat
 	EntityAlpha fresize_image,1.0
 	
 	;CatchErrors("Uncaught Main loop")
+	
+	If I_Opt\ShowFPS Then
+		If ft\fpsgoal < MilliSecs() Then
+			ft\fps = ft\tempfps
+			ft\tempfps = 0
+			ft\fpsgoal = MilliSecs() + 1000
+		Else
+			ft\tempfps = ft\tempfps + 1
+		EndIf
+	EndIf
 	
 	If Vsync = 0 Then
 		Flip 0
@@ -9505,7 +9531,7 @@ Function ResizeImage2(image%,width%,height%)
 End Function
 
 
-Function RenderWorld2()
+Function RenderWorld2(tween#)
 	
 	CameraProjMode ark_blur_cam,0
 	CameraProjMode Camera,1
@@ -9574,7 +9600,7 @@ Function RenderWorld2()
 		EndIf
 	EndIf
 	
-	If (Not IsNVGBlinking) Then RenderWorld()
+	If (Not IsNVGBlinking) Then RenderWorld(tween)
 	
 	CurrTrisAmount = TrisRendered()
 	

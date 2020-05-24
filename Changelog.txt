@@ -118,6 +118,7 @@ Rooms:
 
 Bug Fixes:
 	- Fixed room lights not working most of the time.
+	- Fixed time not being bound to FPS correctly.
 	- Fixed button sound not working when not using launcher.
 	- Fixed input boxes displaying too many characters for a frame, if too many characters are entered.
 	- Fixed inventory not being fully centered.
