@@ -449,7 +449,7 @@ Function UpdateEvents()
 							
 							If SelectedItem <> Null Then
 								e\EventState3 = e\EventState3+FPSfactor/5.0
-							EndIf							
+							EndIf
 							
 						ElseIf e\EventState3 => 150.0 And e\EventState3 < 700
 							FreeSound_Strict(IntroSFX(19)) : IntroSFX(19) = 0
@@ -6043,6 +6043,34 @@ Function UpdateEvents()
 								Exit
 							EndIf
 						Next
+					EndIf
+				EndIf
+				
+			Case "statue"
+			
+				If PlayerRoom = e\room Then
+					If e\EventState = 0 Then
+						If EntityInView(e\room\Objects[0], Camera) Then
+							e\EventState = 1
+						EndIf
+					ElseIf e\EventState = 1 And (Not EntityInView(e\room\Objects[0], Camera)) Then
+						e\EventState = 2
+						e\EventState2 = Rand(15*70, 20*70)
+						HideEntity(e\room\Objects[0])
+					EndIf
+				EndIf
+				
+				If e\EventState = 2 Then
+					If e\EventState2 > 0 Then
+						e\EventState2 = e\EventState2 - FPSfactor
+					Else
+						e\EventState = 3
+						ShowEntity(e\room\Objects[0])
+						RotateEntity(e\room\Objects[0], 0, Rnd(360), 0, True)
+						PositionEntity(e\room\Objects[0], EntityX(Collider), EntityY(Collider), EntityZ(Collider), True)
+						DeathMsg = "After all previous observers have been terminated as per protocol, a Class D subject stumbled across the inert object in its chamber. In the process of SCP-689's effect it was displaced to the location of the aforementioned D Class subject at the time of his death, which resulted in a currently unknown number of Foundation personnel viewing the object before and during recontainment procedures. Investigation ongoing."
+						Kill()
+						KillAnim = 0
 					EndIf
 				EndIf
 
