@@ -1470,7 +1470,7 @@ LoadRoomTemplates("Data\rooms.ini")
 
 Const ZONE_AMOUNT = 3
 
-Global RoomScale# = 8.0 / 2048.0
+Const RoomScale# = 8.0 / 2048.0
 Const MapWidth% = 12, MapHeight% = 12
 Dim MapTemp%(MapWidth+1, MapHeight+1)
 Dim MapFound%(MapWidth+1, MapHeight+1)
