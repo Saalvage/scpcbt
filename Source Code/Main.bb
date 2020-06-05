@@ -1673,8 +1673,6 @@ Function InitEvents()
 	CreateEvent("gatea", "gatea", 0)	
 	CreateEvent("exit1", "gateb", 0)
 	
-	CreateEvent("statue", "statue", 0)
-	
 	CreateEvent("room205", "room205", 0)
 	
 	CreateEvent("room860","room860", 0)

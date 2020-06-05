@@ -3648,11 +3648,6 @@ Function FillRoom(r.Rooms)
 				EntityAlpha(de\obj, 1.0) : ScaleSprite(de\obj,de\Size,de\Size)
 				EntityParent de\obj, r\obj
 			Next
-			
-		Case "statue"
-		
-			r\Objects[0] = LoadMesh_Strict("GFX\map\statue.x",r\obj)
-			PositionEntity(r\Objects[0], r\x, r\y + 144.0 * RoomScale, r\z + 510.0 * RoomScale, True)
 
 		Case "room205"
 
