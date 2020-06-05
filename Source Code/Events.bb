@@ -3766,7 +3766,7 @@ Function UpdateEvents()
 									EndIf
 									If ix<gridsz-1 Then
 										If e\room\grid\waypoints[ix+1+(iy*gridsz)]<>Null Then
-											dist=EntityDistance(e\room\grid\waypoints[ix+(iy*gridsz)]\obj,e\room\grid\waypoints[ix+1+(iy*gridsz)]\obj) ;TODO CHECK FOR WAYPOINT DIST
+											dist=EntityDistance(e\room\grid\waypoints[ix+(iy*gridsz)]\obj,e\room\grid\waypoints[ix+1+(iy*gridsz)]\obj)
 											For i=0 To 3
 												If e\room\grid\waypoints[ix+(iy*gridsz)]\connected[i]=e\room\grid\waypoints[ix+1+(iy*gridsz)] Then
 													Exit

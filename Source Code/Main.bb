@@ -196,8 +196,8 @@ While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
 
-Const VersionNumber$ = "1.4.0"
-Const CompatibleNumber$ = "1.4.0" ;Lowest version with compatible saves
+Const VersionNumber$ = "1.0.0"
+Const CompatibleNumber$ = "1.0.0" ;Lowest version with compatible saves
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%, ButtonSFX2%
@@ -4675,7 +4675,7 @@ Function DrawGUI()
 			Select SelectedItem\itemtemplate\tempname
 				Case "badnvg","nvg","supernvg","finenvg"
 
-					If Wearing1499 = 0 And WearingHazmat=0 Then
+					If CanUseItem(False, False) Then
 						If SelectedItem\Picked = 2 Then
 							Msg = GetLocalString("Messages", "nvgoff")
 							WearingNightVision = 0
@@ -4702,29 +4702,27 @@ Function DrawGUI()
 						Else
 							Msg = GetLocalString("Messages", "nvgdouble")
 						EndIf
-					ElseIf Wearing1499 <> 0 Then
-						Msg = GetLocalString("Messages", "nvg1499")
-					Else
-						Msg = GetLocalString("Messages", "nvghaz")
 					EndIf
 					SelectedItem = Null
 					MsgTimer = 70 * 5
-				Case "scramble" ;TODO redo the whole chabang of double and stuff
-					If SelectedItem\Picked = 2 Then
-						SelectedItem\Picked = 1
-						WearingScramble = False
-						Msg = GetLocalString("Messages", "scrambleoff")
-					Else
-						If WearingScramble = False Then
-							SelectedItem\Picked = 2
-							WearingScramble = SelectedItem\state2 + 1
-							Msg = GetLocalString("Messages", "scrambleon")
+				Case "scramble"
+					If CanUseItem(False, False)
+						If SelectedItem\Picked = 2 Then
+							SelectedItem\Picked = 1
+							WearingScramble = False
+							Msg = GetLocalString("Messages", "scrambleoff")
 						Else
-							Msg = GetLocalString("Messages", "scrambledouble")
+							If WearingScramble = False Then
+								SelectedItem\Picked = 2
+								WearingScramble = SelectedItem\state2 + 1
+								Msg = GetLocalString("Messages", "scrambleon")
+							Else
+								Msg = GetLocalString("Messages", "scrambledouble")
+							EndIf
 						EndIf
+						SelectedItem = Null
+						MsgTimer = 70 * 5
 					EndIf
-					SelectedItem = Null
-					MsgTimer = 70 * 5
 				Case "scp1123"
 					If Not (Wearing714 = 1) Then
 						If PlayerRoom\RoomTemplate\Name <> "room1123" Then
@@ -4764,7 +4762,7 @@ Function DrawGUI()
 
 				Case "scp500"
 
-					If CanUseItem(False, False, True)
+					If CanUseItem(False, True)
 						GiveAchievement(Achv500)
 						
 						If Infect > 0 Then
@@ -4791,7 +4789,7 @@ Function DrawGUI()
 
 				Case "veryfinefirstaid"
 
-					If CanUseItem(False, False, True)
+					If CanUseItem(False, True)
 						Select Rand(5)
 							Case 1
 								Injuries = 3.5
@@ -4847,7 +4845,7 @@ Function DrawGUI()
 						MsgTimer = 70*5
 						SelectedItem = Null
 					Else
-						If CanUseItem(False, True, True)
+						If CanUseItem(True, True)
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
 							SetCrouch(True)
 							
@@ -4932,7 +4930,7 @@ Function DrawGUI()
 
 				Case "eyedrops"
 
-					If CanUseItem(False,False,False)
+					If CanUseItem(False,False)
 						If (Not (Wearing714=1)) Then ;wtf is this
 							BlinkEffect = 0.6
 							BlinkEffectTimer = Rand(20,30)
@@ -4943,7 +4941,7 @@ Function DrawGUI()
 
 				Case "fineeyedrops"
 
-					If CanUseItem(False,False,False)
+					If CanUseItem(False,False)
 						If (Not (Wearing714=1)) Then 
 							BlinkEffect = 0.4
 							BlinkEffectTimer = Rand(30,40)
@@ -4955,7 +4953,7 @@ Function DrawGUI()
 
 				Case "supereyedrops"
 
-					If CanUseItem(False,False,False)
+					If CanUseItem(False,False)
 						If (Not (Wearing714 = 1)) Then
 							BlinkEffect = 0.0
 							BlinkEffectTimer = 60
@@ -5066,7 +5064,7 @@ Function DrawGUI()
 					
 				Case "cup"
 
-					If CanUseItem(False,False,True)
+					If CanUseItem(False,True)
 						SelectedItem\localname = Trim(Lower(SelectedItem\localname))
 						If Left(SelectedItem\localname, Min(Len(GetLocalString("Items", "fullcup")),Len(SelectedItem\localname))) = Lower(GetLocalString("Items", "fullcup")) Then
 							SelectedItem\localname = Right(SelectedItem\localname, Len(SelectedItem\localname)-(Len(GetLocalString("Items", "fullcup"))+1))
@@ -5120,7 +5118,7 @@ Function DrawGUI()
 
 				Case "syringe"
 
-					If CanUseItem(False,True,True)
+					If CanUseItem(True,True)
 						HealTimer = 30
 						StaminaEffect = 0.5
 						StaminaEffectTimer = 20
@@ -5133,7 +5131,7 @@ Function DrawGUI()
 
 				Case "finesyringe"
 
-					If CanUseItem(False,True,True)
+					If CanUseItem(True,True)
 						HealTimer = Rnd(20, 40)
 						StaminaEffect = Rnd(0.5, 0.8)
 						StaminaEffectTimer = Rnd(20, 30)
@@ -5146,7 +5144,7 @@ Function DrawGUI()
 
 				Case "veryfinesyringe"
 
-					If CanUseItem(False,True,True)
+					If CanUseItem(True,True)
 						Select Rand(3)
 							Case 1
 								HealTimer = Rnd(40, 60)
@@ -5491,7 +5489,7 @@ Function DrawGUI()
 
 				Case "cigarette"
 
-					If CanUseItem(False,False,True)
+					If CanUseItem(False,True)
 						If SelectedItem\state = 0 Then
 							Local tempCig = Rand(6)
 							Msg = GetLocalString("Messages", "cig" + tempCig)
@@ -5508,7 +5506,7 @@ Function DrawGUI()
 
 				Case "scp420j"
 
-					If CanUseItem(False,False,True)
+					If CanUseItem(False,True)
 						If Wearing714=1 Then
 							Msg = GetLocalString("Messages", "420j714")
 						Else
@@ -5524,7 +5522,7 @@ Function DrawGUI()
 
 				Case "420s"
 
-					If CanUseItem(False,False,True)
+					If CanUseItem(False,True)
 						If Wearing714=1 Then
 							Msg = GetLocalString("Messages", "420j714")
 						Else
@@ -5661,7 +5659,7 @@ Function DrawGUI()
 
 				Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 
-					If Wearing1499 = 0 And WearingHazmat = 0 Then
+					If CanUseItem(False, False) Then
 						If SelectedItem\Picked = 2 Then
 							Msg = GetLocalString("Messages", "gasmaskremove")
 							WearingGasMask = 0
@@ -5681,16 +5679,10 @@ Function DrawGUI()
 									Msg = GetLocalString("Messages", "gasmaskputon")
 								WearingGasMask = 3
 							End Select
-							If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-							WearingNightVision = 0
 							SelectedItem\Picked = 2
 						Else
 							Msg = GetLocalString("Messages", "gasmaskdouble")
 						EndIf
-					ElseIf Wearing1499 <> 0 Then
-						Msg = GetLocalString("Messages", "gasmask1499")
-					Else
-						Msg = GetLocalString("Messages", "gasmaskhaz")
 					EndIf
 					SelectedItem = Null
 					MsgTimer = 70 * 5
@@ -5883,109 +5875,104 @@ Function DrawGUI()
 					EndIf
 
 				Case "bad1499","scp1499","super1499","fine1499"
-				
-					If SelectedItem\Picked = 2 Lor Wearing1499 = 0 Then
-
-						If WearingHazmat<>0
-							Msg = GetLocalString("Messages", "1499hazmat")
-							MsgTimer = 70 * 5
-							SelectedItem=Null
-							Return
-						EndIf
-						
-						CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-						
-						DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
-						
-						;width = 300
-						;height = 20
-						x% = I_Opt\GraphicWidth / 2 - 300 / 2
-						y% = I_Opt\GraphicHeight / 2 + 80
-						Rect(x, y, 300+4, 20, False)
-						For  i% = 1 To Int((300 - 2) * (SelectedItem\state / 100.0) / 10)
-							DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
-						Next
-						
-						If SelectedItem\itemtemplate\tempname = "fine1499" Then
-							SelectedItem\state = Min(SelectedItem\state+(FPSfactor*2),100)
-						ElseIf SelectedItem\itemtemplate\tempname = "bad1499"
-							SelectedItem\state = Min(SelectedItem\state+(FPSfactor*0.5),100)
-						Else
-							SelectedItem\state = Min(SelectedItem\state+(FPSfactor),100)
-						EndIf
-						
-						If SelectedItem\state=100 Then
-							If Wearing1499<>0 Then
-								Wearing1499 = 0
-								If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-								SelectedItem\Picked = 1
+					
+					If CanUseItem(False, False) Then
+						If SelectedItem\Picked = 2 Lor Wearing1499 = 0 Then
+							
+							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
+							
+							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
+							
+							;width = 300
+							;height = 20
+							x% = I_Opt\GraphicWidth / 2 - 300 / 2
+							y% = I_Opt\GraphicHeight / 2 + 80
+							Rect(x, y, 300+4, 20, False)
+							For  i% = 1 To Int((300 - 2) * (SelectedItem\state / 100.0) / 10)
+								DrawImage(BlinkMeterIMG, x + 3 + 10 * (i - 1), y + 3)
+							Next
+							
+							If SelectedItem\itemtemplate\tempname = "fine1499" Then
+								SelectedItem\state = Min(SelectedItem\state+(FPSfactor*2),100)
+							ElseIf SelectedItem\itemtemplate\tempname = "bad1499"
+								SelectedItem\state = Min(SelectedItem\state+(FPSfactor*0.5),100)
 							Else
-								If SelectedItem\itemtemplate\tempname="bad1499" Then
-									Wearing1499 = -1
-								ElseIf SelectedItem\itemtemplate\tempname="scp1499"
-									Wearing1499 = 1
-								ElseIf SelectedItem\itemtemplate\tempname = "super1499"
-									Wearing1499 = 2
-								Else
-									Wearing1499 = 3
-								EndIf
-								If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
-								GiveAchievement(Achv1499)
-								If WearingNightVision Then CameraFogFar = StoredCameraFogFar
-								WearingGasMask = 0
-								WearingNightVision = 0
-								SelectedItem\Picked = 2
-								For r.Rooms = Each Rooms
-									If r\RoomTemplate\Name = "dimension1499" Then
-										BlinkTimer = -1
-										NTF_1499PrevRoom = PlayerRoom
-										NTF_1499PrevX# = EntityX(Collider)
-										NTF_1499PrevY# = EntityY(Collider)
-										NTF_1499PrevZ# = EntityZ(Collider)
-										
-										If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
-											PositionEntity (Collider, r\x+6086.0*RoomScale, r\y+304.0*RoomScale, r\z+2292.5*RoomScale)
-											RotateEntity Collider,0,90,0,True
-										Else
-											PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
-										EndIf
-										ResetEntity(Collider)
-										UpdateDoors()
-										UpdateRooms()
-										For it.Items = Each Items
-											it\disttimer = 0
-										Next
-										PlayerRoom = r
-										PlaySound_Strict (LoadTempSound("SFX\SCP\1499\Enter.ogg"))
-										NTF_1499X# = 0.0
-										NTF_1499Y# = 0.0
-										NTF_1499Z# = 0.0
-										If Curr096<>Null Then
-											If Curr096\SoundChn<>0 Then
-												SetStreamVolume_Strict(Curr096\SoundChn,0.0)
-											EndIf
-										EndIf
-										For e.Events = Each Events
-											If e\EventName = "dimension1499" Then
-												If EntityDistanceSquared(e\room\obj,Collider) > PowTwo(8300.0*RoomScale) Then
-													If e\EventState2 < 5 Then
-														e\EventState2 = e\EventState2 + 1
-													EndIf
-												EndIf
-												Exit
-											EndIf
-										Next
-										Exit
-									EndIf
-								Next
+								SelectedItem\state = Min(SelectedItem\state+(FPSfactor),100)
 							EndIf
-							SelectedItem\state=0
-							SelectedItem = Null
+							
+							If SelectedItem\state=100 Then
+								If Wearing1499<>0 Then
+									Wearing1499 = 0
+									If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+									SelectedItem\Picked = 1
+								Else
+									If SelectedItem\itemtemplate\tempname="bad1499" Then
+										Wearing1499 = -1
+									ElseIf SelectedItem\itemtemplate\tempname="scp1499"
+										Wearing1499 = 1
+									ElseIf SelectedItem\itemtemplate\tempname = "super1499"
+										Wearing1499 = 2
+									Else
+										Wearing1499 = 3
+									EndIf
+									If SelectedItem\itemtemplate\sound <> 66 Then PlaySound_Strict(PickSFX(SelectedItem\itemtemplate\sound))
+									GiveAchievement(Achv1499)
+									If WearingNightVision Then CameraFogFar = StoredCameraFogFar
+									WearingGasMask = 0
+									WearingNightVision = 0
+									SelectedItem\Picked = 2
+									For r.Rooms = Each Rooms
+										If r\RoomTemplate\Name = "dimension1499" Then
+											BlinkTimer = -1
+											NTF_1499PrevRoom = PlayerRoom
+											NTF_1499PrevX# = EntityX(Collider)
+											NTF_1499PrevY# = EntityY(Collider)
+											NTF_1499PrevZ# = EntityZ(Collider)
+											
+											If NTF_1499X# = 0.0 And NTF_1499Y# = 0.0 And NTF_1499Z# = 0.0 Then
+												PositionEntity (Collider, r\x+6086.0*RoomScale, r\y+304.0*RoomScale, r\z+2292.5*RoomScale)
+												RotateEntity Collider,0,90,0,True
+											Else
+												PositionEntity (Collider, NTF_1499X#, NTF_1499Y#+0.05, NTF_1499Z#)
+											EndIf
+											ResetEntity(Collider)
+											UpdateDoors()
+											UpdateRooms()
+											For it.Items = Each Items
+												it\disttimer = 0
+											Next
+											PlayerRoom = r
+											PlaySound_Strict (LoadTempSound("SFX\SCP\1499\Enter.ogg"))
+											NTF_1499X# = 0.0
+											NTF_1499Y# = 0.0
+											NTF_1499Z# = 0.0
+											If Curr096<>Null Then
+												If Curr096\SoundChn<>0 Then
+													SetStreamVolume_Strict(Curr096\SoundChn,0.0)
+												EndIf
+											EndIf
+											For e.Events = Each Events
+												If e\EventName = "dimension1499" Then
+													If EntityDistanceSquared(e\room\obj,Collider) > PowTwo(8300.0*RoomScale) Then
+														If e\EventState2 < 5 Then
+															e\EventState2 = e\EventState2 + 1
+														EndIf
+													EndIf
+													Exit
+												EndIf
+											Next
+											Exit
+										EndIf
+									Next
+								EndIf
+								SelectedItem\state=0
+								SelectedItem = Null
+							EndIf
+							
+						Else
+							Msg = GetLocalString("Messages", "1499double")
+							MsgTimer = 70 * 10
 						EndIf
-						
-					Else
-						Msg = GetLocalString("Messages", "1499double")
-						MsgTimer = 70 * 10
 					EndIf
 				Case "badge"
 					If SelectedItem\itemtemplate\img=0 Then
@@ -6060,7 +6047,7 @@ Function DrawGUI()
 
 				Case "pill"
 					
-					If CanUseItem(False, False, True)
+					If CanUseItem(False, True)
 						Msg = GetLocalString("Messages", "pillswallow")
 						MsgTimer = 70*7
 						
@@ -6070,7 +6057,7 @@ Function DrawGUI()
 
 				Case "upgradedpill"
 
-					If CanUseItem(False, False, True)
+					If CanUseItem(False, True)
 						Msg = GetLocalString("Messages", "pillswallow")
 						MsgTimer = 70*7
 						
@@ -10063,17 +10050,16 @@ Function CreateQuad()
 	
 End Function
 
-Function CanUseItem(canUseWithHazmat%, canUseWithGasMask%, canUseWithEyewear%)
-	If (canUseWithHazmat = False And WearingHazmat <> 0) Then
-		Msg = GetLocalString("Messages", "canthaz")
-		MsgTimer = 70*5
-		Return False
-	ElseIf (canUseWithGasMask = False And ((WearingGasMask <> 0) Lor (Wearing1499 <> 0)))
+; TODO potentially make it more unique, with an exception for all items
+Function CanUseItem(canUseWithGasMask%, canUseWithEyewear%)
+	If (canUseWithGasMask = False And ((WearingGasMask <> 0) Lor (Wearing1499 <> 0)))
 		Msg = GetLocalString("Messages", "cantgas")
 		MsgTimer = 70*5
 		Return False
 	ElseIf (canUseWithEyewear = False And (WearingNightVision <> 0 Lor Wearing178 <> 0 Lor WearingScramble <> 0))
 		Msg = GetLocalString("Messages", "canthead")
+		MsgTimer = 70*5
+		Return False
 	EndIf
 	
 	Return True
