@@ -75,6 +75,7 @@ Rooms:
 	- And a lot of other improvements!
 - Much improved SCP-970.
 - Added glow to buttons and improved them a bit.
+- Added improved D-Class animations.
 - Improved boxfile models.
 - Added EZ endroom version.
 - Added SCP-106 endroom event to all three endrooms.
@@ -139,6 +140,7 @@ Bug Fixes:
 	- Fixed inventory single clicks being recognized as double clicks.
 	- Fixed message being moved down if selecting a document, while a clipboard/wallet is open.
 	- Fixed SCP-895 and NVG interaction.
+	- Fixed NVG not working against temporary blackouts.
 	- Fixed launcher options not saving when quitting.
 	- Fixed messages being visible in the pause menu.
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
