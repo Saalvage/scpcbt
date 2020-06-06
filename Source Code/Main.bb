@@ -801,7 +801,7 @@ Global LightConeModel
 
 Global ParticleEffect%[2]
 
-Global DTextures%[9]
+Global DTextures%[8]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
