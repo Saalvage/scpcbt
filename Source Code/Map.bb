@@ -3304,18 +3304,14 @@ Function FillRoom(r.Rooms)
 			PositionEntity(d\Buttons[0], r\x - 230.0 * RoomScale, EntityY(d\Buttons[0], True), EntityZ(d\Buttons[0], True), True)
 			PositionEntity(d\Buttons[1], r\x - 250.0 * RoomScale, EntityY(d\Buttons[1], True), EntityZ(d\Buttons[1], True), True)
 			
-			r\Objects[0] = CreatePivot()
+			r\Objects[0] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[0], r\x - 1180.0 * RoomScale, r\y - 256.0 * RoomScale, r\z + 896.0 * RoomScale)
 			
-			r\Objects[1] = CreatePivot()
+			r\Objects[1] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[1], r\x - 1292.0 * RoomScale, r\y - 256.0 * RoomScale, r\z - 160.0 * RoomScale)
 			
-			r\Objects[2] = CreatePivot()
+			r\Objects[2] = CreatePivot(r\obj)
 			PositionEntity(r\Objects[2], r\x - 1065.0 * RoomScale, r\y - 380.0 * RoomScale, r\z + 50.0 * RoomScale)
-			
-			For i = 0 To 2
-				EntityParent(r\Objects[i], r\obj)
-			Next
 			
 			sc = CreateSecurityCam(r\x, r\y + 704.0 * RoomScale, r\z + 863.0 * RoomScale, r)
 			sc\angle = 180.0 : sc\turn = 45.0

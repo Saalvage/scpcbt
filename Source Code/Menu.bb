@@ -31,7 +31,7 @@ Global IntroEnabled% = GetINIInt(OptionFile, "options", "intro enabled")
 Global SelectedInputBox%, CursorPos% = -1
 
 Global RandSeedAmount% = 1
-While GetLocalString("Menu", "randseed" + RandSeedAmount) <> ""
+While GetLocalString("Menu", "randseed" + RandSeedAmount) <> "Menu.randseed" + RandSeedAmount
 	RandSeedAmount = RandSeedAmount + 1
 Wend
 
