@@ -801,7 +801,7 @@ Global LightConeModel
 
 Global ParticleEffect%[2]
 
-Global DTextures[7]
+Global DTextures%[9]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
@@ -7208,8 +7208,7 @@ Function LoadEntities()
 	SetChunkDataValues()
 	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
-
-	For i=0 To 7
+	For i = 0 To 8
 		DTextures[i] = CopyEntity(ClassDObj)
 		HideEntity DTextures[i]
 	Next
@@ -7245,8 +7244,10 @@ Function LoadEntities()
 	tex = LoadTexture_Strict("GFX\npcs\035victim.jpg")
 	EntityTexture DTextures[7],tex
 	FreeTexture tex
-	
-
+	;D-9341
+	tex = LoadTexture_Strict("GFX\npcs\classd3.jpg")
+	EntityTexture DTextures[8],tex
+	FreeTexture tex
 	
 	LoadMaterials("DATA\materials.ini")
 	

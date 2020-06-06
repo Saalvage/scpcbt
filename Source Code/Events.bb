@@ -308,254 +308,224 @@ Function UpdateEvents()
 				EndIf
 
 			Case "173" ;the intro sequence
-
-				If KillTimer >= 0 And e\EventState2 = 0 Then
-					
+				;[Block]
+				If KillTimer >= 0.0 And e\EventState2 = 0.0 Then
 					PlayerZone = 0
 					
-					If e\EventState3>0 Then
-						
+					If e\EventState3 > 0.0 Then
 						ShouldPlay = 13
 						
-						;slow the player down to match his speed to the guards
-						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.01/EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
+						;Slow the player down to match his speed to the guards
+						CurrSpeed = Min(CurrSpeed - (CurrSpeed * (0.01 / EntityDistance(e\room\NPC[3]\Collider, Collider)) * FPSfactor), CurrSpeed)
 						
-						If e\EventState3 < 170 Then
+						If e\EventState3 < 170.0 Then
 							If e\EventState3 = 1.0 Then
-								PositionEntity Camera, x, y, z
-								HideEntity Collider
-								PositionEntity Collider, x, 0.302, z
-								RotateEntity Camera, -70, 0, 0								
+								PositionEntity(Camera, x, y, z)
+								HideEntity(Collider)
+								PositionEntity(Collider, x, 0.302, z)
+								RotateEntity(Camera, -70.0, 0.0, 0.0)						
 								
 								CurrMusicVolume = MusicVolume
 								
 								StopStream_Strict(MusicCHN)
-								MusicCHN = StreamSound_Strict("SFX\Music\"+Music[13]+".ogg",CurrMusicVolume,Mode)
+								MusicCHN = StreamSound_Strict("SFX\Music\" + Music[13] + ".ogg", CurrMusicVolume, 2)
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
-								BlurTimer = 500
-								ShowEntity Light
+								BlurTimer = 500.0
+								ShowEntity(Light)
 								EntityAlpha(Light, 0.5)
 							EndIf
 							
-							If e\EventState3 < 3 Then
-								e\EventState3 = e\EventState3+FPSfactor/100.0
-							ElseIf e\EventState3 < 15 Lor e\EventState3 >= 50 Then
-								e\EventState3 = e\EventState3+FPSfactor/30.0
+							If e\EventState3 < 3.0 Then
+								e\EventState3 = e\EventState3 + FPSfactor / 100.0
+							ElseIf e\EventState3 < 15.0 Lor e\EventState3 >= 50.0 Then
+								e\EventState3 = e\EventState3 + FPSfactor / 30.0
 							EndIf
 							
-							If e\EventState3 < 15 Then
-							
-								If e\EventState3 - FPSfactor/30.0 < 3.7 And e\EventState3 > 3.7 Then PlaySound_Strict(IntroSFX(19))
+							If e\EventState3 < 15.0 Then
+								If e\EventState3 - FPSfactor / 30.0 < 3.7 And e\EventState3 > 3.7 Then PlaySound_Strict(IntroSFX(19))
 								
-								x = EntityX(e\room\obj)-(3224.0+1024.0)*RoomScale
-								y = 136.0*RoomScale
-								z = EntityZ(e\room\obj)+8.0*RoomScale	
+								x = EntityX(e\room\OBJ) - (3224.0 + 1024.0) * RoomScale
+								y = 136.0 * RoomScale
+								z = EntityZ(e\room\OBJ) + 8.0 * RoomScale	
 								
-								If e\EventState3 < 14 Then
-									mouse_x_speed_1#=0
-									mouse_y_speed_1#=0
+								If e\EventState3 < 14.0 Then
+									Mouse_X_Speed_1 = 0.0
+									Mouse_Y_Speed_1 = 0.0
 									
-									Playable=False
-									CanBlinkDespitePlayable=True
+									Playable = False
+									CanBlinkDespitePlayable = True
 									
-									If e\EventState3-FPSfactor/30.0 < 12 And e\EventState3 > 12 Then PlaySound2(StepSFX(0,0,0), Camera, Collider, 8, 0.3)
+									If e\EventState3 - FPSfactor / 30.0 < 12.0 And e\EventState3 > 12.0 Then PlaySound2(StepSFX(0, 0, 0), Camera, Collider, 8.0, 0.3)
 									
-									ShowEntity Light
-									EntityAlpha(Light, 0.9-(e\EventState3/2.0))
+									ShowEntity(Light)
+									EntityAlpha(Light, 0.9 - (e\EventState3 / 2.0))
 									
-									x = x + (EntityX(e\room\obj)-(3048.0+1024.0)*RoomScale - x) * Max((e\EventState3-10.0)/4.0,0.0) 
+									x = x + (EntityX(e\room\OBJ) - (3048.0 + 1024.0) * RoomScale - x) * Max((e\EventState3 - 10.0) / 4.0, 0.0) 
 									
-									If e\EventState3 < 10 Then
-										y = y + (0.2) * Min(Max((e\EventState3-3.0)/5.0, 0.0), 1.0)
+									If e\EventState3 < 10.0 Then
+										y = y + 0.2 * Min(Max((e\EventState3 - 3.0) / 5.0, 0.0), 1.0)
 									Else
-										y = (y+0.2) + (0.302+0.6 - (y+0.2)) * Max((e\EventState3-10)/4.0,0.0) 
+										y = (y + 0.2) + (0.302 + 0.6 - (y + 0.2)) * Max((e\EventState3 - 10.0) / 4.0, 0.0) 
 									EndIf
 									
-									z = z + (EntityZ(e\room\obj)+104.0*RoomScale - z) * Min(Max((e\EventState3-3)/5.0, 0), 1.0)
+									z = z + (EntityZ(e\room\OBJ) + 104.0 * RoomScale - z) * Min(Max((e\EventState3 - 3.0) / 5.0, 0.0), 1.0)
 									
 									;I'm sorry you have to see this
-									RotateEntity Camera, -70.0 + 70.0*Min(Max((e\EventState3-3.0)/5.0,0.0),1.0)+Sin(e\EventState3*12.857)*5.0, -60.0*Max((e\EventState3-10.0)/4.0,0.0), Sin(e\EventState3*25.7)*8.0
+									RotateEntity(Camera, (-70.0) + 70.0 * Min(Max((e\EventState3 - 3.0) / 5.0, 0.0), 1.0) + Sin(e\EventState3 * 12.857) * 5.0, (-60.0) * Max((e\EventState3 - 10.0) / 4.0, 0.0), Sin(e\EventState3 * 25.7) * 8.0)
 									
-									PositionEntity Camera, x, y, z
-									HideEntity Collider
-									PositionEntity Collider, x, 0.302, z	
-									DropSpeed = 0
+									PositionEntity(Camera, x, y, z)
+									HideEntity(Collider)
+									PositionEntity(Collider, x, 0.302, z)	
+									DropSpeed = 0.0
 								Else
-									CanBlinkDespitePlayable=False
-									Playable=True
+									CanBlinkDespitePlayable = False
+									Playable = True
 								
-									HideEntity Light
+									HideEntity(Light)
 									
-									PositionEntity Collider, EntityX(Collider), 0.302, EntityZ(Collider)
-									ResetEntity Collider
-									ShowEntity Collider
-									DropSpeed = 0
-									e\EventState3 = 15
+									PositionEntity(Collider, EntityX(Collider), 0.302, EntityZ(Collider))
+									ResetEntity(Collider)
+									ShowEntity(Collider)
+									DropSpeed = 0.0
+									e\EventState3 = 15.0
 									Msg = GetLocalString("Messages", "pickpaper")
-									MsgTimer=70*7
+									MsgTimer = 70.0 * 7.0
 								EndIf
 								
-								user_camera_pitch = 0
-								RotateEntity Collider, 0, EntityYaw(Camera), 0
-								
-							ElseIf e\EventState3 < 40
-								If Inventory(0)<>Null Then
+								User_Camera_Pitch = 0.0
+								RotateEntity(Collider, 0.0, EntityYaw(Camera), 0.0)
+							ElseIf e\EventState3 < 40.0
+								If Inventory(0) <> Null Then
 									Msg = GetLocalStringR("Messages", "openinv", I_Keys\KeyName[I_Keys\INV])
-									MsgTimer=70*7
-									e\EventState3 = 40
+									MsgTimer = 70.0 * 7.0
+									e\EventState3 = 40.0
 									Exit
 								EndIf
 							EndIf
 							
 							If SelectedItem <> Null Then
-								e\EventState3 = e\EventState3+FPSfactor/5.0
+								e\EventState3 = e\EventState3 + FPSfactor / 5.0
 							EndIf							
-							
-						ElseIf e\EventState3 => 150.0 And e\EventState3 < 700
+						ElseIf e\EventState3 >= 150.0 And e\EventState3 < 700.0
 							FreeSound_Strict(IntroSFX(19)) : IntroSFX(19) = 0
-							If e\room\NPC[3]\State = 7 Then
+							If e\room\NPC[3]\State = 7.0 Then
 								If e\room\NPC[3]\Sound2 = 0
 									e\room\NPC[3]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\BeforeDoorOpen.ogg")
-									e\room\NPC[3]\SoundChn2 = PlaySound2(e\room\NPC[3]\Sound2,Camera,e\room\NPC[3]\Collider)
-									DebugLog "Playing guard sound before cell opening"
+									e\room\NPC[3]\SoundCHN2 = PlaySound2(e\room\NPC[3]\Sound2, Camera, e\room\NPC[3]\Collider)
+									DebugLog("Playing guard sound before cell opening")
 								EndIf
 								
-								UpdateSoundOrigin(e\room\NPC[3]\SoundChn2,Camera,e\room\NPC[3]\Collider)
+								UpdateSoundOrigin(e\room\NPC[3]\SoundCHN2, Camera, e\room\NPC[3]\Collider)
 								
-								If (Not ChannelPlaying(e\room\NPC[3]\SoundChn2))
-									;BlinkTimer = -10
-									
+								If ChannelPlaying(e\room\NPC[3]\SoundCHN2) = False
 									e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCell.ogg")
-									e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
 									
-									;e\room\NPC[3]\State = 7
-									;e\room\NPC[4]\State = 7
-									;e\room\NPC[5]\State = 7
-									e\room\NPC[3]\State = 9
-									e\room\NPC[4]\State = 9
-									e\room\NPC[5]\State = 9
+									e\room\NPC[3]\State = 9.0
+									e\room\NPC[4]\State = 9.0
+									e\room\NPC[5]\State = 9.0
 									
-									e\room\RoomDoors[6]\locked = False		
+									e\room\RoomDoors[6]\Locked = False		
 									UseDoor(e\room\RoomDoors[6], False)
-									e\room\RoomDoors[6]\locked = True
+									e\room\RoomDoors[6]\Locked = True
 								EndIf
 							Else
-								FreeSound_Strict e\room\NPC[3]\Sound2
+								FreeSound_Strict(e\room\NPC[3]\Sound2)
 								
-								;PointEntity e\room\NPC[3]\obj, Collider
-								;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\obj), 0
+								e\EventState3 = Min(e\EventState3 + FPSfactor / 4.0, 699.0)
 								
-								;PointEntity e\room\NPC[4]\obj, Collider
-								;RotateEntity e\room\NPC[4]\Collider, 0, EntityYaw(e\room\NPC[4]\obj), 0
-								
-								e\EventState3 = Min(e\EventState3+FPSfactor/4,699)
-								
-								;outside the cell
-								If DistanceSquared(EntityX(Collider),PlayerRoom\x-(3072+1024)*RoomScale, EntityZ(Collider),PlayerRoom\z+192.0*RoomScale)>PowTwo(1.5) Then
-									;e\room\NPC[3]\State = 5
-									;e\room\NPC[3]\EnemyX = EntityX(Collider)
-									;e\room\NPC[3]\EnemyY = EntityY(Collider)
-									;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
-									
-									If e\EventState3 > 250 Then
-										If e\room\NPC[3]\SoundChn<>0 Then
-											If ChannelPlaying(e\room\NPC[3]\SoundChn) Then StopChannel e\room\NPC[3]\SoundChn
+								;Outside the cell
+								If DistanceSquared(EntityX(Collider), e\room\x - (3072.0 + 1024.0) * RoomScale, EntityZ(Collider), e\room\z + 192.0 * RoomScale) > PowTwo(1.5) Then
+									If e\EventState3 > 250.0 Then
+										If e\room\NPC[3]\SoundCHN <> 0 Then
+											If ChannelPlaying(e\room\NPC[3]\SoundCHN) = True Then StopChannel(e\room\NPC[3]\SoundCHN)
 										EndIf
-										FreeSound_Strict e\room\NPC[3]\Sound
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\Escort"+Rand(1,2)+".ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+										EndIf
 										
-										;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
-										;e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-1584*RoomScale, 0.3, PlayerRoom\z-1040*RoomScale)
-										e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-										e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\Escort" + Rand(1, 2) + ".ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
 										
-										e\room\RoomDoors[6]\locked = False		
+										e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3], PlayerRoom\x - 320.0 * RoomScale, 0.3, PlayerRoom\z - 704.0 * RoomScale)
+										e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4], PlayerRoom\x - 320.0 * RoomScale, 0.3, PlayerRoom\z - 704.0 * RoomScale)
+										
+										e\room\RoomDoors[6]\Locked = False		
 										UseDoor(e\room\RoomDoors[6], False)
-										e\room\RoomDoors[6]\locked = True
+										e\room\RoomDoors[6]\Locked = True
 										
-										e\EventState3 = 710
+										e\EventState3 = 710.0
 									EndIf
-								Else ;inside the cell
-									e\room\NPC[3]\State = 9
-									;PointEntity e\room\NPC[3]\Collider, Collider		
-									;RotateEntity e\room\NPC[3]\Collider, 0, EntityYaw(e\room\NPC[3]\Collider), 0
+								Else ;Inside the cell
+									e\room\NPC[3]\State = 9.0
 									
-									If e\EventState3-(FPSfactor/4) < 350 And e\EventState3=>350 Then
-										FreeSound_Strict e\room\NPC[3]\Sound
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCellRefuse"+Rand(1,2)+".ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-									ElseIf e\EventState3-(FPSfactor/4) < 550 And e\EventState3=>550 
-										FreeSound_Strict e\room\NPC[3]\Sound
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\CellGas"+Rand(1,2)+".ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-									ElseIf e\EventState3>630
-										PositionEntity Collider, EntityX(Collider), EntityY(Collider), Min(EntityZ(Collider), EntityZ(e\room\obj,True)+490*RoomScale)
-										If e\room\RoomDoors[6]\open = True Then 
-											e\room\RoomDoors[6]\locked = False		
-											UseDoor(e\room\RoomDoors[6],False)
-											e\room\RoomDoors[6]\locked = True
-											
-											em.Emitters = CreateEmitter(PlayerRoom\x - (2976.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
-											TurnEntity(em\Obj, 90, 0, 0, True)
-											em\RandAngle = 7
-											em\Speed = 0.03
-											em\SizeChange = 0.003
-											em\Room = PlayerRoom
-											
-											em.Emitters = CreateEmitter(PlayerRoom\x - (3168.0+1024) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
-											TurnEntity(em\Obj, 90, 0, 0, True)
-											em\RandAngle = 7
-											em\Speed = 0.03
-											em\SizeChange = 0.003
-											em\Room = PlayerRoom
+									If e\EventState3 - (FPSfactor / 4.0) < 350.0 And e\EventState3 >= 350.0 Then
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
 										EndIf
 										
-										EyeIrritation=Max(EyeIrritation+FPSfactor * 4, 1.0)
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\ExitCellRefuse" + Rand(1, 2) + ".ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									ElseIf e\EventState3 - (FPSfactor / 4.0) < 550.0 And e\EventState3 >= 550.0 
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+										EndIf
+										
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\CellGas" + Rand(1, 2) + ".ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+									ElseIf e\EventState3 > 630.0
+										PositionEntity(Collider, EntityX(Collider), EntityY(Collider), Min(EntityZ(Collider), EntityZ(e\room\OBJ, True) + 490.0 * RoomScale))
+										If e\room\RoomDoors[6]\Open = True Then 
+											e\room\RoomDoors[6]\Locked = False		
+											UseDoor(e\room\RoomDoors[6], False)
+											e\room\RoomDoors[6]\Locked = True
+											
+											em.Emitters = CreateEmitter(PlayerRoom\x - (2976.0 + 1024.0) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
+											em\RandAngle = 7 : em\Speed = 0.03 : em\SizeChange = 0.003 : em\Room = PlayerRoom
+											TurnEntity(em\OBJ, 90.0, 0.0, 0.0, True)
+											
+											em.Emitters = CreateEmitter(PlayerRoom\x - (3168.0 + 1024.0) * RoomScale, 373.0 * RoomScale, PlayerRoom\z + 204.0 * RoomScale, 0)
+											em\RandAngle = 7 : em\Speed = 0.03 : em\SizeChange = 0.003 : em\Room = PlayerRoom
+											TurnEntity(em\Obj, 90.0, 0.0, 0.0, True)
+										EndIf
+										EyeIrritation = Max(EyeIrritation + FPSfactor * 4.0, 1.0)
 									EndIf
-									
 								EndIf
 							EndIf
-						ElseIf e\EventState3 < 800
-							e\EventState3 = e\EventState3+FPSfactor/4.0
+						ElseIf e\EventState3 < 800.0
+							e\EventState3 = e\EventState3 + FPSfactor / 4.0
 							
-							;e\room\NPC[3]\State = 5
-							;e\room\NPC[3]\EnemyX = EntityX(Collider)
-							;e\room\NPC[3]\EnemyY = EntityY(Collider)
-							;e\room\NPC[3]\EnemyZ = EntityZ(Collider)
-							
-							If e\room\NPC[5]\State <> 11
-								If EntityDistanceSquared(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>PowTwo(5) And EntityDistance(e\room\NPC[4]\Collider,e\room\NPC[5]\Collider) Then ;TODO Check what this is
-									If EntityDistanceSquared(e\room\NPC[5]\Collider,Collider)<PowTwo(3.5) Then
-										e\room\NPC[5]\State = 11
-										e\room\NPC[5]\State3 = 1
-										e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
-										e\room\NPC[5]\Reload = 70*3
+							If e\room\NPC[5]\State <> 11.0 Then
+								If EntityDistanceSquared(e\room\NPC[3]\Collider, e\room\NPC[5]\Collider) > PowTwo(5) And EntityDistance(e\room\NPC[4]\Collider, e\room\NPC[5]\Collider) Then ;TODO: check what this is
+									If EntityDistanceSquared(e\room\NPC[5]\Collider, Collider) < PowTwo(3.5) Then
+										e\room\NPC[5]\State = 11.0
+										e\room\NPC[5]\State3 = 1.0
+										e\room\NPC[5]\SoundCHN2 = PlaySound2(e\room\NPC[5]\Sound2, Camera, e\room\NPC[5]\Collider)
+										e\room\NPC[5]\Reload = 70 * 3.0
 									EndIf
 								EndIf
 							EndIf
-						ElseIf e\EventState3 < 900
-							e\room\NPC[4]\Angle = 0
+						ElseIf e\EventState3 < 900.0
+							e\room\NPC[4]\Angle = 0.0
 							
-							If EntityX(Collider)<EntityX(e\room\obj,True)-5376*RoomScale And e\EventStr = "" Then
-								If Rand(3)=1 Then
-									;e\EventStr = "scripted\scripted"+Rand(1,6)+".ogg|off.ogg|"
-									e\EventStr = "scripted\scripted"+Rand(1,5)+".ogg|off.ogg|"
+							If EntityX(Collider) < EntityX(e\room\OBJ, True) - 5376.0 * RoomScale And e\EventStr = "" Then
+								If Rand(3) = 1 Then
+									e\EventStr = "scripted\scripted" + Rand(1, 5) + ".ogg|off.ogg|"
 								Else
-									;generate the PA message
-									e\EventStr = "1\attention"+Rand(1,2)+".ogg"
+									;Generate the PA message
+									e\EventStr = "1\attention" + Rand(1, 2) + ".ogg"
 									Select Rand(3)
 										Case 1
 											strtemp = "crew"
-											e\EventStr = e\EventStr + "|2\crew"+Rand(0,5)+".ogg"
+											e\EventStr = e\EventStr + "|2\crew" + Rand(0, 5) + ".ogg"
 										Case 2
 											strtemp = "scientist"
-											e\EventStr = e\EventStr + "|2\scientist"+Rand(0,19)+".ogg"
+											e\EventStr = e\EventStr + "|2\scientist" + Rand(0, 19) + ".ogg"
 										Case 3
 											strtemp = "security"	
-											e\EventStr = e\EventStr + "|2\security"+Rand(0,5)+".ogg"
+											e\EventStr = e\EventStr + "|2\security" + Rand(0, 5) + ".ogg"
 									End Select
 									If Rand(2)=1 And strtemp = "scientist" Then ;call on line...
 										e\EventStr = e\EventStr + "|3\callonline.ogg"
@@ -581,67 +551,69 @@ Function UpdateEvents()
 								EndIf
 							EndIf
 							
-							If e\room\NPC[6] <> Null Then ;the scientist
-								If e\room\NPC[6]\State = 0 Then 
-									If e\room\RoomDoors[7]\open Then 
-										If DistanceSquared(EntityX(Collider), EntityX(e\room\obj,True)-3328*RoomScale, EntityZ(Collider), EntityZ(e\room\obj,True)-1232*RoomScale)<PowTwo(5.0) Then
-											e\room\NPC[6]\State = 1
+							If e\room\NPC[6] <> Null Then
+								If e\room\NPC[6]\State = 0.0 Then 
+									If e\room\RoomDoors[7]\Open Then 
+										If DistanceSquared(EntityX(Collider), EntityX(e\room\OBJ, True) - 3328.0 * RoomScale, EntityZ(Collider), EntityZ(e\room\OBJ, True) - 1232.0 * RoomScale) < PowTwo(5.0) Then
+											e\room\NPC[6]\State = 1.0
 											If e\EventStr = "done" Then 
-												PlaySound_Strict LoadTempSound("SFX\Room\Intro\PA\scripted\announcement"+Rand(1,7)+".ogg")
+												PlaySound_Strict(LoadTempSound("SFX\Room\Intro\PA\scripted\announcement" + Rand(1, 7) + ".ogg"))
 											EndIf
 										EndIf
 									EndIf
 								Else
-									If EntityZ(e\room\NPC[6]\Collider)>EntityZ(e\room\obj,True)-64.0*RoomScale Then
-										RotateEntity e\room\NPC[6]\Collider, 0, CurveAngle(90,EntityYaw(e\room\NPC[6]\Collider),15.0),0
-										If e\room\RoomDoors[7]\open Then UseDoor(e\room\RoomDoors[7],False)
-										If e\room\RoomDoors[7]\openstate < 1.0 Then e\room\NPC[6]\State = 0
+									If EntityZ(e\room\NPC[6]\Collider) > EntityZ(e\room\OBJ, True) - 64.0 * RoomScale Then
+										RotateEntity(e\room\NPC[6]\Collider, 0.0, CurveAngle(90.0, EntityYaw(e\room\NPC[6]\Collider), 15.0), 0.0)
+										If e\room\RoomDoors[7]\Open Then UseDoor(e\room\RoomDoors[7], False)
+										If e\room\RoomDoors[7]\OpenState < 1.0 Then e\room\NPC[6]\State = 0.0
 									EndIf
 								EndIf
 							EndIf
 							
-							If e\room\NPC[8] <> Null Then ;the 2 guards and ClassD
-								If e\room\NPC[8]\State = 7 Then
-									;If e\room\RoomDoors[7]\open Then 
-									If DistanceSquared(EntityX(Collider), EntityX(e\room\obj,True)-6688*RoomScale, EntityZ(Collider), EntityZ(e\room\obj,True)-1252*RoomScale)<PowTwo(2.5) Then
-										e\room\NPC[8]\State = 10
-										e\room\NPC[9]\State = 1
-										e\room\NPC[10]\State = 10
-										e\room\NPC[11]\State = 1
+							If e\room\NPC[8] <> Null Then
+								If e\room\NPC[8]\State = 7.0 Then
+									If DistanceSquared(EntityX(Collider), EntityX(e\room\OBJ, True) - 6688.0 * RoomScale, EntityZ(Collider), EntityZ(e\room\OBJ, True) - 1252.0 * RoomScale) < PowTwo(2.5) Then
+										e\room\NPC[8]\State = 10.0
+										e\room\NPC[9]\State = 1.0
+										e\room\NPC[10]\State = 10.0
+										e\room\NPC[11]\State = 1.0
 									EndIf
 								Else
-									If EntityX(e\room\NPC[8]\Collider)<EntityX(e\room\obj,True)-7100.0*RoomScale Then
+									If EntityX(e\room\NPC[8]\Collider) < EntityX(e\room\OBJ, True) - 7100.0 * RoomScale Then
 										For i = 8 To 10
-											e\room\NPC[i]\State = 0
+											e\room\NPC[i]\State = 0.0
 										Next
 									EndIf
 								EndIf
 							EndIf
 							
 							If e\room\NPC[11] <> Null Then
-								If EntityX(e\room\NPC[11]\Collider)>EntityX(e\room\obj,True)-1200.0*RoomScale Then
-									e\room\NPC[11]\State = 0
+								If EntityX(e\room\NPC[11]\Collider) > EntityX(e\room\OBJ, True) - 1200.0 * RoomScale Then
+									e\room\NPC[11]\State = 0.0
 									RemoveNPC(e\room\NPC[11])
 								EndIf
 							EndIf
 							
-							e\room\NPC[5]\SoundChn = LoopSound2(e\room\NPC[5]\Sound,e\room\NPC[5]\SoundChn,Camera,e\room\NPC[5]\obj,2,0.5)
+							e\room\NPC[5]\SoundCHN = LoopSound2(e\room\NPC[5]\Sound, e\room\NPC[5]\SoundCHN, Camera, e\room\NPC[5]\Collider, 2.0, 0.5)
 							
 							If e\EventStr <> "" And e\EventStr <> "done" Then
 								If e\SoundCHN = 0 Then 
 									e\SoundCHN = PlaySound_Strict(LoadTempSound("SFX\Room\Intro\PA\on.ogg"))
 								EndIf
-								If ChannelPlaying(e\SoundCHN)=False Then
+								If ChannelPlaying(e\SoundCHN) = False Then
 									strtemp = Left(e\EventStr, Instr(e\EventStr, "|", 1)-1)
 									e\SoundCHN = PlaySound_Strict (LoadTempSound("SFX\Room\Intro\PA\"+strtemp))
 									e\EventStr = Right(e\EventStr, Len(e\EventStr)-Len(strtemp)-1)
 									If e\EventStr = "" Then 
-										FreeSound_Strict e\room\NPC[3]\Sound
-										temp = Rand(1,5)
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Conversation"+temp+"a.ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-										e\room\NPC[4]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Conversation"+temp+"b.ogg")
-										e\room\NPC[4]\SoundChn = PlaySound2(e\room\NPC[4]\Sound, Camera, e\room\NPC[4]\Collider)
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+										EndIf
+										
+										temp = Rand(1, 5)
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Conversation" + temp + "a.ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										e\room\NPC[4]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Conversation" + temp + "b.ogg")
+										e\room\NPC[4]\SoundCHN = PlaySound2(e\room\NPC[4]\Sound, Camera, e\room\NPC[4]\Collider)
 										e\EventStr = "done"
 									EndIf
 								EndIf
@@ -650,104 +622,107 @@ Function UpdateEvents()
 							dist = DistanceSquared(EntityX(Collider), EntityX(e\room\NPC[3]\Collider), EntityZ(Collider), EntityZ(e\room\NPC[3]\Collider))
 							
 							If dist < PowTwo(3.0) Then
-								e\room\NPC[3]\State3 = Min(Max(e\room\NPC[3]\State3-FPSfactor,0),50)
+								e\room\NPC[3]\State3 = Min(Max(e\room\NPC[3]\State3 - FPSfactor, 0.0), 50.0)
 							Else
-								e\room\NPC[3]\State3 = Max(e\room\NPC[3]\State3+FPSfactor,50)
-								If e\room\NPC[3]\State3 => 70*8 And e\room\NPC[3]\State3-FPSfactor < 70*8 And e\room\NPC[3]\State=7 Then
-									If e\room\NPC[4]\SoundChn <> 0 Then
-										If ChannelPlaying(e\room\NPC[4]\SoundChn) Then StopChannel(e\room\NPC[4]\SoundChn)
+								e\room\NPC[3]\State3 = Max(e\room\NPC[3]\State3 + FPSfactor, 50.0)
+								If e\room\NPC[3]\State3 >= 70.0 * 8.0 And e\room\NPC[3]\State3 - FPSfactor < 70.0 * 8.0 And e\room\NPC[3]\State = 7.0 Then
+									If e\room\NPC[4]\SoundCHN <> 0 Then
+										If ChannelPlaying(e\room\NPC[4]\SoundCHN) = True Then StopChannel(e\room\NPC[4]\SoundCHN)
 									EndIf
 									
-									If e\room\NPC[3]\State2 < 2 Then
-										FreeSound_Strict e\room\NPC[3]\Sound
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortRefuse"+Rand(1,2)+".ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-										e\room\NPC[3]\State3=50
-										e\room\NPC[3]\State2=3
-									ElseIf e\room\NPC[3]\State2=3
-										FreeSound_Strict e\room\NPC[3]\Sound
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortPissedOff"+Rand(1,2)+".ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-										e\room\NPC[3]\State3=50
-										e\room\NPC[3]\State2=4
-									ElseIf e\room\NPC[3]\State2=4
-										FreeSound_Strict e\room\NPC[3]\Sound
-										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortKill"+Rand(1,2)+".ogg")
-										e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-										e\room\NPC[3]\State3 = 50+70*2.5
-										e\room\NPC[3]\State2=5
-									ElseIf e\room\NPC[3]\State2=5
-										e\room\NPC[3]\State = 11
-										e\room\NPC[4]\State = 11
-										e\room\NPC[5]\State = 11
-										e\room\NPC[3]\State3 = 1
-										e\room\NPC[4]\State3 = 1
-										e\room\NPC[5]\State3 = 1
+									If e\room\NPC[3]\State2 < 2.0 Then
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+										EndIf
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortRefuse" + Rand(1, 2) + ".ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										e\room\NPC[3]\State3 = 50.0
+										e\room\NPC[3]\State2 = 3.0
+									ElseIf e\room\NPC[3]\State2 = 3.0
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+										EndIf
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortPissedOff" + Rand(1, 2) + ".ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										e\room\NPC[3]\State3 = 50.0
+										e\room\NPC[3]\State2 = 4.0
+									ElseIf e\room\NPC[3]\State2 = 4.0
+										If e\room\NPC[3]\Sound <> 0 Then
+											FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+										EndIf
+										e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortKill" + Rand(1, 2) + ".ogg")
+										e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+										e\room\NPC[3]\State3 = 50.0 + 70.0 * 2.5
+										e\room\NPC[3]\State2 = 5.0
+									ElseIf e\room\NPC[3]\State2 = 5.0
+										e\room\NPC[3]\State = 11.0
+										e\room\NPC[4]\State = 11.0
+										e\room\NPC[5]\State = 11.0
+										e\room\NPC[3]\State3 = 1.0
+										e\room\NPC[4]\State3 = 1.0
+										e\room\NPC[5]\State3 = 1.0
 									EndIf
 								EndIf
-								If e\room\NPC[5]\State <> 11
-									If EntityDistanceSquared(e\room\NPC[3]\Collider,e\room\NPC[5]\Collider)>PowTwo(5) And EntityDistance(e\room\NPC[4]\Collider,e\room\NPC[5]\Collider)
-										If EntityDistanceSquared(e\room\NPC[5]\Collider,Collider)<PowTwo(3.5) Then
-											e\room\NPC[5]\State = 11
-											e\room\NPC[5]\State3 = 1
-											e\room\NPC[5]\SoundChn2 = PlaySound2(e\room\NPC[5]\Sound2,Camera,e\room\NPC[5]\Collider)
-											e\room\NPC[5]\Reload = 70*3
+								If e\room\NPC[5]\State <> 11.0 Then
+									If EntityDistanceSquared(e\room\NPC[3]\Collider, e\room\NPC[5]\Collider) > PowTwo(5) And EntityDistance(e\room\NPC[4]\Collider, e\room\NPC[5]\Collider) Then ;TODO: check what this is
+										If EntityDistanceSquared(e\room\NPC[5]\Collider, Collider) < PowTwo(3.5) Then
+											e\room\NPC[5]\State = 11.0
+											e\room\NPC[5]\State3 = 1.0
+											e\room\NPC[5]\SoundCHN2 = PlaySound2(e\room\NPC[5]\Sound2, Camera, e\room\NPC[5]\Collider)
+											e\room\NPC[5]\Reload = 70.0 * 3.0
 										EndIf
 									EndIf
 								EndIf
 							EndIf
 							
-							If e\room\NPC[5]\State = 11
-								UpdateSoundOrigin(e\room\NPC[5]\SoundChn2,Camera,e\room\NPC[5]\Collider)
+							If e\room\NPC[5]\State = 11.0 Then
+								UpdateSoundOrigin(e\room\NPC[5]\SoundCHN2, Camera, e\room\NPC[5]\Collider)
 							EndIf
 							
-							If e\room\NPC[3]\State <> 11 Then
-								If dist < PowTwo(Min(Max(4.0-e\room\NPC[3]\State3*0.05, 1.5),4.0)) Then
+							If e\room\NPC[3]\State <> 11.0 Then
+								If dist < PowTwo(Min(Max(4.0 - e\room\NPC[3]\State3 * 0.05, 1.5), 4.0)) Then
 									If e\room\NPC[3]\PathStatus <> 1 Then
-										e\room\NPC[3]\State = 7
-										PointEntity e\room\NPC[3]\obj, Collider
-										RotateEntity e\room\NPC[3]\Collider,0,CurveValue(EntityYaw(e\room\NPC[3]\obj),EntityYaw(e\room\NPC[3]\Collider),20.0),0,True
+										e\room\NPC[3]\State = 7.0
+										PointEntity(e\room\NPC[3]\OBJ, Collider)
+										RotateEntity(e\room\NPC[3]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[3]\OBJ), EntityYaw(e\room\NPC[3]\Collider), 20.0), 0.0, True)
 										
 										If e\room\NPC[3]\PathStatus = 2 Then
-											;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],EntityX(e\room\obj,True)-1584*RoomScale, 0.3, EntityZ(e\room\obj,True)-1040*RoomScale)
-											e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-											e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4],PlayerRoom\x-320*RoomScale, 0.3, PlayerRoom\z-704*RoomScale)
-											e\room\NPC[3]\State = 3
+											e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3], PlayerRoom\x - 320.0 * RoomScale, 0.3, PlayerRoom\z - 704.0 * RoomScale)
+											e\room\NPC[4]\PathStatus = FindPath(e\room\NPC[4], PlayerRoom\x - 320.0 * RoomScale, 0.3, PlayerRoom\z - 704.0 * RoomScale)
+											e\room\NPC[3]\State = 3.0
 										EndIf
 									Else
-										e\room\NPC[3]\State = 3
+										e\room\NPC[3]\State = 3.0
 									EndIf
 								Else
-									e\room\NPC[3]\State = 7
-									PointEntity e\room\NPC[3]\obj, Collider
-									RotateEntity e\room\NPC[3]\Collider,0,CurveValue(EntityYaw(e\room\NPC[3]\obj),EntityYaw(e\room\NPC[3]\Collider),20.0),0,True		
+									e\room\NPC[3]\State = 7.0
+									PointEntity(e\room\NPC[3]\OBJ, Collider)
+									RotateEntity(e\room\NPC[3]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[3]\OBJ), EntityYaw(e\room\NPC[3]\Collider), 20.0), 0.0, True)	
 									
 									If dist > PowTwo(5.5) Then
 										e\room\NPC[3]\PathStatus = 2
-										If e\room\NPC[3]\State2=0 Then
-											FreeSound_Strict e\room\NPC[3]\Sound
+										If e\room\NPC[3]\State2 = 0.0 Then
+											If e\room\NPC[3]\Sound <> 0 Then
+												FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+											EndIf
+											
 											e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortRun.ogg")
-											e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
-											PlaySound2(e\Sound, Camera, e\room\NPC[3]\Collider)
-											e\room\NPC[3]\State2=1
+											e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+											
+											e\room\NPC[3]\State2 = 1.0
 										EndIf
 										
-										e\room\NPC[3]\State = 5
+										e\room\NPC[3]\State = 5.0
 										e\room\NPC[3]\EnemyX = EntityX(Collider)
 										e\room\NPC[3]\EnemyY = EntityY(Collider)
 										e\room\NPC[3]\EnemyZ = EntityZ(Collider)
-										;e\room\NPC[3]\PathStatus = FindPath(e\room\NPC[3],EntityY(Collider), 0.3, EntityZ(Collider))
 									EndIf
 								EndIf	
 								
-								;PointEntity e\room\NPC[5]\obj, Collider
-								;RotateEntity e\room\NPC[5]\Collider, 0, CurveAngle(EntityYaw(e\room\NPC[5]\obj),EntityYaw(e\room\NPC[5]\Collider),30), 0
-								
-								If EntityDistanceSquared(Collider, e\room\NPC[4]\Collider) > PowTwo(1.5) And EntityDistanceSquared(e\room\NPC[3]\Collider, Collider)<EntityDistanceSquared(e\room\NPC[3]\Collider,e\room\NPC[4]\Collider) Then
-									e\room\NPC[4]\State = 3	
-									
+								If EntityDistanceSquared(Collider, e\room\NPC[4]\Collider) > PowTwo(1.5) And EntityDistanceSquared(e\room\NPC[3]\Collider, Collider) < EntityDistanceSquared(e\room\NPC[3]\Collider, e\room\NPC[4]\Collider) Then
+									e\room\NPC[4]\State = 3.0
 								Else
-									e\room\NPC[4]\State = 5
+									e\room\NPC[4]\State = 5.0
 									e\room\NPC[4]\EnemyX = EntityX(Collider)
 									e\room\NPC[4]\EnemyY = EntityY(Collider)
 									e\room\NPC[4]\EnemyZ = EntityZ(Collider)
@@ -755,121 +730,102 @@ Function UpdateEvents()
 								
 							EndIf
 							
-							If DistanceSquared(EntityX(e\room\NPC[3]\Collider), EntityX(e\room\RoomDoors[2]\frameobj,True), EntityZ(e\room\NPC[3]\Collider), EntityZ(e\room\RoomDoors[2]\frameobj,True)) < PowTwo(4.5) And DistanceSquared(EntityX(Collider), EntityX(e\room\RoomDoors[2]\frameobj,True), EntityZ(Collider), EntityZ(e\room\RoomDoors[2]\frameobj,True)) < PowTwo(5.0) Then
+							If DistanceSquared(EntityX(e\room\NPC[3]\Collider), EntityX(e\room\RoomDoors[2]\FrameOBJ, True), EntityZ(e\room\NPC[3]\Collider), EntityZ(e\room\RoomDoors[2]\FrameOBJ, True)) < PowTwo(4.5) And DistanceSquared(EntityX(Collider), EntityX(e\room\RoomDoors[2]\FrameOBJ, True), EntityZ(Collider), EntityZ(e\room\RoomDoors[2]\FrameOBJ, True)) < PowTwo(5.0) Then
 								e\room\NPC[0] = CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[0], True), EntityY(e\room\Objects[0], True), EntityZ(e\room\Objects[0], True))
-								e\room\NPC[0]\Angle = 180
+								e\room\NPC[0]\Angle = 180.0
 								
 								e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1], True), 0.5, EntityZ(e\room\Objects[1], True))
 								PointEntity(e\room\NPC[1]\Collider, e\room\Objects[5])
 								
 								e\room\NPC[2] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[2], True), 0.5, EntityZ(e\room\Objects[2], True))
 								PointEntity(e\room\NPC[2]\Collider, e\room\Objects[5])
-								ChangeNPCTextureID(e\room\NPC[2],6)
-								;EntityTexture e\room\NPC[2]\obj, DTextures[6]
-								;FreeTexture DTextures[6]
-								e\room\NPC[3]\State = 9
-								e\room\NPC[4]\State = 9
+								ChangeNPCTextureID(e\room\NPC[2], 6)
 								
-								If e\room\NPC[7]\SoundChn<>0 Then
-									If ChannelPlaying(e\room\NPC[7]\SoundChn) Then
-										StopChannel(e\room\NPC[7]\SoundChn)
-										FreeSound_Strict e\room\NPC[7]\Sound 
-										e\room\NPC[7]\Sound=0											
+								e\room\NPC[3]\State = 9.0
+								e\room\NPC[4]\State = 9.0
+								
+								If e\room\NPC[7]\SoundCHN <> 0 Then
+									If ChannelPlaying(e\room\NPC[7]\SoundCHN) = True Then StopChannel(e\room\NPC[7]\SoundCHN)
+									If e\room\NPC[7]\Sound <> 0 Then
+										FreeSound_Strict(e\room\NPC[7]\Sound) : e\room\NPC[7]\Sound = 0	
 									EndIf
 								EndIf
 								
 								FreeEntity(e\room\Objects[9])
-								e\room\Objects[9]=0
+								e\room\Objects[9] = 0
 								FreeEntity(e\room\Objects[10])
-								e\room\Objects[10]=0
+								e\room\Objects[10] = 0
 								
-								If e\room\NPC[5]<>Null Then
+								If e\room\NPC[5] <> Null Then
 									RemoveNPC(e\room\NPC[5])
 								EndIf
 								
 								For i = 8 To 10
-									If e\room\NPC[i]<>Null Then
+									If e\room\NPC[i] <> Null Then
 										RemoveNPC(e\room\NPC[i])
 									EndIf
 								Next
 								
-								FreeSound_Strict e\room\NPC[3]\Sound
-								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortDone"+Rand(1,5)+".ogg")
-								e\room\NPC[3]\SoundChn = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
+								If e\room\NPC[3]\Sound <> 0 Then
+									FreeSound_Strict(e\room\NPC[3]\Sound) : e\room\NPC[3]\Sound = 0
+								EndIf
 								
-								PositionEntity e\room\NPC[6]\Collider, EntityX(e\room\obj,True)-1190*RoomScale, 450*RoomScale, EntityZ(e\room\obj, True)+456*RoomScale, True
-								ResetEntity e\room\NPC[6]\Collider
-								PointEntity e\room\NPC[6]\Collider, e\room\obj
-								e\room\NPC[6]\CurrSpeed = 0
-								e\room\NPC[6]\State = 0
+								e\room\NPC[3]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Ulgrin\EscortDone" + Rand(1, 5) + ".ogg")
+								e\room\NPC[3]\SoundCHN = PlaySound2(e\room\NPC[3]\Sound, Camera, e\room\NPC[3]\Collider)
 								
-								e\EventState3 = 910
+								PositionEntity(e\room\NPC[6]\Collider, EntityX(e\room\OBJ, True) - 1190.0 * RoomScale, 450.0 * RoomScale, EntityZ(e\room\OBJ, True) + 456.0 * RoomScale, True)
+								ResetEntity(e\room\NPC[6]\Collider)
+								PointEntity(e\room\NPC[6]\Collider, e\room\OBJ)
+								e\room\NPC[6]\CurrSpeed = 0.0
+								e\room\NPC[6]\State = 0.0
 								
-								e\room\RoomDoors[3]\locked = False
-								UseDoor(e\room\RoomDoors[3],False)
-								e\room\RoomDoors[3]\locked = True
+								e\EventState3 = 910.0
+								
+								e\room\RoomDoors[3]\Locked = False
+								UseDoor(e\room\RoomDoors[3], False)
+								e\room\RoomDoors[3]\Locked = True
 								
 								
-								e\room\RoomDoors[2]\locked = False
-								UseDoor(e\room\RoomDoors[2],False)
-								e\room\RoomDoors[2]\locked = True
+								e\room\RoomDoors[2]\Locked = False
+								UseDoor(e\room\RoomDoors[2], False)
+								e\room\RoomDoors[2]\Locked = True
 							EndIf
 						Else
 							e\room\NPC[3]\Angle = EntityYaw(e\room\NPC[3]\Collider)
-							e\room\NPC[3]\State = 9
-							If DistanceSquared(EntityX(Collider), EntityX(e\room\obj), EntityZ(Collider), EntityZ(e\room\obj)) < PowTwo(4.0) Then
-								e\room\RoomDoors[2]\locked = False
-								UseDoor(e\room\RoomDoors[2],False)
-								e\room\RoomDoors[2]\locked = True
-								e\EventState3 = 0
-								e\room\NPC[3]\State = 0
+							e\room\NPC[3]\State = 9.0
+							If DistanceSquared(EntityX(Collider), EntityX(e\room\OBJ), EntityZ(Collider), EntityZ(e\room\OBJ)) < PowTwo(4.0) Then
+								e\room\RoomDoors[2]\Locked = False
+								UseDoor(e\room\RoomDoors[2], False)
+								e\room\RoomDoors[2]\Locked = True
+								e\EventState3 = 0.0
+								e\room\NPC[3]\State = 0.0
 								
-								UseDoor(e\room\RoomDoors[1],False)
+								UseDoor(e\room\RoomDoors[1], False)
 							EndIf
 						EndIf
 						
-						;the scientist sitting at his desk
-						If e\room\NPC[7]<>Null Then
-							RotateEntity e\room\NPC[7]\Collider,0,180+Sin(MilliSecs()/20)*3,0,True
-							PositionEntity e\room\NPC[7]\Collider, EntityX(e\room\obj,True)-3361*RoomScale,-315*RoomScale,EntityZ(e\room\obj,True)-2165*RoomScale
-							ResetEntity e\room\NPC[7]\Collider
+						;The scientist sitting at his desk
+						If e\room\NPC[7] <> Null Then
+							RotateEntity(e\room\NPC[7]\Collider, 0.0, 180.0 + Sin(MilliSecs() / 20.0) * 3.0, 0.0, True)
+							PositionEntity(e\room\NPC[7]\Collider, EntityX(e\room\OBJ, True) - 3361.0 * RoomScale, (-315.0) * RoomScale, EntityZ(e\room\OBJ, True) - 2165.0 * RoomScale)
+							ResetEntity(e\room\NPC[7]\Collider)
 							
-							e\room\NPC[7]\State = 6
-							SetNPCFrame(e\room\NPC[7], 182)
+							e\room\NPC[7]\State = 6.0
+							SetNPCFrame(e\room\NPC[7], 182.0)
 							
-							If e\room\NPC[6]\State=1 And e\room\NPC[7]\Sound<>0 Then 
-								If e\room\NPC[7]\SoundChn<>0 Then
-									If (Not ChannelPlaying(e\room\NPC[7]\SoundChn)) Then FreeSound_Strict e\room\NPC[7]\Sound : e\room\NPC[7]\Sound=0	
+							If e\room\NPC[6]\State = 1.0 And e\room\NPC[7]\Sound <> 0 Then 
+								If e\room\NPC[7]\SoundCHN <> 0 Then
+									If ChannelPlaying(e\room\NPC[7]\SoundCHN) = False Then FreeSound_Strict(e\room\NPC[7]\Sound) : e\room\NPC[7]\Sound = 0	
 								EndIf
 								
-								If e\room\NPC[7]\Sound<>0 Then e\room\NPC[7]\SoundChn = LoopSound2(e\room\NPC[7]\Sound, e\room\NPC[7]\SoundChn, Camera, e\room\NPC[7]\Collider, 7.0)
+								If e\room\NPC[7]\Sound <> 0 Then e\room\NPC[7]\SoundCHN = LoopSound2(e\room\NPC[7]\Sound, e\room\NPC[7]\SoundCHN, Camera, e\room\NPC[7]\Collider, 7.0)
 							EndIf
 						EndIf
-						
-						If e\room\NPC[3]\Sound <> 0 Then
-							If ChannelPlaying(e\room\NPC[3]\SoundChn)=False Then
-								FreeSound_Strict e\room\NPC[3]\Sound 
-								e\room\NPC[3]\Sound=0
-							Else
-								e\room\NPC[3]\SoundChn=LoopSound2(e\room\NPC[3]\Sound, e\room\NPC[3]\SoundChn, Camera, e\room\NPC[3]\Collider)
-							EndIf
-						EndIf
-						If e\room\NPC[4]\Sound <> 0 Then
-							If ChannelPlaying(e\room\NPC[4]\SoundChn)=False Then
-								FreeSound_Strict e\room\NPC[3]\Sound 
-								e\room\NPC[4]\Sound=0
-							Else
-								e\room\NPC[4]\SoundChn=LoopSound2(e\room\NPC[4]\Sound, e\room\NPC[4]\SoundChn, Camera, e\room\NPC[4]\Collider)
-							EndIf
-						EndIf
-						
 					Else
+						;Ambience inside the chamber
+						If IntroSFX(18) <> 0 Then e\SoundCHN2 = LoopSound2(IntroSFX(18), e\SoundCHN2, Camera, e\room\Objects[4], 6.0)
 						
-						;ambience inside the chamber
-						If IntroSFX(18)<>0 Then e\SoundCHN2 = LoopSound2(IntroSFX(18), e\SoundCHN2, Camera, e\room\Objects[4], 6)
-						
-
-						If e\EventState = 0 Then
+						If e\EventState = 0.0 Then
 							If PlayerRoom = e\room Then
 								IntroSFX(0) = LoadSound_Strict("SFX\Room\Intro\Scientist\Franklin\EnterChamber.ogg")
 								IntroSFX(1) = LoadSound_Strict("SFX\Room\Intro\Scientist\Franklin\Approach173.ogg")
@@ -883,359 +839,344 @@ Function UpdateEvents()
 								
 								Curr173\Idle = True
 								
-								e\room\NPC[3] = CreateNPC(NPCtypeGuard, e\room\x-4096*RoomScale+Rnd(-0.3,0.3), 0.3, e\room\z+Rand(860,896)*RoomScale)
-								RotateEntity e\room\NPC[3]\Collider,0,e\room\angle+180,0
-								e\room\NPC[3]\State = 7
-								e\room\NPC[4] = CreateNPC(NPCtypeGuard, e\room\x-3840*RoomScale, 0.3, e\room\z+768*RoomScale)
-								RotateEntity e\room\NPC[4]\Collider,0,e\room\angle+135,0
-								e\room\NPC[4]\State = 7
-								;SetNPCFrame(e\room\NPC[4], Rnd(1035, 1326))
-								e\room\NPC[5] = CreateNPC(NPCtypeGuard, e\room\x-8288*RoomScale, 0.3, e\room\z+1096*RoomScale)
-								e\room\NPC[5]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Music"+Rand(1,5)+".ogg")
-								RotateEntity e\room\NPC[5]\Collider, 0, e\room\angle+180, 0, True
-								e\room\NPC[5]\State = 7
-								e\room\NPC[5]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\PlayerEscape.ogg")
-								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
-								;tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-								;EntityTexture e\room\NPC[6]\obj, DTextures[3]
-								;FreeTexture tex
-								ChangeNPCTextureID(e\room\NPC[6],3)
-								e\room\NPC[7] = CreateNPC(NPCtypeD, e\room\x-3712*RoomScale, -0.3, e\room\z-2208*RoomScale)
-								;tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
-								e\room\NPC[7]\Sound = LoadSound_Strict("SFX\Room\Intro\Scientist\Conversation.ogg")
-								;EntityTexture e\room\NPC[7]\obj, DTextures[2]
-								;FreeTexture tex
-								ChangeNPCTextureID(e\room\NPC[7],2)
-								pvt = CreatePivot()
-								RotateEntity pvt,90,0,0
+								e\room\NPC[3] = CreateNPC(NPCtypeGuard, e\room\x - 4096.0 * RoomScale + Rnd(-0.3, 0.3), e\room\y + 0.3, e\room\z + Rnd(860.0, 896.0) * RoomScale)
+								RotateEntity(e\room\NPC[3]\Collider, 0.0, e\room\Angle + 180.0, 0.0)
+								e\room\NPC[3]\State = 7.0
+								e\room\NPC[4] = CreateNPC(NPCtypeGuard, e\room\x - 3840.0 * RoomScale, e\room\y + 0.3, e\room\z + 768.0 * RoomScale)
+								RotateEntity(e\room\NPC[4]\Collider,0,e\room\Angle + 135.0, 0.0)
 								
-								e\room\NPC[8] = CreateNPC(NPCtypeGuard, e\room\x-3800.0*RoomScale, 1.0, e\room\z-3900.0*RoomScale)
+								e\room\NPC[4]\State = 7.0
+								e\room\NPC[5] = CreateNPC(NPCtypeGuard, e\room\x - 8288.0 * RoomScale, e\room\y + 0.3, e\room\z + 1096 * RoomScale)
+								e\room\NPC[5]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Music" + Rand(1, 5) + ".ogg")
+								RotateEntity(e\room\NPC[5]\Collider, 0.0, e\room\Angle + 180.0, 0.0, True)
+								e\room\NPC[5]\State = 7.0
+								e\room\NPC[5]\Sound2 = LoadSound_Strict("SFX\Room\Intro\Guard\PlayerEscape.ogg")
+								
+								e\room\NPC[6] = CreateNPC(NPCtypeD, e\room\x - 3712.0 * RoomScale, e\room\y - 0.3, e\room\z - 2208.0 * RoomScale)
+								ChangeNPCTextureID(e\room\NPC[6], 3)
+								
+								e\room\NPC[7] = CreateNPC(NPCtypeD, e\room\x - 3712.0 * RoomScale, e\room\y - 0.3, e\room\z - 2208.0 * RoomScale)
+								e\room\NPC[7]\Sound = LoadSound_Strict("SFX\Room\Intro\Scientist\Conversation.ogg")
+								ChangeNPCTextureID(e\room\NPC[7], 2)
+								pvt = CreatePivot()
+								RotateEntity(pvt, 90.0, 0.0, 0.0)
+								
+								e\room\NPC[8] = CreateNPC(NPCtypeGuard, e\room\x - 3800.0 * RoomScale, e\room\y + 1.0, e\room\z - 3900.0 * RoomScale)
 								e\room\NPC[8]\State = 7
-								e\room\NPC[9] = CreateNPC(NPCtypeD, e\room\x-4000.0*RoomScale, 1.1, e\room\z-3900.0*RoomScale)
+								e\room\NPC[9] = CreateNPC(NPCtypeD, e\room\x - 4000.0 * RoomScale, e\room\y + 1.1, e\room\z - 3900.0 * RoomScale)
 								e\room\NPC[9]\State2 = 1.0
-								tex = LoadTexture_Strict("GFX\npcs\classd3.jpg")
-								EntityTexture e\room\NPC[9]\obj, tex
-								FreeTexture tex
-								e\room\NPC[10] = CreateNPC(NPCtypeGuard, e\room\x-4200.0*RoomScale, 1.0, e\room\z-3900.0*RoomScale)
-								e\room\NPC[10]\State = 7
+								ChangeNPCTextureID(e\room\NPC[9], 8)
+								
+								e\room\NPC[10] = CreateNPC(NPCtypeGuard, e\room\x - 4200.0 * RoomScale, 1.0, e\room\z - 3900.0 * RoomScale)
+								e\room\NPC[10]\State = 7.0
 								e\room\NPC[11] = CreateNPC(NPCtypeVehicle, EntityX(e\room\Objects[11], True), EntityY(e\room\Objects[11], True), EntityZ(e\room\Objects[11], True))
-								e\room\NPC[11]\State = 0
+								e\room\NPC[11]\State = 0.0
 								
 								For i = 8 To 11
-									PositionEntity pvt,EntityX(e\room\NPC[i]\Collider),EntityY(e\room\NPC[i]\Collider),EntityZ(e\room\NPC[i]\Collider)
-									EntityPick pvt,20.0
-									If PickedEntity() <> 0
-										PositionEntity e\room\NPC[i]\Collider,PickedX(),PickedY(),PickedZ(),True
-										AlignToVector e\room\NPC[i]\Collider,-PickedNX(),-PickedNY(),-PickedNZ(),3
-										RotateEntity e\room\NPC[i]\Collider,0,90,0
-										RotateEntity e\room\NPC[11]\Collider, 0, -90, 0
+									PositionEntity(pvt, EntityX(e\room\NPC[i]\Collider), EntityY(e\room\NPC[i]\Collider), EntityZ(e\room\NPC[i]\Collider))
+									EntityPick(pvt, 20.0)
+									If PickedEntity() <> 0 Then
+										PositionEntity(e\room\NPC[i]\Collider, PickedX(), PickedY(), PickedZ(), True)
+										AlignToVector(e\room\NPC[i]\Collider, -PickedNX(), -PickedNY(), -PickedNZ(), 3)
+										If i < 11 Then
+											RotateEntity(e\room\NPC[i]\Collider, 0.0, 90.0, 0.0)
+										Else
+											RotateEntity(e\room\NPC[i]\Collider, 0.0, -90.0, 0.0)
+										EndIf
 									EndIf
 								Next
 								
-								FreeEntity pvt
+								FreeEntity(pvt)
 								
 								PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True), 0.5, EntityZ(e\room\Objects[5], True))
 								ResetEntity(Curr173\Collider)
-								Curr173\angle = 90
+								Curr173\Angle = 90.0
 								
-								PositionEntity Collider, PlayerRoom\x-(3072+1024)*RoomScale, 0.3, PlayerRoom\z+192.0*RoomScale
-								ResetEntity Collider
+								PositionEntity(Collider, e\room\x - (3072.0 + 1024.0) * RoomScale, e\room\y + 0.3, e\room\z + 192.0 * RoomScale)
+								ResetEntity(Collider)
 								
 								e\EventState = 1
 								e\EventState3 = 1
 							EndIf
-						ElseIf e\EventState < 10000
-							If e\room\NPC[6]\SoundChn<>0 Then 
-								If ChannelPlaying (e\room\NPC[6]\SoundChn) Then
-									e\room\NPC[6]\State = 6
-									;PointEntity e\room\NPC[6]\Collider, e\room\obj
-									If AnimTime(e\room\NPC[6]\obj)=>325 Then
-										Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\obj),326,328, 0.02, False)
+						ElseIf e\EventState < 10000.0
+							If e\room\NPC[6]\SoundCHN <> 0 Then 
+								If ChannelPlaying(e\room\NPC[6]\SoundCHN) = True Then
+									e\room\NPC[6]\State = 6.0
+									If AnimTime(e\room\NPC[6]\OBJ) >= 325.0 Then
+										Animate2(e\room\NPC[6]\OBJ, AnimTime(e\room\NPC[6]\OBJ), 326.0, 328.0, 0.02, False)
 									Else
-										Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\obj),320,328, 0.05, False)
+										Animate2(e\room\NPC[6]\OBJ, AnimTime(e\room\NPC[6]\OBJ), 320.0, 328.0, 0.05, False)
 									EndIf
 								Else
-									Animate2(e\room\NPC[6]\obj,AnimTime(e\room\NPC[6]\obj), 328,320,-0.02, False)
+									Animate2(e\room\NPC[6]\OBJ, AnimTime(e\room\NPC[6]\OBJ), 328.0, 320.0, -0.02, False)
 								EndIf
 							EndIf
 							
-							If IntroSFX(17)<>0 Then
+							If IntroSFX(17) <> 0 Then
 								If EntityVisible(Curr173\Collider, Collider) Then
-									If EntityInView(Curr173\obj, Camera) Then
+									If EntityInView(Curr173\OBJ, Camera) Then
 										Msg = GetLocalStringR("Messages", "pressblink", I_Keys\KeyName[I_Keys\BLINK])
-										MsgTimer = 70*4
-										PlaySound_Strict IntroSFX(17)
-										IntroSFX(17)=0
+										MsgTimer = 70.0 * 4.0
+										PlaySound_Strict(IntroSFX(17))
+										IntroSFX(17) = 0
 									EndIf
 								EndIf
 							EndIf
 							
-							e\EventState = Min(e\EventState + (FPSfactor / 3), 5000)
-							If e\EventState >= 130 And e\EventState - (FPSfactor/3) < 130 Then
-								e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(0))
-							ElseIf e\EventState > 230
+							e\EventState = Min(e\EventState + (FPSfactor / 3.0), 5000.0)
+							If e\EventState >= 130.0 And e\EventState - (FPSfactor / 3.0) < 130.0 Then
+								e\room\NPC[6]\SoundCHN = PlaySound_Strict(IntroSFX(0))
+							ElseIf e\EventState > 230.0
 								temp = True
 								For i = 1 To 2
-									If DistanceSquared(EntityX(e\room\NPC[i]\Collider), EntityX(e\room\Objects[i + 2], True), EntityZ(e\room\NPC[i]\Collider), EntityZ(e\room\Objects[i + 2], True)) > PowTwo(0.3) Then ;0.3
-										
+									If DistanceSquared(EntityX(e\room\NPC[i]\Collider), EntityX(e\room\Objects[i + 2], True), EntityZ(e\room\NPC[i]\Collider), EntityZ(e\room\Objects[i + 2], True)) > PowTwo(0.3) Then
 										PointEntity(e\room\NPC[i]\obj, e\room\Objects[i + 2])
-										RotateEntity(e\room\NPC[i]\Collider, 0, CurveValue(EntityYaw(e\room\NPC[i]\obj),EntityYaw(e\room\NPC[i]\Collider),15.0),0)
-										;moveentity(e\room\npc(i).Collider, 0, 0, 0.015 * FPSfactor)
-										If e\EventState > (200 + i * 30) Then e\room\NPC[i]\State = 1
+										RotateEntity(e\room\NPC[i]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[i]\OBJ), EntityYaw(e\room\NPC[i]\Collider), 15.0), 0.0)
+										If e\EventState > (200.0 + i * 30.0) Then e\room\NPC[i]\State = 1.0
 										temp = False
 									Else
-										e\room\NPC[i]\State = 0
+										e\room\NPC[i]\State = 0.0
 										
-										PointEntity(e\room\NPC[i]\obj, e\room\Objects[5])
-										RotateEntity(e\room\NPC[i]\Collider, 0, CurveValue(EntityYaw(e\room\NPC[i]\obj),EntityYaw(e\room\NPC[i]\Collider),15.0), 0)
-										
+										PointEntity(e\room\NPC[i]\OBJ, e\room\Objects[5])
+										RotateEntity(e\room\NPC[i]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[i]\OBJ), EntityYaw(e\room\NPC[i]\Collider), 15.0), 0.0)
 									EndIf
 								Next
 								
-								If EntityX(Collider) < (EntityX(e\room\obj)) + 408.0 * RoomScale Then
-									If e\EventState => 450 And e\EventState - (FPSfactor/3) < 450 Then ;"mene huoneeseen"
-										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(4))
-									ElseIf e\EventState => 650 And e\EventState - (FPSfactor/3) < 650 ;"viimeinen varoitus, 5 sek aikaa"
+								If EntityX(Collider) < (EntityX(e\room\OBJ)) + 408.0 * RoomScale Then
+									If e\EventState >= 450.0 And e\EventState - (FPSfactor / 3.0) < 450.0 Then
+										e\room\NPC[6]\SoundCHN = PlaySound_Strict(IntroSFX(4))
+									ElseIf e\EventState >= 650.0 And e\EventState - (FPSfactor / 3.0) < 650.0
 										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(5))
-									ElseIf e\EventState => 850 And e\EventState - (FPSfactor/3) < 850 ;"fire at will"
-										UseDoor(e\room\RoomDoors[1],False)
-										;e\room\RoomDoors[1]\open = False
-										e\room\NPC[6]\SoundChn = PlaySound_Strict(IntroSFX(6))
-									ElseIf e\EventState > 1000
-										e\room\NPC[0]\State = 1
-										e\room\NPC[0]\State2= 10
-										e\room\NPC[0]\State3= 1
-										e\room\NPC[3]\State = 11
-										e\room\RoomDoors[2]\locked = False
-										UseDoor(e\room\RoomDoors[2],False)
-										e\room\RoomDoors[2]\locked = True
-										e\EventState2 = 1
+									ElseIf e\EventState >= 850.0 And e\EventState - (FPSfactor / 3.0) < 850.0
+										UseDoor(e\room\RoomDoors[1], False)
+										e\room\NPC[6]\SoundCHN = PlaySound_Strict(IntroSFX(6))
+									ElseIf e\EventState > 1000.0
+										e\room\NPC[0]\State = 1.0
+										e\room\NPC[0]\State2= 10.0
+										e\room\NPC[0]\State3= 1.0
+										e\room\NPC[3]\State = 11.0
+										e\room\RoomDoors[2]\Locked = False
+										UseDoor(e\room\RoomDoors[2], False)
+										e\room\RoomDoors[2]\Locked = True
+										e\EventState2 = 1.0
 										Exit
 									EndIf
 									
-									If e\EventState > 850 Then
-										PositionEntity(Collider, Min(EntityX(Collider), EntityX(e\room\obj) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
+									If e\EventState > 850.0 Then
+										PositionEntity(Collider, Min(EntityX(Collider), EntityX(e\room\OBJ) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
 									EndIf
-								ElseIf temp = True ;pelaaja ja molemmat npc:t huoneessa
-									e\EventState = 10000
-									UseDoor(e\room\RoomDoors[1],False)
+								ElseIf temp = True
+									e\EventState = 10000.0
+									UseDoor(e\room\RoomDoors[1], False)
 								EndIf
 							EndIf
 							
-							e\room\NPC[6]\State = 7
-							PointEntity e\room\NPC[6]\obj, Collider
-							RotateEntity e\room\NPC[6]\Collider,0,CurveValue(EntityYaw(e\room\NPC[6]\obj),EntityYaw(e\room\NPC[6]\Collider),20.0),0,True	
+							e\room\NPC[6]\State = 7.0
+							PointEntity(e\room\NPC[6]\OBJ, Collider)
+							RotateEntity(e\room\NPC[6]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[6]\OBJ), EntityYaw(e\room\NPC[6]\Collider), 20.0), 0.0, True)	
 							
 							PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True), EntityY(Curr173\Collider), EntityZ(e\room\Objects[5], True))
-							RotateEntity(Curr173\Collider, 0, 0, 0, True)
+							RotateEntity(Curr173\Collider, 0.0, 0.0, 0.0, True)
 							ResetEntity(Curr173\Collider)
-						ElseIf e\EventState < 14000 ; player is inside the room
-							e\EventState = Min(e\EventState + FPSfactor, 13000)
+						ElseIf e\EventState < 14000.0 ;Player is inside the room
+							e\EventState = Min(e\EventState + FPSfactor, 13000.0)
 							
-							If e\EventState < 10300 Then
-								PositionEntity(Collider, Max(EntityX(Collider), EntityX(e\room\obj) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
+							If e\EventState < 10300.0 Then
+								PositionEntity(Collider, Max(EntityX(Collider), EntityX(e\room\OBJ) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
 							EndIf
 							
-							e\room\NPC[6]\State = 6
-							PointEntity e\room\NPC[6]\obj, Curr173\Collider
-							RotateEntity e\room\NPC[6]\Collider,0,CurveValue(EntityYaw(e\room\NPC[6]\obj),EntityYaw(e\room\NPC[6]\Collider),50.0),0,True	
+							e\room\NPC[6]\State = 6.0
+							PointEntity(e\room\NPC[6]\OBJ, Curr173\Collider)
+							RotateEntity(e\room\NPC[6]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[6]\OBJ), EntityYaw(e\room\NPC[6]\Collider), 50.0), 0.0, True)	
 							
-							If e\EventState => 10300 And e\EventState - FPSfactor < 10300 Then ;"please approach SCP-173..."
+							If e\EventState => 10300 And e\EventState - FPSfactor < 10300 Then
 								e\SoundCHN = PlaySound_Strict(IntroSFX(1))
-								PositionEntity(Collider, Max(EntityX(Collider), EntityX(e\room\obj) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
-							ElseIf e\EventState => 10440 And e\EventState - FPSfactor < 10440 ;the door opens
-								UseDoor(e\room\RoomDoors[1],False)
-								e\SoundCHN = PlaySound_Strict(IntroSFX(7)) ;bang
-							ElseIf e\EventState => 10740 And e\EventState - FPSfactor < 10740 ;"there seems to be a problem..."
+								PositionEntity(Collider, Max(EntityX(Collider), EntityX(e\room\OBJ) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
+							ElseIf e\EventState >= 10440.0 And e\EventState - FPSfactor < 10440.0
+								UseDoor(e\room\RoomDoors[1], False)
+								e\SoundCHN = PlaySound_Strict(IntroSFX(7))
+							ElseIf e\EventState >= 10740.0 And e\EventState - FPSfactor < 10740.0
 								e\SoundCHN = PlaySound_Strict(IntroSFX(2))
-							ElseIf e\EventState => 11145 And e\EventState - FPSfactor < 11145;"I don't like this"
+							ElseIf e\EventState >= 11145.0 And e\EventState - FPSfactor < 11145.0
 								e\SoundCHN = PlaySound_Strict(IntroSFX(10))
 								e\room\NPC[1]\Sound = LoadSound_Strict("SFX\Room\Intro\ClassD\DontLikeThis.ogg")
 								PlaySound2(e\room\NPC[1]\Sound, Camera, e\room\NPC[2]\Collider)
-							ElseIf e\EventState => 11561 And e\EventState - FPSfactor < 11561 ;lights go out
-								e\EventState = 14000
-								PlaySound_Strict IntroSFX(16)
+							ElseIf e\EventState >= 11561.0 And e\EventState - FPSfactor < 11561.0
+								e\EventState = 14000.0
+								PlaySound_Strict(IntroSFX(16))
 								e\room\NPC[2]\Sound = LoadSound_Strict("SFX\Room\Intro\ClassD\Breen.ogg")
 								PlaySound2(e\room\NPC[2]\Sound, Camera, e\room\NPC[1]\Collider)
 							EndIf
 							
 							;Guard Alert
-							If e\EventState => 10440 And e\EventState - FPSfactor < 11561
-								If EntityX(Collider) < EntityX(e\room\RoomDoors[1]\frameobj, True)
-									If e\room\NPC[0]\State <> 12
-										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\Alert"+Rand(1,2)+".ogg")
-										e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
-										e\room\NPC[0]\State = 12
-										e\room\NPC[0]\State2 = 1
+							If e\EventState >= 10440 And e\EventState - FPSfactor < 11561
+								If EntityX(Collider) < EntityX(e\room\RoomDoors[1]\FrameOBJ, True)
+									If e\room\NPC[0]\State <> 12.0 Then
+										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\Alert" + Rand(1, 2) + ".ogg")
+										e\room\NPC[0]\SoundCHN = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 20.0)
+										e\room\NPC[0]\State = 12.0
+										e\room\NPC[0]\State2 = 1.0
 									EndIf
 								EndIf
 							EndIf
 							
-							If e\EventState > 10300 Then 
-								
-								If e\EventState > 10560 Then
-									If e\EventState < 10750 Then
-										e\room\NPC[1]\State = 1
+							If e\EventState > 10300.0 Then 
+								If e\EventState > 10560.0 Then
+									If e\EventState < 10750.0 Then
+										e\room\NPC[1]\State = 1.0
 										e\room\NPC[1]\CurrSpeed = 0.005										
 									Else
-										e\room\NPC[1]\State = 0
-										e\room\NPC[1]\CurrSpeed = CurveValue(0,e\room\NPC[1]\CurrSpeed,10)	
+										e\room\NPC[1]\State = 0.0
+										e\room\NPC[1]\CurrSpeed = CurveValue(0.0, e\room\NPC[1]\CurrSpeed, 10.0)	
 									EndIf
 									
 								EndIf
 								
-								If AnimTime(e\room\NPC[6]\obj)=>325 Then
-									Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\obj),326,328, 0.02, False)
+								If AnimTime(e\room\NPC[6]\OBJ) >= 325.0 Then
+									Animate2(e\room\NPC[6]\OBJ, AnimTime(e\room\NPC[6]\OBJ), 326.0, 328.0, 0.02, False)
 								Else
-									Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\obj),320,328, 0.05, False)
+									Animate2(e\room\NPC[6]\OBJ, AnimTime(e\room\NPC[6]\OBJ), 320.0, 328.0, 0.05, False)
 								EndIf
 							EndIf
 							
-							PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True),EntityY(Curr173\Collider), EntityZ(e\room\Objects[5], True))
-							RotateEntity(Curr173\Collider, 0, 0, 0, True)
+							PositionEntity(Curr173\Collider, EntityX(e\room\Objects[5], True), EntityY(Curr173\Collider), EntityZ(e\room\Objects[5], True))
+							RotateEntity(Curr173\Collider, 0.0, 0.0, 0.0, True)
 							ResetEntity(Curr173\Collider)
-						ElseIf e\EventState < 20000
-							pvt% = CreatePivot()
-							PositionEntity pvt, EntityX(Camera), EntityY(Curr173\Collider,True)-0.05, EntityZ(Camera)
+						ElseIf e\EventState < 20000.0
+							pvt = CreatePivot()
+							PositionEntity(pvt, EntityX(Camera), EntityY(Curr173\Collider, True) - 0.05, EntityZ(Camera))
 							PointEntity(pvt, Curr173\Collider)
-							RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), 40), 0)
-							Curr173\angle = 0
+							RotateEntity(Collider, EntityPitch(Collider), CurveAngle(EntityYaw(pvt), EntityYaw(Collider), 40.0), 0.0)
+							Curr173\Angle = 0.0
 							
-							TurnEntity(pvt, 90, 0, 0)
-							user_camera_pitch = CurveAngle(EntityPitch(pvt), user_camera_pitch + 90.0, 40)
-							user_camera_pitch=user_camera_pitch-90
-							FreeEntity pvt
+							TurnEntity(pvt, 90.0, 0.0, 0.0)
+							User_Camera_Pitch = CurveAngle(EntityPitch(pvt), User_Camera_Pitch + 90.0, 40.0)
+							User_Camera_Pitch = User_Camera_Pitch - 90.0
+							FreeEntity(pvt)
 							
-							e\room\NPC[6]\State = 6
-							PointEntity e\room\NPC[6]\obj, Curr173\Collider
-							RotateEntity e\room\NPC[6]\Collider,0,CurveValue(EntityYaw(e\room\NPC[6]\obj),EntityYaw(e\room\NPC[6]\Collider),20.0),0,True	
-							Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\obj),357,381, 0.05)
+							e\room\NPC[6]\State = 6.0
+							PointEntity(e\room\NPC[6]\OBJ, Curr173\Collider)
+							RotateEntity(e\room\NPC[6]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[6]\OBJ), EntityYaw(e\room\NPC[6]\Collider), 20.0), 0.0, True)	
+							Animate2(e\room\NPC[6]\obj, AnimTime(e\room\NPC[6]\OBJ), 357.0, 381.0, 0.05)
 							
-							e\EventState = Min(e\EventState + FPSfactor, 19000)
-							If e\EventState < 14100 Then ;lights go out and 173 kills the first Class D
-								
-								;14000-14030
-								If e\EventState < 14060 Then
-									BlinkTimer = Max((14000-e\EventState)/2-Rnd(0,1.0),-10)
-									;0-60,   90-640
-									If BlinkTimer = -10 Then
-										PointEntity Curr173\Collider, e\room\NPC[1]\obj
-										RotateEntity(Curr173\Collider, 0, EntityYaw(Curr173\Collider),0)
-										MoveEntity Curr173\Collider, 0,0,Curr173\Speed*0.6*FPSfactor
+							e\EventState = Min(e\EventState + FPSfactor, 19000.0)
+							If e\EventState < 14100.0 Then ;Lights go out and SCP-173 kills the first Class D
+								If e\EventState < 14060.0 Then
+									BlinkTimer = Max((14000.0 - e\EventState) / 2.0 - Rnd(0.0, 1.0), -10.0)
+									If BlinkTimer = -10.0 Then
+										PointEntity(Curr173\Collider, e\room\NPC[1]\OBJ)
+										RotateEntity(Curr173\Collider, 0.0, EntityYaw(Curr173\Collider), 0.0)
+										MoveEntity(Curr173\Collider, 0.0, 0.0, Curr173\Speed * 0.6 * FPSfactor)
 										
 										Curr173\SoundChn = LoopSound2(StoneDragSFX, Curr173\SoundChn, Camera, Curr173\Collider, 10.0, Curr173\State)
 										
-										Curr173\State = CurveValue(1.0, Curr173\State, 3)
+										Curr173\State = CurveValue(1.0, Curr173\State, 3.0)
 										
 									Else
-										Curr173\State = Max(0, Curr173\State - FPSfactor / 20)
+										Curr173\State = Max(0.0, Curr173\State - FPSfactor / 20.0)
 									EndIf
-								ElseIf e\EventState < 14065
-									BlinkTimer = -10
-									If e\room\NPC[1]\State = 0 Then PlaySound2(NeckSnapSFX(Rand(0, 2)),Camera,Curr173\Collider)
+								ElseIf e\EventState < 14065.0
+									BlinkTimer = -10.0
+									If e\room\NPC[1]\State = 0.0 Then PlaySound2(NeckSnapSFX(Rand(0, 2)), Camera, Curr173\Collider)
 									
-									;e\room\NPC[0]\State=8
-									SetAnimTime e\room\NPC[1]\obj, 0
-									e\room\NPC[1]\State = 6
-									PositionEntity(Curr173\Collider, EntityX(e\room\NPC[1]\obj), EntityY(Curr173\Collider), EntityZ(e\room\NPC[1]\obj))
+									SetNPCFrame(e\room\NPC[1], 0.0)
+									e\room\NPC[1]\State = 6.0
+									PositionEntity(Curr173\Collider, EntityX(e\room\NPC[1]\OBJ), EntityY(Curr173\Collider), EntityZ(e\room\NPC[1]\OBJ))
 									ResetEntity(Curr173\Collider)
 									PointEntity(Curr173\Collider, e\room\NPC[2]\Collider)
 									
-									e\room\NPC[2]\State = 3
-									RotateEntity e\room\NPC[2]\Collider, 0, EntityYaw(e\room\NPC[2]\Collider), 0
-									Animate2(e\room\NPC[2]\obj, AnimTime(e\room\NPC[2]\obj),406,382,-0.01*15)
-									MoveEntity e\room\NPC[2]\Collider, 0,0,-0.01*FPSfactor
+									e\room\NPC[2]\State = 3.0
+									RotateEntity(e\room\NPC[2]\Collider, 0.0, EntityYaw(e\room\NPC[2]\Collider), 0.0)
+									Animate2(e\room\NPC[2]\OBJ, AnimTime(e\room\NPC[2]\OBJ), 406.0, 382.0, (-0.01) * 15.0)
+									MoveEntity(e\room\NPC[2]\Collider, 0.0, 0.0, (-0.01) * FPSfactor)
 									
 									;Guard WTF
-									e\room\NPC[0]\State = 12
-									If e\room\NPC[0]\Sound<>0
-										StopChannel(e\room\NPC[0]\SoundChn)
-										FreeSound_Strict(e\room\NPC[0]\Sound)
-										e\room\NPC[0]\Sound = 0
+									e\room\NPC[0]\State = 12.0
+									If e\room\NPC[0]\Sound <> 0
+										If ChannelPlaying(e\room\NPC[0]\SoundCHN) = True Then StopChannel(e\room\NPC[0]\SoundCHN)
+										FreeSound_Strict(e\room\NPC[0]\Sound) : e\room\NPC[0]\Sound = 0
 									EndIf
-									e\room\NPC[0]\Angle = 180
-									e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\WTF"+Rand(1,2)+".ogg")
-									e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
-									e\room\NPC[0]\State2 = 0
+									
+									e\room\NPC[0]\Angle = 180.0
+									e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\WTF" + Rand(1, 2) + ".ogg")
+									e\room\NPC[0]\SoundCHN = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 20.0)
+									e\room\NPC[0]\State2 = 0.0
 								Else
-									Animate2(e\room\NPC[1]\obj, AnimTime(e\room\NPC[1]\obj), 0, 19, 0.2, False)
-									If e\room\NPC[2]\Sound=0 Then 
+									Animate2(e\room\NPC[1]\OBJ, AnimTime(e\room\NPC[1]\OBJ), 0.0, 19.0, 0.2, False)
+									If e\room\NPC[2]\Sound = 0 Then 
 										e\room\NPC[2]\Sound = LoadSound_Strict("SFX\Room\Intro\ClassD\Gasp.ogg")
-										PlaySound2 (e\room\NPC[2]\Sound, Camera, e\room\NPC[2]\Collider, 8.0)	
+										PlaySound2(e\room\NPC[2]\Sound, Camera, e\room\NPC[2]\Collider, 8.0)	
 									EndIf									
 								EndIf
 								
-								If e\EventState > 14080 And e\EventState - FPSfactor < 14080 Then PlaySound_Strict(IntroSFX(12))
-								CameraShake = 3
-							ElseIf e\EventState < 14200 ;kills the other class d
-								Animate2(e\room\NPC[1]\obj, AnimTime(e\room\NPC[1]\obj), 0, 19, 0.2, False)
+								If e\EventState > 14080.0 And e\EventState - FPSfactor < 14080.0 Then PlaySound_Strict(IntroSFX(12))
+								CameraShake = 3.0
+							ElseIf e\EventState < 14200.0 ;Kills the other class d
+								Animate2(e\room\NPC[1]\OBJ, AnimTime(e\room\NPC[1]\OBJ), 0.0, 19.0, 0.2, False)
 								
-								;Animate2(e\room\NPC[0]\obj, AnimTime(e\room\NPC[0]\obj), 110, 120, 0.2, False)
-								e\room\NPC[0]\State=8
-								If e\EventState > 14105 Then
-									If e\room\NPC[2]\State<>6 Then PlaySound2 (NeckSnapSFX(1), Camera, e\room\NPC[2]\Collider, 8.0)
-									e\room\NPC[2]\State = 6
-									PositionEntity(Curr173\Collider, EntityX(e\room\NPC[2]\obj), EntityY(Curr173\Collider), EntityZ(e\room\NPC[2]\obj))
+								e\room\NPC[0]\State = 8.0
+								If e\EventState > 14105.0 Then
+									If e\room\NPC[2]\State <> 6.0 Then PlaySound2(NeckSnapSFX(1), Camera, e\room\NPC[2]\Collider, 8.0)
+									e\room\NPC[2]\State = 6.0
+									PositionEntity(Curr173\Collider, EntityX(e\room\NPC[2]\obj), EntityY(Curr173\Collider), EntityZ(e\room\NPC[2]\OBJ))
 									ResetEntity(Curr173\Collider)
 									PointEntity(Curr173\Collider, Collider)
 								EndIf
-								If e\EventState < 14130 Then 
-									SetAnimTime e\room\NPC[2]\obj,50
-									BlinkTimer = -10 : LightBlink = 1.0
+								If e\EventState < 14130.0 Then 
+									SetAnimTime(e\room\NPC[2]\OBJ, 50.0)
+									BlinkTimer = -10.0 : LightBlink = 1.0
 								Else 
-									Animate2(e\room\NPC[2]\obj, AnimTime(e\room\NPC[2]\obj), 50, 60, 0.2, False)
+									Animate2(e\room\NPC[2]\obj, AnimTime(e\room\NPC[2]\OBJ), 50.0, 60.0, 0.2, False)
 									Curr173\Idle = False
 								EndIf
-								If e\EventState > 14100 And e\EventState - FPSfactor < 14100 Then PlaySound_Strict(IntroSFX(8))
+								If e\EventState > 14100 And e\EventState - FPSfactor < 14100.0 Then PlaySound_Strict(IntroSFX(8))
 								If e\EventState < 14150 Then CameraShake = 5
 							Else
-								Animate2(e\room\NPC[2]\obj, AnimTime(e\room\NPC[2]\obj), 45, 60, 0.2, False)
+								Animate2(e\room\NPC[2]\OBJ, AnimTime(e\room\NPC[2]\OBJ), 45.0, 60.0, 0.2, False)
 								If e\EventState > 14300 Then 
 									If e\EventState > 14600 And e\EventState < 14700 Then BlinkTimer = -10 : LightBlink = 1.0
 									If EntityX(Collider) < (EntityX(e\room\obj)) + 448.0 * RoomScale Then e\EventState = 20000
 								EndIf
 							EndIf
-						ElseIf e\EventState < 30000
-							e\EventState = Min(e\EventState + FPSfactor, 30000)
-							If e\EventState < 20100 Then
-								CameraShake = 2
+						ElseIf e\EventState < 30000.0
+							e\EventState = Min(e\EventState + FPSfactor, 30000.0)
+							If e\EventState < 20100.0 Then
+								CameraShake = 2.0
 							Else
-								If e\EventState < 20200 Then ;lights go out again and 173 teleports next to the guard
-									If e\EventState > 20105 And e\EventState - FPSfactor < 20105 Then 
+								If e\EventState < 20200.0 Then ;Lights go out again and 173 teleports next to the guard
+									If e\EventState > 20105.0 And e\EventState - FPSfactor < 20105.0 Then 
 										PlaySound_Strict(IntroSFX(9))
-										PositionEntity(e\room\NPC[0]\Collider, EntityX(e\room\obj) - 160.0 * RoomScale, EntityY(e\room\NPC[0]\Collider) + 0.1, EntityZ(e\room\obj) + 1280.0 * RoomScale)
+										PositionEntity(e\room\NPC[0]\Collider, EntityX(e\room\OBJ) - 160.0 * RoomScale, EntityY(e\room\NPC[0]\Collider) + 0.1, EntityZ(e\room\OBJ) + 1280.0 * RoomScale)
 										ResetEntity(e\room\NPC[0]\Collider)										
 										
 										;Guard OhShit
-										If e\room\NPC[0]\Sound<>0
-											StopChannel(e\room\NPC[0]\SoundChn)
-											FreeSound_Strict(e\room\NPC[0]\Sound)
-											e\room\NPC[0]\Sound = 0
+										If e\room\NPC[0]\Sound <> 0
+											If ChannelPlaying(e\room\NPC[0]\SoundCHN) = True Then StopChannel(e\room\NPC[0]\SoundCHN)
+											FreeSound_Strict(e\room\NPC[0]\Sound) : e\room\NPC[0]\Sound = 0
 										EndIf
 										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\OhSh.ogg")
-										e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound,Camera,e\room\NPC[0]\Collider,20)
+										e\room\NPC[0]\SoundCHN = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 20.0)
 									EndIf
-									If e\EventState > 20105 Then
+									If e\EventState > 20105.0 Then
 										Curr173\Idle = True
-										PointEntity(e\room\NPC[0]\Collider, Curr173\obj)
-										PositionEntity(Curr173\Collider, EntityX(e\room\obj) - 608.0 * RoomScale, EntityY(e\room\obj) + 480.0 * RoomScale, EntityZ(e\room\obj) + 1312.0 * RoomScale)
+										PointEntity(e\room\NPC[0]\Collider, Curr173\OBJ)
+										PositionEntity(Curr173\Collider, EntityX(e\room\OBJ) - 608.0 * RoomScale, EntityY(e\room\OBJ) + 480.0 * RoomScale, EntityZ(e\room\OBJ) + 1312.0 * RoomScale)
 										ResetEntity(Curr173\Collider)
 										PointEntity(Curr173\Collider, e\room\NPC[0]\Collider)
 									EndIf
 									
-									BlinkTimer = -10 : LightBlink = 1.0
-									CameraShake = 3
-								ElseIf e\EventState < 20300 ;lights on, the guard starts shooting at 173
+									BlinkTimer = -10.0 : LightBlink = 1.0
+									CameraShake = 3.0
+								ElseIf e\EventState < 20300.0 ;Lights on, the guard starts shooting at SCP-173
 									PointEntity(e\room\NPC[0]\Collider, Curr173\Collider)
-									MoveEntity(e\room\NPC[0]\Collider, 0, 0, -0.002)
-									e\room\NPC[0]\State = 2
-									UpdateSoundOrigin(e\room\NPC[0]\SoundChn,Camera,e\room\NPC[0]\Collider,20)
-									If e\EventState > 20260 And e\EventState - FPSfactor < 20260 Then PlaySound_Strict(IntroSFX(12))
-								Else ;lights out, guard dies
-									
-									If e\EventState - FPSfactor < 20300 Then
-										BlinkTimer = -10 : LightBlink = 1.0
-										CameraShake = 3
+									MoveEntity(e\room\NPC[0]\Collider, 0.0, 0.0, -0.002)
+									e\room\NPC[0]\State = 2.0
+									UpdateSoundOrigin(e\room\NPC[0]\SoundCHN, Camera, e\room\NPC[0]\Collider, 20.0)
+									If e\EventState > 20260.0 And e\EventState - FPSfactor < 20260.0 Then PlaySound_Strict(IntroSFX(12))
+								Else ;Lights out, guard dies
+									If e\EventState - FPSfactor < 20300.0 Then
+										BlinkTimer = -10.0 : LightBlink = 1.0
+										CameraShake = 3.0
 										PlaySound_Strict(IntroSFX(11))
 										PlaySound2 (NeckSnapSFX(1), Camera, e\room\NPC[0]\Collider, 8.0)
 										
@@ -1243,76 +1184,71 @@ Function UpdateEvents()
 										
 										e\SoundCHN = PlaySound_Strict(IntroSFX(15))
 										
-										PositionEntity(Curr173\Collider, EntityX(PlayerRoom\obj) - 400.0 * RoomScale, 100.0, EntityZ(PlayerRoom\obj) + 1072.0 * RoomScale)
+										PositionEntity(Curr173\Collider, EntityX(PlayerRoom\OBJ) - 400.0 * RoomScale, 100.0, EntityZ(PlayerRoom\OBJ) + 1072.0 * RoomScale)
 										ResetEntity(Curr173\Collider)
 										
 										For r.Rooms = Each Rooms
 											If r\RoomTemplate\Name = "start" Then
-												DebugLog "tostart"
+												DebugLog("Move to start room")
 												
 												PlayerRoom = r
 												
-												x# = EntityX(r\obj, True)+3712*RoomScale
-												y# = 384.0*RoomScale
-												z# = EntityZ(r\obj, True)+1312*RoomScale
+												x = EntityX(r\OBJ, True) + 3712.0 * RoomScale
+												y = 384.0 * RoomScale
+												z = EntityZ(r\OBJ, True) + 1312.0 * RoomScale
 												
-												PositionEntity(Collider, x  + (EntityX(Collider) - EntityX(e\room\obj)), y+EntityY(Collider)+0.4, z + (EntityZ(Collider) - EntityZ(e\room\obj)))
-												DropSpeed = 0
+												PositionEntity(Collider, x  + (EntityX(Collider) - EntityX(e\room\OBJ)), y + EntityY(Collider) + 0.4, z + (EntityZ(Collider) - EntityZ(e\room\OBJ)))
+												DropSpeed = 0.0
 												ResetEntity(Collider)
 												
 												For i = 0 To 2
-													PositionEntity(e\room\NPC[i]\Collider, x + (EntityX(e\room\NPC[i]\Collider) - EntityX(e\room\obj)), y+EntityY(e\room\NPC[i]\Collider)+0.4, z + (EntityZ(e\room\NPC[i]\Collider) - EntityZ(e\room\obj)))
+													PositionEntity(e\room\NPC[i]\Collider, x + (EntityX(e\room\NPC[i]\Collider) - EntityX(e\room\OBJ)), y + EntityY(e\room\NPC[i]\Collider) + 0.4, z + (EntityZ(e\room\NPC[i]\Collider) - EntityZ(e\room\OBJ)))
 													ResetEntity(e\room\NPC[i]\Collider)
 												Next
 												
 												ShouldPlay = 0
 												
 												For i = 0 To 9
-													FreeSound_Strict IntroSFX(i)
+													FreeSound_Strict(IntroSFX(i))
 												Next
 												For i = 16 To 18
-													FreeSound_Strict IntroSFX(i)
+													FreeSound_Strict(IntroSFX(i))
 												Next
 												
-												r\NPC[0]=e\room\NPC[0]
-												r\NPC[0]\State=8
+												r\NPC[0] = e\room\NPC[0]
+												r\NPC[0]\State = 8.0
 												
-												For do.doors = Each Doors
+												For do.Doors = Each Doors
 													If do\room = e\room Then
 														RemoveDoor(do)
 													EndIf
 												Next
 												
-												For w.waypoints = Each WayPoints
+												For w.Waypoints = Each WayPoints
 													If w\room = e\room Then 
-														FreeEntity w\obj
-														Delete w
+														FreeEntity(w\OBJ)
+														Delete(w)
 													EndIf
 												Next
 												
 												For i = 3 To 4
 													RemoveNPC(e\room\NPC[i])
 												Next
-												r\NPC[1]=e\room\NPC[6]
-												;RemoveNPC(e\room\NPC[7])
+												r\NPC[1] = e\room\NPC[6]
 												
-												FreeEntity e\room\obj
-												Delete e\room
+												FreeEntity(e\room\OBJ)
+												Delete(e\room)
 												
 												For sc.SecurityCams = Each SecurityCams
-													If sc\room = e\room Then Delete sc
+													If sc\room = e\room Then Delete(sc)
 												Next
 												
-												ShowEntity Fog
-												AmbientLight Brightness, Brightness, Brightness
+												ShowEntity(Fog)
+												AmbientLight(Brightness, Brightness, Brightness)
 												CameraFogRange(Camera, CameraFogNear, CameraFogFar)
 												CameraFogMode(Camera, 1)
 												
-												e\EventState2 = 1
-												
-												;For i = 8 To 10
-												;	RemoveNPC(e\room\NPC[i])
-												;Next
+												e\EventState2 = 1.0
 												
 												Exit
 											EndIf
@@ -1323,47 +1259,45 @@ Function UpdateEvents()
 								
 							EndIf
 						EndIf
-						
-
-						
 					EndIf
-					
 				Else
-					If KillTimer<0 Then
-						If e\room\NPC[3]\State = 1 Then 
-							LoadEventSound(e,"SFX\Room\Intro\Guard\Ulgrin\EscortTerminated.ogg")
-							PlaySound_Strict e\Sound
+					If KillTimer < 0.0 Then
+						If e\room\NPC[3]\State = 1.0 Then 
+							LoadEventSound(e, "SFX\Room\Intro\Guard\Ulgrin\EscortTerminated.ogg")
+							PlaySound_Strict(e\Sound)
 						EndIf
 					EndIf
 					
 					For i = 0 To 6
-						If IntroSFX(i)<>0 Then FreeSound_Strict IntroSFX(i) : IntroSFX(i)=0
+						If IntroSFX(i) <> 0 Then FreeSound_Strict(IntroSFX(i)) : IntroSFX(i) = 0
 					Next
-					FreeSound_Strict IntroSFX(16) : IntroSFX(16)=0
+					If IntroSFX(16) <> 0 Then
+						FreeSound_Strict(IntroSFX(16)) : IntroSFX(16) = 0
+					EndIf
 					
-					e\EventState2 = 1
+					e\EventState2 = 1.0
 				EndIf
 				
 				If PlayerRoom = e\room Then
-					If e\EventState >= 10 Then
-						CameraRange(Camera, 0.05, 15)
-						If e\room\NPC[7]<>Null Then
+					If e\EventState >= 10.0 Then
+						CameraRange(Camera, 0.05, 15.0)
+						If e\room\NPC[7] <> Null Then
 							RemoveNPC(e\room\NPC[7])
 						EndIf
 					Else															
-						CameraRange(Camera, 0.05, 40)
+						CameraRange(Camera, 0.05, 40.0)
 					EndIf	
 					CameraFogMode(Camera, 0)
-	 				AmbientLight (140, 140, 140)
+	 				AmbientLight(140.0, 140.0, 140.0)
 	   				HideEntity(Fog)
 					
 					LightVolume = 4.0
 					TempLightVolume = 4.0			
 				Else
-					DebugLog "delete intro event"
+					DebugLog("Intro scene finished successfully!")
 					RemoveEvent(e)		
 				EndIf	
-
+				;[End Block]
 			Case "buttghost"
 
 				If PlayerRoom = e\room Then
