@@ -79,6 +79,7 @@ Rooms:
 - Added EZ endroom version.
 - Added SCP-106 endroom event to all three endrooms.
 - Added new ambiance music to SCP-106's room.
+- Changed position of clipboard in room2closets.
 - Changed SCP-008's, SCP-035's, SCP-079's, SCP-513's and SCP-895's containment chamber to HCZ style.
 - Slightly improved SCP-372 model.
 - Added appropriate step sounds to Dr. L's office.
@@ -144,9 +145,10 @@ Bug Fixes:
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed security camera bases rotating with the cameras.
 	- Fixed security camera positions in room173 and start.
+	- Fixed z-fighting of a door in room2closets.
 	- Fixed the emitters in SCP-035's room sometimes clipping into the maintenance tunnels.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.
-	- Fixed button positions in SCP-079 and SCP-035's room.
+	- Fixed button positions in room2closets, SCP-079 and SCP-035's room.
 	- Fixed the triggers in the SCP-939 infested area.
 	- Fixed the security camera's position in SCP-966's room.
 	- Fixed items not pushing each other away in SCP-970's room.
