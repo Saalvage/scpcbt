@@ -3298,48 +3298,56 @@ Function FillRoom(r.Rooms)
 			EntityParent(it\collider, r\obj)
 
 		Case "room2closets"
-
-			it = CreateItem("paper", r\x + 736.0 * RoomScale, r\y + 176.0 * RoomScale, r\z + 736.0 * RoomScale, "d1048")
-			EntityParent(it\collider, r\obj)
+			
+			d = CreateDoor(r\zone, r\x - 240.0 * RoomScale, r\y - 0.1 * RoomScale, r\z, 90.0, r)
+			d\AutoClose = False
+			PositionEntity(d\Buttons[0], r\x - 230.0 * RoomScale, EntityY(d\Buttons[0], True), EntityZ(d\Buttons[0], True), True)
+			PositionEntity(d\Buttons[1], r\x - 250.0 * RoomScale, EntityY(d\Buttons[1], True), EntityZ(d\Buttons[1], True), True)
+			
+			r\Objects[0] = CreatePivot()
+			PositionEntity(r\Objects[0], r\x - 1180.0 * RoomScale, r\y - 256.0 * RoomScale, r\z + 896.0 * RoomScale)
+			
+			r\Objects[1] = CreatePivot()
+			PositionEntity(r\Objects[1], r\x - 1292.0 * RoomScale, r\y - 256.0 * RoomScale, r\z - 160.0 * RoomScale)
+			
+			r\Objects[2] = CreatePivot()
+			PositionEntity(r\Objects[2], r\x - 1065.0 * RoomScale, r\y - 380.0 * RoomScale, r\z + 50.0 * RoomScale)
+			
+			For i = 0 To 2
+				EntityParent(r\Objects[i], r\obj)
+			Next
+			
+			sc = CreateSecurityCam(r\x, r\y + 704.0 * RoomScale, r\z + 863.0 * RoomScale, r)
+			sc\angle = 180.0 : sc\turn = 45.0
+			TurnEntity(sc\CameraObj, 20.0, 0.0, 0.0)
 			
 			it = CreateItem("gasmask", r\x + 736.0 * RoomScale, r\y + 176.0 * RoomScale, r\z + 544.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
+			EntityParent(it\Collider, r\obj)
 			
-			it = CreateItem("bat", r\x + 736.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 448.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
+			it = CreateItem("bat", r\x + 736.0 * RoomScale, r\y + 100.0 * RoomScale, r\z - 448.0 * RoomScale)
+			EntityParent(it\Collider, r\obj)
+			
 			If Rand(2) = 1 Then
-				it = CreateItem("bat", r\x + 730.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 496.0 * RoomScale)
-				EntityParent(it\collider, r\obj)
+				it = CreateItem("bat", r\x + 730.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 580.0 * RoomScale)
+				EntityParent(it\Collider, r\obj)
 			EndIf
+			
 			If Rand(2) = 1 Then
-				it = CreateItem("bat", r\x + 740.0 * RoomScale, r\y + 176.0 * RoomScale, r\z - 560.0 * RoomScale)
-				EntityParent(it\collider, r\obj)
+				it = CreateItem("bat", r\x + 740.0 * RoomScale, r\y + 240.0 * RoomScale, r\z - 750.0 * RoomScale)
+				EntityParent(it\Collider, r\obj)
 			EndIf
 			
 			it = CreateItem("key1", r\x + 736.0 * RoomScale, r\y + 240.0 * RoomScale, r\z + 752.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
+			EntityParent(it\Collider, r\obj)
 			
-			Local clipboard.Items = CreateItem("clipboard",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -480.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
+			it = CreateItem("clipboard", r\x - 400.0 * RoomScale, r\y - 50.0 * RoomScale, r\z - 700.0 * RoomScale)
+			EntityParent(it\Collider, r\obj)
 			
-			it = CreateItem("paper",r\x + 736.0 * RoomScale, r\y + 224.0 * RoomScale, r\z -480.0 * RoomScale, "ir1048a")
-			EntityParent(it\collider, r\obj)
+			it = CreateItem("paper", r\x - 400.0 * RoomScale, r\y - 50.0 * RoomScale, r\z - 700.0 * RoomScale, "ir1048a")
+			EntityParent(it\Collider, r\obj)
 			
-			r\Objects[0]=CreatePivot(r\obj)
-			PositionEntity r\Objects[0], r\x-1120*RoomScale, r\y-256*RoomScale, r\z+896*RoomScale, True
-			r\Objects[1]=CreatePivot(r\obj)
-			PositionEntity r\Objects[1], r\x-1232*RoomScale, r\y-256*RoomScale, r\z-160*RoomScale, True
-			
-			d.Doors = CreateDoor(0, r\x - 240.0 * RoomScale, r\y, r\z, 90, r, False)
-			PositionEntity(d\buttons[0], r\x - 230.0 * RoomScale, EntityY(d\buttons[0],True), EntityZ(d\buttons[0],True), True)
-			PositionEntity(d\buttons[1], r\x - 250.0 * RoomScale, EntityY(d\buttons[1],True), EntityZ(d\buttons[1],True), True)
-			d\open = False : d\AutoClose = False
-			
-			sc.SecurityCams = CreateSecurityCam(r\x, r\y + 704*RoomScale, r\z + 863*RoomScale, r)
-			sc\angle = 180
-			sc\turn = 45
-			TurnEntity(sc\CameraObj, 20, 0, 0)
-			;sc\FollowPlayer = True
+			it = CreateItem("paper", r\x + 736.0 * RoomScale, r\y + 176.0 * RoomScale, r\z + 736.0 * RoomScale, "d1048")
+			EntityParent(it\Collider, r\obj)
 
 		Case "room2offices"
 
@@ -5033,11 +5041,11 @@ Function SetupTriggerBoxes(r.Rooms)
 		
 		GetMeshExtents(t\obj)
 		
-		pxmin = cos(r\angle) * sx*Mesh_MinX - sin(r\angle) * sz*Mesh_MinZ + r\x
-		pzmin = sin(r\angle) * sx*Mesh_MinX + cos(r\angle) * sz*Mesh_MinZ + r\z
+		pxmin = Cos(r\angle) * sx*Mesh_MinX - Sin(r\angle) * sz*Mesh_MinZ + r\x
+		pzmin = Sin(r\angle) * sx*Mesh_MinX + Cos(r\angle) * sz*Mesh_MinZ + r\z
 		
-		pxmax = cos(r\angle) * sx*Mesh_MaxX - sin(r\angle) * sz*Mesh_MaxZ + r\x
-		pzmax = sin(r\angle) * sx*Mesh_MaxX + cos(r\angle) * sz*Mesh_MaxZ + r\z
+		pxmax = Cos(r\angle) * sx*Mesh_MaxX - Sin(r\angle) * sz*Mesh_MaxZ + r\x
+		pzmax = Sin(r\angle) * sx*Mesh_MaxX + Cos(r\angle) * sz*Mesh_MaxZ + r\z
 		
 		If pxmin > pxmax Then
 			t\minX = pxmax
@@ -8273,3 +8281,5 @@ Function CreateRandomItem.Items(maxlevel%, x#, y#, z#)
 	EndIf
 	Return CreateItem(tempstr2, x, y, z, tempstr)
 End Function
+;~IDEal Editor Parameters:
+;~C#Blitz3D
