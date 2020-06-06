@@ -6763,7 +6763,7 @@ Function DrawMenu()
 			Else
 				y = y+104*MenuScale
 				If GameSaved And (Not SelectedDifficulty\permaDeath) Then
-					If DrawButton(x, y, 390*MenuScale, 60*MenuScale, GetLocalString("Menu", "options")) Then
+					If DrawButton(x, y, 390*MenuScale, 60*MenuScale, GetLocalString("Menu", "loadgame")) Then
 						DrawLoading(0)
 						
 						MenuOpen = False
