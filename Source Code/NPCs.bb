@@ -251,7 +251,7 @@ Function CreateNPC.NPCs(NPCtype%, x#, y#, z#)
 			EntityType n\Collider, HIT_PLAYER
 			n\obj = LoadAnimMesh_Strict("GFX\npcs\096.b3d")
 			
-			n\obj2 = CreateSprite(FindChild(n\Obj, "Reyelid"))
+			n\obj2 = CreateSprite(FindChild(n\obj, "Reyelid"))
 			ScaleSprite(n\obj2, 0.07, 0.08)
 			EntityOrder(n\obj2, -5)
 			EntityTexture(n\obj2, DarkTexture)
@@ -5370,7 +5370,7 @@ Function UpdateMTFUnit(n.NPCs)
 	If n\BlinkTimer<=-5.0 Then 
 		;only play the "blinking" sound clip if searching/containing 173
 		If n\State = 2
-			If OtherNPCSeesMeNPC(Curr173,n)
+			If EntityDistanceSquared(Curr173\Collider, n\Collider) < PowTwo(8.0) Then
 				PlayMTFSound(LoadTempSound("SFX\Character\MTF\173\BLINKING.ogg"),n)
 			EndIf
 		EndIf
@@ -6745,7 +6745,7 @@ Function UpdateMTFUnit(n.NPCs)
 							Else
 								If (Not n\Target\IsDead)
 									If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
-									If n\NPCtype = NPCtypeZombie
+									If n\Target\NPCtype = NPCtypeZombie
 										n\Sound = LoadSound_Strict("SFX\Character\MTF\049\Player0492_2.ogg")
 										PlayMTFSound(n\Sound, n)
 									Else
