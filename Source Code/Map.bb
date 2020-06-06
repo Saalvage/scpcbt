@@ -3651,8 +3651,13 @@ Function FillRoom(r.Rooms)
 			
 		Case "statue"
 		
-			r\Objects[0] = LoadMesh_Strict("GFX\map\statue.x",r\obj)
+			r\Objects[0] = LoadMesh_Strict("GFX\map\statue.b3d",r\obj)
+			r\Objects[1] = CreatePivot(r\obj)
+			EntityRadius r\Objects[1], 0.1, 0.1
+			EntityType r\Objects[1], HIT_PLAYER
 			PositionEntity(r\Objects[0], r\x, r\y + 144.0 * RoomScale, r\z + 510.0 * RoomScale, True)
+			PositionEntity(r\Objects[1], r\x, r\y + 144.0 * RoomScale, r\z + 510.0 * RoomScale, True)
+			ResetEntity(r\Objects[1])
 
 		Case "room205"
 

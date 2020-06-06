@@ -881,6 +881,7 @@ Function UpdateNPCs()
 													
 												EndIf
 											Else
+												; Could this be replaced by MoveEntity?
 												PointEntity(n\Collider, Collider)
 												RotateEntity n\Collider, 0, EntityYaw(n\Collider), 0
 												TranslateEntity n\Collider,Cos(EntityYaw(n\Collider)+90.0)*n\Speed*FPSfactor,0.0,Sin(EntityYaw(n\Collider)+90.0)*n\Speed*FPSfactor

@@ -6053,10 +6053,6 @@ Function UpdateEvents()
 						If EntityInView(e\room\Objects[0], Camera) Then
 							e\EventState = 1
 						EndIf
-					ElseIf e\EventState = 1 And (Not EntityInView(e\room\Objects[0], Camera)) Then
-						e\EventState = 2
-						e\EventState2 = Rand(15*70, 20*70)
-						HideEntity(e\room\Objects[0])
 					EndIf
 				EndIf
 				
@@ -6067,10 +6063,24 @@ Function UpdateEvents()
 						e\EventState = 3
 						ShowEntity(e\room\Objects[0])
 						RotateEntity(e\room\Objects[0], 0, Rnd(360), 0, True)
-						PositionEntity(e\room\Objects[0], EntityX(Collider), EntityY(Collider), EntityZ(Collider), True)
-						DeathMsg = "After all previous observers have been terminated as per protocol, a Class D subject stumbled across the inert object in its chamber. In the process of SCP-689's effect it was displaced to the location of the aforementioned D Class subject at the time of his death, which resulted in a currently unknown number of Foundation personnel viewing the object before and during recontainment procedures. Investigation ongoing."
+						PositionEntity(e\room\Objects[0], EntityX(Collider), 0.0, EntityZ(Collider), True)
+						DeathMsg = "After all previous observers have been terminated as per protocol, a Class D subject stumbled upon the inert object in its chamber. In the process of SCP-689's effect it was displaced to the location of the aforementioned D Class subject at the time of his death, which resulted in a currently unknown number of Foundation personnel viewing the object before and during recontainment procedures. Investigation ongoing."
 						Kill()
 						KillAnim = 0
+					EndIf
+				ElseIf e\EventState = 1 Then
+					; If Not ((BlinkTimer < - 16 Lor BlinkTimer > - 6) And (IsNVGBlinking=False)) Then
+						; PointEntity(e\room\Objects[1], Collider)
+						; RotateEntity(e\room\Objects[1], 0, EntityYaw(e\room\Objects[1]), 0)
+						; MoveEntity(e\room\Objects[1],0.0,0.0,30.0*FPSfactor)
+						; PositionEntity(e\room\Objects[0], EntityX(e\room\Objects[1]), 0.0, EntityZ(e\room\Objects[1]))
+						; RotateEntity(e\room\Objects[0], 0, 180 + EntityYaw(e\room\Objects[0]) + DeltaYaw(e\room\Objects[0],Camera), 0)
+					; EndIf
+					If (Not EntityInView(e\room\Objects[0], Camera)) Then
+						e\EventState = 2
+						e\EventState2 = Rand(15*70, 20*70)
+						HideEntity(e\room\Objects[0])
+						HideEntity(e\room\Objects[1])
 					EndIf
 				EndIf
 
