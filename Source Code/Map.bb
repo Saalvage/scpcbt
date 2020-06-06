@@ -4118,7 +4118,7 @@ Function FillRoom(r.Rooms)
 			EntityPickMode(r\Objects[9], 2)
 			
 			r\Objects[10] = LoadMesh_Strict("GFX\map\intro_labels.b3d", r\obj)
-			PositionEntity(r\Objects[10], EntityX(r\Objects[10], True), EntityY(r\Objects[10], True) - 12.0 * RoomScale, EntityZ(r\Objects[10], True), True)
+			PositionEntity(r\Objects[10], EntityX(r\Objects[10], True), EntityY(r\Objects[10], True) - 16.0 * RoomScale, EntityZ(r\Objects[10], True), True)
 			
 			;Vehicle's spawnpoint
 			r\Objects[11] = CreatePivot(r\obj)

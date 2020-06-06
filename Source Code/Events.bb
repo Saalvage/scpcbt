@@ -332,8 +332,11 @@ Function UpdateEvents()
 								NowPlaying = ShouldPlay
 								
 								PlaySound_Strict(IntroSFX(11))
-								BlurTimer = 500.0
-								LightFlash = 2.5
+								BlurTimer = 600.0
+								
+								CreateConsoleMsg("")
+								CreateConsoleMsg("WARNING! Using the console commands or teleporting away from the intro scene may cause bugs or crashing.", 255, 0, 0)
+								CreateConsoleMsg("")
 							EndIf
 							
 							If e\EventState3 < 3.0 Then
@@ -829,7 +832,7 @@ Function UpdateEvents()
 								RotateEntity(e\room\NPC[3]\Collider, 0.0, e\room\Angle + 180.0, 0.0)
 								e\room\NPC[3]\State = 7.0
 								e\room\NPC[4] = CreateNPC(NPCtypeGuard, e\room\x - 3840.0 * RoomScale, e\room\y + 0.3, e\room\z + 768.0 * RoomScale)
-								RotateEntity(e\room\NPC[4]\Collider,0,e\room\Angle + 135.0, 0.0)
+								RotateEntity(e\room\NPC[4]\Collider, 0.0, e\room\Angle + 135.0, 0.0)
 								
 								e\room\NPC[4]\State = 7.0
 								e\room\NPC[5] = CreateNPC(NPCtypeGuard, e\room\x - 8288.0 * RoomScale, e\room\y + 0.3, e\room\z + 1096 * RoomScale)
@@ -848,10 +851,9 @@ Function UpdateEvents()
 								RotateEntity(pvt, 90.0, 0.0, 0.0)
 								
 								e\room\NPC[8] = CreateNPC(NPCtypeGuard, e\room\x - 3800.0 * RoomScale, e\room\y + 1.0, e\room\z - 3900.0 * RoomScale)
-								e\room\NPC[8]\State = 7
+								e\room\NPC[8]\State = 7.0
 								e\room\NPC[9] = CreateNPC(NPCtypeD, e\room\x - 4000.0 * RoomScale, e\room\y + 1.1, e\room\z - 3900.0 * RoomScale)
 								e\room\NPC[9]\State2 = 1.0
-								ChangeNPCTextureID(e\room\NPC[9], 8)
 								
 								e\room\NPC[10] = CreateNPC(NPCtypeGuard, e\room\x - 4200.0 * RoomScale, 1.0, e\room\z - 3900.0 * RoomScale)
 								e\room\NPC[10]\State = 7.0
@@ -974,10 +976,8 @@ Function UpdateEvents()
 							e\EventState = Min(e\EventState + FPSfactor, 13000.0)
 							
 							For i = 1 To 2
-								If Distance(EntityX(e\room\NPC[i]\Collider), EntityZ(e\room\NPC[i]\Collider), EntityX(e\room\Objects[i + 2], True), EntityZ(e\room\Objects[i + 2], True)) < 0.3 Then
-									PointEntity(e\room\NPC[i]\OBJ, e\room\Objects[5])
-									RotateEntity(e\room\NPC[i]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[i]\OBJ), EntityYaw(e\room\NPC[i]\Collider), 15.0), 0.0)
-								EndIf
+								PointEntity(e\room\NPC[i]\OBJ, e\room\Objects[5])
+								RotateEntity(e\room\NPC[i]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[i]\OBJ), EntityYaw(e\room\NPC[i]\Collider), 15.0), 0.0)
 							Next
 							
 							If e\EventState < 10300.0 Then
@@ -988,7 +988,7 @@ Function UpdateEvents()
 							PointEntity(e\room\NPC[6]\OBJ, Curr173\Collider)
 							RotateEntity(e\room\NPC[6]\Collider, 0.0, CurveValue(EntityYaw(e\room\NPC[6]\OBJ), EntityYaw(e\room\NPC[6]\Collider), 50.0), 0.0, True)	
 							
-							If e\EventState => 10300 And e\EventState - FPSfactor < 10300 Then
+							If e\EventState >= 10300 And e\EventState - FPSfactor < 10300 Then
 								e\SoundCHN = PlaySound_Strict(IntroSFX(1))
 								PositionEntity(Collider, Max(EntityX(Collider), EntityX(e\room\OBJ) + 352.0 * RoomScale), EntityY(Collider), EntityZ(Collider))
 							ElseIf e\EventState >= 10440.0 And e\EventState - FPSfactor < 10440.0
@@ -1008,7 +1008,7 @@ Function UpdateEvents()
 							EndIf
 							
 							;Guard Alert
-							If e\EventState >= 10440 And e\EventState - FPSfactor < 11561
+							If e\EventState >= 10440.0 And e\EventState - FPSfactor < 11561.0
 								If EntityX(Collider) < EntityX(e\room\RoomDoors[1]\FrameOBJ, True)
 									If e\room\NPC[0]\State <> 12.0 Then
 										e\room\NPC[0]\Sound = LoadSound_Strict("SFX\Room\Intro\Guard\Balcony\Alert" + Rand(1, 2) + ".ogg")
@@ -1028,7 +1028,6 @@ Function UpdateEvents()
 										e\room\NPC[1]\State = 0.0
 										e\room\NPC[1]\CurrSpeed = CurveValue(0.0, e\room\NPC[1]\CurrSpeed, 10.0)	
 									EndIf
-									
 								EndIf
 								
 								If AnimTime(e\room\NPC[6]\OBJ) >= 325.0 Then
