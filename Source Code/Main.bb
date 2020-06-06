@@ -115,24 +115,29 @@ End Function
 ;Returns localized version of a String, if no translation exists, use English
 Function GetLocalString$(Section$, Parameter$)
 
-	;CreateConsoleMsg("OwO")
-
 	For l.LocalString = Each LocalString
 		If l\section = Section And l\parameter = Parameter Then
 			Return l\value
 		EndIf
 	Next
+	; TODO Find out all occassions where this is called every frame
+	;CreateConsoleMsg("Called " + Section + Parameter)
 	
-	;CreateConsoleMsg("YES DADDY" + Section + Parameter)
+	Local temp$
 	
 	If I_Loc\Localized And FileType(I_Loc\LangPath + "Data\local.ini") = 1 Then
-		Local temp$=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
+		temp=GetINIString(I_Loc\LangPath + "Data\local.ini", Section, Parameter)
 		If temp <> "" Then
 			Return temp
 		EndIf
 	EndIf
 	
-	Return GetINIString("Data\local.ini", Section, Parameter)
+	temp=GetINIString("Data\local.ini", Section, Parameter)
+	If temp <> "" Then
+		Return temp
+	EndIf
+	
+	Return Section + "." + Parameter
 	
 End Function
 
