@@ -2456,42 +2456,6 @@ Function QuickLoadEvents()
 				EndIf
 			EndIf
 
-		Case "room2closets"
-
-			If e\EventState = 0
-				If e\EventStr = "load0"
-					If e\room\NPC[0]=Null Then
-						e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True),EntityY(e\room\Objects[0],True),EntityZ(e\room\Objects[0],True))
-					EndIf
-					
-					ChangeNPCTextureID(e\room\NPC[0],4)
-					e\EventStr = "load1"
-				ElseIf e\EventStr = "load1"
-					e\room\NPC[0]\Sound=LoadSound_Strict("SFX\Room\Storeroom\Escape1.ogg")
-					e\EventStr = "load2"
-				ElseIf e\EventStr = "load2"
-					e\room\NPC[0]\SoundChn = PlaySound2(e\room\NPC[0]\Sound, Camera, e\room\NPC[0]\Collider, 12)
-					e\EventStr = "load3"
-				ElseIf e\EventStr = "load3"
-					If e\room\NPC[1]=Null Then
-						e\room\NPC[1] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[1],True),EntityY(e\room\Objects[1],True),EntityZ(e\room\Objects[1],True))
-					EndIf
-					
-					ChangeNPCTextureID(e\room\NPC[1],2)
-					e\EventStr = "load4"
-				ElseIf e\EventStr = "load4"
-					e\room\NPC[1]\Sound=LoadSound_Strict("SFX\Room\Storeroom\Escape2.ogg")
-					e\EventStr = "load5"
-				ElseIf e\EventStr = "load5"
-					PointEntity e\room\NPC[0]\Collider, e\room\NPC[1]\Collider
-					PointEntity e\room\NPC[1]\Collider, e\room\NPC[0]\Collider
-					
-					e\EventState=1
-					
-					QuickLoad_CurrEvent = Null
-				EndIf
-			EndIf
-
 		Case "room3storage"
 
 			If e\room\NPC[0]=Null Then
@@ -3092,7 +3056,7 @@ Function MovePlayer()
 	EndIf
 	
 	If (Not I_Cheats\NoClip) Then 
-		If (Playable And ((KeyDown(I_Keys\DOWN) Xor KeyDown(I_Keys\UP)) Lor (KeyDown(I_Keys\RIGHT) Xor KeyDown(I_Keys\LEFT)))) Lor ForceMove>0 Then
+		If (Playable And ((KeyDown(I_Keys\DOWN) Xor KeyDown(I_Keys\UP)) Lor (KeyDown(I_Keys\Right) Xor KeyDown(I_Keys\Left)))) Lor ForceMove>0 Then
 			
 			If Crouch = 0 And (KeyDown(I_Keys\SPRINT)) And Stamina > 0.0 And (Not IsZombie) Then
 				Sprint = 2.5
@@ -3177,8 +3141,8 @@ Function MovePlayer()
 		If KeyDown(I_Keys\DOWN) Then MoveEntity Collider, 0, 0, -temp2*FPSfactor
 		If KeyDown(I_Keys\UP) Then MoveEntity Collider, 0, 0, temp2*FPSfactor
 		
-		If KeyDown(I_Keys\LEFT) Then MoveEntity Collider, -temp2*FPSfactor, 0, 0
-		If KeyDown(I_Keys\RIGHT) Then MoveEntity Collider, temp2*FPSfactor, 0, 0	
+		If KeyDown(I_Keys\Left) Then MoveEntity Collider, -temp2*FPSfactor, 0, 0
+		If KeyDown(I_Keys\Right) Then MoveEntity Collider, temp2*FPSfactor, 0, 0	
 		
 		ResetEntity Collider
 	Else
@@ -3193,20 +3157,20 @@ Function MovePlayer()
 				If Not KeyDown(I_Keys\UP) Then
 					temp = True
 					angle = 180
-					If KeyDown(I_Keys\LEFT) Then
-						If Not KeyDown(I_Keys\RIGHT) Then
+					If KeyDown(I_Keys\Left) Then
+						If Not KeyDown(I_Keys\Right) Then
 							angle = 135
 						EndIf
-					ElseIf KeyDown(I_Keys\RIGHT) Then
+					ElseIf KeyDown(I_Keys\Right) Then
 						angle = -135
 					EndIf
 				Else
-					If KeyDown(I_Keys\LEFT) Then
-						If Not KeyDown(I_Keys\RIGHT) Then
+					If KeyDown(I_Keys\Left) Then
+						If Not KeyDown(I_Keys\Right) Then
 							temp = True
 							angle = 90
 						EndIf
-					ElseIf KeyDown(I_Keys\RIGHT) Then
+					ElseIf KeyDown(I_Keys\Right) Then
 						temp = True
 						angle = -90
 					EndIf
@@ -3214,23 +3178,23 @@ Function MovePlayer()
 			ElseIf KeyDown(I_Keys\UP) And Playable Then
 				temp = True
 				angle = 0
-				If KeyDown(I_Keys\LEFT) Then
-					If Not KeyDown(I_Keys\RIGHT) Then
+				If KeyDown(I_Keys\Left) Then
+					If Not KeyDown(I_Keys\Right) Then
 						angle = 45
 					EndIf
-				ElseIf KeyDown(I_Keys\RIGHT) Then
+				ElseIf KeyDown(I_Keys\Right) Then
 					angle = -45 
 				EndIf
 			ElseIf ForceMove>0 Then
 				temp=True
 				angle = ForceAngle
 			ElseIf Playable Then
-				If KeyDown(I_Keys\LEFT) Then
-					If Not KeyDown(I_Keys\RIGHT) Then
+				If KeyDown(I_Keys\Left) Then
+					If Not KeyDown(I_Keys\Right) Then
 						temp = True
 						angle = 90
 					EndIf
-				ElseIf KeyDown(I_Keys\RIGHT) Then
+				ElseIf KeyDown(I_Keys\Right) Then
 					temp = True
 					angle = -90
 				EndIf
@@ -3695,7 +3659,7 @@ Function DrawGUI()
 		If PlayingSince <> 0 Then SavePlayTime()
 	Else
 		HidePointer()
-		IF PlayingSince = 0 Then PlayingSince = MilliSecs()
+		If PlayingSince = 0 Then PlayingSince = MilliSecs()
 	EndIf 	
 	
 	If PlayerRoom\RoomTemplate\Name = "pocketdimension" Then
@@ -6487,11 +6451,11 @@ Function DrawMenu()
 					Text(x, y + 20 * MenuScale, GetLocalString("Options", "forward"))
 					InputBox(x + 200 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\UP,210)],5)		
 					Text(x, y + 40 * MenuScale, GetLocalString("Options", "left"))
-					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\LEFT,210)],3)	
+					InputBox(x + 200 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\Left,210)],3)	
 					Text(x, y + 60 * MenuScale, GetLocalString("Options", "backward"))
 					InputBox(x + 200 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\DOWN,210)],6)				
 					Text(x, y + 80 * MenuScale, GetLocalString("Options", "right"))
-					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\RIGHT,210)],4)
+					InputBox(x + 200 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\Right,210)],4)
 					
 					Text(x, y + 100 * MenuScale, GetLocalString("Options", "blink"))
 					InputBox(x + 200 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\BLINK,210)],7)				
@@ -6516,9 +6480,9 @@ Function DrawMenu()
 					If key <> 0 Then
 						Select SelectedInputBox
 							Case 3
-								I_Keys\LEFT = key
+								I_Keys\Left = key
 							Case 4
-								I_Keys\RIGHT = key
+								I_Keys\Right = key
 							Case 5
 								I_Keys\UP = key
 							Case 6
@@ -9383,8 +9347,8 @@ Function SaveOptionsINI()
 	PutINIValue(OptionFile, "audio", "enable user tracks", EnableUserTracks%)
 	PutINIValue(OptionFile, "audio", "user track setting", UserTrackMode%)
 	
-	PutINIValue(OptionFile, "binds", "Right key", I_Keys\RIGHT)
-	PutINIValue(OptionFile, "binds", "Left key", I_Keys\LEFT)
+	PutINIValue(OptionFile, "binds", "Right key", I_Keys\Right)
+	PutINIValue(OptionFile, "binds", "Left key", I_Keys\Left)
 	PutINIValue(OptionFile, "binds", "Up key", I_Keys\UP)
 	PutINIValue(OptionFile, "binds", "Down key", I_Keys\DOWN)
 	PutINIValue(OptionFile, "binds", "Blink key", I_Keys\BLINK)
@@ -10144,3 +10108,5 @@ Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
 	Return EventState
 	
 End Function
+;~IDEal Editor Parameters:
+;~C#Blitz3D

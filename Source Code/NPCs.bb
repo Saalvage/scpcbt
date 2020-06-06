@@ -2807,10 +2807,10 @@ Function UpdateNPCs()
 					EndIf
 				EndIf
 				
-				If n\Frame = 19 Lor n\Frame = 60
+				If n\Frame = 19.0 Lor n\Frame = 40.0 Lor n\Frame = 60.0 Lor n\Frame = 629.0 Lor n\Frame = 677.0 Lor n\Frame = 711.0 Lor n\Frame = 779.0 Then
 					n\IsDead = True
 				EndIf
-				If AnimTime(n\obj)=19 Lor AnimTime(n\obj)=60
+				If AnimTime(n\obj) = 19.0 Lor AnimTime(n\obj) = 40.0 Lor AnimTime(n\obj) = 60.0 Lor AnimTime(n\obj) = 629.0 Lor AnimTime(n\obj) = 677.0 Lor AnimTime(n\obj) = 711.0 Lor AnimTime(n\obj) = 779.0 Then
 					n\IsDead = True
 				EndIf
 				
@@ -7443,3 +7443,5 @@ Function ChangeNPCTextureID(n.NPCs,textureid%) ;TODO check wtf this is
 	SetNPCFrame(n,n\Frame)
 	
 End Function
+;~IDEal Editor Parameters:
+;~C#Blitz3D
