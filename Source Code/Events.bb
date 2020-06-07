@@ -2497,16 +2497,15 @@ Function UpdateEvents()
 				EndIf
 
 			Case "room2ccont"
-
+				;[Block]
 				If PlayerRoom = e\room Then
-					
 					EntityPick(Camera, 1.5)
 					
 					If PickedEntity() = e\room\Objects[3]
-						If e\EventState = 0
-							e\EventState = Max(e\EventState,1)
-							PlaySound_Strict HorrorSFX(7)
-							PlaySound_Strict LeverSFX
+						If e\EventState = 0.0 Then
+							e\EventState = Max(e\EventState, 1.0)
+							PlaySound_Strict(HorrorSFX(7))
+							PlaySound_Strict(LeverSFX)
 						EndIf 
 					EndIf
 					
@@ -2514,10 +2513,11 @@ Function UpdateEvents()
 					UpdateLever(e\room\Objects[1])
 					
 					;Secondary Lighting
-					Local prevstate2 = e\EventState2
+					Local PrevState2# = e\EventState2
+					
 					e\EventState2 = UpdateLever(e\room\Objects[3])
-					If (prevstate2 <> e\EventState2) And e\EventState>0 Then PlaySound2(LightSFX, Camera, e\room\Objects[3])
-					If e\EventState2
+					If PrevState2 <> e\EventState2 And e\EventState > 0.0 Then PlaySound2(LightSFX, Camera, e\room\Objects[3])
+					If e\EventState2 Then
 						SecondaryLightOn = CurveValue(1.0, SecondaryLightOn, 10.0)
 					Else
 						SecondaryLightOn = CurveValue(0.0, SecondaryLightOn, 10.0)
@@ -2526,13 +2526,12 @@ Function UpdateEvents()
 					;Remote Door Control
 					RemoteDoorOn = UpdateLever(e\room\Objects[5])
 					
-					If e\EventState > 0 And e\EventState < 200 Then
+					If e\EventState > 0.0 And e\EventState < 200.0 Then
 						e\EventState = e\EventState + FPSfactor
-						RotateEntity(e\room\Objects[3], CurveValue(-85, EntityPitch(e\room\Objects[3]), 5), EntityYaw(e\room\Objects[3]), 0)
+						RotateEntity(e\room\Objects[3], CurveValue(-85.0, EntityPitch(e\room\Objects[3]), 5), EntityYaw(e\room\Objects[3]), 0.0)
 					EndIf 
-					
 				EndIf
-				
+				;[End Block]
 			Case "room2closets"
 				;[Block]
 				If e\EventState = 0.0 Then
