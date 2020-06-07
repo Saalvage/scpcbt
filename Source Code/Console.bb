@@ -415,8 +415,45 @@ Function UpdateConsole()
 				Case "infect"
 					Infect = Float(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 				Case "heal"
-					Injuries = 0
-					Bloodloss = 0
+					;[Block]
+					Injuries = 0.0
+					Bloodloss = 0.0
+					
+					BlurTimer = 0.0
+					
+					Infect = 0.0
+					
+					DeafTimer = 0.0
+					DeathTimer = 0.0
+					
+					Stamina = 100.0
+					
+					For i = 0 To 5
+						SCP1025State[i] = 0.0
+					Next
+					
+					If I_427\Timer >= 70.0 * 360.0 Then I_427\Timer = 0.0
+					
+					For e.Events = Each Events
+						If e\EventName = "1048a" Then 
+							If PlayerRoom = e\room Then BlinkTimer = -10.0
+							If e\room\Objects[0] <> 0 Then
+								FreeEntity(e\room\Objects[0]) : e\room\Objects[0] = 0
+							EndIf
+							RemoveEvent(e)
+						EndIf
+					Next
+					
+					If BlinkEffect > 1.0 Then 
+						BlinkEffect = 1.0
+						BlinkEffectTimer = 0.0
+					EndIf
+					
+					If StaminaEffect > 1.0 Then
+						StaminaEffect = 1.0
+						StaminaEffectTimer = 0.0
+					EndIf
+					;[End Block]
 				Case "teleport"
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
