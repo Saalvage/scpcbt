@@ -604,7 +604,7 @@ Global MusicVolume# = GetINIFloat(OptionFile, "audio", "music volume")
 ;Global MusicCHN% = StreamSound_Strict("SFX\Music\"+Music[2]+".ogg", MusicVolume, CurrMusicStream)
 
 Global CurrMusicStream, MusicCHN
-MusicCHN = StreamSound_Strict("SFX\Music\"+Music[2]+".ogg",MusicVolume,Mode)
+MusicCHN = StreamSound_Strict("SFX\Music\"+Music[2]+".ogg",MusicVolume,2)
 
 Global CurrMusicVolume# = 1.0, NowPlaying%=2, ShouldPlay%=11
 Global CurrMusic% = 1
@@ -1263,7 +1263,7 @@ Function UpdateDoors()
 				If d\locked <> d\lockedupdated Then
 					If d\locked Then
 						For i = 0 To 2
-							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTextureLocked)
+							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtontextureLocked)
 						Next
 					Else
 						For i = 0 To 2
@@ -2803,7 +2803,7 @@ Function DrawEnding()
 							If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
 						Next
 						StopStream_Strict(MusicCHN)
-						MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,Mode)
+						MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,2)
 						SetStreamVolume_Strict(MusicCHN,1.0*MusicVolume)
 						FlushKeys()
 						EndingTimer=-2000
@@ -3818,7 +3818,7 @@ Function DrawGUI()
 		Rect(x - 50 - 1, y - 1, 30 + 2, 30 + 2, False)
 		If Crouch Then
 			DrawImage(CrouchIcon, x - 50, y)
-		ElseIf KeyDown(I_Keys\SPRINT)
+		ElseIf KeyDown(I_Keys\SPRINT) And CurrSpeed > 0.0
 			DrawImage(SprintIcon, x - 50, y)
 		Else
 			DrawImage(WalkIcon, x - 50, y)
@@ -7950,7 +7950,7 @@ Function UpdateMusic()
 		
 		If NowPlaying < 66
 			If CurrMusic = 0
-				MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,Mode)
+				MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,2)
 				CurrMusic = 1
 			EndIf
 			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
