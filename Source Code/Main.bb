@@ -816,6 +816,7 @@ Global PauseMenuIMG%
 Global SprintIcon%
 Global BlinkIcon%
 Global CrouchIcon%
+Global WalkIcon%
 Global HandIcon%
 Global HandIcon2%
 
@@ -3814,9 +3815,11 @@ Function DrawGUI()
 		Color 255, 255, 255
 		Rect(x - 50 - 1, y - 1, 30 + 2, 30 + 2, False)
 		If Crouch Then
-			DrawImage CrouchIcon, x - 50, y
+			DrawImage(CrouchIcon, x - 50, y)
+		ElseIf KeyDown(I_Keys\SPRINT)
+			DrawImage(SprintIcon, x - 50, y)
 		Else
-			DrawImage SprintIcon, x - 50, y
+			DrawImage(WalkIcon, x - 50, y)
 		EndIf
 		
 		If DebugHUD Then
@@ -6825,20 +6828,21 @@ Function LoadEntities()
 		TempSounds[i]=0
 	Next
 	
-	PauseMenuIMG% = LoadImage_Strict("GFX\menu\pausemenu.jpg")
+	PauseMenuIMG = LoadImage_Strict("GFX\menu\pausemenu.jpg")
 	MaskImage PauseMenuIMG, 255,255,0
 	ScaleImage PauseMenuIMG,MenuScale,MenuScale
 	
-	SprintIcon% = LoadImage_Strict("GFX\sprinticon.png")
-	BlinkIcon% = LoadImage_Strict("GFX\blinkicon.png")
-	CrouchIcon% = LoadImage_Strict("GFX\sneakicon.png")
-	HandIcon% = LoadImage_Strict("GFX\handsymbol.png")
-	HandIcon2% = LoadImage_Strict("GFX\handsymbol2.png")
+	SprintIcon = LoadImage_Strict("GFX\sprinticon.png")
+	BlinkIcon = LoadImage_Strict("GFX\blinkicon.png")
+	CrouchIcon = LoadImage_Strict("GFX\sneakicon.png")
+	WalkIcon = LoadImage_Strict("GFX\walkicon.png")
+	HandIcon = LoadImage_Strict("GFX\handsymbol.png")
+	HandIcon2 = LoadImage_Strict("GFX\handsymbol2.png")
 
-	StaminaMeterIMG% = LoadImage_Strict("GFX\staminameter.jpg")
+	StaminaMeterIMG = LoadImage_Strict("GFX\staminameter.jpg")
 	
-	Buttontexture = LoadTexture_Strict("GFX\map\KeyPad.jpg")
-	ButtonTextureLocked = LoadTexture_Strict("GFX\map\KeyPadLocked.jpg")
+	ButtonTexture = LoadTexture_Strict("GFX\map\KeyPad.jpg")
+	ButtontextureLocked = LoadTexture_Strict("GFX\map\KeyPadLocked.jpg")
 
 	KeypadHUD =  LoadImage_Strict("GFX\keypadhud.jpg")
 	MaskImage(KeypadHUD, 255,0,255)
