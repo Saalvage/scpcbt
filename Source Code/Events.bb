@@ -7090,41 +7090,42 @@ Function UpdateEvents()
 				
 
 			Case "106sinkhole"
-
-				If e\EventState=0 Then
-					de.Decals = CreateDecal(0, EntityX(e\room\obj)+Rnd(-0.5,0.5), 0.01, EntityZ(e\room\obj)+Rnd(-0.5,0.5), 90, Rand(360), 0)
-					de\Size = 2.5 : ScaleSprite(de\obj, de\Size, de\Size);
+				;[Block]
+				If e\EventState = 0.0 Then
+					de.Decals = CreateDecal(0, EntityX(e\room\OBJ) + Rnd(-0.5, 0.5), 0.01, EntityZ(e\room\OBJ) + Rnd(-0.5, 0.5), 90.0, Rnd(360.0), 0.0)
+					de\Size = 2.5
+					ScaleSprite(de\OBJ, de\Size, de\Size)
 					
-					e\EventState=1
+					e\EventState = 1.0
 				ElseIf PlayerRoom = e\room
-					If e\Sound=0 Then
-						e\Sound=LoadSound_Strict("SFX\Room\Sinkhole.ogg")
+					If e\Sound = 0 Then
+						e\Sound = LoadSound_Strict("SFX\Room\Sinkhole.ogg")
 					Else
-						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\obj, 4.5, 1.5)
+						e\SoundCHN = LoopSound2(e\Sound, e\SoundCHN, Camera, e\room\OBJ, 4.5, 1.5)
 					EndIf
-					dist = Distance(EntityX(Collider),EntityX(e\room\obj),EntityZ(Collider),EntityZ(e\room\obj))
+					dist = Distance(EntityX(Collider), EntityX(e\room\OBJ), EntityZ(Collider), EntityZ(e\room\OBJ))
 					If dist < 2.0 Then
-						CurrStepSFX=1
-						CurrSpeed = CurveValue(0.0, CurrSpeed, Max(dist*50,1.0))	
-						CrouchState = (2.0-dist)/2.0
+						CurrStepSFX = 1
+						CurrSpeed = CurveValue(0.0, CurrSpeed, Max(dist * 50.0, 1.0))	
+						CrouchState = (2.0 - dist) / 2.0
 						
-						If dist<0.5 Then
-							If e\EventState2 = 0 Then
+						If dist < 0.5 Then
+							If e\EventState2 = 0.0 Then
 								PlaySound_Strict(LoadTempSound("SFX\Room\SinkholeFall.ogg"))
 							EndIf
 							
-							CurrSpeed = CurveValue(0.0, CurrSpeed, Max(dist*50,1.0))
+							CurrSpeed = CurveValue(0.0, CurrSpeed, Max(dist * 50.0, 1.0))
 							
-							x = CurveValue(EntityX(e\room\obj),EntityX(Collider),10.0)
-							y = CurveValue(EntityY(e\room\obj)-e\EventState2,EntityY(Collider),25.0)
-							z = CurveValue(EntityZ(e\room\obj),EntityZ(Collider),10.0)
-							PositionEntity Collider, x, y, z, True
+							x = CurveValue(EntityX(e\room\OBJ), EntityX(Collider), 10.0)
+							y = CurveValue(EntityY(e\room\OBJ) - e\EventState2, EntityY(Collider), 25.0)
+							z = CurveValue(EntityZ(e\room\OBJ), EntityZ(Collider), 10.0)
+							PositionEntity(Collider, x, y, z, True)
 							
-							DropSpeed = 0
+							DropSpeed = 0.0
 							
-							ResetEntity Collider
+							ResetEntity(Collider)
 							
-							e\EventState2=Min(e\EventState2+FPSfactor/200.0,2.0)
+							e\EventState2 = Min(e\EventState2 + FPSfactor / 200.0, 2.0)
 							
 							If e\EventState2 >= 0.2 Then BlinkTimer = -10.0
 							
@@ -7134,11 +7135,9 @@ Function UpdateEvents()
 						EndIf
 					EndIf
 				Else 
-					e\EventState2=0
+					e\EventState2 = 0.0
 				EndIf
-				
-
-				
+				;[End Block]
 			Case "682roar"
 
 				If e\EventState = 0 Then
