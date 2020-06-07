@@ -1252,7 +1252,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 				fr\Door[i] = CopyEntity(r\Objects[3])
 				PositionEntity fr\Door[i],72*RoomScale,32.0*RoomScale,0,True
 				RotateEntity fr\Door[i], 0,180,0
-				ScaleEntity fr\Door[i],48*RoomScale,45*RoomScale,48*RoomScale,True
+				ScaleEntity fr\Door[i],49*RoomScale,45*RoomScale,48*RoomScale,True
 				EntityParent fr\Door[i],fr\DetailEntities[i]
 				;SetAnimTime fr\Door[i], 0
 				
@@ -1673,13 +1673,13 @@ Function FillRoom(r.Rooms)
 			PositionEntity r\Objects[3],r\x + 112.0 * RoomScale,r\y,r\z+0.05,True
 			EntityType r\Objects[3], HIT_MAP
 			
-			ScaleEntity r\Objects[3],46.0*RoomScale,45.0*RoomScale,46.0*RoomScale,True
+			ScaleEntity r\Objects[3],49.0*RoomScale,45.0*RoomScale,46.0*RoomScale,True
 			EntityParent r\Objects[3],r\obj
 			
 			r\Objects[4] = CopyEntity(r\Objects[3])
 			PositionEntity r\Objects[4],r\x + 256.0 * RoomScale,r\y,r\z-0.05,True
 			RotateEntity r\Objects[4], 0,180,0
-			ScaleEntity r\Objects[4],46.0*RoomScale,45.0*RoomScale,46.0*RoomScale,True
+			ScaleEntity r\Objects[4],49.0*RoomScale,45.0*RoomScale,46.0*RoomScale,True
 			EntityParent r\Objects[4],r\obj
 			
 			;doors to observation booth
