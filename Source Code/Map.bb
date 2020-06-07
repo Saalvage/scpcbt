@@ -5007,27 +5007,29 @@ Function FillRoom(r.Rooms)
 			EntityParent r\Objects[1],r\obj
 
 		Case "medibay"
-
-			r\Objects[0] = LoadMesh_Strict("GFX\map\medibay_props.b3d",r\obj)
-			EntityType r\Objects[0],HIT_MAP
-			EntityPickMode r\Objects[0],2
+			;[Block]
+			d = CreateDoor(r\zone, r\x - 264.0 * RoomScale, r\y, r\z + 640.0 * RoomScale, 90.0, r, False, False, 3)
+			PositionEntity(d\Buttons[0], EntityX(d\Buttons[0], True) - 0.031, EntityY(d\Buttons[0], True), EntityZ(d\Buttons[0], True), True)
+			PositionEntity(d\Buttons[1], EntityX(d\Buttons[1], True) + 0.031, EntityY(d\Buttons[1], True), EntityZ(d\Buttons[1], True), True)
+			
+			r\Objects[0] = LoadMesh_Strict("GFX\map\medibay_props.b3d", r\obj)
+			EntityType(r\Objects[0], HIT_MAP)
+			EntityPickMode(r\Objects[0], 2)
 			
 			r\Objects[1] = CreatePivot(r\obj)
-			PositionEntity(r\Objects[1], r\x - 762.0 * RoomScale, r\y + 0.0 * RoomScale, r\z - 346.0 * RoomScale, True)
-			r\Objects[2] = CreatePivot(r\obj)
-			PositionEntity(r\Objects[2], (EntityX(r\Objects[1],True)+(126.0 * RoomScale)), EntityY(r\Objects[1],True), EntityZ(r\Objects[1],True), True)
-			it = CreateItem("firstaid", r\x - 506.0 * RoomScale, r\y + 192.0 * RoomScale, r\z - 322.0 * RoomScale)
-			EntityParent(it\collider, r\obj)
-			it = CreateItem("syringe", r\x - 333.0 * RoomScale, r\y + 100.0 * RoomScale, r\z + 97.3 * RoomScale)
-			EntityParent(it\collider, r\obj)
-			it = CreateItem("syringe", r\x - 340.0 * RoomScale, r\y + 100.0 * RoomScale, r\z + 52.3 * RoomScale)
-			EntityParent(it\collider, r\obj)
-			r\RoomDoors[0] = CreateDoor(r\zone, r\x - 264.0 * RoomScale, r\y - 0.0 * RoomScale, r\z + 640.0 * RoomScale, 90, r, False, False, 3)
+			PositionEntity(r\Objects[1], r\x - 820.0 * RoomScale, r\y, r\z - 318.399 * RoomScale, True)
 			
-			r\Objects[3] = CreatePivot(r\obj)
-			;PositionEntity r\Objects[3],r\x-926.891*RoomScale,r\y,r\z-318.399*RoomScale,True
-			PositionEntity r\Objects[3],r\x-820.0*RoomScale,r\y,r\z-318.399*RoomScale,True
-
+			it = CreateItem("firstaid", r\x - 506.0 * RoomScale, r\y + 192.0 * RoomScale, r\z - 322.0 * RoomScale)
+			EntityParent(it\Collider, r\obj)
+			
+			it = CreateItem("syringe", r\x - 340.0 * RoomScale, r\y + 100.0 * RoomScale, r\z + 52.3 * RoomScale)
+			RotateEntity(it\Collider, 0.0, Rnd(100.0, 110.0), 0.0)
+			EntityParent(it\Collider, r\obj)
+			
+			it = CreateItem("syringe", r\x - 340.0 * RoomScale, r\y + 100.0 * RoomScale, r\z + 97.3 * RoomScale)
+			RotateEntity(it\Collider, 0.0, Rnd(250.0, 260.0), 0.0)
+			EntityParent(it\Collider, r\obj)
+			;[End Block]
 		Case "room2cpit"
 
 			em.Emitters = CreateEmitter(r\x + 512.0 * RoomScale, r\y-76 * RoomScale, r\z - 688 * RoomScale, 0)

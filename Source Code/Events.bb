@@ -8346,41 +8346,29 @@ Function UpdateEvents()
 				EndIf
 
 			Case "medibay"
-
-				;e\EventState: Determines if the player has entered the room or not
-				;	- 0 : Not entered
-				;	- 1 : Has entered
-				;e\EventState2: A timer for the zombie wake up
-				
+				;[Block]
 				;Hiding/Showing the props in this room
-				If PlayerRoom <> e\room
-					HideEntity e\room\Objects[0]
+				If PlayerRoom <> e\room Then
+					HideEntity(e\room\Objects[0])
 				Else
-					ShowEntity e\room\Objects[0]
-					;Setup
-					If e\EventState = 0
-						e\room\NPC[0] = CreateNPC(NPCtype008,EntityX(e\room\Objects[3],True),EntityY(e\room\Objects[3],True)+0.5,EntityZ(e\room\Objects[3],True))
-						RotateEntity e\room\NPC[0]\Collider,0,e\room\angle-90,0
-						e\EventState = 1
+					ShowEntity(e\room\Objects[0])
+					
+					If e\EventState = 0.0 Then
+						e\room\NPC[0] = CreateNPC(NPCtype008, EntityX(e\room\Objects[1], True), EntityY(e\room\Objects[1], True) + 0.5, EntityZ(e\room\Objects[1], True))
+						RotateEntity(e\room\NPC[0]\Collider, 0.0, e\room\Angle - 90.0, 0.0)
+						e\EventState = 1.0
 					EndIf
 					
-					If EntityDistanceSquared(e\room\NPC[0]\Collider,Collider) < PowTwo(1.2)
-						If e\EventState2 = 0
-							LightBlink = 12.0
-							PlaySound_Strict LightSFX
-							e\EventState2 = FPSfactor
+					If EntityDistanceSquared(e\room\NPC[0]\Collider, Collider) < PowTwo(1.2) Then
+						If e\EventState2 = 0.0
+							LightBlink = 8.0
+							PlaySound_Strict(LightSFX)
+							e\room\NPC[0]\State = 1.0
+							e\EventState2 = 1.0
 						EndIf
 					EndIf
 				EndIf
-				
-				If e\EventState2 > 0 And e\EventState2 < 70*4
-					e\EventState2 = e\EventState2 + FPSfactor
-				ElseIf e\EventState2 >= 70*4
-					If e\room\NPC[0]\State = 0
-						e\room\NPC[0]\State = 2
-					EndIf
-				EndIf
-
+				;[End Block]
 			Case "dimension1499"
 
 				If PlayerRoom<>e\room

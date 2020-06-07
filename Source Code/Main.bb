@@ -2101,7 +2101,7 @@ Repeat
 				EndIf
 				
 				LightBlink = Max(LightBlink - (FPSfactor / 35.0), 0)
-				If LightBlink > 0 Then darkA = Min(Max(darkA, LightBlink * Rnd(0.3, 0.8)), 1.0)
+				If LightBlink > 0.0 And WearingNightVision =< 0 Then darkA = Min(Max(darkA, LightBlink * Rnd(0.3, 0.8)), 1.0)
 				
 				If Using294 Then darkA=1.0
 				
