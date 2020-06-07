@@ -48,6 +48,8 @@ Function UpdateMainMenu()
 	
 	DrawImage(MenuBack, 0, 0)
 	
+	MouseHit1 = MouseHit(1)
+	
 	If (MilliSecs() Mod MenuBlinkTimer(0)) >= Rand(MenuBlinkDuration(0)) Then
 		DrawImage(Menu173, I_Opt\GraphicWidth - ImageWidth(Menu173), I_Opt\GraphicHeight - ImageHeight(Menu173))
 	EndIf

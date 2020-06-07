@@ -2503,7 +2503,7 @@ Function UpdateEvents()
 					
 					If PickedEntity() = e\room\Objects[3]
 						If e\EventState = 0.0 Then
-							e\EventState = Max(e\EventState, 1.0)
+							e\EventState = Max(e\EventState, 1.0) ; TODO check here
 							PlaySound_Strict(HorrorSFX(7))
 							PlaySound_Strict(LeverSFX)
 						EndIf 
@@ -2526,9 +2526,9 @@ Function UpdateEvents()
 					;Remote Door Control
 					RemoteDoorOn = UpdateLever(e\room\Objects[5])
 					
-					If e\EventState = 1.0 Then
-						RotateEntity(e\room\Objects[3], 0.0, EntityYaw(e\room\Objects[3]), 0.0)
-						e\EventState = 2.0
+					If e\EventState > 0.0 And e\EventState < 200.0 Then
+						e\EventState = e\EventState + FPSFactor
+						RotateEntity(e\room\Objects[3], CurveValue(-85.0, EntityPitch(e\room\Objects[3]), 5), EntityYaw(e\room\Objects[3]), 0.0)
 					EndIf
 				EndIf
 				;[End Block]
