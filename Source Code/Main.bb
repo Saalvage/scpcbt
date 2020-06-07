@@ -164,7 +164,7 @@ Function LoadLocalFont(Font$, IgnoreScaling%=0)
 	If FileType(name) <> 1 Then RuntimeError("Font not found: " + Font + " : " + name)
 	
 	; Font size is handled via a budget ternary operator
-	Local temp% = LoadFont(name, (Int(GetIniInt(file, Font, "size") * (I_Opt\GraphicHeight / 1024.0))) * (Not IgnoreScaling) + IgnoreScaling * GetIniInt(file, Font, "size"))
+	Local temp% = LoadFont(name, (Int(GetINIInt(file, Font, "size") * (I_Opt\GraphicHeight / 1024.0))) * (Not IgnoreScaling) + IgnoreScaling * GetINIInt(file, Font, "size"))
 	If temp = 0 Then RuntimeError("Failed to load Font: " + Font + " : " + name)
 	Return temp
 	
@@ -296,8 +296,10 @@ Type Cheats
 	Field NoClip%, NoClipSpeed#
 	Field Enabled173%, Enabled106%
 	Field SuperMan%, SuperManTimer#
-	Field Speed%
+	Field Speed%, InfiniteStamina%
 	Field WireframeState%
+	Field NoTarget%
+	Field NoBlink%
 End Type
 
 Function ClearCheats(I_Cheats.Cheats)
@@ -307,9 +309,12 @@ Function ClearCheats(I_Cheats.Cheats)
 	I_Cheats\Enabled173 = 1
 	I_Cheats\Enabled106 = 1
 	I_Cheats\SuperMan = 0
-	I_Cheats\SuperManTimer = 0
-	I_Cheats\Speed = 0
+	I_Cheats\SuperManTimer = 0.0
+	I_Cheats\InfiniteStamina = 0
+	I_Cheats\Speed = 0.0
 	I_Cheats\WireframeState = 0
+	I_Cheats\NoTarget = 0
+	I_Cheats\NoBlink = 0
 End Function
 
 Global I_Cheats.Cheats = New Cheats
@@ -477,7 +482,6 @@ End Function
 Global ConsoleFlush%
 Global ConsoleFlushSnd% = 0, ConsoleMusFlush% = 0, ConsoleMusPlay% = 0
 
-Global InfiniteStamina% = False
 Global IsNVGBlinking% = False
 
 
@@ -741,7 +745,6 @@ Global MonitorTimer# = 0.0, MonitorTimer2# = 0.0, UpdateCheckpoint1%, UpdateChec
 	;True: The Player got detected by a camera
 Global PlayerDetected%
 Global PrevInjuries#,PrevBloodloss#
-Global NoTarget% = False
 
 Global NVGImages = LoadAnimImage("GFX\battery.png",64,64,0,3)
 MaskImage NVGImages,255,0,255
@@ -2018,7 +2021,8 @@ Repeat
 				EndIf
 			EndIf
 			
-			If InfiniteStamina% Then Stamina = 100
+			If I_Cheats\InfiniteStamina Then Stamina = 100.0
+			If I_Cheats\NoBlink Then BlinkTimer = BLINKFREQ
 			
 			If FPSfactor=0
 				UpdateWorld(0)
@@ -7717,8 +7721,6 @@ Function NullGame(playbuttonsfx%=True)
 	RemoteDoorOn = True
 	SoundTransmission = False
 	
-	InfiniteStamina% = False
-	
 	Msg = ""
 	MsgTimer = 0
 	
@@ -7828,8 +7830,6 @@ Function NullGame(playbuttonsfx%=True)
 	DeleteElevatorObjects()
 	
 	DeleteDevilEmitters()
-	
-	NoTarget% = False
 	
 	OptionsMenu% = -1
 	QuitMSG% = -1

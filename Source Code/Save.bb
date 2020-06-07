@@ -1394,8 +1394,6 @@ Function LoadGameQuick(file$, loadzone%=1)
 	
 	DebugHUD = False
 	GameSaved = True
-	NoTarget = False
-	InfiniteStamina = False
 	IsZombie% = False
 	DeafPlayer% = False
 	DeafTimer# = 0.0
@@ -1970,7 +1968,7 @@ Function LoadGameQuick(file$, loadzone%=1)
 			e\EventState2 = ReadFloat(f)
 			e\EventState3 = ReadFloat(f)		
 			x = ReadFloat(f)
-			y = ReadFloaT(f)
+			y = ReadFloat(f)
 			z = ReadFloat(f)
 			For r.Rooms = Each Rooms
 				If EntityX(r\obj) = x And EntityY(r\obj) = y And EntityZ(r\obj) = z Then
@@ -2239,3 +2237,6 @@ Function LoadSaveGames()
 	
 	;CatchErrors("Uncaught LoadSaveGames")
 End Function
+
+;~IDEal Editor Parameters:
+;~C#Blitz3D

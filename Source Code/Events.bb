@@ -223,7 +223,7 @@ Function UpdateEvents()
 								EndIf
 								
 								;If Ulgrin can see the player then start shooting at them.
-								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not NoTarget) Then
+								If (CurrTrigger = "173scene_end") And EntityVisible(e\room\NPC[2]\Collider, Collider) And (Not I_Cheats\NoTarget) Then
 									e\room\NPC[2]\State = 1.0
 									e\room\NPC[2]\State3 = 1.0
 								ElseIf e\room\NPC[2]\State = 1.0 And (Not EntityVisible(e\room\NPC[2]\Collider, Collider))
@@ -6036,7 +6036,7 @@ Function UpdateEvents()
 								e\room\RoomDoors[0]\open = Not e\room\RoomDoors[0]\open
 							EndIf 
 							
-							If CheckTriggers() = "205scene_enter" And (Not NoTarget) Then
+							If CheckTriggers() = "205scene_enter" And (Not I_Cheats\NoTarget) Then
 								PlaySound_Strict(LoadTempSound("SFX\SCP\205\Enter.ogg"))
 								
 								e\EventState = 65
@@ -7393,7 +7393,7 @@ Function UpdateEvents()
 						Case 1
 							Animate2(e\room\Objects[0], AnimTime(e\room\Objects[0]), 2.0, 395.0, 1.0)
 							
-							If (EntityDistanceSquared(Collider, e\room\Objects[0])<PowTwo(2.5) And (Not NoTarget)) Then e\EventState = 2
+							If (EntityDistanceSquared(Collider, e\room\Objects[0])<PowTwo(2.5) And (Not I_Cheats\NoTarget)) Then e\EventState = 2
 						Case 2
 							Local prevFrame# = AnimTime(e\room\Objects[0]) 
 							Animate2(e\room\Objects[0], prevFrame, 2.0, 647.0, 1.0, False)
@@ -9332,13 +9332,13 @@ Function UpdateEndings()
 						EndIf
 						
 						;Helicopter spots or player is within range. --> Start shooting.
-						If (Not NoTarget) And ((e\room\NPC[1]\State <> 1) And ((EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(15)) Lor EntityVisible(e\room\NPC[0]\Collider,Collider))) Then
+						If (Not I_Cheats\NoTarget) And ((e\room\NPC[1]\State <> 1) And ((EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(15)) Lor EntityVisible(e\room\NPC[0]\Collider,Collider))) Then
 							e\room\NPC[1]\State = 1
 							e\room\NPC[1]\State3 = 1
 						EndIf
 						
 						;Below roof or inside catwalk. --> Stop shooting.
-						If (EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(8.9)) Lor (EntityDistanceSquared(e\room\Objects[5],Collider) < PowTwo(16.9)) Lor (Not NoTarget) Then
+						If (EntityDistanceSquared(e\room\NPC[1]\Collider,Collider) < PowTwo(8.9)) Lor (EntityDistanceSquared(e\room\Objects[5],Collider) < PowTwo(16.9)) Lor (Not I_Cheats\NoTarget) Then
 							e\room\NPC[1]\State3 = 0
 						Else
 							e\room\NPC[1]\State3 = 1

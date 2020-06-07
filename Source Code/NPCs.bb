@@ -749,7 +749,7 @@ Function UpdateNPCs()
 									n\PrevX = EntityX(n\Collider)
 									n\PrevZ = EntityZ(n\Collider)				
 									
-									If (Not NoTarget) And (BlinkTimer < - 16 Lor BlinkTimer > - 6) And (IsNVGBlinking=False) And (EntityInView(n\obj, Camera) Lor EntityInView(n\obj2, Camera)) Then
+									If (Not I_Cheats\NoTarget) And (BlinkTimer < - 16 Lor BlinkTimer > - 6) And (IsNVGBlinking=False) And (EntityInView(n\obj, Camera) Lor EntityInView(n\obj2, Camera)) Then
 										move = False
 									EndIf
 								EndIf
@@ -846,7 +846,7 @@ Function UpdateNPCs()
 											Next
 										EndIf
 										
-										If NoTarget
+										If I_Cheats\NoTarget Then
 											temp = False
 											n\EnemyX = 0
 											n\EnemyY = 0
@@ -1040,7 +1040,7 @@ Function UpdateNPCs()
 										Visible% = EntityVisible(n\Collider, Collider)
 									EndIf
 									
-									If NoTarget Then Visible = False
+									If I_Cheats\NoTarget Then Visible = False
 									
 									If Visible Then
 										If PlayerRoom\RoomTemplate\Name <> "gatea" Then n\PathTimer = 0
@@ -1138,7 +1138,7 @@ Function UpdateNPCs()
 											
 										EndIf
 										
-									ElseIf PlayerRoom\RoomTemplate\Name <> "gatea" And (Not NoTarget)
+									ElseIf PlayerRoom\RoomTemplate\Name <> "gatea" And (Not I_Cheats\NoTarget)
 										
 										If dist > 0.5 Then 
 											n\CurrSpeed = CurveValue(n\Speed * 2.5,n\CurrSpeed,10.0)
@@ -1259,7 +1259,7 @@ Function UpdateNPCs()
 				If Abs(WearingScramble) > 50 And n\BlinkTimer = 0 Then ;I am using this variable outside of its intended use
 					EntityTexture n\obj2, LightTexture
 					n\BlinkTimer = 1
-				ElseIf Abs(WearingScramble) < 50 And n\Blinktimer = 1 Then
+				ElseIf Abs(WearingScramble) < 50 And n\BlinkTimer = 1 Then
 					EntityTexture n\obj2, DarkTexture
 					n\BlinkTimer = 0
 				EndIf
@@ -1317,7 +1317,7 @@ Function UpdateNPCs()
 							EndIf
 							;AnimateNPC(n, 1085,1412, 0.1) ;sitting
 							
-							If (Not NoTarget) And (ScrambleActive = 0 Lor (ScrambleActive = -1 And Rand(300) = 300)) And (angle<90 Lor angle>270) Then
+							If (Not I_Cheats\NoTarget) And (ScrambleActive = 0 Lor (ScrambleActive = -1 And Rand(300) = 300)) And (angle<90 Lor angle>270) Then
 								CameraProject Camera,EntityX(n\Collider), EntityY(n\Collider)+0.25, EntityZ(n\Collider)
 								
 								If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth And ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight And EntityVisible(Collider, n\Collider) And (BlinkTimer < - 16 Lor BlinkTimer > - 6) Then
@@ -1370,7 +1370,7 @@ Function UpdateNPCs()
 							EndIf
 						EndIf
 						
-						If NoTarget And n\Target = Null Then n\State = 5
+						If I_Cheats\NoTarget And n\Target = Null Then n\State = 5
 						
 						If KillTimer =>0 Then
 							
@@ -1650,7 +1650,7 @@ Function UpdateNPCs()
 							
 							angle = WrapAngle(DeltaYaw(n\Collider, Camera));-EntityYaw(n\Collider))
 							
-							If (Not NoTarget) And (ScrambleActive = 0 Lor (ScrambleActive = -1 And Rand(300) = 300)) And (angle<55 Lor angle>360-55) Then
+							If (Not I_Cheats\NoTarget) And (ScrambleActive = 0 Lor (ScrambleActive = -1 And Rand(300) = 300)) And (angle<55 Lor angle>360-55) Then
 								CameraProject Camera,EntityX(n\Collider), EntityY(Collider)+5.8*0.2-0.25, EntityZ(n\Collider)
 								
 								If ProjectedX()>0 And ProjectedX()<I_Opt\GraphicWidth And ProjectedY()>0 And ProjectedY()<I_Opt\GraphicHeight And EntityVisible(Collider, n\Collider) And (BlinkTimer < - 16 Lor BlinkTimer > - 6)
@@ -2214,7 +2214,7 @@ Function UpdateNPCs()
 									n\State3=n\State3-FPSfactor
 								EndIf
 								
-								If n\State2 > 0 And (Not NoTarget) Then ;player is visible -> attack
+								If n\State2 > 0 And (Not I_Cheats\NoTarget) Then ;player is visible -> attack
 									n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, n\Collider, 6.0, 0.6)
 									
 									n\PathStatus = 0
@@ -2287,7 +2287,7 @@ Function UpdateNPCs()
 
 							Case 3
 
-								If NoTarget Then n\State = 2
+								If I_Cheats\NoTarget Then n\State = 2
 								If n\Frame < 66 Then
 									AnimateNPC(n, 2, 65, 0.7, False)
 									
@@ -3065,11 +3065,11 @@ Function UpdateNPCs()
 				End Select
 				
 				If n\State = 0 Then
-					If ChannelPlaying(n\SoundCHN2) = True Then StopChannel n\SoundCHN2 
-					n\SoundCHN = LoopSound2(VehicleSFX(1), n\SoundCHN, Camera, n\Collider, 13, 1.0)
+					If ChannelPlaying(n\SoundChn2) = True Then StopChannel n\SoundChn2 
+					n\SoundChn = LoopSound2(VehicleSFX(1), n\SoundChn, Camera, n\Collider, 13, 1.0)
 				ElseIf n\State = 1
-					If ChannelPlaying(n\SoundCHN) = True Then StopChannel n\SoundCHN  
-					n\SoundCHN2 = LoopSound2(VehicleSFX(0), n\SoundCHN2, Camera, n\Collider, 13, 1.0)
+					If ChannelPlaying(n\SoundChn) = True Then StopChannel n\SoundChn  
+					n\SoundChn2 = LoopSound2(VehicleSFX(0), n\SoundChn2, Camera, n\Collider, 13, 1.0)
 				EndIf
 												
 				MoveEntity(n\Collider, 0, 0, n\CurrSpeed * FPSfactor)
@@ -3097,7 +3097,7 @@ Function UpdateNPCs()
 						TurnEntity(n\obj2,0,20.0*FPSfactor,0)
 						TurnEntity(n\obj3,20.0*FPSfactor,0,0)
 						
-						If n\State=1 And (Not NoTarget) Then
+						If n\State=1 And (Not I_Cheats\NoTarget) Then
 							If Abs(EntityX(Collider)-EntityX(n\Collider))< 30.0 Then
 								If Abs(EntityZ(Collider)-EntityZ(n\Collider))<30.0 Then
 									If Abs(EntityY(Collider)-EntityY(n\Collider))<20.0 Then
@@ -3120,7 +3120,7 @@ Function UpdateNPCs()
 							PositionEntity target, n\EnemyX, n\EnemyY, n\EnemyZ, True
 						EndIf
 						
-						If NoTarget And n\State = 2 Then n\State = 1
+						If I_Cheats\NoTarget And n\State = 2 Then n\State = 1
 						
 						TurnEntity(n\obj2,0,20.0*FPSfactor,0)
 						TurnEntity(n\obj3,20.0*FPSfactor,0,0)
@@ -3265,7 +3265,7 @@ Function UpdateNPCs()
 							EndIf
 							n\SoundChn2 = LoopSound2(n\Sound2,n\SoundChn2,Camera,n\Collider)
 							
-							If dist < PowTwo(1.8) And (Not NoTarget) Then 
+							If dist < PowTwo(1.8) And (Not I_Cheats\NoTarget) Then 
 								If Abs(DeltaYaw(n\Collider, Collider))<20 Then 
 									n\State = 2
 									If n\Sound<>0 Then FreeSound_Strict n\Sound : n\Sound = 0 
@@ -3768,7 +3768,7 @@ Function UpdateNPCs()
 								n\LastSeen = 10*7
 							EndIf
 							
-							If n\LastSeen > 0 And (Not NoTarget) Then
+							If n\LastSeen > 0 And (Not I_Cheats\NoTarget) Then
 								prevFrame = n\Frame
 								
 								If (n\Frame=>18.0 And n\Frame<68.0) Then
@@ -3848,7 +3848,7 @@ Function UpdateNPCs()
 							
 					End Select
 					
-					If n\State < 3 And (Not NoTarget) And (Not n\IgnorePlayer) Then
+					If n\State < 3 And (Not I_Cheats\NoTarget) And (Not n\IgnorePlayer) Then
 						dist = EntityDistance(n\Collider, Collider)
 						
 						If dist < 4.0 Then dist = dist - EntityVisible(Collider, n\Collider)
@@ -4278,7 +4278,7 @@ Function UpdateNPCs()
 					
 					If (WearingNightVision<=0) Then
 						HideEntity n\obj
-						If dist<PowTwo(1.0) And n\Reload <= 0 And MsgTimer <= 0 And (Not NoTarget) Then
+						If dist<PowTwo(1.0) And n\Reload <= 0 And MsgTimer <= 0 And (Not I_Cheats\NoTarget) Then
 							Msg = GetLocalString("Messages", "966" + Rand(6))
 							n\Reload = 20*70
 							MsgTimer=8*70
@@ -4327,7 +4327,7 @@ Function UpdateNPCs()
 								;echo/stare/walk around periodically
 								;If n\Frame>1014.0 Then
 								If n\Frame>213.0
-									If Rand(3)=1 And dist<PowTwo(4.0) And (Not NoTarget) Then
+									If Rand(3)=1 And dist<PowTwo(4.0) And (Not I_Cheats\NoTarget) Then
 										n\State = Rand(1,4)
 									Else
 										n\State = Rand(5,6)								
@@ -4335,7 +4335,7 @@ Function UpdateNPCs()
 								EndIf
 								
 								;echo if player gets close
-								If dist<PowTwo(2.0) And (Not NoTarget) Then 
+								If dist<PowTwo(2.0) And (Not I_Cheats\NoTarget) Then 
 									n\State=Rand(1,4)
 								EndIf 							
 							EndIf
@@ -4408,7 +4408,7 @@ Function UpdateNPCs()
 								EndIf
 								
 								;chasing the player
-								If n\State = 8 And dist<PowTwo(32.0) And (Not NoTarget) Then
+								If n\State = 8 And dist<PowTwo(32.0) And (Not I_Cheats\NoTarget) Then
 									If n\PathTimer <= 0 Then
 										n\PathStatus = FindPath (n, EntityX(Collider,True), EntityY(Collider,True), EntityZ(Collider,True))
 										n\PathTimer = 40*10
@@ -4768,7 +4768,7 @@ Function UpdateNPCs()
 									EndIf
 								EndIf
 								
-								If (n\ID Mod 2 = 0) And (Not NoTarget) Then
+								If (n\ID Mod 2 = 0) And (Not I_Cheats\NoTarget) Then
 									dist = EntityDistanceSquared(n\Collider,Collider)
 									If dist < PowTwo(10.0) Then
 										If EntityVisible(n\Collider,Collider) Then
@@ -4799,7 +4799,7 @@ Function UpdateNPCs()
 									EndIf
 								EndIf
 							ElseIf n\PrevState=1 Then
-								If (Not NoTarget) Then
+								If (Not I_Cheats\NoTarget) Then
 									If EntityDistanceSquared(n\Collider,Collider) < PowTwo(4.0) Then
 										If EntityVisible(n\Collider,Collider) Then
 											If n\Sound <> 0 Then FreeSound_Strict n\Sound : n\Sound = 0
@@ -4816,7 +4816,7 @@ Function UpdateNPCs()
 
 						Case 1 ;attacking the player
 
-							If NoTarget Then n\State = 0
+							If I_Cheats\NoTarget Then n\State = 0
 							
 							If PlayerRoom\RoomTemplate\Name = "dimension1499" And n\PrevState=0 Then
 								ShouldPlay = 19
@@ -5310,7 +5310,7 @@ Function MeNPCSeesPlayer%(me.NPCs,disablesoundoncrouch%=False)
 		;3: Player is detected by a camera (only for MTF Units!)
 		;4: Player is detected through glass
 	
-	If NoTarget Then Return False
+	If I_Cheats\NoTarget Then Return False
 	
 	If (Not PlayerDetected) Lor me\NPCtype <> NPCtypeMTF
 		If me\BlinkTimer<=0.0 Then Return False
@@ -5605,7 +5605,7 @@ Function UpdateMTFUnit(n.NPCs)
 				
 				Local temp = MeNPCSeesPlayer(n)
 				
-				If NoTarget Then temp = False
+				If I_Cheats\NoTarget Then temp = False
 				
 				If temp>False Then
 					If n\LastSeen > 0 And n\LastSeen < 70*15 Then
@@ -6845,7 +6845,7 @@ Function UpdateMTFUnit(n.NPCs)
 			EndIf
 		EndIf
 		
-		If NoTarget And n\State = 1 Then n\State = 0
+		If I_Cheats\NoTarget And n\State = 1 Then n\State = 0
 		
 		If n\State <> 3 And n\State <> 5 And n\State <> 6 And n\State <> 7
 			If n\MTFLeader<>Null Then

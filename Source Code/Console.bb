@@ -189,7 +189,8 @@ Function UpdateConsole()
 					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 255
 					
 					Select Lower(StrTemp)
-						Case "1",""
+						Case "1", ""
+							;[Block]
 							CreateConsoleMsg("LIST OF COMMANDS - PAGE 1/3")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("- asd")
@@ -198,22 +199,22 @@ Function UpdateConsole()
 							CreateConsoleMsg("- ending")
 							CreateConsoleMsg("- noclipspeed")
 							CreateConsoleMsg("- noclip")
-							CreateConsoleMsg("- injure [value]")
-							CreateConsoleMsg("- infect [value]")
+							CreateConsoleMsg("- noblink")
+							CreateConsoleMsg("- notarget")
+							CreateConsoleMsg("- infinitestamina")
 							CreateConsoleMsg("- heal")
-							CreateConsoleMsg("- teleport [room name]")
-							CreateConsoleMsg("- spawnitem [item name]")
 							CreateConsoleMsg("- wireframe")
 							CreateConsoleMsg("- 173speed")
 							CreateConsoleMsg("- 106speed")
 							CreateConsoleMsg("- 173state")
 							CreateConsoleMsg("- 106state")
-							CreateConsoleMsg("- spawn [npc type] [state]")
 							CreateConsoleMsg("******************************")
-							CreateConsoleMsg("Use "+Chr(34)+"help 2/3"+Chr(34)+" to find more commands.")
-							CreateConsoleMsg("Use "+Chr(34)+"help [command name]"+Chr(34)+" to get more information about a command.")
+							CreateConsoleMsg("Use " + Chr(34) + "help 2/3" + Chr(34) + " to find more commands.")
+							CreateConsoleMsg("Use " + Chr(34) + "help [command name]" + Chr(34) + " to get more information about a command.")
 							CreateConsoleMsg("******************************")
+							;[End Block]
 						Case "2"
+							;[Block]
 							CreateConsoleMsg("LIST OF COMMANDS - PAGE 2/3")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("- reset096")
@@ -227,25 +228,34 @@ Function UpdateConsole()
 							CreateConsoleMsg("- scp-420-j")
 							CreateConsoleMsg("- godmode")
 							CreateConsoleMsg("- revive")
-							CreateConsoleMsg("- noclip")
 							CreateConsoleMsg("- showfps")
 							CreateConsoleMsg("- 096state")
 							CreateConsoleMsg("- debughud")
+							CreateConsoleMsg("******************************")
+							CreateConsoleMsg("Use " + Chr(34) + "help 3/3" + Chr(34) + " to find more commands.")
+							CreateConsoleMsg("Use " + Chr(34) + "help [command name]" + Chr(34) + " to get more information about a command.")
+							CreateConsoleMsg("******************************")
+							;[End Block]
+						Case "3"
+							;[Block]
+							CreateConsoleMsg("- playmusic [clip + .wav/.ogg]")
 							CreateConsoleMsg("- camerafog [near] [far]")
 							CreateConsoleMsg("- gamma [value]")
-							CreateConsoleMsg("- infinitestamina")
-							CreateConsoleMsg("******************************")
-							CreateConsoleMsg("Use "+Chr(34)+"help [command name]"+Chr(34)+" to get more information about a command.")
-							CreateConsoleMsg("******************************")
-						Case "3"
-							CreateConsoleMsg("- playmusic [clip + .wav/.ogg]")
 							CreateConsoleMsg("- notarget")
 							CreateConsoleMsg("- unlockexits")
+							CreateConsoleMsg("- spawn [npc type] [state]")
+							CreateConsoleMsg("- teleport [room name]")
+							CreateConsoleMsg("- spawnitem [item name]")
+							CreateConsoleMsg("- injure [value]")
+							CreateConsoleMsg("- infect [value]")
+							CreateConsoleMsg("******************************")
+							CreateConsoleMsg("Use " + Chr(34) + "help [command name]" + Chr(34) + " to get more information about a command.")
+							CreateConsoleMsg("******************************")
+							;[End Block]
 						Case "asd"
 							CreateConsoleMsg("HELP - asd")
 							CreateConsoleMsg("******************************")
-							CreateConsoleMsg("Actives godmode, noclip, wireframe and")
-							CreateConsoleMsg("sets fog distance to 20 near, 30 far")
+							CreateConsoleMsg("Actives all cheats")
 							CreateConsoleMsg("******************************")
 						Case "camerafog"
 							CreateConsoleMsg("HELP - camerafog")
@@ -263,7 +273,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("Should be set to a value between 0.0 and 2.0.")
 							CreateConsoleMsg("Default is 1.0.")
 							CreateConsoleMsg("******************************")
-						Case "noclip","fly"
+						Case "noclip", "fly"
 							CreateConsoleMsg("HELP - noclip")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Toggles noclip, unless a valid parameter")
@@ -271,7 +281,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("Allows the camera to move in any direction while")
 							CreateConsoleMsg("bypassing collision.")
 							CreateConsoleMsg("******************************")
-						Case "godmode","god"
+						Case "godmode", "god"
 							CreateConsoleMsg("HELP - godmode")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Toggles godmode, unless a valid parameter")
@@ -345,20 +355,19 @@ Function UpdateConsole()
 							CreateConsoleMsg("Will play tracks in .ogg/.wav format")
 							CreateConsoleMsg("from "+Chr(34)+"SFX\Music\Custom\"+Chr(34)+".")
 							CreateConsoleMsg("******************************")
-							
+						Case "noblink", "nb"
+							;[Block]
+							CreateConsoleMsg("HELP - noblonk")
+							CreateConsoleMsg("******************************")
+							CreateConsoleMsg("Toggles NoBlink, unless a valid parameter")
+							CreateConsoleMsg("is specified (on/off).")
+							CreateConsoleMsg("Prevents player blinking.")
+							CreateConsoleMsg("******************************")
+							;[End Block]
 						Default
 							CreateConsoleMsg("There is no help available for that command.",255,150,0)
 					End Select
 					
-				Case "asd"
-
-					WireFrame 1
-					I_Cheats\WireframeState=1
-					I_Cheats\GodMode = 1
-					I_Cheats\NoClip = 1
-					CameraFogNear = 15
-					CameraFogFar = 20
-
 				Case "status"
 
 					ConsoleR = 0 : ConsoleG = 255 : ConsoleB = 0
@@ -540,6 +549,30 @@ Function UpdateConsole()
 					Else
 						CreateConsoleMsg("GODMODE OFF")
 					EndIf
+				Case "noblink", "nb"
+					;[Block]
+					StrTemp = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+					
+					Select StrTemp
+						Case "on", "1", "true"
+							;[Block]
+							I_Cheats\NoBlink = True		
+							;[End Block]
+						Case "off", "0", "false"
+							;[Block]
+							I_Cheats\NoBlink = False
+							;[End Block]
+						Default
+							;[Block]
+							I_Cheats\NoBlink = (Not I_Cheats\NoBlink)
+							;[End Block]
+					End Select	
+					If I_Cheats\NoBlink Then
+						CreateConsoleMsg("NOBLINK ON")
+					Else
+						CreateConsoleMsg("NOBLINK OFF")	
+					EndIf
+					;[End Block]
 				Case "revive", "undead", "resurrect"
 					DropSpeed = -0.1
 					HeadDropSpeed = 0.0
@@ -684,43 +717,45 @@ Function UpdateConsole()
 					Else
 						Console_SpawnNPC(StrTemp)
 					EndIf
-				Case "infinitestamina","infstam"
-
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+				Case "infinitestamina", "infstam", "is"
+					;[Block]
+					StrTemp = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
 						Case "on", "1", "true"
-							InfiniteStamina% = True						
+							;[Block]
+							I_Cheats\InfiniteStamina = True	
+							;[End Block]
 						Case "off", "0", "false"
-							InfiniteStamina% = False
+							;[Block]
+							I_Cheats\InfiniteStamina = False
+							;[End Block]
 						Default
-							InfiniteStamina% = Not InfiniteStamina%
+							;[Block]
+							I_Cheats\InfiniteStamina = (Not I_Cheats\InfiniteStamina)
+							;[End Block]
 					End Select
 					
-					If InfiniteStamina
+					If I_Cheats\InfiniteStamina
 						CreateConsoleMsg("INFINITE STAMINA ON")
 					Else
 						CreateConsoleMsg("INFINITE STAMINA OFF")	
 					EndIf
-
-				Case "asd2"
-					I_Cheats\GodMode = 1
-					InfiniteStamina = 1
-					Curr173\Idle = 3
-					Curr106\Idle = True
-					Curr106\State = 200000
-					Contained106 = True
-				Case "asd3"
+					;[End Block]
+				Case "asd"
+					;[Block]
 					I_Cheats\GodMode = 1
 					I_Cheats\NoClip = 1
+					I_Cheats\InfiniteStamina = 1
+					I_Cheats\NoBlink = 1
+					I_Cheats\NoTarget = 1
 					CameraFogNear = INFINITY
 					CameraFogFar = INFINITY
 					
-					;stfu
 					For snd.Sound = Each Sound
 						For i = 0 To 31
-							If snd\channels[i]<>0 Then
-								StopChannel snd\channels[i]
+							If snd\Channels[i] <> 0 Then
+								StopChannel(snd\Channels[i])
 							EndIf
 						Next
 					Next
@@ -736,17 +771,18 @@ Function UpdateConsole()
 							If e\room\NPC[1] <> Null Then RemoveNPC(e\room\NPC[1])
 							If e\room\NPC[2] <> Null Then RemoveNPC(e\room\NPC[2])
 							
-							FreeEntity e\room\Objects[0] : e\room\Objects[0]=0
-							FreeEntity e\room\Objects[1] : e\room\Objects[1]=0
-							PositionEntity Curr173\Collider, 0,0,0
-							ResetEntity Curr173\Collider
-							ShowEntity Curr173\obj
-							ShowEntity Curr173\obj2
+							FreeEntity(e\room\Objects[0]) : e\room\Objects[0] = 0
+							FreeEntity(e\room\Objects[1]) : e\room\Objects[1] = 0
+							PositionEntity(Curr173\Collider, 0.0, 0.0, 0.0)
+							ResetEntity(Curr173\Collider)
+							ShowEntity(Curr173\OBJ)
+							ShowEntity(Curr173\OBJ2)
 							RemoveEvent(e)
 							Exit
 						EndIf
 					Next
 					CreateConsoleMsg("Stopped all sounds.")
+					;[End Block]
 				Case "cls", "clear"
 					For c.ConsoleMsg = Each ConsoleMsg
 						Delete c
@@ -856,23 +892,31 @@ Function UpdateConsole()
 					ResetEntity Collider
 					ResetEntity Camera
 					CreateConsoleMsg("Teleported to coordinates (X|Y|Z): "+EntityX(Collider)+"|"+EntityY(Collider)+"|"+EntityZ(Collider))
-				Case "notarget"
-					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
+				Case "notarget", "nt"
+					;[Block]
+					StrTemp = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))
 					
 					Select StrTemp
 						Case "on", "1", "true"
-							NoTarget% = True						
+							;[Block]
+							I_Cheats\NoTarget = True	
+							;[End Block]
 						Case "off", "0", "false"
-							NoTarget% = False	
+							;[Block]
+							I_Cheats\NoTarget = False	
+							;[End Block]
 						Default
-							NoTarget% = Not NoTarget%
+							;[Block]
+							I_Cheats\NoTarget = (Not I_Cheats\NoTarget)
+							;[End Block]
 					End Select
 					
-					If NoTarget% = False Then
+					If I_Cheats\NoTarget = False Then
 						CreateConsoleMsg("NOTARGET OFF")
 					Else
 						CreateConsoleMsg("NOTARGET ON")	
 					EndIf
+					;[End Block]
 				Case "spawnulti", "ulti"
 					it.Items = CreateItem("keyomni", EntityX(Collider), EntityY(Camera,True), EntityZ(Collider))
 					EntityType(it\collider, HIT_ITEM)
@@ -1072,3 +1116,6 @@ Function UpdateConsole()
 	SetFont I_Opt\Fonts[1]
 	
 End Function
+
+;~IDEal Editor Parameters:
+;~C#Blitz3D
