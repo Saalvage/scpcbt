@@ -2503,9 +2503,9 @@ Function UpdateEvents()
 					
 					If PickedEntity() = e\room\Objects[3]
 						If e\EventState = 0.0 Then
+							e\EventState = Max(e\EventState, 1.0)
 							PlaySound_Strict(HorrorSFX(7))
 							PlaySound_Strict(LeverSFX)
-							e\EventState = 1.0
 						EndIf 
 					EndIf
 					
