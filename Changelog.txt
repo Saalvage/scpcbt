@@ -36,6 +36,7 @@ Rooms:
 - Added bloody SCP-096 texture after killing someone.
 - Added vehicle in the intro sequence.
 	- Made it faster and adjusted the tire speed.
+- Added improved D-Class animations.
 - Added improved Pizza Day poster.
 - Added idle gasmask breathing.
 - Added crouch sound.
@@ -98,6 +99,7 @@ Rooms:
 - Flipped vest around.
 - The hazmat suit is now hunched over when put off.
 - Increased size of the SCP-148 ingot and Electronical Components.
+- Lowered the cell number signs in the intro sequence.
 - Disabled saving in SCP-1499's dimension.
 - Added "freeze" command, very fun!
 - Added "clear" command, which clears the console.
@@ -113,7 +115,7 @@ Rooms:
 - Removed 16-Bit mode.
 - Removed Antialiased Text (the implementation was very inconsistent and caused a lot of problems, the new B3D text implementation should look good in all resolutions).
 - Removed and renamed a few commands.
-- Removed Graphics Driver Selection, which did not change anything anyways.
+- Removed Graphics Driver Selection, which did not actually change anything anyways.
 - Removed one SCP-939 sound.
 - Removed unused and duplicate files.
 
@@ -147,6 +149,11 @@ Bug Fixes:
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed security camera bases rotating with the cameras.
 	- Fixed security camera positions in room173 and start.
+	- Fixed decals disappearing after the intro sequence.
+	- Fixed animation of balcony guard.
+	- Fixed gurads not shooting at the player if the music guard has been triggered.
+	- Fixed MTFs not announcing blinking or the presence of SCP-049-2.
+	- Fixed MTF SCP-049-2 voicelines not having a radio filter.
 	- Fixed z-fighting of a door in room2closets.
 	- Fixed the emitters in SCP-035's room sometimes clipping into the maintenance tunnels.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.
