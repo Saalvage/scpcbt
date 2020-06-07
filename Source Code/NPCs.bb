@@ -4363,7 +4363,7 @@ Function UpdateNPCs()
 								
 								If (WearingNightVision>0) Then GiveAchievement(Achv966)
 								
-								If (Not Wearing714) And (WearingGasMask<3) And (WearingHazmat<3) And dist<16 Then
+								If (Not Wearing714) And (WearingGasMask<3) And (WearingHazmat<3) And dist < PowTwo(16.0) Then
 									BlinkEffect = Max(BlinkEffect, 1.5)
 									BlinkEffectTimer = 1000
 									

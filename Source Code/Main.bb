@@ -4813,7 +4813,7 @@ Function DrawGUI()
 					Else
 						If CanUseItem(True, True)
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-							SetCrouch(True) ;Find any way to prevent crouching again  ~  Jabka
+							SetCrouch(True) ;Find any way to prevent crouching sound again  ~  Jabka
 							
 							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 							
