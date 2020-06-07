@@ -3120,7 +3120,9 @@ Function MovePlayer()
 		EndIf
 	EndIf
 	
-	If KeyHit(I_Keys\CROUCH) And Playable And (Not IsZombie) And Bloodloss < 60.0 And I_427\Timer < 70.0 * 390.0 And (Not I_Cheats\NoClip) And Sprint <> 0.0 Then SetCrouch(Not Crouch)
+	If KeyHit(I_Keys\CROUCH) And Playable And (Not IsZombie) And Bloodloss < 60.0 And I_427\Timer < 70.0 * 390.0 And (Not I_Cheats\NoClip) And (SelectedItem = Null Lor (SelectedItem\itemtemplate\tempname <> "firstaid" And SelectedItem\itemtemplate\tempname <> "finefirstaid" And SelectedItem\itemtemplate\tempname <> "firstaid2")) Then
+		SetCrouch(Not Crouch)
+	EndIf
 	
 	Local temp2# = (Speed * Sprint) / (1.0+CrouchState)
 	
@@ -4814,7 +4816,7 @@ Function DrawGUI()
 					Else
 						If CanUseItem(True, True)
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-							SetCrouch(True) ;Find any way to prevent crouching sound again  ~  Jabka
+							SetCrouch(True)
 							
 							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 							

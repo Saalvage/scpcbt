@@ -104,7 +104,9 @@ Rooms:
 - Added "freeze" command, very fun!
 - Added "clear" command, which clears the console.
 - Added "ulti" command, which spawns a set of ultimate tools.
+- Added "noblink" command.
 - Reworked the disable/enable commands for SCP-173 and SCP-106 and adjusted the teleport commands accordingly.
+- Reworked "heal" command to work like SCP-500, removing any damage.
 - Added a retreat command for SCP-106.
 - Now only 5 save games are displayed per page on the load game tab.
 - Error logs are now stored in a folder.
@@ -157,7 +159,7 @@ Bug Fixes:
 	- Fixed z-fighting of a door in room2closets.
 	- Fixed the emitters in SCP-035's room sometimes clipping into the maintenance tunnels.
 	- Fixed the items glitching in the storage chamber in SCP-035's room.
-	- Fixed button positions in room2closets, SCP-079 and SCP-035's room.
+	- Fixed button positions in room2closets, medibay, SCP-079 and SCP-035's room.
 	- Fixed the triggers in the SCP-939 infested area.
 	- Fixed the security camera's position in SCP-966's room.
 	- Fixed items not pushing each other away in SCP-970's room.

@@ -357,11 +357,11 @@ Function UpdateConsole()
 							CreateConsoleMsg("******************************")
 						Case "noblink", "nb"
 							;[Block]
-							CreateConsoleMsg("HELP - noblonk")
+							CreateConsoleMsg("HELP - noblink")
 							CreateConsoleMsg("******************************")
 							CreateConsoleMsg("Toggles NoBlink, unless a valid parameter")
 							CreateConsoleMsg("is specified (on/off).")
-							CreateConsoleMsg("Prevents player blinking.")
+							CreateConsoleMsg("Prevents the player from having to blink.")
 							CreateConsoleMsg("******************************")
 							;[End Block]
 						Default
@@ -781,14 +781,15 @@ Function UpdateConsole()
 					;[End Block]
 				Case "asd"
 					;[Block]
-					I_Cheats\GodMode = 1
-					I_Cheats\NoClip = 1
-					I_Cheats\InfiniteStamina = 1
-					I_Cheats\NoBlink = 1
-					I_Cheats\NoTarget = 1
+					I_Cheats\GodMode = True
+					I_Cheats\NoClip = True
+					I_Cheats\InfiniteStamina = True
+					I_Cheats\NoBlink = True
+					I_Cheats\NoTarget = True
 					CameraFogNear = INFINITY
 					CameraFogFar = INFINITY
 					
+					; stfu command
 					For snd.Sound = Each Sound
 						For i = 0 To 31
 							If snd\Channels[i] <> 0 Then

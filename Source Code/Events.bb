@@ -7127,7 +7127,7 @@ Function UpdateEvents()
 							
 							e\EventState2 = Min(e\EventState2 + FPSfactor / 200.0, 2.0)
 							
-							If e\EventState2 >= 0.2 Then BlinkTimer = -10.0
+							LightBlink = Min(e\EventState2 * 5.0, 10.0)
 							
 							BlurTimer = e\EventState2 * 500.0
 							
