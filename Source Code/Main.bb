@@ -1,17 +1,11 @@
-;SCP - Containment Breach
-
-;	The game is based on the works of the SCP Foundation community (http://www.scp-wiki.net/).
-
-;	The source code is licensed under Creative Commons Attribution-ShareAlike 3.0 License.
-;	http://creativecommons.org/licenses/by-sa/3.0/
-
-;	See Credits.txt for a list of contributors
-
 Local InitErrorStr$ = ""
-If FileSize("fmod.dll") = 0 Then InitErrorStr=InitErrorStr+ "fmod.dll"+Chr(13)+Chr(10)
+If FileSize("fmod.dll") = 0 Then InitErrorStr = InitErrorStr + "fmod.dll" + Chr(13) + Chr(10)
+If FileSize("d3dim700.dll") = 0 Then InitErrorStr = InitErrorStr + "d3dim700.dll" + Chr(13) + Chr(10)
+If FileSize("BlitzMovie.dll") = 0 Then InitErrorStr = InitErrorStr + "BlitzMovie.dll" + Chr(13) + Chr(10)
+If FileSize("FreeImage.dll") = 0 Then InitErrorStr = InitErrorStr + "FreeImage.dll" + Chr(13) + Chr(10)
 
-If Len(InitErrorStr)>0 Then
-	RuntimeError "The following DLLs were not found in the game directory:"+Chr(13)+Chr(10)+Chr(13)+Chr(10)+InitErrorStr
+If Len(InitErrorStr) > 0 Then
+	RuntimeError "The following DLLs were not found in the game directory:" + Chr(13) + Chr(10) + Chr(13) + Chr(10) + InitErrorStr
 EndIf
 
 Include "Source Code\Math.bb"
