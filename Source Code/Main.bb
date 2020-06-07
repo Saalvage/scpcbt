@@ -3045,9 +3045,7 @@ Function MovePlayer()
 		Sanity = Max(-850, Sanity)
 	EndIf
 	
-	If IsZombie Then
-		SetCrouch(False)
-	EndIf
+	If IsZombie Then SetCrouch(False)
 	
 	If Abs(CrouchState-Crouch)<0.001 Then 
 		CrouchState = Crouch
@@ -3057,7 +3055,6 @@ Function MovePlayer()
 	
 	If (Not I_Cheats\NoClip) Then 
 		If (Playable And ((KeyDown(I_Keys\DOWN) Xor KeyDown(I_Keys\UP)) Lor (KeyDown(I_Keys\Right) Xor KeyDown(I_Keys\Left)))) Lor ForceMove>0 Then
-			
 			If Crouch = 0 And (KeyDown(I_Keys\SPRINT)) And Stamina > 0.0 And (Not IsZombie) Then
 				Sprint = 2.5
 				Stamina = Stamina - FPSfactor * 0.4 * StaminaEffect
@@ -3076,7 +3073,7 @@ Function MovePlayer()
 			
 			If SelectedItem<>Null Then
 				If SelectedItem\itemtemplate\tempname = "firstaid" Lor SelectedItem\itemtemplate\tempname = "finefirstaid" Lor SelectedItem\itemtemplate\tempname = "firstaid2" Then 
-					Sprint = 0
+					Sprint = 0.0
 				EndIf
 			EndIf
 			
@@ -3124,7 +3121,7 @@ Function MovePlayer()
 		EndIf
 	EndIf
 	
-	If KeyHit(I_Keys\CROUCH) And Playable Then SetCrouch(Not Crouch)
+	If KeyHit(I_Keys\CROUCH) And Playable And (Not IsZombie) And Bloodloss < 60.0 And I_427\Timer < 70.0 * 390.0 And (Not I_Cheats\NoClip) And Sprint <> 0.0 Then SetCrouch(Not Crouch)
 	
 	Local temp2# = (Speed * Sprint) / (1.0+CrouchState)
 	
@@ -3285,7 +3282,7 @@ Function MovePlayer()
 		
 		CurrCameraZoom = Max(CurrCameraZoom, (Sin(Float(MilliSecs())/20.0)+1.0)*Bloodloss*0.2)
 		
-		If Bloodloss > 60 Then
+		If Bloodloss > 60.0 Then
 			SetCrouch(True)
 		EndIf
 		If Bloodloss => 100 Then 
@@ -4816,7 +4813,7 @@ Function DrawGUI()
 					Else
 						If CanUseItem(True, True)
 							CurrSpeed = CurveValue(0, CurrSpeed, 5.0)
-							SetCrouch(True)
+							SetCrouch(True) ;Find any way to prevent crouching again  ~  Jabka
 							
 							DrawImage(SelectedItem\itemtemplate\invimg, I_Opt\GraphicWidth / 2 - ImageWidth(SelectedItem\itemtemplate\invimg) / 2, I_Opt\GraphicHeight / 2 - ImageHeight(SelectedItem\itemtemplate\invimg) / 2)
 							
