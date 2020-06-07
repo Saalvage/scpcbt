@@ -1263,7 +1263,7 @@ Function UpdateDoors()
 				If d\locked <> d\lockedupdated Then
 					If d\locked Then
 						For i = 0 To 2
-							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTextureLocked)
+							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtontextureLocked)
 						Next
 					Else
 						For i = 0 To 2
@@ -3816,7 +3816,7 @@ Function DrawGUI()
 		Rect(x - 50 - 1, y - 1, 30 + 2, 30 + 2, False)
 		If Crouch Then
 			DrawImage(CrouchIcon, x - 50, y)
-		ElseIf KeyDown(I_Keys\SPRINT)
+		ElseIf KeyDown(I_Keys\SPRINT) And CurrSpeed > 0.0
 			DrawImage(SprintIcon, x - 50, y)
 		Else
 			DrawImage(WalkIcon, x - 50, y)
