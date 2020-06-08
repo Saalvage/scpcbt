@@ -586,6 +586,8 @@ Function UpdateItems()
 		deletedItem = False
 	Next
 	
+	CreateConsoleMsg((ClosestItem <> Null) + "   " + MouseHit1)
+	
 	If ClosestItem <> Null Then
 		;DrawHandIcon = True
 		

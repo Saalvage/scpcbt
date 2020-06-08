@@ -1848,25 +1848,6 @@ Repeat
 	
 	If MenuOpen Lor InvOpen Lor OtherOpen<>Null Lor ConsoleOpen Lor SelectedDoor <> Null Lor SelectedScreen <> Null Lor Using294 Then FPSfactor = 0
 	
-	If Input_ResetTime<=0.0
-		DoubleClick = False
-		MouseHit1 = MouseHit(1)
-		If MouseHit1 Then
-			If MilliSecs() - LastMouseHit1 < 800 Then DoubleClick = True
-			LastMouseHit1 = MilliSecs()
-		EndIf
-		
-		Local prevmousedown1 = MouseDown1
-		MouseDown1 = MouseDown(1)
-		If prevmousedown1 = True And MouseDown1=False Then MouseUp1 = True Else MouseUp1 = False
-		
-		MouseHit2 = MouseHit(2)
-		
-		If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
-	Else
-		Input_ResetTime = Max(Input_ResetTime-FPSfactor,0.0)
-	EndIf
-	
 	UpdateMusic()
 	If EnableSFXRelease Then AutoReleaseSounds()
 	
@@ -1897,6 +1878,25 @@ Repeat
 			
 			RestoreSanity = True
 			ShouldEntitiesFall = True
+			
+			If Input_ResetTime<=0.0
+				DoubleClick = False
+				MouseHit1 = MouseHit(1)
+				If MouseHit1 Then
+					If MilliSecs() - LastMouseHit1 < 800 Then DoubleClick = True
+					LastMouseHit1 = MilliSecs()
+				EndIf
+				
+				Local prevmousedown1 = MouseDown1
+				MouseDown1 = MouseDown(1)
+				If prevmousedown1 = True And MouseDown1=False Then MouseUp1 = True Else MouseUp1 = False
+				
+				MouseHit2 = MouseHit(2)
+				
+				If (Not MouseDown1) And (Not MouseHit1) Then GrabbedEntity = 0
+			Else
+				Input_ResetTime = Max(Input_ResetTime-FPSfactor,0.0)
+			EndIf
 			
 			If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
 				
@@ -6026,7 +6026,7 @@ Function DrawGUI()
 					; check if the item is an inventory-type object
 					If SelectedItem\invSlots>0 Then
 						DoubleClick = 0
-						MouseHit1 = 0
+						;MouseHit1 = 0
 						MouseDown1 = 0
 						LastMouseHit1 = 0
 						OtherOpen = SelectedItem

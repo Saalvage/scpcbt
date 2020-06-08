@@ -151,6 +151,7 @@ Bug Fixes:
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed security camera bases rotating with the cameras.
 	- Fixed security camera positions in room173 and start.
+	- Fixed SCP-860's door.
 	- Fixed decals disappearing after the intro sequence.
 	- Fixed animation of balcony guard.
 	- Fixed gurads not shooting at the player if the music guard has been triggered.
