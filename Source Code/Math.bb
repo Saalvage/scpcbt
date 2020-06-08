@@ -1,58 +1,71 @@
-Function GenerateSeedNumber(seed$)
- 	Local temp% = 0
- 	Local shift% = 0
- 	For i = 1 To Len(seed)
- 		temp = temp Xor (Asc(Mid(seed,i,1)) Shl shift)
- 		shift=(shift+1) Mod 24
+Function GenerateSeedNumber(Seed$)
+	Local i%
+ 	Local Temp% = 0
+ 	Local Shift% = 0
+	
+ 	For i = 1 To Len(Seed)
+ 		Temp = Temp Xor((Asc(Mid(Seed, i, 1)) Shl(Shift)))
+ 		Shift = (Shift + 1) Mod 24
 	Next
- 	Return temp
+ 	Return(Temp)
 End Function
 
-Function CurveValue#(number#, old#, smooth#)
-	If FPSfactor = 0 Then Return old
+Function CurveValue#(Number#, Old#, Smooth#)
+	If FPSfactor = 0 Then Return(Old)
 	
-	If number < old Then
-		Return Max(old + (number - old) * (1.0 / smooth * FPSfactor), number)
+	If Number < Old Then
+		Return(Max(Old + (Number - Old) * (1.0 / Smooth * FPSfactor), Number))
 	Else
-		Return Min(old + (number - old) * (1.0 / smooth * FPSfactor), number)
+		Return(Min(Old + (Number - Old) * (1.0 / Smooth * FPSfactor), Number))
 	EndIf
 End Function
 
-Function CurveAngle#(val#, old#, smooth#)
-	If FPSfactor = 0 Then Return old
+Function CurveAngle#(Val#, Old#, Smooth#)
+	If FPSfactor = 0.0 Then Return(Old)
 	
-	Local diff# = WrapAngle(val) - WrapAngle(old)
-	If diff > 180 Then diff = diff - 360
-	If diff < - 180 Then diff = diff + 360
-	Return WrapAngle(old + diff * (1.0 / smooth * FPSfactor))
+	Local Diff# = WrapAngle(Val) - WrapAngle(Old)
+	
+	If Diff > 180.0 Then Diff = Diff - 360.0
+	If Diff < -180.0 Then Diff = Diff + 360.0
+	
+	Return(WrapAngle(Old + Diff * (1.0 / Smooth * FPSfactor)))
 End Function
 
 ; This is necessary because negative numbers modulod yield negative numbers, thanks for your help Juan! :)
-Function WrapAngle#(angle#)
-	If angle = INFINITY Then Return 0.0
-	If angle < 0 Then
-		Return 360 + (angle Mod 360)
+Function WrapAngle#(Angle#)
+	If Angle = INFINITY Then Return(0.0)
+	If Angle < 0.0 Then
+		Return(360.0 + (Angle Mod 360.0))
 	Else
-		Return angle Mod 360
+		Return(Angle Mod 360.0)
 	EndIf
 End Function
 
-Function point_direction#(x1#,z1#,x2#,z2#)
+Function Point_Direction#(x1#, z1#, x2#, z2#)
 	Local dx#, dz#
+	
 	dx = x1 - x2
 	dz = z1 - z2
-	Return ATan2(dz,dx)
+	Return(ATan2(dz, dx))
 End Function
 
-Function angleDist#(a0#,a1#)
-	Local b# = a0-a1
+Function AngleDist#(a0#, a1#)
+	Local b# = a0 - a1
 	Local bb#
-	If b<-180.0 Then
-		bb = b+360.0
-	ElseIf b>180.0 Then
-		bb = b-360.0
+	
+	If b < -180.0 Then
+		bb = b + 360.0
+	ElseIf b > 180.0 Then
+		bb = b - 360.0
 	Else
 		bb = b
 	EndIf
-	Return bb
+	Return(bb)
 End Function
+
+Function f2s$(n#, Count%)
+	Return(Left(n, Len(Int(n)) + Count + 1))
+End Function
+
+;~IDEal Editor Parameters:
+;~C#Blitz3D

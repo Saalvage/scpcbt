@@ -812,11 +812,11 @@ Function UpdateMainMenu()
 						Text(x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Options", "forward"))
 						InputBox(x + 160 * MenuScale, y + 20 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\UP,210)],5)
 						Text(x + 20 * MenuScale, y + 40 * MenuScale, GetLocalString("Options", "left"))
-						InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\LEFT,210)],3)
+						InputBox(x + 160 * MenuScale, y + 40 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\Left,210)],3)
 						Text(x + 20 * MenuScale, y + 60 * MenuScale, GetLocalString("Options", "backward"))
 						InputBox(x + 160 * MenuScale, y + 60 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\DOWN,210)],6)
 						Text(x + 20 * MenuScale, y + 80 * MenuScale, GetLocalString("Options", "right"))
-						InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\RIGHT,210)],4)
+						InputBox(x + 160 * MenuScale, y + 80 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\Right,210)],4)
 						Text(x + 20 * MenuScale, y + 100 * MenuScale, GetLocalString("Options", "save"))
 						InputBox(x + 160 * MenuScale, y + 100 * MenuScale,100*MenuScale,20*MenuScale,I_Keys\KeyName[Min(I_Keys\SAVE,210)],11)
 						
@@ -841,9 +841,9 @@ Function UpdateMainMenu()
 						If key<>0 Then
 							Select SelectedInputBox
 								Case 3
-									I_Keys\LEFT = key
+									I_Keys\Left = key
 								Case 4
-									I_Keys\RIGHT = key
+									I_Keys\Right = key
 								Case 5
 									I_Keys\UP = key
 								Case 6
@@ -987,8 +987,8 @@ Function UpdateMainMenu()
 							EnableUserTracks = 1
 							UserTrackMode = 1
 							EnableSFXRelease = 1
-							I_Keys\RIGHT = 32
-							I_Keys\LEFT = 30
+							I_Keys\Right = 32
+							I_Keys\Left = 30
 							I_Keys\UP = 17
 							I_Keys\DOWN = 31
 							I_Keys\BLINK = 57
@@ -1018,9 +1018,6 @@ Function UpdateMainMenu()
 	
 	SetFont I_Opt\Fonts[1]
 End Function
-
-Const L_WIDTH = 640
-Const L_HEIGHT = 480
 
 Function UpdateLauncher(I_LOpt.LauncherOptions)
 	
@@ -1924,3 +1921,6 @@ Function Slider5(x%,y%,width%,value%,ID%,val1$,val2$,val3$,val4$,val5$)
 	Return value
 	
 End Function
+
+;~IDEal Editor Parameters:
+;~C#Blitz3D

@@ -11,8 +11,6 @@ EndIf
 Include "Source Code\Math.bb"
 Include "Source Code\DevilParticleSystem.bb"
 
-Const OptionFile$ = "Data\options.ini"
-
 If FileType(OptionFile) <> 1 Then
 	DefaultOptionsINI()
 EndIf
@@ -187,16 +185,12 @@ End Function
 Include "Source Code\StrictLoads.bb"
 Include "Source Code\Keys.bb"
 
-Const ErrorDir$ = "Logs\"
 Global ErrorFile$ = ErrorDir + "error_log_"
 Local ErrorFileInd% = 0
 While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 	ErrorFileInd = ErrorFileInd+1
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
-
-Const VersionNumber$ = "1.0.0"
-Const CompatibleNumber$ = "1.0.0" ;Lowest version with compatible saves
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%, ButtonSFX2%
@@ -337,10 +331,7 @@ Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 
 Global FOV% = GetINIInt(OptionFile, "options", "fov")
 
-Const HIT_MAP% = 1, HIT_PLAYER% = 2, HIT_ITEM% = 3, HIT_APACHE% = 4, HIT_178% = 5, HIT_DEAD% = 6
 SeedRnd MilliSecs()
-
-
 
 Global GameSaved%
 
@@ -1471,7 +1462,7 @@ Type Events
 	Field EventState#, EventState2#, EventState3#
 	Field SoundCHN%, SoundCHN2%
 	Field Sound, Sound2
-	Field SoundCHN_isStream%, SoundCHN2_isStream%
+	Field SoundCHN_IsStream%, SoundCHN2_IsStream%
 	
 	Field EventStr$
 	
@@ -1809,8 +1800,6 @@ Global I_427.SCP427 = New SCP427
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ; MAIN LOOP
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
-
-Const TICK_DURATION# = 70.0/60.0
 
 Type FixedTimesteps
 	Field accumulator#
@@ -3608,7 +3597,7 @@ Function MouseLook()
 						SCP1025state[i]=SCP1025state[i]+0.00025*factor1025*(100/SCP1025state[i])
 					EndIf
 					Stamina = Min(100, Stamina + (90.0-Stamina)*SCP1025state[i]*factor1025*0.00008)
-					If SCP1025state[i]>15 And SCP1025state[i]-FPSFactor<=15 Then
+					If SCP1025state[i]>15 And SCP1025state[i]-FPSfactor<=15 Then
 						Msg = GetLocalString("Messages", "1025breathe")
 						MsgTimer = 70*4
 					EndIf
@@ -3620,12 +3609,6 @@ Function MouseLook()
 End Function
 
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
-
-Const INVENTORY_GFX_SIZE = 70
-Const INVENTORY_GFX_SPACING = 35
-
-Const NAV_WIDTH = 287
-Const NAV_HEIGHT = 256
 
 Function DrawGUI()
 	;CatchErrors("DrawGUI")
@@ -6800,9 +6783,8 @@ Function MouseOn%(x%, y%, width%, height%)
 	Return False
 End Function
 
-;----------------------------------------------------------------------------------------------
+Include "Source Code\Sounds.bb"
 
-Include "Source Code\LoadAllSounds.bb"
 Function LoadEntities()
 	;CatchErrors("LoadEntities")
 	
@@ -7857,410 +7839,7 @@ End Function
 
 ;--------------------------------------- music & sounds ----------------------------------------------
 
-Function PlaySound2%(SoundHandle%, cam%, entity%, range# = 10, volume# = 1.0)
-	range# = Max(range, 1.0)
-	Local soundchn% = 0
-	
-	If volume > 0 Then 
-		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 > dist And 0 < dist Then
-			soundchn% = PlaySound_Strict (SoundHandle)
-			
-			ChannelVolume(soundchn, volume# * (1 - dist#)*SFXVolume#)
-			ChannelPan(soundchn, Sin(-DeltaYaw(cam,entity)))			
-		EndIf
-	EndIf
-	
-	Return soundchn
-End Function
-
-Function LoopSound2%(SoundHandle%, Chn%, cam%, entity%, range# = 10, volume# = 1.0)
-	range# = Max(range,1.0)
-	
-	If volume>0 Then
-		;If 1 > dist And 0 < dist Then
-			
-			If Chn = 0 Then
-				Chn% = PlaySound_Strict (SoundHandle)
-			Else
-				If (Not ChannelPlaying(Chn)) Then Chn% = PlaySound_Strict (SoundHandle)
-			EndIf
-			
-			ChannelVolume(Chn, volume# * (1 - (EntityDistance(cam, entity) / range#))*SFXVolume#)
-			ChannelPan(Chn, Sin(-DeltaYaw(cam,entity)))
-		;EndIf
-	Else
-		If Chn <> 0 Then
-			ChannelVolume (Chn, 0)
-		EndIf 
-	EndIf
-	
-	Return Chn
-End Function
-
-Function LoadTempSound(file$)
-	If TempSounds[TempSoundIndex]<>0 Then FreeSound_Strict(TempSounds[TempSoundIndex])
-	TempSound = LoadSound_Strict(file)
-	TempSounds[TempSoundIndex] = TempSound
-	
-	TempSoundIndex=(TempSoundIndex+1) Mod 10
-	
-	Return TempSound
-End Function
-
-Function LoadEventSound(e.Events,file$,num%=0)
-	
-	If num=0 Then
-		If e\Sound<>0 Then FreeSound_Strict e\Sound : e\Sound=0
-		e\Sound=LoadSound_Strict(file)
-		Return e\Sound
-	ElseIf num=1 Then
-		If e\Sound2<>0 Then FreeSound_Strict e\Sound2 : e\Sound2=0
-		e\Sound2=LoadSound_Strict(file)
-		Return e\Sound2
-	EndIf
-End Function
-
-Function UpdateMusic()
-	
-	If ConsoleFlush Then
-		If Not ChannelPlaying(ConsoleMusPlay) Then ConsoleMusPlay = PlaySound(ConsoleMusFlush)
-	ElseIf (Not PlayCustomMusic)
-		If NowPlaying <> ShouldPlay ; playing the wrong clip, fade out
-			CurrMusicVolume# = Max(CurrMusicVolume - (FPSfactor / 250.0), 0)
-			If CurrMusicVolume = 0
-				If NowPlaying<66
-					StopStream_Strict(MusicCHN)
-				EndIf
-				NowPlaying = ShouldPlay
-				MusicCHN = 0
-				CurrMusic=0
-			EndIf
-		Else ; playing the right clip
-			CurrMusicVolume = CurrMusicVolume + (MusicVolume - CurrMusicVolume) * (0.1*FPSfactor)
-		EndIf
-		
-		If NowPlaying < 66
-			If CurrMusic = 0
-				MusicCHN = StreamSound_Strict("SFX\Music\"+Music[NowPlaying]+".ogg",0.0,2)
-				CurrMusic = 1
-			EndIf
-			SetStreamVolume_Strict(MusicCHN,CurrMusicVolume)
-		EndIf
-	Else
-		If FPSfactor > 0 Lor OptionsMenu = 2 Then
-			;CurrMusicVolume = 1.0
-			If (Not ChannelPlaying(MusicCHN)) Then MusicCHN = PlaySound_Strict(CustomMusic)
-			ChannelVolume MusicCHN,1.0*MusicVolume
-		EndIf
-	EndIf
-	
-End Function
-
-Function PauseSounds()
-	For e.events = Each Events
-		If e\soundchn <> 0 Then
-			If (Not e\soundchn_isstream)
-				If ChannelPlaying(e\soundchn) Then PauseChannel(e\soundchn)
-			Else
-				SetStreamPaused_Strict(e\soundchn,True)
-			EndIf
-		EndIf
-		If e\soundchn2 <> 0 Then
-			If (Not e\soundchn2_isstream)
-				If ChannelPlaying(e\soundchn2) Then PauseChannel(e\soundchn2)
-			Else
-				SetStreamPaused_Strict(e\soundchn2,True)
-			EndIf
-		EndIf		
-	Next
-	
-	For n.npcs = Each NPCs
-		If n\soundchn <> 0 Then
-			If (Not n\soundchn_isstream)
-				If ChannelPlaying(n\soundchn) Then PauseChannel(n\soundchn)
-			Else
-				If n\soundchn_isstream=True
-					SetStreamPaused_Strict(n\soundchn,True)
-				EndIf
-			EndIf
-		EndIf
-		If n\soundchn2 <> 0 Then
-			If (Not n\soundchn2_isstream)
-				If ChannelPlaying(n\soundchn2) Then PauseChannel(n\soundchn2)
-			Else
-				If n\soundchn2_isstream=True
-					SetStreamPaused_Strict(n\soundchn2,True)
-				EndIf
-			EndIf
-		EndIf
-	Next	
-	
-	For d.doors = Each Doors
-		If d\soundchn <> 0 Then
-			If ChannelPlaying(d\soundchn) Then PauseChannel(d\soundchn)
-		EndIf
-	Next
-	
-	For dem.DevilEmitters = Each DevilEmitters
-		If dem\soundchn <> 0 Then
-			If ChannelPlaying(dem\soundchn) Then PauseChannel(dem\soundchn)
-		EndIf
-	Next
-	
-	If AmbientSFXCHN <> 0 Then
-		If ChannelPlaying(AmbientSFXCHN) Then PauseChannel(AmbientSFXCHN)
-	EndIf
-	
-	If BreathCHN <> 0 Then
-		If ChannelPlaying(BreathCHN) Then PauseChannel(BreathCHN)
-	EndIf
-	
-	If IntercomStreamCHN <> 0
-		SetStreamPaused_Strict(IntercomStreamCHN,True)
-	EndIf
-End Function
-
-Function ResumeSounds()
-	For e.events = Each Events
-		If e\soundchn <> 0 Then
-			If (Not e\soundchn_isstream)
-				If ChannelPlaying(e\soundchn) Then ResumeChannel(e\soundchn)
-			Else
-				SetStreamPaused_Strict(e\soundchn,False)
-			EndIf
-		EndIf
-		If e\soundchn2 <> 0 Then
-			If (Not e\soundchn2_isstream)
-				If ChannelPlaying(e\soundchn2) Then ResumeChannel(e\soundchn2)
-			Else
-				SetStreamPaused_Strict(e\soundchn2,False)
-			EndIf
-		EndIf	
-	Next
-	
-	For n.npcs = Each NPCs
-		If n\soundchn <> 0 Then
-			If (Not n\soundchn_isstream)
-				If ChannelPlaying(n\soundchn) Then ResumeChannel(n\soundchn)
-			Else
-				If n\soundchn_isstream=True
-					SetStreamPaused_Strict(n\soundchn,False)
-				EndIf
-			EndIf
-		EndIf
-		If n\soundchn2 <> 0 Then
-			If (Not n\soundchn2_isstream)
-				If ChannelPlaying(n\soundchn2) Then ResumeChannel(n\soundchn2)
-			Else
-				If n\soundchn2_isstream=True
-					SetStreamPaused_Strict(n\soundchn2,False)
-				EndIf
-			EndIf
-		EndIf
-	Next	
-	
-	For d.doors = Each Doors
-		If d\soundchn <> 0 Then
-			If ChannelPlaying(d\soundchn) Then ResumeChannel(d\soundchn)
-		EndIf
-	Next
-	
-	For dem.DevilEmitters = Each DevilEmitters
-		If dem\soundchn <> 0 Then
-			If ChannelPlaying(dem\soundchn) Then ResumeChannel(dem\soundchn)
-		EndIf
-	Next
-	
-	If AmbientSFXCHN <> 0 Then
-		If ChannelPlaying(AmbientSFXCHN) Then ResumeChannel(AmbientSFXCHN)
-	EndIf	
-	
-	If BreathCHN <> 0 Then
-		If ChannelPlaying(BreathCHN) Then ResumeChannel(BreathCHN)
-	EndIf
-	
-	If IntercomStreamCHN <> 0
-		SetStreamPaused_Strict(IntercomStreamCHN,False)
-	EndIf
-End Function
-
-Function KillSounds()
-	Local i%,e.Events,n.NPCs,d.Doors,dem.DevilEmitters,snd.Sound
-	
-	For i=0 To 9
-		If TempSounds[i]<>0 Then FreeSound_Strict TempSounds[i] : TempSounds[i]=0
-	Next
-	For e.Events = Each Events
-		If e\SoundCHN <> 0 Then
-			If (Not e\SoundCHN_isStream)
-				If ChannelPlaying(e\SoundCHN) Then StopChannel(e\SoundCHN)
-			Else
-				StopStream_Strict(e\SoundCHN)
-			EndIf
-		EndIf
-		If e\SoundCHN2 <> 0 Then
-			If (Not e\SoundCHN2_isStream)
-				If ChannelPlaying(e\SoundCHN2) Then StopChannel(e\SoundCHN2)
-			Else
-				StopStream_Strict(e\SoundCHN2)
-			EndIf
-		EndIf		
-	Next
-	For n.NPCs = Each NPCs
-		If n\SoundChn <> 0 Then
-			If (Not n\SoundChn_IsStream)
-				If ChannelPlaying(n\SoundChn) Then StopChannel(n\SoundChn)
-			Else
-				StopStream_Strict(n\SoundChn)
-			EndIf
-		EndIf
-		If n\SoundChn2 <> 0 Then
-			If (Not n\SoundChn2_IsStream)
-				If ChannelPlaying(n\SoundChn2) Then StopChannel(n\SoundChn2)
-			Else
-				StopStream_Strict(n\SoundChn2)
-			EndIf
-		EndIf
-	Next	
-	For d.Doors = Each Doors
-		If d\SoundCHN <> 0 Then
-			If ChannelPlaying(d\SoundCHN) Then StopChannel(d\SoundCHN)
-		EndIf
-	Next
-	For dem.DevilEmitters = Each DevilEmitters
-		If dem\SoundCHN <> 0 Then
-			If ChannelPlaying(dem\SoundCHN) Then StopChannel(dem\SoundCHN)
-		EndIf
-	Next
-	If AmbientSFXCHN <> 0 Then
-		If ChannelPlaying(AmbientSFXCHN) Then StopChannel(AmbientSFXCHN)
-	EndIf
-	If BreathCHN <> 0 Then
-		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
-	EndIf
-	If IntercomStreamCHN <> 0
-		StopStream_Strict(IntercomStreamCHN)
-		IntercomStreamCHN = 0
-	EndIf
-	If EnableSFXRelease
-		For snd.Sound = Each Sound
-			If snd\internalHandle <> 0 Then
-				FreeSound snd\internalHandle
-				snd\internalHandle = 0
-				snd\releaseTime = 0
-			EndIf
-		Next
-	EndIf
-	
-	For snd.Sound = Each Sound
-		For i = 0 To 31
-			If snd\channels[i]<>0 Then
-				StopChannel snd\channels[i]
-			EndIf
-		Next
-	Next
-	
-	DebugLog "Terminated all sounds"
-	
-End Function
-
-Function GetStepSound(entity%)
-	Local picker%,brush%,texture%,name$
-	Local mat.Materials
-	
-	picker = LinePick(EntityX(entity),EntityY(entity),EntityZ(entity),0,-1,0)
-	If picker <> 0 Then
-		If GetEntityType(picker) <> HIT_MAP Then Return 0
-		brush = GetSurfaceBrush(GetSurface(picker,CountSurfaces(picker)))
-		If brush <> 0 Then
-			texture = GetBrushTexture(brush,3)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name <> "") Then FreeTexture(texture)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound > 0 Then
-							FreeBrush(brush)
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-			texture = GetBrushTexture(brush,2)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name <> "") Then FreeTexture(texture)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound > 0 Then
-							FreeBrush(brush)
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-			texture = GetBrushTexture(brush,1)
-			If texture <> 0 Then
-				name = StripPath(TextureName(texture))
-				If (name <> "") Then FreeTexture(texture)
-				FreeBrush(brush)
-				For mat.Materials = Each Materials
-					If mat\name = name Then
-						If mat\StepSound > 0 Then
-							Return mat\StepSound-1
-						EndIf
-						Exit
-					EndIf
-				Next				
-			EndIf
-		EndIf
-	EndIf
-	
-	Return 0
-End Function
-
-Function UpdateSoundOrigin2(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
-	range# = Max(range,1.0)
-	
-	If volume>0 Then
-		
-		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 > dist And 0 < dist Then
-			
-			ChannelVolume(Chn, volume# * (1 - dist#))
-			ChannelPan(Chn, Sin(-DeltaYaw(cam,entity)))
-		EndIf
-	Else
-		If Chn <> 0 Then
-			ChannelVolume (Chn, 0)
-		EndIf 
-	EndIf
-End Function
-
-Function UpdateSoundOrigin(Chn%, cam%, entity%, range# = 10, volume# = 1.0)
-	range# = Max(range,1.0)
-	
-	If volume>0 Then
-		
-		Local dist# = EntityDistance(cam, entity) / range#
-		If 1 > dist And 0 < dist Then
-			ChannelVolume(Chn, volume# * (1 - dist#)*SFXVolume#)
-			ChannelPan(Chn, Sin(-DeltaYaw(cam,entity)))
-		EndIf
-	Else
-		If Chn <> 0 Then
-			ChannelVolume (Chn, 0)
-		EndIf 
-	EndIf
-End Function
 ;--------------------------------------- random -------------------------------------------------------
-
-Function f2s$(n#, count%)
-	Return Left(n, Len(Int(n))+count+1)
-End Function
 
 Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
 	Local newTime#
@@ -9816,102 +9395,12 @@ Function IsItemGoodFor1162(itt.ItemTemplates)
 	End Select
 End Function
 
-Function ControlSoundVolume()
-	Local snd.Sound,i
-	
-	For snd.Sound = Each Sound
-		For i=0 To 31
-			;If snd\channels[i]<>0 Then
-			;	ChannelVolume snd\channels[i],SFXVolume#
-			;Else
-				ChannelVolume snd\channels[i],SFXVolume#
-			;EndIf
-		Next
-	Next
-	
-End Function
-
-Function UpdateDeafPlayer()
-	
-	If DeafTimer > 0
-		DeafTimer = DeafTimer-FPSfactor
-		SFXVolume# = 0.0
-		If SFXVolume# > 0.0
-			ControlSoundVolume()
-		EndIf
-		DebugLog DeafTimer
-	Else
-		DeafTimer = 0
-		SFXVolume# = PrevSFXVolume#
-		If DeafPlayer Then ControlSoundVolume()
-		DeafPlayer = False
-	EndIf
-	
-End Function
-
 Function ScaledMouseX%()
 	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(I_Opt\GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
 
 Function ScaledMouseY%()
 	Return Float(MouseY())*Float(I_Opt\GraphicHeight)/Float(RealGraphicHeight)
-End Function
-
-Function PlayAnnouncement(file$) ;This function streams the announcement currently playing
-	
-	If IntercomStreamCHN <> 0 Then
-		StopStream_Strict(IntercomStreamCHN)
-		IntercomStreamCHN = 0
-	EndIf
-	
-	IntercomStreamCHN = StreamSound_Strict(file$,SFXVolume,0)
-	
-End Function
-
-Function UpdateStreamSounds()
-	Local e.Events
-	
-	If FPSfactor > 0 Then
-		If IntercomStreamCHN <> 0 Then
-			SetStreamVolume_Strict(IntercomStreamCHN,SFXVolume)
-		EndIf
-		For e = Each Events
-			If e\SoundCHN<>0 Then
-				If e\SoundCHN_isStream
-					SetStreamVolume_Strict(e\SoundCHN,SFXVolume)
-				EndIf
-			EndIf
-			If e\SoundCHN2<>0 Then
-				If e\SoundCHN2_isStream
-					SetStreamVolume_Strict(e\SoundCHN2,SFXVolume)
-				EndIf
-			EndIf
-		Next
-	EndIf
-	
-	If (Not PlayerInReachableRoom()) Then
-		If PlayerRoom\RoomTemplate\Name <> "gateb" And PlayerRoom\RoomTemplate\Name <> "gatea" Then
-			If IntercomStreamCHN <> 0 Then
-				StopStream_Strict(IntercomStreamCHN)
-				IntercomStreamCHN = 0
-			EndIf
-			If PlayerRoom\RoomTemplate\Name$ <> "dimension1499" Then
-				For e = Each Events
-					If e\SoundCHN<>0 And e\SoundCHN_isStream Then
-						StopStream_Strict(e\SoundCHN)
-						e\SoundCHN = 0
-						e\SoundCHN_isStream = 0
-					EndIf
-					If e\SoundCHN2<>0 And e\SoundCHN2_isStream Then
-						StopStream_Strict(e\SoundCHN2)
-						e\SoundCHN = 0
-						e\SoundCHN_isStream = 0
-					EndIf
-				Next
-			EndIf
-		EndIf
-	EndIf
-	
 End Function
 
 Function TeleportEntity(entity%,x#,y#,z#,customradius#=0.3,isglobal%=False,pickrange#=2.0,dir%=0)

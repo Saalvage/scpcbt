@@ -1,20 +1,9 @@
 ;achievement menu & messages by InnocentSam
 
-Const MAXACHIEVEMENTS=37
 Global Achievements%[MAXACHIEVEMENTS]
 Global AchievementStrings$[MAXACHIEVEMENTS]
 Global AchievementDescs$[MAXACHIEVEMENTS]
 Global AchvIMG%[MAXACHIEVEMENTS]
-
-Const Achv008%=0, Achv012%=1, Achv035%=2, Achv049%=3, Achv055=4,  Achv079%=5, Achv096%=6, Achv106%=7, Achv148%=8, Achv178%=9
-Const Achv205=10, Achv294%=11, Achv372%=12, Achv420%=13, Achv427=14, Achv500%=15, Achv513%=16, Achv714%=17, Achv789%=18, Achv860%=19
-Const Achv895%=20, Achv914%=21, Achv939%=22, Achv966%=23, Achv970=24, Achv1025%=25, Achv1048=26, Achv1123=27
-
-Const AchvMaynard%=28, AchvHarp%=29, AchvSNAV%=30, AchvOmni%=31, AchvConsole%=32, AchvTesla%=33, AchvPD%=34
-
-Const Achv1162% = 35, Achv1499% = 36
-
-Const AchvKeter% = 37
 
 Global UsedConsole
 
@@ -158,3 +147,6 @@ Function UpdateAchievementMsg()
 	Next
 	
 End Function
+
+;~IDEal Editor Parameters:
+;~C#Blitz3D

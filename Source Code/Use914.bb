@@ -1,5 +1,3 @@
-Const ROUGH% = -2, COARSE% = -1, ONETOONE% = 0, FINE% = 1, VERY_FINE% = 2
-
 Function Use914(item.Items, setting%, x#, y#, z#)
 	
 	RefinedItems = RefinedItems+1
@@ -117,7 +115,7 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 									Else
 										it2 = CreateItem("key5", x, y, z)
 									EndIf
-								CASE EXTREME
+								Case EXTREME
 									If Rand(2)=1 Then
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									Else
@@ -1411,3 +1409,6 @@ Function GetPaper$(item.Items)
 			Return "d1499"
 	End Select
 End Function
+
+;~IDEal Editor Parameters:
+;~C#Blitz3D

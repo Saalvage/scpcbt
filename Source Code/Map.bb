@@ -782,17 +782,6 @@ End Function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-;Forest gen consts
-Const gridsize% = 10
-Const deviation_chance% = 40 ;out of 100
-Const branch_chance% = 65
-Const branch_max_life% = 4
-Const branch_die_chance% = 18
-Const max_deviation_distance% = 3
-Const return_chance% = 27
-Const center = 5 ;(gridsize-1) / 2
-
 Type Forest
 	Field TileMesh%[6]
 	Field DetailMesh%[6]
@@ -1337,13 +1326,6 @@ End Function
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-Const MaxRoomLights% = 32
-Const MaxRoomEmitters% = 8
-Const MaxRoomObjects% = 30
-
-
-Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
-
 Global RoomTempID%
 Type RoomTemplates
 	Field obj%, id%
@@ -1468,10 +1450,6 @@ End Function
 
 LoadRoomTemplates("Data\rooms.ini")
 
-Const ZONE_AMOUNT = 3
-
-Const RoomScale# = 8.0 / 2048.0
-Const MapWidth% = 12, MapHeight% = 12
 Dim MapTemp%(MapWidth+1, MapHeight+1)
 Dim MapFound%(MapWidth+1, MapHeight+1)
 
@@ -1554,8 +1532,6 @@ Type Triggerbox
 	Field maxY#
 	Field maxZ#
 End Type
-
-Const gridsz%=19
 
 Type Grids
 	Field grid%[gridsz*gridsz]
@@ -7796,8 +7772,6 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#,isSpawnChunk%=False)
 	Return ch
 End Function
 
-Const ChunkMaxDistance#=3*40
-
 Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Local ch.Chunk,StrTemp$,i%,x#,z#,ch2.Chunk,y#,n.NPCs,j%
 	Local ChunkX#,ChunkZ#
@@ -8187,16 +8161,6 @@ Function PreventRoomOverlap(r.Rooms)
 	DebugLog "Couldn't fix overlap issue for room "+r\RoomTemplate\Name
 	Return False
 End Function
-
-;Flu-Light constants, type and functions
-Const MaxFluTextures=3
-Const FluState_Off=0
-Const FluState_Between=1
-Const FluState_On=2
-Const MaxFluSounds=7
-Const FLU_STATE_OFF=0
-Const FLU_STATE_ON=1
-Const FLU_STATE_FLICKER=2
 
 Type TempFluLight
 	Field x#, y#, z#

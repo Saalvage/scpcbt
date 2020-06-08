@@ -5725,7 +5725,7 @@ Function UpdateEvents()
 								;LoadEventSound(e,"SFX\SCP\079\Speech.ogg")
 								;e\SoundCHN = PlaySound_Strict (e\Sound)
 								e\SoundCHN = StreamSound_Strict("SFX\SCP\079\Speech.ogg",SFXVolume,0)
-								e\SoundCHN_isStream = True
+								e\SoundCHN_IsStream = True
 							EndIf							
 						;ElseIf e\EventState = 3
 						ElseIf e\EventState < 2000 Then ;3500
@@ -5788,7 +5788,7 @@ Function UpdateEvents()
 							StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 						EndIf
 						e\SoundCHN = StreamSound_Strict("SFX\SCP\079\GateB.ogg",SFXVolume,0)
-						e\SoundCHN_isStream = True
+						e\SoundCHN_IsStream = True
 						e\EventState2 = 2
 						
 						For e2.Events = Each Events
@@ -8829,7 +8829,7 @@ Function UpdateDimension1499()
 								If e\SoundCHN = 0 Then
 									e\Sound2 = LoadSound_Strict("SFX\Music\HaveMercyOnMe(Choir).ogg")
 									e\SoundCHN = StreamSound_Strict("SFX\Music\HaveMercyOnMe(NoChoir).ogg",MusicVolume)
-									e\SoundCHN_isStream = True
+									e\SoundCHN_IsStream = True
 								EndIf
 								;If e\SoundCHN2<>0 Then
 								;	UpdateStreamSoundOrigin(e\SoundCHN2,Camera,e\room\Levers[0])
@@ -9058,7 +9058,7 @@ Function UpdateEndings()
 									CameraShake = 1.5		
 									If e\EventState-FPSfactor =< 35.0*70 Then
 										e\SoundCHN = StreamSound_Strict("SFX\Ending\GateB\DetonatingAlphaWarheads.ogg",SFXVolume,0)
-										e\SoundCHN_isStream = True
+										e\SoundCHN_IsStream = True
 									EndIf									
 								ElseIf e\EventState > 39.5*70 And e\EventState < 39.8*70		
 									CameraShake = 1.0
@@ -9081,7 +9081,7 @@ Function UpdateEndings()
 								If e\EventState < 75.0*70 Then
 									If e\SoundCHN2=0
 										e\SoundCHN2 = StreamSound_Strict("SFX\Ending\GateB\Siren.ogg",SFXVolume,Mode)
-										e\SoundCHN2_isStream = True
+										e\SoundCHN2_IsStream = True
 									EndIf
 								Else
 									If SelectedEnding = "" Then
