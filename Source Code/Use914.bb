@@ -1,3 +1,5 @@
+Const ROUGH% = -2, COARSE% = -1, ONETOONE% = 0, FINE% = 1, VERY_FINE% = 2
+
 Function Use914(item.Items, setting%, x#, y#, z#)
 	
 	RefinedItems = RefinedItems+1

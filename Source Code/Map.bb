@@ -666,17 +666,21 @@ Function KeyValue$(entity,key$,defaultvalue$="")
 	Forever 
 End Function
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Const GridSize% = 10
+Const Deviation_Chance% = 40 ;out of 100
+Const Branch_Chance% = 65
+Const Branch_Max_Life% = 4
+Const Branch_Die_Chance% = 18
+Const Max_Deviation_Distance% = 3
+Const Return_Chance% = 27
+Const Center% = 5 ;(GridSize - 1) / 2
 
 Type Forest
 	Field TileMesh%[6]
 	Field DetailMesh%[6]
 	Field TileTexture%[10]
-	Field grid%[(gridsize*gridsize)+11]
-	Field TileEntities%[(gridsize*gridsize)+1]
+	Field grid%[(GridSize*GridSize)+11]
+	Field TileEntities%[(GridSize*GridSize)+1]
 	Field Forest_Pivot%
 	
 	Field Door%[2]
@@ -1157,12 +1161,12 @@ End Function
 Function DestroyForest(fr.Forest)
 	;CatchErrors("DestroyForest")
 	Local tx%,ty%
-	For tx% = 0 To gridsize-1
-		For ty% = 0 To gridsize-1
-			If fr\TileEntities[tx+(ty*gridsize)]<>0 Then
-				FreeEntity fr\TileEntities[tx+(ty*gridsize)]
-				fr\TileEntities[tx+(ty*gridsize)] = 0
-				fr\grid[tx+(ty*gridsize)] = 0
+	For tx% = 0 To GridSize-1
+		For ty% = 0 To GridSize-1
+			If fr\TileEntities[tx+(ty*GridSize)]<>0 Then
+				FreeEntity fr\TileEntities[tx+(ty*GridSize)]
+				fr\TileEntities[tx+(ty*GridSize)] = 0
+				fr\grid[tx+(ty*GridSize)] = 0
 			EndIf
 		Next
 	Next
@@ -1192,17 +1196,17 @@ Function UpdateForest(fr.Forest,ent%)
 	;local variables
 	Local tx%,ty%
 	If Abs(EntityY(ent,True)-EntityY(fr\Forest_Pivot,True))<12.0 Then
-		For tx% = 0 To gridsize-1
-			For ty% = 0 To gridsize-1
-				If fr\TileEntities[tx+(ty*gridsize)]<>0 Then
-					If Abs(EntityX(ent,True)-EntityX(fr\TileEntities[tx+(ty*gridsize)],True))<20.0 Then
-						If Abs(EntityZ(ent,True)-EntityZ(fr\TileEntities[tx+(ty*gridsize)],True))<20.0 Then
-							ShowEntity fr\TileEntities[tx+(ty*gridsize)]
+		For tx% = 0 To GridSize-1
+			For ty% = 0 To GridSize-1
+				If fr\TileEntities[tx+(ty*GridSize)]<>0 Then
+					If Abs(EntityX(ent,True)-EntityX(fr\TileEntities[tx+(ty*GridSize)],True))<20.0 Then
+						If Abs(EntityZ(ent,True)-EntityZ(fr\TileEntities[tx+(ty*GridSize)],True))<20.0 Then
+							ShowEntity fr\TileEntities[tx+(ty*GridSize)]
 						Else
-							HideEntity fr\TileEntities[tx+(ty*gridsize)]
+							HideEntity fr\TileEntities[tx+(ty*GridSize)]
 						EndIf
 					Else
-						HideEntity fr\TileEntities[tx+(ty*gridsize)]
+						HideEntity fr\TileEntities[tx+(ty*GridSize)]
 					EndIf
 				EndIf
 			Next
@@ -1211,9 +1215,11 @@ Function UpdateForest(fr.Forest,ent%)
 	;CatchErrors("Uncaught UpdateForest")
 End Function
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+Const MaxRoomLights% = 32
+Const MaxRoomEmitters% = 8
+Const MaxRoomObjects% = 30
+
+Const ROOM1% = 1, ROOM2% = 2, ROOM2C% = 3, ROOM3% = 4, ROOM4% = 5
 
 Global RoomTempID%
 Type RoomTemplates
@@ -1339,6 +1345,11 @@ End Function
 
 LoadRoomTemplates("Data\rooms.ini")
 
+Const ZONE_AMOUNT% = 3
+
+Const RoomScale# = 8.0 / 2048.0
+Const MapWidth% = 12, MapHeight% = 12
+
 Dim MapTemp%(MapWidth+1, MapHeight+1)
 Dim MapFound%(MapWidth+1, MapHeight+1)
 
@@ -1422,11 +1433,13 @@ Type Triggerbox
 	Field maxZ#
 End Type
 
+Const GridSZ% = 19
+
 Type Grids
-	Field grid%[gridsz*gridsz]
-	Field angles%[gridsz*gridsz]
+	Field grid%[GridSZ*GridSZ]
+	Field angles%[GridSZ*GridSZ]
 	Field Meshes%[7]
-	Field Entities%[gridsz*gridsz]
+	Field Entities%[GridSZ*GridSZ]
 	Field waypoints.WayPoints[gridsz*gridsz]
 End Type
 
@@ -7661,6 +7674,8 @@ Function CreateChunk.Chunk(obj%,x#,y#,z#,isSpawnChunk%=False)
 	Return ch
 End Function
 
+Const ChunkMaxDistance# = 40.0 * 3.0
+
 Function UpdateChunks(r.Rooms,ChunkPartAmount%,spawnNPCs%=True)
 	Local ch.Chunk,StrTemp$,i%,x#,z#,ch2.Chunk,y#,n.NPCs,j%
 	Local ChunkX#,ChunkZ#
@@ -8017,6 +8032,15 @@ Function PreventRoomOverlap(r.Rooms)
 	Return False
 End Function
 
+Const MaxFluTextures% = 3
+Const FluState_OFF% = 0
+Const FluState_Between% = 1
+Const FluState_ON% = 2
+Const MaxFluSounds% = 7
+Const FLU_STATE_OFF% = 0
+Const FLU_STATE_ON% = 1
+Const FLU_STATE_FLICKER% = 2
+
 Type TempFluLight
 	Field x#, y#, z#
 	Field pitch#, yaw#, roll#
@@ -8064,12 +8088,12 @@ Function CreateFluLight.FluLight(id%)
 	EndIf
 	ScaleEntity fll\obj,RoomScale,RoomScale,RoomScale
 	
-	If fll\tex[FluState_Off]=0 Then
+	If fll\tex[FluState_OFF]=0 Then
 		For i = 0 To MaxFluTextures-1
 			fll\tex[i] = LoadTexture_Strict("GFX\map\light_flu"+(i+1)+".jpg",1)
 		Next
 	EndIf
-	EntityTexture fll\obj,fll\tex[FluState_Off]
+	EntityTexture fll\obj,fll\tex[FluState_OFF]
 	HideEntity fll\obj
 	
 	If fll\sfx[0]=0 Then

@@ -8,9 +8,10 @@ If Len(InitErrorStr) > 0 Then
 	RuntimeError "The following DLLs were not found in the game directory:" + Chr(13) + Chr(10) + Chr(13) + Chr(10) + InitErrorStr
 EndIf
 
-Include "Source Code\Constants.bb"
 Include "Source Code\Math.bb"
 Include "Source Code\DevilParticleSystem.bb"
+
+Const OptionFile$ = "Data\options.ini"
 
 If FileType(OptionFile) <> 1 Then
 	DefaultOptionsINI()
@@ -186,12 +187,16 @@ End Function
 Include "Source Code\StrictLoads.bb"
 Include "Source Code\Keys.bb"
 
+Const ErrorDir$ = "Logs\"
 Global ErrorFile$ = ErrorDir + "error_log_"
 Local ErrorFileInd% = 0
 While FileType(ErrorFile+Str(ErrorFileInd)+".txt")<>0
 	ErrorFileInd = ErrorFileInd+1
 Wend
 ErrorFile = ErrorFile+Str(ErrorFileInd)+".txt"
+
+Const VersionNumber$ = "1.0.0"
+Const CompatibleNumber$ = "1.0.0" ;Lowest version with compatible saves
 
 Global MenuWhite%, MenuBlack%
 Global ButtonSFX%, ButtonSFX2%
@@ -332,6 +337,7 @@ Global ScreenGamma# = GetINIFloat(OptionFile, "options", "screengamma")
 
 Global FOV% = GetINIInt(OptionFile, "options", "fov")
 
+Const HIT_MAP% = 1, HIT_PLAYER% = 2, HIT_ITEM% = 3, HIT_APACHE% = 4, HIT_178% = 5, HIT_DEAD% = 6
 SeedRnd MilliSecs()
 
 Global GameSaved%
@@ -1530,6 +1536,8 @@ Global I_427.SCP427 = New SCP427
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ; MAIN LOOP
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Const TICK_DURATION# = 70.0 / 60.0
 
 Type FixedTimesteps
 	Field accumulator#
@@ -3113,6 +3121,12 @@ Function MouseLook()
 End Function
 
 ;--------------------------------------- GUI, menu etc ------------------------------------------------
+
+Const INVENTORY_GFX_SIZE% = 70
+Const INVENTORY_GFX_SPACING% = 35
+
+Const NAV_WIDTH% = 287
+Const NAV_HEIGHT% = 256
 
 Function DrawGUI()
 	;CatchErrors("DrawGUI")

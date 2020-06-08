@@ -25,6 +25,12 @@ If FileType("does the black moon howl") = 1 Then
 	CloseFile(dtbmh)
 EndIf
 
+Const SAFE% = 0, EUCLID% = 1, KETER% = 2, APOLLYON% = 3, CUSTOM% = 4
+
+Const SAVEANYWHERE% = 0, SAVEONQUIT% = 1, SAVEONSCREENS% = 2
+
+Const EASY% = 0, NORMAL% = 1, HARD% = 2, EXTREME% = 3
+
 difficulties[SAFE] = New Difficulty
 difficulties[SAFE]\name = GetLocalString("Menu", "safe")
 difficulties[SAFE]\description =GetLocalString("Menu", "safe_desc")

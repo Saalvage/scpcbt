@@ -1019,6 +1019,9 @@ Function UpdateMainMenu()
 	SetFont I_Opt\Fonts[1]
 End Function
 
+Const L_WIDTH% = 640
+Const L_HEIGHT% = 480
+
 Function UpdateLauncher(I_LOpt.LauncherOptions)
 	
 	MenuScale = 1
