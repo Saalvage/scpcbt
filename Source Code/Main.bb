@@ -106,7 +106,7 @@ End Function
 
 ;Returns localized version of a String, if no translation exists, use English
 Function GetLocalString$(Section$, Parameter$)
-
+	
 	For l.LocalString = Each LocalString
 		If l\section = Section And l\parameter = Parameter Then
 			Return l\value
@@ -789,7 +789,7 @@ Global LightConeModel
 
 Global ParticleEffect%[2]
 
-Global DTextures%[9]
+Global DTextures%[10]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
@@ -1077,16 +1077,6 @@ Function UpdateDoors()
 				If d\obj2 <> 0 Then ShowEntity d\obj2
 				If d\buttons[0] <> 0 Then ShowEntity d\buttons[0]
 				If d\buttons[1] <> 0 Then ShowEntity d\buttons[1]
-			EndIf
-			
-			If PlayerRoom\RoomTemplate\Name$ = "room2sl"
-				If ValidRoom2slCamRoom(d\room)
-					If d\obj <> 0 Then ShowEntity d\obj
-					If d\frameobj <> 0 Then ShowEntity d\frameobj
-					If d\obj2 <> 0 Then ShowEntity d\obj2
-					If d\buttons[0] <> 0 Then ShowEntity d\buttons[0]
-					If d\buttons[1] <> 0 Then ShowEntity d\buttons[1]
-				EndIf
 			EndIf
 		Next
 		
@@ -1447,275 +1437,14 @@ End Function
 DrawLoading(40,True)
 
 Include "Source Code\Map.bb"
+
 Include "Source Code\Save.bb"
 
 DrawLoading(80,True)
 
 Include "Source Code\NPCs.bb"
 
-;-------------------------------------  Events --------------------------------------------------------------
-
-Type Events
-	Field EventName$
-	Field room.Rooms
-	
-	Field EventState#, EventState2#, EventState3#
-	Field SoundCHN%, SoundCHN2%
-	Field Sound, Sound2
-	Field SoundCHN_IsStream%, SoundCHN2_IsStream%
-	
-	Field EventStr$
-	
-	Field img%
-End Type
-
-Function CreateEvent.Events(eventname$, roomname$, id%, prob# = 0.0)
-	;roomname = the name of the room(s) you want the event to be assigned to
-	
-	;the id-variable determines which of the rooms the event is assigned to,
-	;0 will assign it to the first generated room, 1 to the second, etc
-	
-	;the prob-variable can be used to randomly assign events into some rooms
-	;0.5 means that there's a 50% chance that event is assigned to the rooms
-	;1.0 means that the event is assigned to every room
-	;the id-variable is ignored if prob <> 0.0
-	
-	Local i% = 0, temp%, e.Events, e2.Events, r.Rooms
-	
-	If prob = 0.0 Then
-		For r.Rooms = Each Rooms
-			If (roomname = "" Lor roomname = r\RoomTemplate\Name) Then
-				temp = False
-				For e2.Events = Each Events
-					If e2\room = r Then temp = True : Exit
-				Next
-				
-				i=i+1
-				If i >= id And temp = False Then
-					e.Events = New Events
-					e\EventName = eventname					
-					e\room = r
-					Return e
-				EndIf
-			EndIf
-		Next
-	Else
-		For r.Rooms = Each Rooms
-			If (roomname = "" Lor roomname = r\RoomTemplate\Name) Then
-				temp = False
-				For e2.Events = Each Events
-					If e2\room = r Then temp = True : Exit
-				Next
-				
-				If Rnd(0.0, 1.0) < prob And temp = False Then
-					e.Events = New Events
-					e\EventName = eventname					
-					e\room = r
-				EndIf
-			EndIf
-		Next		
-	EndIf
-	
-	Return Null
-End Function
-
-Function InitEvents()
-	Local e.Events
-	
-	MaxItemAmount = SelectedDifficulty\items
-	Dim Inventory.Items(MaxItemAmount)
-	
-	CreateEvent("173", "room173", 0)
-	CreateEvent("alarm", "start", 0)
-	
-	CreateEvent("pocketdimension", "pocketdimension", 0)
-	
-	;there's a 7% chance that 106 appears in the rooms named "tunnel"
-	CreateEvent("tunnel106", "tunnel", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
-	
-	;the chance for 173 appearing in the first lockroom is about 66%
-	;there's a 30% chance that it appears in the later lockrooms
-	If Rand(3)<3 Then CreateEvent("lockroom173", "lockroom", 0)
-	CreateEvent("lockroom173", "lockroom", 0, 0.3 + (0.5*SelectedDifficulty\aggressiveNPCs))
-	
-	CreateEvent("room2trick", "room2", 0, 0.15)	
-	
-	CreateEvent("1048a", "room2", 0, 1.0)	
-	
-	CreateEvent("room2storage", "room2storage", 0)
-	
-	;096 spawns in the first (and last) lockroom2
-	CreateEvent("lockroom096", "lockroom2", 0)
-	
-	CreateEvent("endroom106", "endroom", Rand(0,1))
-	CreateEvent("endroom106", "endroom2", Rand(0,1))
-	CreateEvent("endroom106", "endroom3", Rand(0,1))
-	
-	CreateEvent("room2poffices2", "room2poffices2", 0)
-	
-	CreateEvent("room2fan", "room2_2", 0, 1.0)
-	
-	CreateEvent("room2elevator2", "room2elevator", 0)
-	CreateEvent("room2elevator", "room2elevator", Rand(1,2))
-	
-	CreateEvent("room3storage", "room3storage", 0, 0)
-	
-	CreateEvent("tunnel2smoke", "tunnel2", 0, 0.2)
-	CreateEvent("173spawn", "tunnel2", Rand(0,2), 0)
-	CreateEvent("173spawn", "tunnel2", 0, (0.15*SelectedDifficulty\aggressiveNPCs))
-	
-	CreateEvent("173spawn", "room2tunnel3", Rand(0, 1), 0)
-	CreateEvent("173spawn", "room2tunnel3", 0, (0.15*SelectedDifficulty\aggressiveNPCs))
-	
-	;173 appears in half of the "room2doors" -rooms
-	CreateEvent("room2doors173", "room2doors", 0, 0.5 + (0.4*SelectedDifficulty\aggressiveNPCs))
-	
-	;the anomalous duck in room2offices2-rooms
-	CreateEvent("room2offices2", "room2offices2", 0, 0.7)
-	
-	CreateEvent("room2closets", "room2closets", 0)	
-	
-	CreateEvent("room2cafeteria", "room2cafeteria", 0)	
-	
-	CreateEvent("room3pit1048", "room3pit", 0)
-	CreateEvent("room3pitduck", "room3pit", 1)
-	
-	;the event that causes the door to open by itself in room2offices3
-	CreateEvent("room2offices3", "room2offices3", 0, 1.0)	
-	
-	CreateEvent("room2servers", "room2servers", 0)	
-	
-	CreateEvent("room3servers", "room3servers", 0)	
-	CreateEvent("room3servers", "room3servers2", 0)
-	
-	;the dead guard
-	CreateEvent("room3tunnel","room3tunnel", 0, 0.08)
-	
-	CreateEvent("room4","room4", 0)
-	
-	If Rand(5)<5 Then 
-		Select Rand(3)
-			Case 1
-				CreateEvent("682roar", "tunnel", Rand(0,2), 0)
-			Case 2
-				CreateEvent("682roar", "room3pit", Rand(0,2), 0)
-			Case 3
-				;CreateEvent("682roar", "room2offices", 0, 0)
-				CreateEvent("682roar", "room2z3", 0, 0)
-		End Select 
-	EndIf 
-	
-	CreateEvent("testroom173", "room2testroom2", 0, 1.0)
-	
-	CreateEvent("room2tesla", "room2tesla", 0, 0.9)
-	CreateEvent("room2tesla", "room2tesla_lcz", 0, 0.9)
-	CreateEvent("room2tesla", "room2tesla_hcz", 0, 0.9)
-	
-	CreateEvent("room2nuke", "room2nuke", 0, 0)
-	
-	If Rand(5) = 1 Then 
-		CreateEvent("coffin", "room895", 0, 0)
-	Else
-		CreateEvent("coffin106", "room895", 0, 0)
-	EndIf 
-	
-	CreateEvent("checkpoint", "checkpoint1", 0, 1.0)
-	CreateEvent("checkpoint", "checkpoint2", 0, 1.0)
-	
-	CreateEvent("room3door", "room3", 0, 0.1)
-	CreateEvent("room3door", "room3tunnel", 0, 0.1)
-	
-	If Rand(2)=1 Then
-		CreateEvent("106victim", "room3", Rand(1,2))
-		CreateEvent("106sinkhole", "room3_2", Rand(2,3))
-	Else
-		CreateEvent("106victim", "room3_2", Rand(1,2))
-		CreateEvent("106sinkhole", "room3", Rand(2,3))
-	EndIf
-	CreateEvent("106sinkhole", "room4", Rand(1,2))
-	
-	CreateEvent("room079", "room079", 0, 0)	
-	
-	CreateEvent("room049", "room049", 0, 0)
-	
-	CreateEvent("room012", "room012", 0, 0)
-	
-	CreateEvent("room035", "room035", 0, 0)
-	
-	CreateEvent("008", "room008", 0, 0)
-	
-	CreateEvent("room106", "room106", 0, 0)
-	
-	CreateEvent("room372", "room372", 0, 0)
-	
-	CreateEvent("914", "room914", 0, 0)
-	
-	CreateEvent("buttghost", "room2toilets", 0, 0)
-	CreateEvent("toiletguard", "room2toilets", 1, 0)
-	
-	CreateEvent("room2pipes106", "room2pipes", Rand(0, 3)) 
-	
-	CreateEvent("room2pit", "room2pit", 0, 0.4 + (0.4*SelectedDifficulty\aggressiveNPCs))
-	
-	CreateEvent("testroom", "testroom", 0)
-	
-	CreateEvent("room2mtunnels", "room2mtunnels", 0)
-	
-	CreateEvent("room2ccont", "room2ccont", 0)
-	
-	CreateEvent("gateaentrance", "gateaentrance", 0)
-	CreateEvent("gatea", "gatea", 0)	
-	CreateEvent("gateb", "gateb", 0)
-	
-	CreateEvent("room205", "room205", 0)
-	
-	CreateEvent("room860","room860", 0)
-	
-	CreateEvent("room966","room966", 0)
-	
-	CreateEvent("room1123", "room1123", 0, 0)
-	
-	;New Events in SCP:CB Version 1.3 - ENDSHN
-	CreateEvent("room4tunnels","room4tunnels",0)
-	CreateEvent("room_gw","room2gw",0,1.0)
-	CreateEvent("dimension1499","dimension1499",0)
-	CreateEvent("room1162","room1162",0)
-	CreateEvent("room2scps2","room2scps2",0)
-	CreateEvent("room_gw","room3gw",0,1.0)
-	CreateEvent("room2sl","room2sl",0)
-	CreateEvent("medibay","medibay",0)
-	CreateEvent("room2shaft","room2shaft",0)
-	CreateEvent("room1lifts","room1lifts",0)
-	
-	CreateEvent("room2gw_b","room2gw_b",Rand(0,1))
-	
-	CreateEvent("096spawn","room4pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room3pit",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room2pipes",0,0.4+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room2pit",0,0.5+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room3tunnel",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room4tunnels",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","tunnel",0,0.6+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","tunnel2",0,0.4+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room2tunnel3",0,0.3+(0.2*SelectedDifficulty\aggressiveNPCs))
-	CreateEvent("096spawn","room3z2",0,0.7+(0.2*SelectedDifficulty\aggressiveNPCs))
-	
-	CreateEvent("room2pit","room2_4",0,0.4 + (0.4*SelectedDifficulty\aggressiveNPCs))
-	
-	CreateEvent("room2offices035","room2offices",0)
-	
-	CreateEvent("room2pit106", "room2pit", 0, 0.07 + (0.1*SelectedDifficulty\aggressiveNPCs))
-	
-End Function
-
 Include "Source Code\Events.bb"
-
-Function RemoveEvent(e.Events)
-	If e\Sound<>0 Then FreeSound_Strict e\Sound
-	If e\Sound2<>0 Then FreeSound_Strict e\Sound2
-	If e\img<>0 Then FreeImage e\img
-	Delete e
-End Function
 
 Collisions HIT_PLAYER, HIT_MAP, 2, 2
 Collisions HIT_PLAYER, HIT_PLAYER, 1, 3
@@ -2379,232 +2108,6 @@ Forever
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------------------------------------------------------------
-
-Function QuickLoadEvents()
-	;CatchErrors("QuickLoadEvents")
-	
-	Local e.Events = QuickLoad_CurrEvent
-	
-	Local r.Rooms,sc.SecurityCams,sc2.SecurityCams,scale#,pvt%,n.NPCs,tex%,i%,x#,z#
-	
-	;might be a good idea to use QuickLoadPercent to determine the "steps" of the loading process 
-	;instead of magic values in e\eventState and e\eventStr
-
-	Select e\EventName
-		Case "room2sl"
-
-			If e\EventState = 0 And e\EventStr <> ""
-				If e\EventStr <> "" And Left(e\EventStr,4) <> "load"
-					If Int(e\EventStr) > 9
-						e\EventStr = "load2"
-					Else
-						e\EventStr = Int(e\EventStr) + 1
-					EndIf
-				ElseIf e\EventStr = "load2"
-					;For SCP-049
-					Local skip = False
-					If e\room\NPC[0]=Null Then
-						For n.NPCs = Each NPCs
-							If n\NPCtype = NPCtype049
-								;e\room\NPC[0] = n
-								skip = True
-								Exit
-							EndIf
-						Next
-						
-						If (Not skip)
-							e\room\NPC[0] = CreateNPC(NPCtype049,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True))
-							e\room\NPC[0]\HideFromNVG = True
-							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
-							ResetEntity e\room\NPC[0]\Collider
-							RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
-							e\room\NPC[0]\State = 0
-							e\room\NPC[0]\PrevState = 2
-							
-							DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
-						Else
-							DebugLog "Skipped 049 spawning in room2sl"
-						EndIf
-					EndIf
-					e\EventStr = "load3"
-				ElseIf e\EventStr = "load3"
-					;PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[7],True),EntityY(e\room\Objects[7],True)+5,EntityZ(e\room\Objects[7],True)
-					;ResetEntity e\room\NPC[0]\Collider
-					;RotateEntity e\room\NPC[0]\Collider,0,e\room\angle+180,0
-					
-					;DebugLog(EntityX(e\room\Objects[7],True)+", "+EntityY(e\room\Objects[7],True)+", "+EntityZ(e\room\Objects[7],True))
-					
-					;e\room\NPC[0]\State = 0
-					;e\room\NPC[0]\PrevState = 2
-					
-					e\EventState = 1
-					If e\EventState2 = 0 Then e\EventState2 = -(70*5)
-					
-					QuickLoad_CurrEvent = Null
-				EndIf
-			EndIf
-
-		Case "room3storage"
-
-			If e\room\NPC[0]=Null Then
-				e\room\NPC[0]=CreateNPC(NPCtype939, 0,0,0)
-			ElseIf e\room\NPC[1]=Null Then
-				e\room\NPC[1]=CreateNPC(NPCtype939, 0,0,0)
-			ElseIf e\room\NPC[2]=Null Then
-				e\room\NPC[2]=CreateNPC(NPCtype939, 0,0,0)
-			Else
-				QuickLoad_CurrEvent = Null
-			EndIf
-
-		Case "room049"
-
-			If e\EventState = 0 Then
-				If e\EventStr = "load0"
-					n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True),EntityZ(e\room\Objects[4],True))
-					PointEntity n\Collider, e\room\obj
-					TurnEntity n\Collider, 0, 190, 0
-					e\EventStr = "load1"
-				ElseIf e\EventStr = "load1"
-					n.NPCs = CreateNPC(NPCtypeZombie, EntityX(e\room\Objects[5],True),EntityY(e\room\Objects[5],True),EntityZ(e\room\Objects[5],True))
-					PointEntity n\Collider, e\room\obj
-					TurnEntity n\Collider, 0, 20, 0
-					e\EventStr = "load2"
-				ElseIf e\EventStr = "load2"
-					For n.NPCs = Each NPCs
-						If n\NPCtype = NPCtype049
-							e\room\NPC[0]=n
-							e\room\NPC[0]\State = 2
-							e\room\NPC[0]\Idle = 1
-							e\room\NPC[0]\HideFromNVG = True
-							PositionEntity e\room\NPC[0]\Collider,EntityX(e\room\Objects[4],True),EntityY(e\room\Objects[4],True)+3,EntityZ(e\room\Objects[4],True)
-							ResetEntity e\room\NPC[0]\Collider
-							Exit
-						EndIf
-					Next
-					If e\room\NPC[0]=Null
-						n.NPCs = CreateNPC(NPCtype049, EntityX(e\room\Objects[4],True), EntityY(e\room\Objects[4],True)+3, EntityZ(e\room\Objects[4],True))
-						PointEntity n\Collider, e\room\obj
-						n\State = 2
-						n\Idle = 1
-						n\HideFromNVG = True
-						e\room\NPC[0]=n
-					EndIf
-					e\EventState=1
-					QuickLoad_CurrEvent = Null
-				EndIf
-			EndIf
-
-		Case "room205"
-
-			If e\EventState=0 Lor e\room\Objects[0]=0 Then
-				If e\EventStr = "load0"
-					e\room\Objects[3] = LoadAnimMesh_Strict("GFX\npcs\205_demon1.b3d")
-					e\EventStr = "load1"
-				ElseIf e\EventStr = "load1"
-					e\room\Objects[4] = LoadAnimMesh_Strict("GFX\npcs\205_demon2.b3d")
-					e\EventStr = "load2"
-				ElseIf e\EventStr = "load2"
-					e\room\Objects[5] = LoadAnimMesh_Strict("GFX\npcs\205_demon3.b3d")
-					e\EventStr = "load3"
-				ElseIf e\EventStr = "load3"
-					e\room\Objects[6] = LoadAnimMesh_Strict("GFX\npcs\205_woman.b3d")
-					e\EventStr = "load4"
-				ElseIf e\EventStr = "load4"
-					e\EventStr = "load5"
-				ElseIf e\EventStr = "load5"
-					For i = 3 To 6
-						PositionEntity e\room\Objects[i], EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True), True
-						RotateEntity e\room\Objects[i], -90, EntityYaw(e\room\Objects[0],True), 0, True
-						ScaleEntity(e\room\Objects[i], 0.05, 0.05, 0.05, True)
-					Next
-					e\EventStr = "load6"
-				ElseIf e\EventStr = "load6"
-					n.NPCs = CreateNPC(NPCtypeD,e\room\x+3.8,e\room\y+0.5,e\room\z-2.3)
-					RotateEntity n\Collider,0,e\room\angle+155,0
-					n\State = 3
-					SetNPCFrame(n,20)
-					n\IsDead = True
-					n\texture = "GFX\npcs\deadd.jpg"
-					tex = LoadTexture_Strict(n\texture)
-					EntityTexture(n\obj, tex)
-					FreeTexture tex
-					e\EventStr = "load7"
-				ElseIf e\EventStr = "load7"
-					HideEntity(e\room\Objects[3])
-					HideEntity(e\room\Objects[4])
-					HideEntity(e\room\Objects[5])
-					e\EventStr = "loaddone"
-					QuickLoad_CurrEvent = Null
-				EndIf
-			EndIf
-
-		Case "room860"
-
-			If e\EventStr = "load0"
-				ForestNPC = CreateSprite()
-				;0.75 = 0.75*(410.0/410.0) - 0.75*(width/height)
-				ScaleSprite ForestNPC,0.75*(140.0/410.0),0.75
-				SpriteViewMode ForestNPC,4
-				EntityFX ForestNPC,1+8
-				ForestNPCTex = LoadAnimTexture("GFX\npcs\AgentIJ.AIJ",1+2,140,410,0,4)
-				ForestNPCData[0] = 0
-				EntityTexture ForestNPC,ForestNPCTex,ForestNPCData[0]
-				ForestNPCData[1]=0
-				ForestNPCData[2]=0
-				HideEntity ForestNPC
-				e\EventStr = "load1"
-			ElseIf e\EventStr = "load1"
-				e\EventStr = "load2"
-			ElseIf e\EventStr = "load2"
-				If e\room\NPC[0]=Null Then e\room\NPC[0]=CreateNPC(NPCtype860, 0,0,0)
-				e\EventStr = "loaddone"
-				QuickLoad_CurrEvent = Null
-			EndIf
-
-		Case "dimension1499"
-
-			If e\EventState = 0.0
-				If e\EventStr = "load0"
-					e\room\Objects[0] = LoadMesh_Strict("GFX\map\dimension1499\1499plane.b3d")
-					;Local planetex% = LoadTexture_Strict("GFX\map\dimension1499\grit3.jpg")
-					;ScaleTexture planetex%,0.5,0.5
-					;EntityTexture e\room\Objects[0],planetex%
-					;FreeTexture planetex%
-					HideEntity e\room\Objects[0]
-					e\EventStr = "load1"
-				ElseIf e\EventStr = "load1"
-					NTF_1499Sky = sky_CreateSky("GFX\map\sky\1499sky")
-					e\EventStr = 1
-				Else
-					If Int(e\EventStr)<16
-						e\room\Objects[Int(e\EventStr)] = LoadMesh_Strict("GFX\map\dimension1499\1499object"+(Int(e\EventStr))+".b3d")
-						HideEntity e\room\Objects[Int(e\EventStr)]
-						e\EventStr = Int(e\EventStr)+1
-					ElseIf Int(e\EventStr)=16
-						CreateChunkParts(e\room)
-						e\EventStr = 17
-					ElseIf Int(e\EventStr) = 17
-						x# = EntityX(e\room\obj)
-						z# = EntityZ(e\room\obj)
-						Local ch.Chunk
-						For i = -2 To 0 Step 2
-							ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#,True)
-						Next
-						For i = -2 To 0 Step 2
-							ch = CreateChunk(-1,x#*(i*2.5),EntityY(e\room\obj),z#-40,True)
-						Next
-						e\EventState = 2.0
-						e\EventStr = 18
-						QuickLoad_CurrEvent = Null
-					EndIf
-				EndIf
-			EndIf
-
-	End Select
-	
-	;CatchErrors("Uncaught QuickLoadEvents "+e\EventName)
-	
-End Function
 
 Function Kill()
 	If I_Cheats\GodMode Then Return
@@ -7175,50 +6678,54 @@ Function LoadEntities()
 	SetChunkDataValues()
 	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
-	For i = 0 To 9
+	For i = 0 To 10
 		DTextures[i] = CopyEntity(ClassDObj)
 		HideEntity DTextures[i]
 	Next
-	;Gonzales
-	tex = LoadTexture_Strict("GFX\npcs\gonzales.jpg")
-	EntityTexture DTextures[0],tex
-	FreeTexture tex
-	;SCP-970 corpse
-	tex = LoadTexture_Strict("GFX\npcs\corpse.jpg")
-	EntityTexture DTextures[1],tex
-	FreeTexture tex
-	;scientist 1
-	tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
-	EntityTexture DTextures[2],tex
-	FreeTexture tex
-	;scientist 2
-	tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
-	EntityTexture DTextures[3],tex
-	FreeTexture tex
-	;janitor
-	tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
-	EntityTexture DTextures[4],tex
-	FreeTexture tex
-	;106 Victim
-	tex = LoadTexture_Strict("GFX\npcs\106victim.jpg")
-	EntityTexture DTextures[5],tex
-	FreeTexture tex
-	;2nd ClassD
-	tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
-	EntityTexture DTextures[6],tex
-	FreeTexture tex
-	;035 victim
-	tex = LoadTexture_Strict("GFX\npcs\035victim.jpg")
-	EntityTexture DTextures[7],tex
-	FreeTexture tex
-	;body 1
-	tex = LoadTexture_Strict("GFX\npcs\body1.jpg")
-	EntityTexture DTextures[8],tex
-	FreeTexture tex
-	;body 2
-	tex = LoadTexture_Strict("GFX\npcs\body2.jpg")
-	EntityTexture DTextures[9],tex
-	FreeTexture tex
+	; Gonzales
+	Tex = LoadTexture_Strict("GFX\npcs\gonzales.jpg")
+	EntityTexture(DTextures[0], Tex)
+	FreeTexture(Tex)
+	; D-9341
+	Tex = LoadTexture_Strict("GFX\npcs\corpse.jpg")
+	EntityTexture(DTextures[1], Tex)
+	FreeTexture(Tex)
+	; Scientist 1
+	Tex = LoadTexture_Strict("GFX\npcs\scientist.jpg")
+	EntityTexture(DTextures[2], Tex)
+	FreeTexture(Tex)
+	; Franklin
+	Tex = LoadTexture_Strict("GFX\npcs\scientist2.jpg")
+	EntityTexture(DTextures[3], Tex)
+	FreeTexture(Tex)
+	; Janitor
+	Tex = LoadTexture_Strict("GFX\npcs\janitor.jpg")
+	EntityTexture(DTextures[4], Tex)
+	FreeTexture(Tex)
+	; Maynard
+	Tex = LoadTexture_Strict("GFX\npcs\106victim.jpg")
+	EntityTexture(DTextures[5], tex)
+	FreeTexture(Tex)
+	; Afro-American Class D
+	Tex = LoadTexture_Strict("GFX\npcs\classd2.jpg")
+	EntityTexture(DTextures[6], Tex)
+	FreeTexture(Tex)
+	; SCP-035's Victim
+	Tex = LoadTexture_Strict("GFX\npcs\035victim.jpg")
+	EntityTexture(DTextures[7], Tex)
+	FreeTexture(Tex)
+	; Body #1
+	Tex = LoadTexture_Strict("GFX\npcs\body1.jpg")
+	EntityTexture(DTextures[8], Tex)
+	FreeTexture(Tex)
+	; Body #2
+	Tex = LoadTexture_Strict("GFX\npcs\body2.jpg")
+	EntityTexture(DTextures[9], Tex)
+	FreeTexture(Tex)
+	; Body #3
+	Tex = LoadTexture_Strict("GFX\npcs\body3.jpg")
+	EntityTexture(DTextures[10], Tex)
+	FreeTexture(Tex)
 	
 	LoadMaterials("DATA\materials.ini")
 	
@@ -7806,8 +7313,6 @@ Function NullGame(playbuttonsfx%=True)
 	NTF_1499Z# = 0.0
 	Wearing1499% = False
 	DeleteChunks()
-	
-	DeleteElevatorObjects()
 	
 	DeleteDevilEmitters()
 	
@@ -8472,7 +7977,6 @@ Function UpdateDecals()
 		EndIf
 	Next
 End Function
-
 
 ;--------------------------------------- INI-functions -------------------------------------------------------
 
@@ -9362,20 +8866,7 @@ Function PlayStartupVideos()
 	
 End Function
 
-Function CreateQuad()
-	
-	mesh = CreateMesh()
-	surf = CreateSurface(mesh)
-	v0 = AddVertex(surf,-1.0, 1.0, 0, 0, 0)
-	v1 = AddVertex(surf, 1.0, 1.0, 0, 1, 0)
-	v2 = AddVertex(surf, 1.0,-1.0, 0, 1, 1)
-	v3 = AddVertex(surf,-1.0,-1.0, 0, 0, 1)
-	AddTriangle(surf, v0, v1, v2)
-	AddTriangle(surf, v0, v2, v3)
-	UpdateNormals mesh
-	Return mesh
-	
-End Function
+
 
 ; TODO potentially make it more unique, with an exception for all items
 Function CanUseItem(canUseWithGasMask%, canUseWithEyewear%)

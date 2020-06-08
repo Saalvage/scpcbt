@@ -436,8 +436,8 @@ Function UpdateStreamSounds()
 					EndIf
 					If e\SoundCHN2 <> 0 And e\SoundCHN2_IsStream Then
 						StopStream_Strict(e\SoundCHN2)
-						e\SoundCHN = 0
-						e\SoundCHN_IsStream = 0
+						e\SoundCHN2 = 0
+						e\SoundCHN2_IsStream = 0
 					EndIf
 				Next
 			EndIf
@@ -469,6 +469,26 @@ Function UpdateDeafPlayer()
 		If DeafPlayer Then ControlSoundVolume()
 		DeafPlayer = False
 	EndIf
+End Function
+
+Function PlayMTFSound(Sound%, n.NPCs)
+	If n <> Null Then
+		n\SoundCHN = PlaySound2(Sound, Camera, n\Collider, 8.0)	
+	EndIf
+	
+	If SelectedItem <> Null Then
+		If SelectedItem\State2 = 3.0 And SelectedItem\State > 0.0 Then 
+			Select SelectedItem\ItemTemplate\TempName 
+				Case "radio", "fineradio", "18vradio"
+					;[Block]
+					If Sound <> MTFSFX(5) Lor (Not ChannelPlaying(RadioCHN[3]))
+						If RadioCHN[3]<> 0 Then StopChannel(RadioCHN[3])
+						RadioCHN[3] = PlaySound_Strict (Sound)
+					EndIf
+					;[End Block]
+			End Select
+		EndIf
+	EndIf 
 End Function
 
 Function LoadAllSounds()

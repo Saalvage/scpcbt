@@ -50,7 +50,6 @@ Type NPCs
 	Field NPCNameInSection$
 	Field InFacility% = True
 	Field CanUseElevator% = False
-	Field CurrElevator.ElevatorObj
 	Field HP%
 	Field PathX#,PathZ#
 	Field Model$
@@ -690,7 +689,7 @@ End Function
 
 Function UpdateNPCs()
 	;CatchErrors("UpdateNPCs")
-	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms, eo.ElevatorObj, eo2.ElevatorObj
+	Local n.NPCs, n2.NPCs, d.Doors, de.Decals, r.Rooms
 	Local i%, dist#, dist2#, angle#, x#, y#, z#, prevFrame#, PlayerSeeAble%, RN$
 	
 	Local target
@@ -2800,10 +2799,10 @@ Function UpdateNPCs()
 					EndIf
 				EndIf
 				
-				If n\Frame = 19.0 Lor n\Frame = 40.0 Lor n\Frame = 60.0 Lor n\Frame = 629.0 Lor n\Frame = 677.0 Lor n\Frame = 711.0 Lor n\Frame = 779.0 Then
+				If n\Frame = 20.0 Lor n\Frame = 40.0 Lor n\Frame = 60.0 Lor n\Frame = 629.0 Lor n\Frame = 677.0 Lor n\Frame = 711.0 Lor n\Frame = 779.0 Then
 					n\IsDead = True
 				EndIf
-				If AnimTime(n\obj) = 19.0 Lor AnimTime(n\obj) = 40.0 Lor AnimTime(n\obj) = 60.0 Lor AnimTime(n\obj) = 629.0 Lor AnimTime(n\obj) = 677.0 Lor AnimTime(n\obj) = 711.0 Lor AnimTime(n\obj) = 779.0 Then
+				If AnimTime(n\obj) = 20.0 Lor AnimTime(n\obj) = 40.0 Lor AnimTime(n\obj) = 60.0 Lor AnimTime(n\obj) = 629.0 Lor AnimTime(n\obj) = 677.0 Lor AnimTime(n\obj) = 711.0 Lor AnimTime(n\obj) = 779.0 Then
 					n\IsDead = True
 				EndIf
 				
@@ -7015,24 +7014,6 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 		
 	EndIf
 	
-End Function
-
-Function PlayMTFSound(sound%, n.NPCs)
-	If n <> Null Then
-		n\SoundChn = PlaySound2(sound, Camera, n\Collider, 8.0)	
-	EndIf
-	
-	If SelectedItem <> Null Then
-		If SelectedItem\state2 = 3 And SelectedItem\state > 0 Then 
-			Select SelectedItem\itemtemplate\tempname 
-				Case "radio","fineradio","18vradio"
-					If sound<>MTFSFX(5) Lor (Not ChannelPlaying(RadioCHN[3]))
-						If RadioCHN[3]<> 0 Then StopChannel RadioCHN[3]
-						RadioCHN[3] = PlaySound_Strict (sound)
-					EndIf
-			End Select
-		EndIf
-	EndIf 
 End Function
 
 Function MoveToPocketDimension()
