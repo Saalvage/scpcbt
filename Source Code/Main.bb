@@ -610,6 +610,7 @@ Global CurrMusic% = 1
 DrawLoading(10, True)
 
 Dim OpenDoorSFX%(3,3), CloseDoorSFX%(3,3)
+Dim BigDoorErrorSFX%(3)
 
 Global KeyCardSFX1 
 Global KeyCardSFX2
@@ -1159,9 +1160,7 @@ Function UpdateDoors()
 							d\timerstate = Max(0, d\timerstate - FPSfactor)
 							If d\timerstate + FPSfactor > 110 And d\timerstate <= 110 Then d\SoundCHN = PlaySound2(CautionSFX, Camera, d\obj)
 							;If d\timerstate = 0 Then d\open = (Not d\open) : PlaySound2(CloseDoorSFX(Min(d\dir,1),Rand(0, 2)), Camera, d\obj)
-							Local sound%
-							If d\dir = 1 Then sound% = Rand(0, 1) Else sound% = Rand(0, 2)
-							If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,sound%), Camera, d\obj)
+							If d\timerstate = 0 Then d\open = (Not d\open) : d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir,Rand(0, 2)), Camera, d\obj)
 						EndIf
 						If d\AutoClose And RemoteDoorOn = True Then
 							If EntityDistanceSquared(Camera, d\obj) < PowTwo(2.1) Then
@@ -1264,6 +1263,13 @@ Function UpdateDoors()
 			EndIf
 			UpdateSoundOrigin(d\SoundCHN,Camera,d\frameobj)
 			
+			If d\dir = 1 And d\locked = 2 Then
+				If d\openstate > 48.0 Then
+					d\open = False
+					d\openstate = Min(d\openstate, 48.0)
+				EndIf	
+			EndIf
+			
 			If d\DoorHitOBJ<>0 Then
 				If DebugHUD Then
 					EntityAlpha d\DoorHitOBJ,0.5
@@ -1315,7 +1321,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 			ElseIf temp >= d\KeyCard 
 				SelectedItem = Null
 				If showmsg = True Then
-					If d\locked Then
+					If d\locked = True Then
 						PlaySound_Strict KeyCardSFX2
 						Msg = GetLocalString("Messages", "keyinsertednothing")
 						MsgTimer = 70 * 7
@@ -1330,7 +1336,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 				SelectedItem = Null
 				If showmsg = True Then 
 					PlaySound_Strict KeyCardSFX2					
-					If d\locked Then
+					If d\locked = True Then
 						Msg = GetLocalString("Messages", "keyinsertednothing")
 					Else
 						Msg = GetLocalStringR("Messages", "keylevel", d\KeyCard)
@@ -1357,7 +1363,7 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 		EndIf
 		SelectedItem = Null
 	Else
-		If d\locked Then
+		If d\locked = True Then
 			If showmsg = True Then 
 				If Not (d\IsElevatorDoor>0) Then
 					PlaySound_Strict ButtonSFX2
@@ -1406,19 +1412,19 @@ Function UseDoor(d.Doors, showmsg%=True, playsfx%=True)
 	d\open = (Not d\open)
 	If d\LinkedDoor <> Null Then d\LinkedDoor\open = (Not d\LinkedDoor\open)
 	
-	Local sound = 0
-	;If d\dir = 1 Then sound = 0 Else sound=Rand(0, 2)
-	If d\dir = 1 Then sound=Rand(0, 1) Else sound=Rand(0, 2)
-	
-	If playsfx=True Then
+	If playsfx = True Then
 		If d\open Then
 			If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer
 			d\timerstate = d\timer
-			d\SoundCHN = PlaySound2 (OpenDoorSFX(d\dir, sound), Camera, d\obj)
+			If d\dir = 1 And d\locked = 2 Then
+				d\SoundCHN = PlaySound2(BigDoorErrorSFX(Rand(0, 2)), Camera, d\obj)
+			Else
+				d\SoundCHN = PlaySound2(OpenDoorSFX(d\dir, Rand(0, 2)), Camera, d\obj)
+			EndIf
 		Else
-			d\SoundCHN = PlaySound2 (CloseDoorSFX(d\dir, sound), Camera, d\obj)
+			d\SoundCHN = PlaySound2(CloseDoorSFX(d\dir, Rand(0, 2)), Camera, d\obj)
 		EndIf
-		UpdateSoundOrigin(d\SoundCHN,Camera,d\obj)
+		UpdateSoundOrigin(d\SoundCHN, Camera, d\obj)
 	Else
 		If d\open Then
 			If d\LinkedDoor <> Null Then d\LinkedDoor\timerstate = d\LinkedDoor\timer

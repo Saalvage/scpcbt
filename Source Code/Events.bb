@@ -485,19 +485,12 @@ Function UpdateEvents()
 		Select e\EventName
 			Case "gateb"
 
-				If RemoteDoorOn=False Then
-					e\room\RoomDoors[4]\locked=True
-				ElseIf RemoteDoorOn And e\EventState3=0
-					e\room\RoomDoors[4]\locked=False
-					If e\room\RoomDoors[4]\open Then 
-						If e\room\RoomDoors[4]\openstate > 50 Lor EntityDistanceSquared(Collider, e\room\RoomDoors[4]\frameobj)<PowTwo(0.5) Then
-							e\room\RoomDoors[4]\openstate = Min(e\room\RoomDoors[4]\openstate,50)
-							e\room\RoomDoors[4]\open = False
-							PlaySound2 (LoadTempSound("SFX\Door\DoorError.ogg"), Camera, e\room\RoomDoors[4]\frameobj)
-						EndIf							
-					EndIf
+				If RemoteDoorOn = False Then
+					e\room\RoomDoors[4]\Locked = True
+				ElseIf RemoteDoorOn And e\EventState3 = 0.0
+					e\room\RoomDoors[4]\Locked = 2
 				Else
-					e\room\RoomDoors[4]\locked=False
+					e\room\RoomDoors[4]\Locked = False
 					
 					If Curr096 <> Null Then
 						If Curr096\State = 0 Lor Curr096\State = 5 Then
@@ -2256,14 +2249,7 @@ Function UpdateEvents()
 					If RemoteDoorOn=False Then
 						e\room\RoomDoors[1]\locked=True
 					ElseIf RemoteDoorOn And e\EventState3=0
-						e\room\RoomDoors[1]\locked=False
-						If e\room\RoomDoors[1]\open Then 
-							If e\room\RoomDoors[1]\openstate > 50 Lor EntityDistanceSquared(Collider, e\room\RoomDoors[1]\frameobj)<PowTwo(0.5) Then
-								e\room\RoomDoors[1]\openstate = Min(e\room\RoomDoors[1]\openstate,50)
-								e\room\RoomDoors[1]\open = False
-								PlaySound2 (LoadTempSound("SFX\Door\DoorError.ogg"), Camera, e\room\RoomDoors[1]\frameobj)
-							EndIf							
-						EndIf
+						e\room\RoomDoors[1]\locked=2
 					Else
 						e\room\RoomDoors[1]\locked=False
 						Local gatea.Rooms =Null
@@ -6172,14 +6158,9 @@ Function UpdateEvents()
 					
 					ShouldPlay = 4
 					If RemoteDoorOn Then 
-						If e\room\RoomDoors[0]\open Then 
-							If e\room\RoomDoors[0]\openstate > 50 Lor EntityDistanceSquared(Collider, e\room\RoomDoors[0]\frameobj)<PowTwo(0.5) Then
-								e\room\RoomDoors[0]\openstate = Min(e\room\RoomDoors[0]\openstate,50)
-								e\room\RoomDoors[0]\open = False
-								PlaySound_Strict (LoadTempSound("SFX\Door\DoorError.ogg"))
-							EndIf							
-						EndIf
+						e\room\RoomDoors[0]\Locked = 2
 					ElseIf e\EventState < 10000
+						e\room\RoomDoors[0]\Locked = False
 						If e\EventState = 1 Then 
 							e\EventState = 2
 						ElseIf e\EventState = 2
@@ -8419,7 +8400,7 @@ Function UpdateEvents()
 								e\room\RoomDoors[0]\locked = True
 								e\room\RoomDoors[1]\locked = True
 								If e\room\NPC[0]\Reload = 0
-									PlaySound_Strict LoadTempSound("SFX\Door\DoorOpen079.ogg")
+									If (Not e\room\RoomDoors[0]\Open) Then PlaySound_Strict LoadTempSound("SFX\Door\DoorOpen079.ogg")
 									DebugLog "079 - OPEN DOORS IN ROOM2SL"
 									e\room\NPC[0]\Reload = 1
 								EndIf

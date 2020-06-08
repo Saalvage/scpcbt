@@ -1754,7 +1754,7 @@ Function FillRoom(r.Rooms)
 			;[Block]
 			;Elevator
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 736.0 * RoomScale, r\y, r\z + 512.0 * RoomScale, 90.0, r, True, 3)
-			r\RoomDoors[0]\AutoClose = False ;: r\RoomDoors[0]\Locked = 2
+			r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\Locked = 2
 			PositionEntity(r\RoomDoors[0]\Buttons[1], EntityX(r\RoomDoors[0]\Buttons[1], True) - 0.061, EntityY(r\RoomDoors[0]\Buttons[1], True), EntityZ(r\RoomDoors[0]\Buttons[1], True), True)
 			PositionEntity(r\RoomDoors[0]\Buttons[0], EntityX(r\RoomDoors[0]\Buttons[0], True) + 0.061, EntityY(r\RoomDoors[0]\Buttons[0], True), EntityZ(r\RoomDoors[0]\Buttons[0], True), True)
 			
@@ -1790,7 +1790,7 @@ Function FillRoom(r.Rooms)
 			r\RoomDoors[3]\AutoClose = False
 			
 			r\RoomDoors[4] = CreateDoor(r\zone, r\x, r\y, r\z - 320.0 * RoomScale, 0.0, r, False, True, 5)
-			r\RoomDoors[4]\AutoClose = False ;: r\RoomDoors[4]\Locked = 2
+			r\RoomDoors[4]\AutoClose = False : r\RoomDoors[4]\Locked = 2
 			PositionEntity(r\RoomDoors[4]\Buttons[1], r\x + 358.0 * RoomScale, EntityY(r\RoomDoors[4]\Buttons[1], True), r\z - 528.0 * RoomScale, True)
 			RotateEntity(r\RoomDoors[4]\Buttons[1], 0.0, r\angle - 90, 0.0, True)
 			PositionEntity(r\RoomDoors[4]\Buttons[0], EntityX(r\RoomDoors[4]\Buttons[0], True), EntityY(r\RoomDoors[4]\Buttons[0], True), r\z - 198.0 * RoomScale, True)
@@ -1880,12 +1880,12 @@ Function FillRoom(r.Rooms)
 		Case "room079" ;WAIT FOR ELEVATOR
 			
 			d = CreateDoor(r\zone, r\x, r\y+-448.0*RoomScale, r\z + 1136.0 * RoomScale, 0, r, False,True, 4)
-			d\dir = 1 : d\AutoClose = False : d\open = False
+			d\dir = 1 : d\AutoClose = False : d\open = False 
 			PositionEntity(d\buttons[1], r\x + 224.0 * RoomScale, r\y-250*RoomScale, r\z + 918.0 * RoomScale, True)
 			PositionEntity(d\buttons[0], r\x - 240.0 * RoomScale, r\y-250*RoomScale, r\z + 1366.0 * RoomScale, True)
 			
 			r\RoomDoors[0] = CreateDoor(r\zone, r\x + 1456.0*RoomScale, r\y-448.0*RoomScale, r\z + 976.0 * RoomScale, 0, r, False, True, 3)
-			r\RoomDoors[0]\dir = 1 : r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False
+			r\RoomDoors[0]\dir = 1 : r\RoomDoors[0]\AutoClose = False : r\RoomDoors[0]\open = False : r\RoomDoors[0]\Locked = 2
 			PositionEntity(r\RoomDoors[0]\buttons[1], r\x + 1760.0 * RoomScale, r\y-268.8*RoomScale, r\z + 1236.0 * RoomScale, True)
 			TurnEntity(r\RoomDoors[0]\buttons[0],0,-90-90,0,True)
 			PositionEntity(r\RoomDoors[0]\buttons[0], r\x + 1752.0 * RoomScale, r\y-268.8*RoomScale, r\z + 740.0 * RoomScale, True)
