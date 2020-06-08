@@ -798,7 +798,7 @@ Global LightConeModel
 
 Global ParticleEffect%[2]
 
-Global DTextures%[7]
+Global DTextures%[9]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
@@ -1655,7 +1655,7 @@ Function InitEvents()
 	
 	CreateEvent("room106", "room106", 0, 0)
 	
-	CreateEvent("pj", "roompj", 0, 0)
+	CreateEvent("room372", "room372", 0, 0)
 	
 	CreateEvent("914", "room914", 0, 0)
 	
@@ -1674,7 +1674,7 @@ Function InitEvents()
 	
 	CreateEvent("gateaentrance", "gateaentrance", 0)
 	CreateEvent("gatea", "gatea", 0)	
-	CreateEvent("exit1", "gateb", 0)
+	CreateEvent("gateb", "gateb", 0)
 	
 	CreateEvent("room205", "room205", 0)
 	
@@ -2570,22 +2570,6 @@ Function QuickLoadEvents()
 				If e\room\NPC[0]=Null Then e\room\NPC[0]=CreateNPC(NPCtype860, 0,0,0)
 				e\EventStr = "loaddone"
 				QuickLoad_CurrEvent = Null
-			EndIf
-
-		Case "room966"
-
-			If e\EventState = 1
-				e\EventState2 = e\EventState2+FPSfactor
-				If e\EventState2>30 Then
-					If e\EventStr = ""
-						CreateNPC(NPCtype966, EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True), EntityZ(e\room\Objects[0],True))
-						e\EventStr = "load0"
-					ElseIf e\EventStr = "load0"
-						CreateNPC(NPCtype966, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True), EntityZ(e\room\Objects[2],True))
-						e\EventState=2
-						QuickLoad_CurrEvent = Null
-					EndIf
-				EndIf
 			EndIf
 
 		Case "dimension1499"
@@ -7209,7 +7193,7 @@ Function LoadEntities()
 	SetChunkDataValues()
 	
 	;NPCtypeD - different models with different textures (loaded using "CopyEntity") - ENDSHN
-	For i = 0 To 8
+	For i = 0 To 9
 		DTextures[i] = CopyEntity(ClassDObj)
 		HideEntity DTextures[i]
 	Next
@@ -7244,6 +7228,14 @@ Function LoadEntities()
 	;035 victim
 	tex = LoadTexture_Strict("GFX\npcs\035victim.jpg")
 	EntityTexture DTextures[7],tex
+	FreeTexture tex
+	;body 1
+	tex = LoadTexture_Strict("GFX\npcs\body1.jpg")
+	EntityTexture DTextures[8],tex
+	FreeTexture tex
+	;body 2
+	tex = LoadTexture_Strict("GFX\npcs\body2.jpg")
+	EntityTexture DTextures[9],tex
 	FreeTexture tex
 	
 	LoadMaterials("DATA\materials.ini")

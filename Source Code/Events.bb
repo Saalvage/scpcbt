@@ -17,7 +17,7 @@ Function UpdateEvents()
 	
 	For e.Events = Each Events
 		Select e\EventName
-			Case "exit1"
+			Case "gateb"
 
 				If RemoteDoorOn=False Then
 					e\room\RoomDoors[4]\locked=True
@@ -1858,19 +1858,19 @@ Function UpdateEvents()
 					RemoveEvent(e)
 				EndIf
 
-			Case "pj"
-
+			Case "room372"
+				;[Block]
 				If PlayerRoom = e\room Then
-					If e\EventState = 0 Then
-						If EntityDistanceSquared(Collider, e\room\obj) < PowTwo(2.5) Then
-							PlaySound_Strict(RustleSFX(Rand(0,2)))
-							CreateNPC(NPCtype372, 0, 0, 0)
-							e\EventState = 1
+					If e\EventState = 0.0 Then
+						If EntityDistanceSquared(Collider, e\room\OBJ) < PowTwo(2.0) Then
+							PlaySound_Strict(RustleSFX(Rand(0, 2)))
+							CreateNPC(NPCtype372, 0.0, 0.0, 0.0)
+							e\EventState = 1.0
 							RemoveEvent(e)
 						EndIf					
 					EndIf
 				EndIf
-
+				;[End Block]
 			Case "pocketdimension"
 
 				
@@ -2704,22 +2704,21 @@ Function UpdateEvents()
 				EndIf
 
 			Case "room2elevator2"
-
-				If e\room\dist < 8.0 And e\room\dist > 0 Then
+				;[Block]
+				If e\room\Dist < 8.0 And e\room\Dist > 0.0 Then
+					de.Decals = CreateDecal(3, EntityX(e\room\Objects[0], True), 0.005, EntityZ(e\room\Objects[0], True), 90.0, Rnd(360.0), 0.0)
 					
-					de.Decals = CreateDecal(3, EntityX(e\room\Objects[0],True), EntityY(e\room\Objects[0],True)+0.0005, EntityZ(e\room\Objects[0],True),90,Rnd(360),0)
+					e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\Objects[0], True), 0.5, EntityZ(e\room\Objects[0], True))
+					ChangeNPCTextureID(e\room\NPC[0], 0)
 					
-					e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\Objects[0],True), 0.5, EntityZ(e\room\Objects[0],True))
-					ChangeNPCTextureID(e\room\NPC[0],0)
+					RotateEntity(e\room\NPC[0]\Collider, 0.0, EntityYaw(e\room\OBJ) - 80.0, 0.0, True)
 					
-					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\obj)-80,0, True
-					
-					SetNPCFrame e\room\NPC[0], 19
-					e\room\NPC[0]\State=8
+					SetNPCFrame(e\room\NPC[0], 19.0)
+					e\room\NPC[0]\State = 8.0
 					
 					RemoveEvent(e)
 				EndIf
-
+				;[End Block]
 			Case "room2fan"
 
 				;eventstate1 = timer for turning the fan on/off
@@ -2753,7 +2752,7 @@ Function UpdateEvents()
 				EndIf
 
 			Case "room2nuke"
-
+				;[Block]
 				If PlayerRoom = e\room Then
 					e\EventState2 = UpdateElevators(e\EventState2, e\room\RoomDoors[0], e\room\RoomDoors[1], e\room\Objects[4], e\room\Objects[5], e)
 					
@@ -2761,19 +2760,15 @@ Function UpdateEvents()
 					UpdateLever(e\room\Objects[3])
 				EndIf
 				
-				If e\EventState3 = 0 Then
-					n.NPCs = CreateNPC(NPCtypeD,EntityX(e\room\Objects[6],True),EntityX(e\room\Objects[6],True)+0.5,EntityZ(e\room\Objects[6],True))
-					RotateEntity n\Collider,0,e\room\angle+90,0
-					n\State = 3
-					SetNPCFrame(n,40)
-					n\IsDead = True
-					n\texture = "GFX\npcs\body2.jpg"
-					tex = LoadTexture_Strict(n\texture)
-					EntityTexture(n\obj, tex)
-					FreeTexture tex
-					e\EventState3 = 1
+				If e\EventState3 = 0.0 Then
+					n.NPCs = CreateNPC(NPCtypeD, EntityX(e\room\Objects[6], True), 0.6, EntityZ(e\room\Objects[6], True))
+					RotateEntity(n\Collider, 0.0, e\room\Angle + 90.0, 0.0)
+					n\State = 3.0
+					SetNPCFrame(n, 40.0)
+					ChangeNPCTextureID(n, 9)
+					e\EventState3 = 1.0
 				EndIf
-
+				;[End Block]
 			Case "room2offices2"
 
 				If PlayerRoom = e\room Then
@@ -5797,7 +5792,7 @@ Function UpdateEvents()
 						e\EventState2 = 2
 						
 						For e2.Events = Each Events
-							If e2\EventName="exit1" Lor e2\EventName="gateaentrance" Then
+							If e2\EventName="gateb" Lor e2\EventName="gateaentrance" Then
 								e2\EventState3 = 1
 							EndIf
 						Next
@@ -6415,25 +6410,18 @@ Function UpdateEvents()
 				EndIf
 				
 
-				
 			Case "room966"
-
+				;[Block]
 				If PlayerRoom = e\room Then
-					Select e\EventState
-						Case 0
-							;a dirty workaround to hide the pause when loading 966 model
-							If QuickLoad_CurrEvent = Null
-								;LightBlink = 5.0
-								e\EventState = 1
-								;PlaySound_Strict LightSFX
-								QuickLoad_CurrEvent = e
-							EndIf
-						Case 2
-							e\EventState = 2
-							RemoveEvent (e)
-					End Select
+					If e\EventState = 0.0 Then
+						CreateNPC(NPCtype966, EntityX(e\room\Objects[0], True), EntityY(e\room\Objects[0], True), EntityZ(e\room\Objects[0], True))
+						
+						CreateNPC(NPCtype966, EntityX(e\room\Objects[1], True), EntityY(e\room\Objects[1], True), EntityZ(e\room\Objects[1], True))
+						
+						RemoveEvent(e)	
+					EndIf
 				EndIf
-
+				;[End Block]
 			Case "room1123"
 
 				If PlayerRoom = e\room Then
@@ -7127,7 +7115,9 @@ Function UpdateEvents()
 							e\EventState2 = Min(e\EventState2 + FPSfactor / 200.0, 2.0)
 							
 							LightBlink = Min(e\EventState2 * 5.0, 10.0)
-							
+							If WearingNightVision > 0 Then
+								If e\EventState2 >= 0.2 Then BlinkTimer = -10.0
+							EndIf
 							BlurTimer = e\EventState2 * 500.0
 							
 							If e\EventState2 = 2.0 Then MoveToPocketDimension()
@@ -7460,29 +7450,22 @@ Function UpdateEvents()
 
 			;New Events in SCP:CB version 1.3 - ENDSHN
 			Case "room4tunnels"
-
-				If e\room\dist < 10.0 And e\room\dist > 0 Then
-					e\room\NPC[0]=CreateNPC(NPCtypeD, EntityX(e\room\obj,True)+1.0, EntityY(e\room\obj,True)+0.5, EntityZ(e\room\obj,True)+1.0)
-					e\room\NPC[0]\texture = "GFX\npcs\body1.jpg"
-					tex = LoadTexture_Strict(e\room\NPC[0]\texture)
-					EntityTexture(e\room\NPC[0]\obj, tex)
-					FreeTexture tex
-					;EntityTexture e\room\NPC[0]\obj,NTF_BodyTextures(0)
+				;[Block]
+				If e\room\Dist < 10.0 And e\room\Dist > 0.0 Then
+					e\room\NPC[0] = CreateNPC(NPCtypeD, EntityX(e\room\OBJ, True) + 1.0, EntityY(e\room\OBJ, True) + 0.5, EntityZ(e\room\OBJ, True) + 1.0)
+					ChangeNPCTextureID(e\room\NPC[0], 8)
+					SetNPCFrame(e\room\NPC[0], 19.0)
+					e\room\NPC[0]\State = 8.0
+					RotateEntity(e\room\NPC[0]\Collider, 0.0, EntityYaw(e\room\OBJ) - (Rnd(20.0, 60.0)), 0.0, True)
 					
-					RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\obj)-(Rand(20,60)),0, True	
-					
-					SetNPCFrame e\room\NPC[0], 19
-					e\room\NPC[0]\State=8
-					
-					;Delete e
 					RemoveEvent(e)
 				EndIf
-
+				;[End Block]
 			Case "room2gw_b"
 
 				If e\room\dist < 8
 					If e\EventState = 0 Then
-						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[2],True), EntityY(e\room\Objects[2],True)+0.5, EntityZ(e\room\Objects[2],True))
+						e\room\NPC[0]=CreateNPC(NPCtypeGuard, EntityX(e\room\Objects[1],True), EntityY(e\room\Objects[1],True)+0.5, EntityZ(e\room\Objects[1],True))
 						PointEntity e\room\NPC[0]\Collider, e\room\obj
 						RotateEntity e\room\NPC[0]\Collider, 0, EntityYaw(e\room\NPC[0]\Collider),0, True
 						SetNPCFrame(e\room\NPC[0], 288)
@@ -7498,7 +7481,7 @@ Function UpdateEvents()
 					
 					p\Achange = -0.02
 					
-					e\SoundCHN = LoopSound2(AlarmSFX(3),e\SoundCHN,Camera,e\room\Objects[3],5)
+					e\SoundCHN = LoopSound2(AlarmSFX(3),e\SoundCHN,Camera,e\room\Objects[1],5)
 				EndIf
 
 			Case "room2scps2"
@@ -8925,7 +8908,7 @@ Function UpdateEndings()
 	
 	For e.Events = Each Events
 		Select e\EventName
-			Case "exit1"
+			Case "gateb"
 
 				If PlayerRoom = e\room Then
 					

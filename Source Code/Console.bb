@@ -850,7 +850,7 @@ Function UpdateConsole()
 							CreateConsoleMsg("Gate A is now unlocked.")	
 						Case "b"
 							For e.Events = Each Events
-								If e\EventName = "exit1" Then
+								If e\EventName = "gateb" Then
 									e\EventState3 = 1
 									e\room\RoomDoors[4]\open = True
 									Exit
@@ -862,7 +862,7 @@ Function UpdateConsole()
 								If e\EventName = "gateaentrance" Then
 									e\EventState3 = 1
 									e\room\RoomDoors[1]\open = True
-								ElseIf e\EventName = "exit1" Then
+								ElseIf e\EventName = "gateb" Then
 									e\EventState3 = 1
 									e\room\RoomDoors[4]\open = True
 								EndIf
