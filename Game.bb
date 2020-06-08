@@ -11,7 +11,5 @@
 
 Include "Source Code\Main.bb"
 
-Include "Source Code\Constants.bb"
-
 ;~IDEal Editor Parameters:
 ;~C#Blitz3D

@@ -8,6 +8,7 @@ If Len(InitErrorStr) > 0 Then
 	RuntimeError "The following DLLs were not found in the game directory:" + Chr(13) + Chr(10) + Chr(13) + Chr(10) + InitErrorStr
 EndIf
 
+Include "Source Code\Constants.bb"
 Include "Source Code\Math.bb"
 Include "Source Code\DevilParticleSystem.bb"
 

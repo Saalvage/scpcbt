@@ -111,7 +111,7 @@ Rooms:
 - Now only 5 save games are displayed per page on the load game tab.
 - Error logs are now stored in a folder.
 - Removed Check for updates feature in launcher.
-- Removed event load text to increase immersion.
+- Removed load events.
 - Removed scene in which Guard Ulgrin provides D-9341 with classified information (the document will now be found just after the initial intro).
 - Removed orientation document in inventory when disabling the intro.
 - Removed 16-Bit mode.
@@ -158,12 +158,8 @@ Bug Fixes:
 	- Fixed MTFs not announcing blinking or the presence of SCP-049-2.
 	- Fixed MTF SCP-049-2 voicelines not having a radio filter.
 	- Fixed z-fighting of a door in room2closets.
-	- Fixed the emitters in SCP-035's room sometimes clipping into the maintenance tunnels.
-	- Fixed the items glitching in the storage chamber in SCP-035's room.
-	- Fixed button positions in room2closets, medibay, SCP-079 and SCP-035's room.
+	- Fixed a ton of small room issues.
 	- Fixed the triggers in the SCP-939 infested area.
-	- Fixed the security camera's position in SCP-966's room.
-	- Fixed items not pushing each other away in SCP-970's room.
 	- Fixed certain item attributes not being saved.
 	- Fixed intro movies being laggy.
 	- Fixed z-fighting on monitor model.
