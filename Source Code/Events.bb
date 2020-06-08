@@ -6198,7 +6198,7 @@ Function UpdateEvents()
 							;If ChannelPlaying(e\SoundCHN) Then
 							If IsStreamPlaying_Strict(e\SoundCHN)
 								If Rand(3) = 1 Then
-									EntityTexture(e\room\Objects[1], OldAiPics[0])
+									EntityTexture(e\room\Objects[1], OldAiPics[Rand(1, 6)])
 									ShowEntity (e\room\Objects[1])
 								ElseIf Rand(10) = 1 
 									HideEntity (e\room\Objects[1])							
@@ -6208,7 +6208,7 @@ Function UpdateEvents()
 								If e\SoundCHN<>0
 									StopStream_Strict(e\SoundCHN) : e\SoundCHN=0
 								EndIf
-								EntityTexture(e\room\Objects[1], OldAiPics[1])
+								EntityTexture(e\room\Objects[1], OldAiPics[0])
 								ShowEntity (e\room\Objects[1])
 								e\EventState = e\EventState + FPSfactor
 							EndIf
@@ -6230,11 +6230,11 @@ Function UpdateEvents()
 						If e\SoundCHN<>0
 							If (Not IsStreamPlaying_Strict(e\SoundCHN))
 								e\SoundCHN = 0
-								EntityTexture(e\room\Objects[1], OldAiPics[1])
+								EntityTexture(e\room\Objects[1], OldAiPics[0])
 								ShowEntity (e\room\Objects[1])
 							Else
 								If Rand(3) = 1 Then
-									EntityTexture(e\room\Objects[1], OldAiPics[0])
+									EntityTexture(e\room\Objects[1], OldAiPics[Rand(1, 6)])
 									ShowEntity (e\room\Objects[1])
 								ElseIf Rand(10) = 1 
 									HideEntity (e\room\Objects[1])							

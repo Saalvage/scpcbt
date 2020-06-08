@@ -826,14 +826,29 @@ Function UpdateConsole()
 						Delete c
 					Next
 				Case "togglewarhead"
-
+					;[Block]
 					For e.Events = Each Events
 						If e\EventName = "room2nuke" Then
 							e\EventState = (Not e\EventState)
-							Exit
+							UpdateLever(e\room\Objects[1])
+							UpdateLever(e\room\Objects[3])
+							RotateEntity(e\room\Objects[1], 0.0, EntityYaw(e\room\Objects[1]), e\EventState * 30.0)
+							RotateEntity(e\room\Objects[3], 0.0, EntityYaw(e\room\Objects[3]), e\EventState * 30.0)
+							;Exit
 						EndIf
 					Next
-
+					;[End Block]
+				Case "togglecontrol"
+					;[Block]
+					For e.Events = Each Events
+						If e\EventName = "room2ccont" Then
+							RemoteDoorOn = (Not RemoteDoorOn)
+							UpdateLever(e\room\Objects[5])
+							RotateEntity(e\room\Objects[5], 0.0, EntityYaw(e\room\Objects[5]), RemoteDoorOn * 30.0)
+							;Exit
+						EndIf
+					Next
+					;[End Block]
 				Case "unlockexits"
 
 					StrTemp$ = Lower(Right(ConsoleInput, Len(ConsoleInput) - Instr(ConsoleInput, " ")))

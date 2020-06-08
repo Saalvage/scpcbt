@@ -466,7 +466,7 @@ Global RadioState3%[6]
 Global RadioState4%[9]
 Global RadioCHN%[6]
 
-Global OldAiPics%[1]
+Global OldAiPics%[7]
 
 ; Handlded in DrawGUI
 Global PlayTime%
@@ -6572,8 +6572,18 @@ Function LoadEntities()
 	
 	CloseDir(Dir)
 	
-	OldAiPics[0] = LoadTexture_Strict("GFX\AIface.jpg")
-	OldAiPics[1] = LoadTexture_Strict("GFX\AIface2.jpg")	
+	Dir = ReadDir("GFX\079pics\")
+	NextFile(Dir) : NextFile(Dir)
+	File$ = NextFile(Dir)
+	
+	i = 0
+	While File <> ""
+		OldAiPics[i] = LoadTexture_Strict("GFX\079pics\" + File)
+		i = i + 1
+		File = NextFile(Dir)
+	Wend
+	
+	CloseDir(Dir)
 	
 	DrawLoading(20)
 	
