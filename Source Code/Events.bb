@@ -9862,5 +9862,106 @@ Function UpdateEndings()
 	
 End Function
 
+Function Update096ElevatorEvent#(e.Events, EventState#, d.Doors, ElevatorOBJ%)
+	Local PrevEventState# = EventState#
+	
+	If EventState < 0.0 Then
+		EventState = 0.0
+		PrevEventState = 0.0
+	EndIf
+	
+	If d\OpenState = 0.0 And d\Open = False Then
+		If Abs(EntityX(Collider) - EntityX(ElevatorOBJ, True)) =< 280.0 * RoomScale + (0.015 * FPSfactor) Then
+			If Abs(EntityZ(Collider) - EntityZ(ElevatorOBJ, True)) =< 280.0 * RoomScale + (0.015 * FPSfactor) Then
+				If Abs(EntityY(Collider) - EntityY(ElevatorOBJ, True)) =< 280.0 * RoomScale + (0.015 * FPSfactor) Then
+					d\Locked = True
+					If EventState = 0.0 Then
+						TeleportEntity(Curr096\Collider,EntityX(d\FrameOBJ), EntityY(d\FrameOBJ) + 1.0, EntityZ(d\FrameOBJ), Curr096\CollRadius)
+						PointEntity(Curr096\Collider, ElevatorOBJ)
+						RotateEntity(Curr096\Collider, 0.0, EntityYaw(Curr096\Collider), 0.0)
+						MoveEntity(Curr096\Collider, 0.0, 0.0, -0.5)
+						ResetEntity(Curr096\Collider)
+						Curr096\State = 6.0
+						SetNPCFrame(Curr096, 0.0)
+						e\Sound = LoadSound_Strict("SFX\SCP\096\ElevatorSlam.ogg")
+						EventState = EventState + FPSfactor * 1.4
+					EndIf
+				EndIf
+			EndIf
+		EndIf
+	EndIf
+	
+	If EventState > 0.0 Then
+		If PrevEventState = 0.0 Then
+			e\SoundCHN = PlaySound_Strict(e\Sound)
+		EndIf
+		
+		If EventState > 70.0 * 1.9 And EventState < 70.0 * 2.0 + FPSfactor
+			CameraShake = 7.0
+		ElseIf EventState > 70.0 * 4.2 And EventState < 70.0 * 4.25 + FPSfactor
+			CameraShake = 1.0
+		ElseIf EventState > 70.0 * 5.9 And EventState < 70.0 * 5.95 + FPSfactor
+			CameraShake = 1.0
+		ElseIf EventState > 70.0 * 7.25 And EventState < 70.0 * 7.3 + FPSfactor
+			CameraShake = 1.0
+			d\FastOpen = True
+			d\Open = True
+			Curr096\State = 4.0
+			Curr096\LastSeen = 1
+		ElseIf EventState > 70.0 * 8.1 And EventState < 70.0 * 8.15 + FPSfactor
+			CameraShake = 1.0
+		EndIf
+		
+		If EventState =< 70.0 * 8.1 Then
+			d\OpenState = Min(d\OpenState, 20.0)
+		EndIf
+		EventState = EventState + FPSfactor * 1.4
+	EndIf
+	Return(EventState)
+End Function
+
+Function IsItemGoodFor1162(itt.ItemTemplates)
+	Local IN$ = itt\TempName
+	
+	Select itt\TempName
+		Case "key1", "key2", "key3"
+			;[Block]
+			Return(True)
+			;[End Block]
+		Case "misc", "scp420j", "cigarette"
+			;[Block]
+			Return(True)
+			;[End Block]
+		Case "badvest", "vest", "finevest", "gasmask"
+			;[Block]
+			Return(True)
+			;[End Block]
+		Case "radio", "18vradio"
+			;[Block]
+			Return(True)
+			;[End Block]
+		Case "clipboard", "eyedrops", "badnvg", "nvg", "finenvg", "supernvg", "scramble"
+			;[Block]
+			Return(True)
+			;[End Block]
+		Default
+			;[Block]
+			If itt\TempName <> "paper" Then
+				Return(False)
+			ElseIf itt\NameSpec = "drawing" Then
+				If itt\Img <> 0 Then FreeImage(itt\Img)
+				itt\Img = LoadImage_Strict("GFX\items\1048\1048_" + Rand(1, 20) + ".jpg") ; Gives a random drawing.
+				Return(True)
+			ElseIf itt\NameSpec = "leaflet"
+				Return(False)
+			Else
+				; If the item is a paper, only allow spawning it if the name DOESN'T contains the word "note" or "log"
+				; (because those are items created recently, which D-9341 has most likely never seen)
+				Return(Not (Instr(Lower(itt\LocalName), GetLocalString("Items", "notename")) Lor Instr(Lower(itt\LocalName), GetLocalString("Items", "logname"))))
+			EndIf
+			;[End Block]
+	End Select
+End Function
+
 ;~IDEal Editor Parameters:
 ;~C#Blitz3D

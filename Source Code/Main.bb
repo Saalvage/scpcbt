@@ -7837,92 +7837,6 @@ Function NullGame(playbuttonsfx%=True)
 	;CatchErrors("Uncaught NullGame")
 End Function
 
-;--------------------------------------- music & sounds ----------------------------------------------
-
-;--------------------------------------- random -------------------------------------------------------
-
-Function AnimateNPC(n.NPCs, start#, quit#, speed#, loop=True)
-	Local newTime#
-	
-	If speed > 0.0 Then 
-		newTime = Max(Min(n\Frame + speed * FPSfactor,quit),start)
-		
-		If loop And newTime => quit Then
-			newTime = start
-		EndIf
-	Else
-		If start < quit Then
-			temp% = start
-			start = quit
-			quit = temp
-		EndIf
-		
-		If loop Then
-			newTime = n\Frame + speed * FPSfactor
-			
-			If newTime < quit Then 
-				newTime = start
-			ElseIf newTime > start 
-				newTime = quit
-			EndIf
-		Else
-			newTime = Max(Min(n\Frame + speed * FPSfactor,start),quit)
-		EndIf
-	EndIf
-	SetNPCFrame(n, newTime)
-	
-End Function
-
-Function SetNPCFrame(n.NPCs, frame#)
-	If (Abs(n\Frame-frame)<0.001) Then Return
-	
-	SetAnimTime n\obj, frame
-	
-	n\Frame = frame
-End Function
-
-Function Animate2#(entity%, curr#, start%, quit%, speed#, loop=True)
-	
-	Local newTime#
-	
-	If speed > 0.0 Then 
-		newTime = Max(Min(curr + speed * FPSfactor,quit),start)
-		
-		If loop Then
-			If newTime => quit Then 
-				;SetAnimTime entity, start
-				newTime = start
-			Else
-				;SetAnimTime entity, newTime
-			EndIf
-		Else
-			;SetAnimTime entity, newTime
-		EndIf
-	Else
-		If start < quit Then
-			temp% = start
-			start = quit
-			quit = temp
-		EndIf
-		
-		If loop Then
-			newTime = curr + speed * FPSfactor
-			
-			If newTime < quit Then newTime = start
-			If newTime > start Then newTime = quit
-			
-			;SetAnimTime entity, newTime
-		Else
-			;SetAnimTime (entity, Max(Min(curr + speed * FPSfactor,start),quit))
-			newTime = Max(Min(curr + speed * FPSfactor,start),quit)
-		EndIf
-	EndIf
-	
-	SetAnimTime entity, newTime
-	Return newTime
-	
-End Function
-
 Function Use294()
 	
 	Local x#,y#, xtemp%,ytemp%, strtemp$, temp%
@@ -9364,37 +9278,6 @@ Function CheckForPlayerInFacility()
 	Return True
 End Function
 
-Function IsItemGoodFor1162(itt.ItemTemplates)
-	Local IN$ = itt\tempname$
-	
-	Select itt\tempname
-		Case "key1", "key2", "key3"
-			Return True
-		Case "misc", "scp420j", "cigarette"
-			Return True
-		Case "badvest","vest","finevest","gasmask"
-			Return True
-		Case "radio","18vradio"
-			Return True
-		Case "clipboard","eyedrops","badnvg","nvg","finenvg","supernvg","scramble"
-			Return True
-		Default
-			If itt\tempname <> "paper" Then
-				Return False
-			ElseIf itt\namespec = "drawing" Then
-				If itt\img<>0 Then FreeImage itt\img
-				itt\img = LoadImage_Strict("GFX\items\1048\1048_"+Rand(1,20)+".jpg") ;Gives a random drawing.
-				Return True
-			ElseIf itt\namespec = "leaflet"
-				Return False
-			Else
-				;if the item is a paper, only allow spawning it if the name DOESN'T contains the word "note" or "log"
-				;(because those are items created recently, which D-9341 has most likely never seen)
-				Return Not (Instr(Lower(itt\localname), GetLocalString("Items", "notename")) Lor Instr(Lower(itt\localname), GetLocalString("Items", "logname")))
-			EndIf
-	End Select
-End Function
-
 Function ScaledMouseX%()
 	Return Float(MouseX()-(RealGraphicWidth*0.5*(1.0-AspectRatioRatio)))*Float(I_Opt\GraphicWidth)/Float(RealGraphicWidth*AspectRatioRatio)
 End Function
@@ -9522,65 +9405,6 @@ Function ResetInput()
 	MouseDown(1)
 	GrabbedEntity = 0
 	Input_ResetTime# = 10.0
-	
-End Function
-
-Function Update096ElevatorEvent#(e.Events,EventState#,d.Doors,elevatorobj%)
-	Local prevEventState# = EventState#
-	
-	If EventState < 0 Then
-		EventState = 0
-		prevEventState = 0
-	EndIf
-	
-	If d\openstate = 0 And d\open = False Then
-		If Abs(EntityX(Collider)-EntityX(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-			If Abs(EntityZ(Collider)-EntityZ(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-				If Abs(EntityY(Collider)-EntityY(elevatorobj%,True))<=280.0*RoomScale+(0.015*FPSfactor) Then
-					d\locked = True
-					If EventState = 0 Then
-						TeleportEntity(Curr096\Collider,EntityX(d\frameobj),EntityY(d\frameobj)+1.0,EntityZ(d\frameobj),Curr096\CollRadius)
-						PointEntity Curr096\Collider,elevatorobj
-						RotateEntity Curr096\Collider,0,EntityYaw(Curr096\Collider),0
-						MoveEntity Curr096\Collider,0,0,-0.5
-						ResetEntity Curr096\Collider
-						Curr096\State = 6
-						SetNPCFrame(Curr096,0)
-						e\Sound = LoadSound_Strict("SFX\SCP\096\ElevatorSlam.ogg")
-						EventState = EventState + FPSfactor * 1.4
-					EndIf
-				EndIf
-			EndIf
-		EndIf
-	EndIf
-	
-	If EventState > 0 Then
-		If prevEventState = 0 Then
-			e\SoundCHN = PlaySound_Strict(e\Sound)
-		EndIf
-		
-		If EventState > 70*1.9 And EventState < 70*2+FPSfactor
-			CameraShake = 7
-		ElseIf EventState > 70*4.2 And EventState < 70*4.25+FPSfactor
-			CameraShake = 1
-		ElseIf EventState > 70*5.9 And EventState < 70*5.95+FPSfactor
-			CameraShake = 1
-		ElseIf EventState > 70*7.25 And EventState < 70*7.3+FPSfactor
-			CameraShake = 1
-			d\fastopen = True
-			d\open = True
-			Curr096\State = 4
-			Curr096\LastSeen = 1
-		ElseIf EventState > 70*8.1 And EventState < 70*8.15+FPSfactor
-			CameraShake = 1
-		EndIf
-		
-		If EventState <= 70*8.1 Then
-			d\openstate = Min(d\openstate,20)
-		EndIf
-		EventState = EventState + FPSfactor * 1.4
-	EndIf
-	Return EventState
 	
 End Function
 ;~IDEal Editor Parameters:

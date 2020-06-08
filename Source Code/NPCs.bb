@@ -6879,7 +6879,7 @@ End Function
 Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False)
 	
 	;muzzle flash
-	Local p.Particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
+	Local p.particles = CreateParticle(x,y,z, 1, Rnd(0.08,0.1), 0.0, 5)
 	TurnEntity p\obj, 0,0,Rnd(360)
 	p\Achange = -0.15
 	
@@ -6983,7 +6983,7 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 				
 				If particles Then 
 					;dust/smoke particles
-					p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
+					p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.03, 0, 80)
 					p\speed = 0.001
 					p\SizeChange = 0.003
 					p\A = 0.8
@@ -6991,7 +6991,7 @@ Function Shoot(x#, y#, z#, hitProb# = 1.0, particles% = True, instaKill% = False
 					RotateEntity p\pvt, EntityPitch(pvt)-180, EntityYaw(pvt),0
 					
 					For i = 0 To Rand(2,3)
-						p.Particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
+						p.particles = CreateParticle(PickedX(),PickedY(),PickedZ(), 0, 0.006, 0.003, 80)
 						p\speed = 0.02
 						p\A = 0.8
 						p\Achange = -0.01
@@ -7436,5 +7436,77 @@ Function ChangeNPCTextureID(n.NPCs,textureid%) ;TODO check wtf this is
 	SetNPCFrame(n,n\Frame)
 	
 End Function
+
+Function AnimateNPC(n.NPCs, FirstFrame#, LastFrame#, Speed#, Loop% = True)
+	Local NewTime#, Temp%
+	
+	If Speed > 0.0 Then 
+		NewTime = Max(Min(n\Frame + Speed * FPSfactor, LastFrame), FirstFrame)
+		
+		If Loop And NewTime >= LastFrame Then
+			NewTime = FirstFrame
+		EndIf
+	Else
+		If FirstFrame < LastFrame Then
+			Temp = FirstFrame
+			FirstFrame = LastFrame
+			LastFrame = FirstFrame
+		EndIf
+		
+		If Loop Then
+			NewTime = n\Frame + Speed * FPSfactor
+			
+			If NewTime < LastFrame Then 
+				NewTime = FirstFrame
+			ElseIf NewTime > FirstFrame 
+				NewTime = LastFrame
+			EndIf
+		Else
+			NewTime = Max(Min(n\Frame + Speed * FPSfactor, FirstFrame),LastFrame)
+		EndIf
+	EndIf
+	SetNPCFrame(n, NewTime)
+End Function
+
+Function SetNPCFrame(n.NPCs, Frame#)
+	If (Abs(n\Frame - Frame) < 0.001) Then Return
+	
+	SetAnimTime(n\obj, Frame)
+	
+	n\Frame = Frame
+End Function
+
+Function Animate2#(Entity%, Curr#, FirstFrame#, LastFrame#, Speed#, Loop% = True)
+	Local NewTime#, Temp%
+	
+	If Speed > 0.0 Then 
+		NewTime = Max(Min(Curr + Speed * FPSfactor, LastFrame), FirstFrame)
+		
+		If Loop Then
+			If NewTime >= LastFrame Then 
+				NewTime = FirstFrame
+			EndIf
+		EndIf
+	Else
+		If FirstFrame < LastFrame Then
+			Temp = FirstFrame
+			FirstFrame = LastFrame
+			LastFrame = Temp
+		EndIf
+		
+		If Loop Then
+			NewTime = Curr + Speed * FPSfactor
+			
+			If NewTime < LastFrame Then NewTime = FirstFrame
+			If NewTime > FirstFrame Then NewTime = LastFrame
+		Else
+			NewTime = Max(Min(Curr + Speed * FPSfactor, FirstFrame), LastFrame)
+		EndIf
+	EndIf
+	
+	SetAnimTime(Entity, NewTime)
+	Return(NewTime)
+End Function
+
 ;~IDEal Editor Parameters:
 ;~C#Blitz3D
