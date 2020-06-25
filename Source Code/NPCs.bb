@@ -4262,15 +4262,6 @@ Function UpdateNPCs()
 					
 					prevFrame = n\Frame
 					
-					If n\Sound > 0 Then
-						temp = 0.5
-						;the ambient sound gets louder when the npcs are attacking
-						If n\State > 0 Then temp = 1.0	
-						
-						n\SoundChn = LoopSound2(n\Sound, n\SoundChn, Camera, Camera, 10.0,temp)
-					EndIf
-					
-					temp = Rnd(-1.0,1.0)
 					PositionEntity n\obj,EntityX(n\Collider,True),EntityY(n\Collider,True)-0.2,EntityZ(n\Collider,True)
 					RotateEntity n\obj,-90.0,EntityYaw(n\Collider),0.0
 					
@@ -4386,7 +4377,7 @@ Function UpdateNPCs()
 							EndIf
 							
 							;If n\Frame>1393.0 And prevFrame<=1393.0 Lor n\Frame>1589.0 And prevFrame<=1589.0 Lor n\Frame>2000.0 And prevFrame<=2000.0 Then
-							If n\Frame>271.0 And prevFrame<=271.0 Lor n\Frame>354 Lor n\Frame>314.0 And prevFrame<=314.0 Lor n\Frame>301.0 And prevFrame<=301.0
+							If n\Frame>271.0 And prevFrame<=271.0 Lor n\Frame>314.0 And prevFrame<=314.0 Lor n\Frame>301.0 And prevFrame<=301.0
 								PlaySound2(LoadTempSound("SFX\SCP\966\Idle"+Rand(1,3)+".ogg"), Camera, n\Collider)
 							EndIf
 							
