@@ -1052,11 +1052,11 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 	
 End Function
 
-Function CreateButton(x#,y#,z#, pitch#,yaw#,roll#=0)
-	Local obj = CopyEntity(ButtonOBJ)	
+Function CreateButton(x#,y#,z#, pitch#,yaw#,roll#=0, Locked% = False)
+	Local obj% = CopyEntity(ButtonOBJ)	
 	
 	ScaleEntity(obj, 0.03, 0.03, 0.03)
-	
+	EntityTexture(obj, ButtontextureLocked)
 	PositionEntity obj, x,y,z
 	RotateEntity obj, pitch,yaw,roll
 	
@@ -1248,7 +1248,7 @@ Function UpdateDoors()
 				EndIf
 				
 				If d\locked <> d\lockedupdated Then
-					If d\locked Then
+					If d\locked = True Then
 						For i = 0 To 2
 							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtontextureLocked)
 						Next
