@@ -152,6 +152,14 @@ Function PauseSounds()
 		If ChannelPlaying(BreathCHN) Then PauseChannel(BreathCHN)
 	EndIf
 	
+	If VomitCHN <> 0 Then
+		If ChannelPlaying(VomitCHN) Then PauseChannel(VomitCHN)
+	EndIf
+	
+	If CoughCHN <> 0 Then
+		If ChannelPlaying(CoughCHN) Then PauseChannel(CoughCHN)
+	EndIf
+	
 	If IntercomStreamCHN <> 0
 		SetStreamPaused_Strict(IntercomStreamCHN, True)
 	EndIf
@@ -216,6 +224,14 @@ Function ResumeSounds()
 		If ChannelPlaying(BreathCHN) Then ResumeChannel(BreathCHN)
 	EndIf
 	
+	If VomitCHN <> 0 Then
+		If ChannelPlaying(VomitCHN) Then ResumeChannel(VomitCHN)
+	EndIf
+	
+	If CoughCHN <> 0 Then
+		If ChannelPlaying(CoughCHN) Then ResumeChannel(CoughCHN)
+	EndIf
+		
 	If IntercomStreamCHN <> 0 Then
 		SetStreamPaused_Strict(IntercomStreamCHN, False)
 	EndIf
@@ -274,6 +290,12 @@ Function KillSounds()
 	EndIf
 	If BreathCHN <> 0 Then
 		If ChannelPlaying(BreathCHN) Then StopChannel(BreathCHN)
+	EndIf
+	If VomitCHN <> 0 Then
+		If ChannelPlaying(VomitCHN) Then StopChannel(VomitCHN)
+	EndIf
+	If CoughCHN <> 0 Then
+		If ChannelPlaying(CoughCHN) Then StopChannel(CoughCHN)
 	EndIf
 	If IntercomStreamCHN <> 0
 		StopStream_Strict(IntercomStreamCHN)
