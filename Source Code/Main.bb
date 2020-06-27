@@ -1056,7 +1056,7 @@ Function CreateButton(x#,y#,z#, pitch#,yaw#,roll#=0, Locked% = False)
 	Local obj% = CopyEntity(ButtonOBJ)	
 	
 	ScaleEntity(obj, 0.03, 0.03, 0.03)
-	EntityTexture(obj, ButtontextureLocked)
+	If Locked Then EntityTexture(obj, ButtontextureLocked)
 	PositionEntity obj, x,y,z
 	RotateEntity obj, pitch,yaw,roll
 	

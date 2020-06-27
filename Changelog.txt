@@ -93,7 +93,7 @@ Rooms:
 - Updated SCP-294's loading screen units to metric.
 - Changed the name of the Custom difficulty to "Esoteric".
 - User tracks and FPS limit options now collapse their related fields when disabled.
-- Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "testroom" -> "room682", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
+- Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "pj" -> "room372", "testroom" -> "room682", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
 - Improved gasmask model.
 - Flipped vest around.
@@ -104,6 +104,7 @@ Rooms:
 - Added "freeze" command, very fun!
 - Added "clear" command, which clears the console.
 - Added "ulti" command, which spawns a set of ultimate tools.
+- Added "togglecontrol" command, which toggles the remote door control system lever.
 - Added "noblink" command.
 - Reworked the disable/enable commands for SCP-173 and SCP-106 and adjusted the teleport commands accordingly.
 - Reworked "heal" command to work like SCP-500, removing any damage.
@@ -150,7 +151,7 @@ Bug Fixes:
 	- Fixed refined items of which the base version requires batteries being broken when spawned via command and removed the commands that acted as workarounds.
 	- Fixed Right and Down movement always overriding Left and Up movement.
 	- Fixed security camera bases rotating with the cameras.
-	- Fixed security camera positions in room173 and start.
+	- Fixed security camera positions in some rooms.
 	- Fixed SCP-860's door.
 	- Fixed decals disappearing after the intro sequence.
 	- Fixed animation of balcony guard.
