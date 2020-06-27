@@ -1051,7 +1051,7 @@ Function UpdateConsole()
 						StrTemp$ = ""
 					EndIf
 					
-					If Int(StrTemp)>=0 And Int(StrTemp)<MAXACHIEVEMENTS+1
+					If Int(StrTemp)>=0 And Int(StrTemp)<MAXACHIEVEMENTS
 						Achievements[Int(StrTemp)]=True
 						CreateConsoleMsg("Achievemt "+AchievementStrings[Int(StrTemp)]+" unlocked.")
 					Else

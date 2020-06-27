@@ -14,7 +14,7 @@ Type Difficulty
 	Field customizable%
 End Type
 
-Global difficulties.Difficulty[4]
+Global difficulties.Difficulty[5]
 
 Global SelectedDifficulty.Difficulty
 

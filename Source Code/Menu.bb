@@ -418,7 +418,7 @@ Function UpdateMainMenu()
 					CurrLoadGamePage = CurrLoadGamePage - 1
 				EndIf
 				
-				If ((First Save) = Null) Then
+				If SaveGameAmount = 0 Then
 					Text(x + 20 * MenuScale, y + 20 * MenuScale, GetLocalString("Menu", "nosavegames"))
 				Else
 					x = x + 20 * MenuScale
@@ -428,7 +428,7 @@ Function UpdateMainMenu()
 					
 					For i% = 0 To 4+(5*CurrLoadGamePage)
 						If i > 0 Then CurrSave = After CurrSave
-						If i >= (0+(5*CurrLoadGamePage))
+						If i >= (0+(5*CurrLoadGamePage)) Then
 							DrawFrame(x,y,540* MenuScale, 70* MenuScale)
 							
 							If CurrSave\Version <> CompatibleNumber Then

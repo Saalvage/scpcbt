@@ -7,7 +7,7 @@
 
 
 Type Template
-	Field sub_template.Template[7]								  ;Sub templates
+	Field sub_template.Template[8]								  ;Sub templates
 	Field emitter_blend											 ;blendmode of emitter entity
 	Field interval, particles_per_interval						  ;particle interval
 	Field max_particles											 ;max particles
@@ -18,7 +18,7 @@ Type Template
 	Field min_xv#, max_xv#, min_yv#, max_yv#, min_zv#, max_zv#	  ;Velocity
 	Field rot_vel1#, rot_vel2#, align_to_fall, align_to_fall_offset ;Rotation
 	Field gravity#												  ;Gravity
-	Field alpha#, alpha_vel										 ;Alpha
+	Field alpha#, alpha_vel%									 ;Alpha
 	Field sx#, sy#, size_multiplicator1#, size_multiplicator2#	  ;Size
 	Field size_add#, size_mult#									 ;Size velocity
 	Field r1, g1, b1, r2, g2, b2									;Colors

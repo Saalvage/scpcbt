@@ -1,6 +1,6 @@
 ;achievement menu & messages by InnocentSam
 
-Const MAXACHIEVEMENTS% = 37
+Const MAXACHIEVEMENTS% = 38
 Global Achievements%[MAXACHIEVEMENTS]
 Global AchievementStrings$[MAXACHIEVEMENTS]
 Global AchievementDescs$[MAXACHIEVEMENTS]
@@ -20,7 +20,7 @@ Global UsedConsole
 
 Global AchievementsMenu%
 Global AchvMSGenabled% = GetINIInt(OptionFile, "options", "achievement popup enabled")
-For i = 0 To MAXACHIEVEMENTS
+For i = 0 To MAXACHIEVEMENTS-1
 	Local loc2 = GetINISectionLocation(AchvIni, "s"+Str(i))
 	AchievementStrings[i] = GetINIString2(AchvIni, loc2, "name")
 	AchievementDescs[i] = GetINIString2(AchvIni, loc2, "desc")

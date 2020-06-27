@@ -121,7 +121,7 @@ Function SaveGame(file$, zonemod%=0)
 	WriteByte f, SoundTransmission
 	WriteByte f, Contained106
 	
-	For i = 0 To MAXACHIEVEMENTS
+	For i = 0 To MAXACHIEVEMENTS-1
 		WriteByte f, Achievements[i]
 	Next
 	WriteInt f, RefinedItems
@@ -647,7 +647,7 @@ Function LoadGame(file$)
 	SoundTransmission = ReadByte(f)
 	Contained106 = ReadByte(f)
 	
-	For i = 0 To MAXACHIEVEMENTS
+	For i = 0 To MAXACHIEVEMENTS-1
 		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
@@ -1534,7 +1534,7 @@ Function LoadGameQuick(file$, loadzone%=1)
 	SoundTransmission = ReadByte(f)	
 	Contained106 = ReadByte(f)	
 	
-	For i = 0 To MAXACHIEVEMENTS
+	For i = 0 To MAXACHIEVEMENTS-1
 		Achievements[i]=ReadByte(f)
 	Next
 	RefinedItems = ReadInt(f)
@@ -2176,22 +2176,6 @@ Function LoadGameQuick(file$, loadzone%=1)
 	;CatchErrors("Uncaught LoadGameQuick")
 End Function
 
-Function DeleteGame(I_SAV.Save)
-	I_SAV\Name = SavePath + I_SAV\Name + "\"
-	Local delDir% = ReadDir(I_SAV\Name)
-	If delDir <> 0 Then
-		NextFile(delDir) : NextFile(delDir) ;Skipping "." and ".."
-		Local file$=NextFile(delDir)
-		While file<>""
-			DeleteFile(I_SAV\Name + file)
-			file=NextFile$(delDir)
-		Wend
-		CloseDir(delDir)
-		DeleteDir(I_SAV\Name)
-	EndIf
-	Delete I_SAV
-End Function
-
 Global SavePath$ = "Saves\"
 
 Type Save
@@ -2236,6 +2220,22 @@ Function LoadSaveGames()
 	CloseDir myDir
 	
 	;CatchErrors("Uncaught LoadSaveGames")
+End Function
+
+Function DeleteGame(I_SAV.Save)
+	I_SAV\Name = SavePath + I_SAV\Name + "\"
+	Local delDir% = ReadDir(I_SAV\Name)
+	If delDir <> 0 Then
+		NextFile(delDir) : NextFile(delDir) ;Skipping "." and ".."
+		Local file$=NextFile(delDir)
+		While file<>""
+			DeleteFile(I_SAV\Name + file)
+			file=NextFile$(delDir)
+		Wend
+		CloseDir(delDir)
+		DeleteDir(I_SAV\Name)
+	EndIf
+	Delete I_SAV
 End Function
 
 ;~IDEal Editor Parameters:

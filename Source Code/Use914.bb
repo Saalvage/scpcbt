@@ -126,7 +126,7 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 							End Select
 						Case 5	
 							Local CurrAchvAmount%=0
-							For i = 0 To MAXACHIEVEMENTS
+							For i = 0 To MAXACHIEVEMENTS-1
 								If Achievements[i]=True
 									CurrAchvAmount=CurrAchvAmount+1
 								EndIf
@@ -134,25 +134,25 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 							
 							Select SelectedDifficulty\otherFactors
 								Case EASY
-									If Rand(0,((MAXACHIEVEMENTS)*3)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									EndIf
 								Case NORMAL
-									If Rand(0,((MAXACHIEVEMENTS)*4)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									EndIf
 								Case HARD
-									If Rand(0,((MAXACHIEVEMENTS)*5)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
 									EndIf
 								Case EXTREME
-									If Rand(0,((MAXACHIEVEMENTS)*6)-((CurrAchvAmount-1)*3))=0
+									If Rand(0,((MAXACHIEVEMENTS-1)*6)-((CurrAchvAmount-1)*3))=0
 										it2 = CreateItem("keyomni", x, y, z)
 									Else
 										it2 = CreateItem("misc", x, y, z, "keymaster")
@@ -161,7 +161,7 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 					End Select
 				Case VERY_FINE
 					CurrAchvAmount%=0
-					For i = 0 To MAXACHIEVEMENTS
+					For i = 0 To MAXACHIEVEMENTS-1
 						If Achievements[i]=True
 							CurrAchvAmount=CurrAchvAmount+1
 						EndIf
@@ -169,25 +169,25 @@ Function Use914(item.Items, setting%, x#, y#, z#)
 					
 					Select SelectedDifficulty\otherFactors
 						Case EASY
-							If Rand(0,((MAXACHIEVEMENTS)*3)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*3)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
 							EndIf
 						Case NORMAL
-							If Rand(0,((MAXACHIEVEMENTS)*4)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*4)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
 							EndIf
 						Case HARD
-							If Rand(0,((MAXACHIEVEMENTS)*5)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*5)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")
 							EndIf
 						Case EXTREME
-							If Rand(0,((MAXACHIEVEMENTS)*6)-((CurrAchvAmount-1)*3))=0
+							If Rand(0,((MAXACHIEVEMENTS-1)*6)-((CurrAchvAmount-1)*3))=0
 								it2 = CreateItem("keyomni", x, y, z)
 							Else
 								it2 = CreateItem("misc", x, y, z, "keymaster")

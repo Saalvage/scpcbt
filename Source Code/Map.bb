@@ -916,7 +916,7 @@ Function PlaceForest(fr.Forest,x#,y#,z#,r.Rooms)
 	
 	;load assets
 	
-	Local hmap[ROOM4], mask[ROOM4]
+	Local hmap[6], mask[6] ; TODO 0 unused
 	Local GroundTexture = LoadTexture_Strict("GFX\map\forest\forestfloor.jpg")
 	;TextureBlend GroundTexture, FE_ALPHACURRENT
 	Local PathTexture = LoadTexture_Strict("GFX\map\forest\forestpath.jpg")
@@ -1353,7 +1353,7 @@ Const MapWidth% = 12, MapHeight% = 12
 Dim MapTemp%(MapWidth+1, MapHeight+1)
 Dim MapFound%(MapWidth+1, MapHeight+1)
 
-Global RoomAmbience%[9]
+Global RoomAmbience%[10]
 
 Global Sky
 
@@ -5808,7 +5808,7 @@ Type SecurityCams
 	Field MinAngle#, MaxAngle#, dir%
 End Type
 
-Global ScreenTexs%[1]
+Global ScreenTexs%[2]
 
 Global CurrRoom2slRenderCam%
 Global Room2slCam%
@@ -6594,7 +6594,7 @@ Function CreateMap(zone%)
 		y = y - height
 	Until y < 2
 	
-	Local RoomAmount[4]
+	Local RoomAmount[5]
 	;Room1Amount%[3], Room2Amount%[3],Room2CAmount%[3],Room3Amount%[3],Room4Amount%[3]
 	; Room1: 0
 	; Room2: 1
@@ -7275,7 +7275,7 @@ Function UpdateRoomLights(cam%)
 	
 	For r.Rooms = Each Rooms
 		If r\dist < HideDistance*0.7 Lor r = PlayerRoom Then
-			For i = 0 To r\MaxLights%
+			For i = 0 To r\MaxLights% - 1
 				If r\Lights%[i]<>0 Then
 					If EnableRoomLights% And (SecondaryLightOn>0.5) And cam%=Camera Then
 						EntityOrder r\LightSprites2[i],-1
@@ -7550,7 +7550,7 @@ End Function
 ;CHUNKS FOR 1499
 ;#########################################################################
 
-Global CHUNKDATA[64 * 64 - 1]
+Global CHUNKDATA[64 * 64]
 
 Function SetChunkDataValues()
 	Local StrTemp$,i%,j%
@@ -8051,9 +8051,9 @@ End Type
 Type FluLight
 	Field id%
 	Field obj%
-	Field tex%[MaxFluTextures-1]
+	Field tex%[MaxFluTextures]
 	Field time#
-	Field sfx%[MaxFluSounds-1]
+	Field sfx%[MaxFluSounds]
 	Field flashsprite%
 	Field lightobj%
 	Field room.Rooms

@@ -204,7 +204,7 @@ Global ButtonSFX%, ButtonSFX2%
 Global EnableSFXRelease% = GetINIInt(OptionFile, "audio", "sfx release")
 Global EnableSFXRelease_Prev% = EnableSFXRelease%
 
-Global ArrowIMG[3]
+Global ArrowIMG[4]
 
 Global Data294$ = "Data\SCP-294.ini"
 
@@ -399,7 +399,7 @@ Global Stamina#, StaminaEffect#=1.0, StaminaEffectTimer#
 
 Global CameraShakeTimer#, Vomit%, VomitTimer#, Regurgitate%
 
-Global SCP1025state#[7]
+Global SCP1025state#[8]
 
 Global HeartBeatRate#, HeartBeatTimer#, HeartBeatVolume#
 
@@ -453,18 +453,18 @@ Global MsgTimer#, Msg$, DeathMSG$
 Global AccessCode%, KeypadInput$, KeypadTimer#, KeypadMSG$
 
 Global DrawHandIcon%
-Global DrawArrowIcon%[3]
+Global DrawArrowIcon%[4]
 
 ;misc ---------------------------------------------------------------------------------------------------------------
 
 Include "Source Code\Difficulty.bb"
 
-Global MTFtimer#, MTFrooms.Rooms[6], MTFroomState%[6]
+Global MTFtimer#, MTFrooms.Rooms[7], MTFroomState%[7]
 
-Global RadioState#[8]
-Global RadioState3%[6]
-Global RadioState4%[9]
-Global RadioCHN%[6]
+Global RadioState#[9]
+Global RadioState3%[7]
+Global RadioState4%[10]
+Global RadioCHN%[7]
 
 Global OldAiPics%[7]
 
@@ -564,12 +564,12 @@ Include "Source Code\Dreamfilter.bb"
 ;----------------------------------------------  Sounds -----------------------------------------------------
 
 Global SoundEmitter%
-Global TempSounds%[9]
+Global TempSounds%[10]
 Global TempSoundCHN%
 Global TempSoundIndex% = 0
 
 ;The Music now has to be pre-defined, as the new system uses streaming instead of the usual sound loading system Blitz3D has
-Global Music$[26]
+Global Music$[27]
 Music[0] = "The Dread"
 Music[1] = "HeavyContainment"
 Music[2] = "EntranceZone"
@@ -784,7 +784,7 @@ Global room2gw_z# = 0.0
 
 Global ParticleAmount% = GetINIInt(OptionFile,"options","particle amount")
 
-Global NavImages[4]
+Global NavImages[5]
 For i = 0 To 3
 	NavImages[i] = LoadImage_Strict("GFX\navigator\roomborder"+i+".png")
 	MaskImage NavImages[i],255,0,255
@@ -795,16 +795,16 @@ Global NavBG = CreateImage(I_Opt\GraphicWidth,I_Opt\GraphicHeight)
 
 Global LightConeModel
 
-Global ParticleEffect%[2]
+Global ParticleEffect%[3]
 
-Global DTextures%[10]
+Global DTextures%[11]
 
 Global NPC049OBJ, NPC0492OBJ
 Global ClerkOBJ
 
 Global IntercomStreamCHN%
 
-Global ForestNPC,ForestNPCTex,ForestNPCData#[2]
+Global ForestNPC,ForestNPCTex,ForestNPCData#[3]
 
 
 
@@ -1249,11 +1249,11 @@ Function UpdateDoors()
 				
 				If d\locked <> d\lockedupdated Then
 					If d\locked Then
-						For i = 0 To 2
+						For i = 0 To 1
 							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtontextureLocked)
 						Next
 					Else
-						For i = 0 To 2
+						For i = 0 To 1
 							If d\buttons[i] <> 0 Then EntityTexture(d\buttons[i], ButtonTexture)
 						Next
 					EndIf
@@ -1486,7 +1486,7 @@ Global FogNVTexture%
 Global TeslaTexture%
 
 Global LightTexture%, Light%
-Global LightSpriteTex%[2]
+Global LightSpriteTex%[3]
 Global DoorOBJ%, DoorFrameOBJ%
 
 Global LeverOBJ%, LeverBaseOBJ%
@@ -1532,8 +1532,8 @@ Global Input_ResetTime# = 0
 Type SCP427
 	Field Using%
 	Field Timer#
-	Field Sound[1]
-	Field SoundCHN[1]
+	Field Sound[2]
+	Field SoundCHN[2]
 	Field Amount%
 End Type
 
@@ -2268,12 +2268,12 @@ Function DrawEnding()
 					Next
 					
 					Local achievementsUnlocked =0
-					For i = 0 To MAXACHIEVEMENTS
+					For i = 0 To MAXACHIEVEMENTS-1
 						achievementsUnlocked = achievementsUnlocked + Achievements[i]
 					Next
 					
 					Text x, y, "SCPs encountered: " +scpsEncountered
-					Text x, y+20*MenuScale, "Achievements unlocked: " + achievementsUnlocked+"/"+(MAXACHIEVEMENTS+1)
+					Text x, y+20*MenuScale, "Achievements unlocked: " + achievementsUnlocked+"/"+(MAXACHIEVEMENTS)
 					Text x, y+40*MenuScale, "Rooms found: " + roomsfound+"/"+roomamount
 					Text x, y+60*MenuScale, "Documents discovered: " +docsfound+"/"+docamount
 					Text x, y+80*MenuScale, "Items refined in SCP-914: " +RefinedItems			
@@ -6119,7 +6119,7 @@ Function DrawMenu()
 			
 			If AchievementsMenu>0 Then
 				;DebugLog AchievementsMenu
-				If AchievementsMenu <= Floor(Float(MAXACHIEVEMENTS)/12.0) Then 
+				If AchievementsMenu <= Floor(Float(MAXACHIEVEMENTS-1)/12.0) Then 
 					If DrawButton(x+341*MenuScale, y + 344*MenuScale, 50*MenuScale, 60*MenuScale, ">") Then
 						AchievementsMenu = AchievementsMenu+1
 					EndIf
@@ -6131,7 +6131,7 @@ Function DrawMenu()
 				EndIf
 				
 				For i=0 To 11
-					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS+1 Then
+					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS Then
 						DrawAchvIMG(AchvXIMG,y+((i/4)*120*MenuScale),i+((AchievementsMenu-1)*12))
 					Else
 						Exit
@@ -6139,7 +6139,7 @@ Function DrawMenu()
 				Next
 				
 				For i=0 To 11
-					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS+1 Then
+					If i+((AchievementsMenu-1)*12)<MAXACHIEVEMENTS Then
 						If MouseOn(AchvXIMG+((i Mod 4)*SeparationConst),y+((i/4)*120*MenuScale),64*scale,64*scale) Then
 							AchievementTooltip(i+((AchievementsMenu-1)*12))
 							Exit
@@ -6910,7 +6910,7 @@ Function InitNewGame(zone%=0)
 	Next	
 	
 	For r.Rooms = Each Rooms
-		For i = 0 To MaxRoomLights
+		For i = 0 To MaxRoomLights-1
 			If r\Lights[i]<>0 Then EntityParent(r\Lights[i],0)
 		Next
 		
@@ -7210,7 +7210,7 @@ Function NullGame(playbuttonsfx%=True)
 		Delete s
 	Next
 	
-	For i = 0 To MAXACHIEVEMENTS
+	For i = 0 To MAXACHIEVEMENTS-1
 		Achievements[i]=0
 	Next
 	RefinedItems = 0
