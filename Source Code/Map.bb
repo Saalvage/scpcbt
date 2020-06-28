@@ -1907,7 +1907,7 @@ Function FillRoom(r.Rooms)
 			ScaleSprite(r\Objects[1],0.18*0.5,0.145*0.5)
 			TurnEntity(r\Objects[1],0,13.0,0)
 			MoveEntity r\Objects[1], 0,0,-0.022
-			EntityTexture (r\Objects[1],OldAiPics[0])
+			EntityTexture (r\Objects[1],OldAiPics[6])
 			
 			HideEntity r\Objects[1]
 			
@@ -6068,7 +6068,7 @@ Function UpdateSecurityCams()
 						EndIf
 						
 						If Rand(500) = 1 Then
-							EntityTexture(sc\ScrOverlay, OldAiPics[0])
+							EntityTexture(sc\ScrOverlay, OldAiPics[Rand(1, 6)])
 						EndIf
 						
 						If (MilliSecs() Mod sc\PlayerState) >= Rand(600) Then
@@ -6081,7 +6081,7 @@ Function UpdateSecurityCams()
 								sc\soundCHN = PlaySound_Strict(LoadTempSound("SFX\SCP\079\Broadcast"+Rand(1,3)+".ogg"))
 								If sc\CoffinEffect=2 Then sc\CoffinEffect=3 : sc\PlayerState = 0
 							EndIf
-							EntityTexture(sc\ScrOverlay, OldAiPics[0])
+							EntityTexture(sc\ScrOverlay, OldAiPics[Rand(1, 6)])
 						EndIf
 						
 					EndIf
