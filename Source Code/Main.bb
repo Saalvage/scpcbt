@@ -973,7 +973,6 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 				Else
 					d\buttons[i] = CopyEntity(ButtonOBJ)
 				EndIf
-				ScaleEntity(d\buttons[i], 0.03, 0.03, 0.03)
 			Else
 				d\buttons[i] = CopyEntity(ButtonOBJ)
 			EndIf

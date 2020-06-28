@@ -1,0 +1,20 @@
+default:
+lum 20
+
+205:
+blur 2
+del ramp!
+2x -> 1
+
+079:
+lum 30
+
+035:
+lum 25
+
+archive:
+blur 2
+lum 30
+
+tunn3l:
+blur 2
