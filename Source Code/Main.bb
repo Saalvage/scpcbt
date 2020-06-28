@@ -966,7 +966,14 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 			If keycard>0 Then
 				d\buttons[i]= CopyEntity(ButtonKeyOBJ)
 			ElseIf keycard<0
-				d\buttons[i]= CopyEntity(ButtonScannerOBJ)	
+				d\buttons[i]= CopyEntity(ButtonScannerOBJ)
+			ElseIf big = 3
+				If i = 0 Then
+					d\buttons[i] = CopyEntity(ButtonElevatorOBJ)
+				Else
+					d\buttons[i] = CopyEntity(ButtonOBJ)
+				EndIf
+				ScaleEntity(d\buttons[i], 0.03, 0.03, 0.03)
 			Else
 				d\buttons[i] = CopyEntity(ButtonOBJ)
 			EndIf
@@ -1499,7 +1506,7 @@ Global DoorOBJ%, DoorFrameOBJ%
 Global LeverOBJ%, LeverBaseOBJ%
 
 Global DoorColl%
-Global ButtonOBJ%, ButtonKeyOBJ%, ButtonCodeOBJ%, ButtonScannerOBJ%
+Global ButtonOBJ%, ButtonKeyOBJ%, ButtonCodeOBJ%, ButtonScannerOBJ%, ButtonElevatorOBJ%
 
 Dim DecalTextures%(20)
 
@@ -6559,6 +6566,8 @@ Function LoadEntities()
 	HideEntity ButtonCodeOBJ	
 	ButtonScannerOBJ = LoadMesh_Strict("GFX\map\ButtonScanner.b3d")
 	HideEntity ButtonScannerOBJ	
+	ButtonElevatorOBJ = LoadMesh_Strict("GFX\map\ButtonElevator.b3d")
+	HideEntity(ButtonElevatorOBJ)
 	
 	BigDoorOBJ(0) = LoadMesh_Strict("GFX\map\ContDoorLeft.x")
 	HideEntity BigDoorOBJ(0)
