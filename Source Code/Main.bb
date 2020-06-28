@@ -979,28 +979,25 @@ Function CreateDoor.Doors(lvl, x#, y#, z#, angle#, room.Rooms, dopen% = False,  
 		EndIf
 		
 		ScaleEntity(d\buttons[i], 0.03, 0.03, 0.03)
-	Next
-	
-	For i = 0 To 1
-		If d\buttons[i] <> 0 Then
-			If big = 1 Then
-				If i = 0 Then
-					PositionEntity(d\buttons[i], x - 432.0 * RoomScale, y + 0.7, z + 192.0 * RoomScale)
-				Else
-					PositionEntity(d\buttons[i], x + 432.0 * RoomScale, y + 0.7, z - 192.0 * RoomScale)
-				EndIf
-				RotateEntity(d\buttons[i], 0.0, 90.0 + (i * 180.0), 0.0)
+		
+		If big = 1 Then
+			If i = 0 Then
+				PositionEntity(d\buttons[i], x - 432.0 * RoomScale, y + 0.7, z + 192.0 * RoomScale)
 			Else
-				If i = 0 Then
-					PositionEntity(d\buttons[i], x + 0.6, y + 0.7, z - 0.1)
-				Else
-					PositionEntity(d\buttons[i], x - 0.6, y + 0.7, z + 0.1)
-					RotateEntity(d\buttons[i], 0.0, 180.0, 0.0)
-				EndIf
+				PositionEntity(d\buttons[i], x + 432.0 * RoomScale, y + 0.7, z - 192.0 * RoomScale)
 			EndIf
-			EntityParent(d\buttons[i], d\frameobj)
-			EntityPickMode(d\buttons[i], 2)
+			RotateEntity(d\buttons[i], 0.0, 90.0 + (i * 180.0), 0.0)
+		Else
+			If i = 0 Then
+				PositionEntity(d\buttons[i], x + 0.6, y + 0.7, z - 0.1)
+			Else
+				PositionEntity(d\buttons[i], x - 0.6, y + 0.7, z + 0.1)
+				RotateEntity(d\buttons[i], 0.0, 180.0, 0.0)
+			EndIf
 		EndIf
+		
+		EntityParent(d\buttons[i], d\frameobj)
+		EntityPickMode(d\buttons[i], 2)
 	Next
 	
 	PositionEntity d\obj, x, y, z
