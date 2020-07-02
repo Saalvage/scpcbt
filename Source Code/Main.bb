@@ -745,7 +745,7 @@ Global MonitorTimer# = 0.0, MonitorTimer2# = 0.0, UpdateCheckpoint1%, UpdateChec
 Global PlayerDetected%
 Global PrevInjuries#,PrevBloodloss#
 
-Global NVGImages = LoadAnimImage("GFX\battery.png",64,64,0,3)
+Global NVGImages = LoadImage("GFX\battery.png")
 MaskImage NVGImages,255,0,255
 
 Global Wearing1499% = False
@@ -8627,7 +8627,10 @@ Function RenderWorld2(tween#)
 			For np.NPCs = Each NPCs
 				If np\NVName<>"" And (Not np\HideFromNVG) Then ;don't waste your time if the string is empty
 					PositionEntity temp2,np\NVX,np\NVY,np\NVZ
-					If EntityDistanceSquared(temp2,Collider) < PowTwo(23.5) Then ;don't draw text if the NPC is too far away
+					
+					Local Dist# = EntityDistanceSquared(Temp2, Collider)
+					
+					If Dist < PowTwo(23.5) Then ;don't draw text if the NPC is too far away
 						PointEntity temp, temp2
 						yawvalue# = WrapAngle(EntityYaw(Camera) - EntityYaw(temp))
 						xvalue# = 0.0
@@ -8650,7 +8653,7 @@ Function RenderWorld2(tween#)
 						
 						If (Not IsNVGBlinking%)
 							Text I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2),np\NVName,True,True
-							Text I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
+							Text I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2) + 30.0 * MenuScale,f2s(Sqr(Dist),1)+" m",True,True
 						EndIf
 					EndIf
 				EndIf
@@ -8667,10 +8670,17 @@ Function RenderWorld2(tween#)
 		For k=0 To 10
 			Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
 		Next
+		If WearingNightVision = 2
+			Color(0, 0, 255)
+		ElseIf WearingNightVision = 1
+			Color(0, 255, 0)
+		Else ;SCRAMBLE or NoVG
+			Color(255, 255, 255)
+		EndIf
 		For l=0 To Min(Floor((power%+50)*0.01), 11)
 			Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
 		Next
-		DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,2
+		DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30
 		
 		If hasBattery = 1 And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
