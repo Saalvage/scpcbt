@@ -95,6 +95,7 @@ Rooms:
 - User tracks and FPS limit options now collapse their related fields when disabled.
 - Changed a few room names for consistency: "008" -> "room008", "173" -> "room173", "pj" -> "room372", "testroom" -> "room682", "coffin" -> "room895", "914" -> "room914", "exit1" -> "gateb"
 - SCP-970's "darkness" effect is now applied in a smooth fashion.
+- Added unique elevator buttons.
 - Improved gasmask model.
 - Improved chair model.
 - Flipped vest around.
