@@ -141,7 +141,7 @@ Bug Fixes:
 	- Fixed SCP-173 not breaking the glass in the testroom event if the player looked away.
 	- Fixed SCP-966's walking animations.
 	- Fixed SCP-1025's appendicitis messages not showing up.
-	- Fixed SCP-1074-A's scream being able to be heard anywhere.
+	- Fixed SCP-1048-A's scream being able to be heard anywhere.
 	- Fixed being able to see SCP-1048 disappearing in room682 when using the keycard scanner.
 	- Fixed godmode not protecting against all injuries.
 	- Fixed inventory single clicks being recognized as double clicks.

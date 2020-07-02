@@ -745,7 +745,7 @@ Global MonitorTimer# = 0.0, MonitorTimer2# = 0.0, UpdateCheckpoint1%, UpdateChec
 Global PlayerDetected%
 Global PrevInjuries#,PrevBloodloss#
 
-Global NVGImages = LoadAnimImage("GFX\battery.png",64,64,0,3)
+Global NVGImages = LoadImage("GFX\battery.png")
 MaskImage NVGImages,255,0,255
 
 Global Wearing1499% = False
@@ -1641,7 +1641,7 @@ Repeat
 				Input_ResetTime = Max(Input_ResetTime-FPSfactor,0.0)
 			EndIf
 			
-			If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And PlayerRoom\RoomTemplate\Name <> "gateb" And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
+			If PlayerRoom\RoomTemplate\Name <> "pocketdimension" And PlayerRoom\RoomTemplate\Name <> "gatea" And (PlayerRoom\RoomTemplate\Name <> "gateb" And EntityY(Collider) =< 1040.0 * RoomScale) And (Not MenuOpen) And (Not ConsoleOpen) And (Not InvOpen) Then
 				
 				If Rand(1500) = 1 Then
 					For i = 0 To 5
@@ -5640,7 +5640,7 @@ Function DrawMenu()
 		
 		;DebugLog AchievementsMenu+"|"+OptionsMenu+"|"+QuitMSG
 		
-		If PlayerRoom\RoomTemplate\Name$ <> "gateb" And PlayerRoom\RoomTemplate\Name$ <> "gatea"
+		If (PlayerRoom\RoomTemplate\Name$ <> "gateb" And EntityY(Collider) =< 1040.0 * RoomScale) And PlayerRoom\RoomTemplate\Name$ <> "gatea"
 			If StopHidingTimer = 0 Then
 				If EntityDistanceSquared(Curr173\Collider, Collider) < PowTwo(4.0) Lor EntityDistanceSquared(Curr106\Collider, Collider) < PowTwo(4.0) Then
 					StopHidingTimer = 1
@@ -7913,7 +7913,7 @@ Function UpdateInfect()
 				BlinkTimer = Max(Min(-10*(Infect-96),BlinkTimer),-10)
 				If PlayerRoom\RoomTemplate\Name = "dimension1499" Then
 					DeathMSG = GetLocalString("Deaths", "0081499")
-				ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Lor PlayerRoom\RoomTemplate\Name = "gateb" Then
+				ElseIf PlayerRoom\RoomTemplate\Name = "gatea" Lor (PlayerRoom\RoomTemplate\Name = "gateb" And EntityY(Collider) > 1040.0 * RoomScale) Then
 					If PlayerRoom\RoomTemplate\Name = "gatea" Then
 						DeathMSG = GetLocalString("Deaths", "008gatea")
 					Else
@@ -8523,7 +8523,7 @@ Function RenderWorld2(tween#)
 	ElseIf WearingNightVision=3
 		AmbientLight 255,255,255
 	ElseIf PlayerRoom<>Null
-		If (PlayerRoom\RoomTemplate\Name<>"room173") And (PlayerRoom\RoomTemplate\Name<>"gateb") And (PlayerRoom\RoomTemplate\Name<>"gatea") Then
+		If (PlayerRoom\RoomTemplate\Name<>"room173") And (PlayerRoom\RoomTemplate\Name<>"gateb" And EntityY(Collider) =< 1040.0 * RoomScale) And (PlayerRoom\RoomTemplate\Name<>"gatea") Then
 			AmbientLight Brightness, Brightness, Brightness
 		EndIf
 	EndIf
@@ -8627,7 +8627,10 @@ Function RenderWorld2(tween#)
 			For np.NPCs = Each NPCs
 				If np\NVName<>"" And (Not np\HideFromNVG) Then ;don't waste your time if the string is empty
 					PositionEntity temp2,np\NVX,np\NVY,np\NVZ
-					If EntityDistanceSquared(temp2,Collider) < PowTwo(23.5) Then ;don't draw text if the NPC is too far away
+					
+					Local Dist# = EntityDistanceSquared(Temp2, Collider)
+					
+					If Dist < PowTwo(23.5) Then ;don't draw text if the NPC is too far away
 						PointEntity temp, temp2
 						yawvalue# = WrapAngle(EntityYaw(Camera) - EntityYaw(temp))
 						xvalue# = 0.0
@@ -8650,7 +8653,7 @@ Function RenderWorld2(tween#)
 						
 						If (Not IsNVGBlinking%)
 							Text I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2),np\NVName,True,True
-							Text I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2) + 30.0 * MenuScale,f2s(dist,1)+" m",True,True
+							Text I_Opt\GraphicWidth / 2 + xvalue * (I_Opt\GraphicWidth / 2),I_Opt\GraphicHeight / 2 - yvalue * (I_Opt\GraphicHeight / 2) + 30.0 * MenuScale,f2s(Sqr(Dist),1)+" m",True,True
 						EndIf
 					EndIf
 				EndIf
@@ -8667,10 +8670,17 @@ Function RenderWorld2(tween#)
 		For k=0 To 10
 			Rect 45,I_Opt\GraphicHeight*0.5-(k*20),54,10,True
 		Next
+		If WearingNightVision = 2
+			Color(0, 0, 255)
+		ElseIf WearingNightVision = 1
+			Color(0, 255, 0)
+		Else ;SCRAMBLE or NoVG
+			Color(255, 255, 255)
+		EndIf
 		For l=0 To Min(Floor((power%+50)*0.01), 11)
 			Rect 45,I_Opt\GraphicHeight*0.5-(l*20),54,10,True
 		Next
-		DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30,2
+		DrawImage NVGImages,40,I_Opt\GraphicHeight*0.5+30
 		
 		If hasBattery = 1 And ((MilliSecs() Mod 800) < 400) Then
 			Color 255,0,0
