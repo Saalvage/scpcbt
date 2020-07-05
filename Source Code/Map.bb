@@ -5810,9 +5810,6 @@ End Type
 
 Global ScreenTexs%[2]
 
-Global CurrRoom2slRenderCam%
-Global Room2slCam%
-
 Function CreateSecurityCam.SecurityCams(x#, y#, z#, r.Rooms, screen% = False)
 	Local sc.SecurityCams = New SecurityCams
 	
