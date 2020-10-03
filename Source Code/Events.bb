@@ -2944,7 +2944,6 @@ Function UpdateEvents()
 				
 				If e\EventState = 0 Then
 					CreateNPC(NPCtype066, EntityX(e\room\obj), EntityY(e\room\obj)+0.5, EntityZ(e\room\obj))
-					CreateConsoleMsg(EntityY(e\room\obj))
 					e\EventState = 1
 				EndIf
 
