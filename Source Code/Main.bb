@@ -4144,14 +4144,13 @@ Function DrawGUI()
 		If SelectedItem <> Null Then
 			Select SelectedItem\itemtemplate\tempname
 				Case "badnvg","nvg","supernvg","finenvg"
-
-					If CanUseItem(False, False) Then
-						If SelectedItem\Picked = 2 Then
-							Msg = GetLocalString("Messages", "nvgoff")
-							WearingNightVision = 0
-							CameraFogFar = StoredCameraFogFar
-							SelectedItem\Picked = 1
-						ElseIf WearingNightVision=0
+					If SelectedItem\Picked = 2 Then
+						Msg = GetLocalString("Messages", "nvgoff")
+						WearingNightVision = 0
+						CameraFogFar = StoredCameraFogFar
+						SelectedItem\Picked = 1
+					ElseIf WearingNightVision=0
+						If CanUseItem(False, False) Then
 							Msg = GetLocalString("Messages", "nvgon")
 							WearingGasMask = 0
 							Select SelectedItem\itemtemplate\tempname
@@ -4169,30 +4168,28 @@ Function DrawGUI()
 								CameraFogFar = 30
 							EndIf
 							SelectedItem\Picked = 2
-						Else
-							Msg = GetLocalString("Messages", "nvgdouble")
 						EndIf
+					Else
+						Msg = GetLocalString("Messages", "nvgdouble")
 					EndIf
 					SelectedItem = Null
 					MsgTimer = 70 * 5
 				Case "scramble"
-					If CanUseItem(False, False)
-						If SelectedItem\Picked = 2 Then
-							SelectedItem\Picked = 1
-							WearingScramble = False
-							Msg = GetLocalString("Messages", "scrambleoff")
-						Else
-							If WearingScramble = False Then
-								SelectedItem\Picked = 2
-								WearingScramble = SelectedItem\state2 + 1
-								Msg = GetLocalString("Messages", "scrambleon")
-							Else
-								Msg = GetLocalString("Messages", "scrambledouble")
-							EndIf
+					If SelectedItem\Picked = 2 Then
+						SelectedItem\Picked = 1
+						WearingScramble = False
+						Msg = GetLocalString("Messages", "scrambleoff")
+					ElseIf WearingScramble = False Then
+						If CanUseItem(False, False)
+							SelectedItem\Picked = 2
+							WearingScramble = SelectedItem\state2 + 1
+							Msg = GetLocalString("Messages", "scrambleon")
 						EndIf
-						SelectedItem = Null
-						MsgTimer = 70 * 5
-					EndIf
+					Else
+						Msg = GetLocalString("Messages", "scrambledouble")
+					Endif
+					SelectedItem = Null
+					MsgTimer = 70 * 5
 				Case "scp1123"
 					If Not (Wearing714 = 1) Then
 						If PlayerRoom\RoomTemplate\Name <> "room1123" Then
@@ -5129,12 +5126,12 @@ Function DrawGUI()
 
 				Case "badgasmask", "gasmask", "supergasmask", "heavygasmask"
 
-					If CanUseItem(False, False) Then
-						If SelectedItem\Picked = 2 Then
-							Msg = GetLocalString("Messages", "gasmaskremove")
-							WearingGasMask = 0
-							SelectedItem\Picked = 1
-						ElseIf WearingGasMask=0
+					If SelectedItem\Picked = 2 Then
+						Msg = GetLocalString("Messages", "gasmaskremove")
+						WearingGasMask = 0
+						SelectedItem\Picked = 1
+					ElseIf WearingGasMask=0
+						If CanUseItem(False, False) Then
 							Select SelectedItem\itemtemplate\tempname
 								Case "badgasmask"
 									Msg = GetLocalString("Messages", "gasmaskharder")
@@ -5150,9 +5147,9 @@ Function DrawGUI()
 								WearingGasMask = 3
 							End Select
 							SelectedItem\Picked = 2
-						Else
-							Msg = GetLocalString("Messages", "gasmaskdouble")
-						EndIf
+						Endif
+					Else
+						Msg = GetLocalString("Messages", "gasmaskdouble")
 					EndIf
 					SelectedItem = Null
 					MsgTimer = 70 * 5
