@@ -69,6 +69,8 @@ Function SaveGame(file$, zonemod%=0)
 	WriteByte f, Vomit
 	WriteFloat f, CameraShakeTimer
 	WriteFloat f, Infect
+
+	WriteInt f, MaxItemAmount
 	
 	For i = 0 To CUSTOM
 		If (SelectedDifficulty = difficulties[i]) Then
@@ -604,6 +606,8 @@ Function LoadGame(file$)
 	Vomit = ReadByte(f)
 	CameraShakeTimer = ReadFloat(f)
 	Infect = ReadFloat(f)
+
+	MaxItemAmount = ReadInt(f)
 	
 	Local difficultyIndex = ReadByte(f)
 	SelectedDifficulty = difficulties[difficultyIndex]
@@ -1491,6 +1495,8 @@ Function LoadGameQuick(file$, loadzone%=1)
 	Vomit = ReadByte(f)
 	CameraShakeTimer = ReadFloat(f)
 	Infect = ReadFloat(f)
+
+	MaxItemAmount = ReadInt(f)
 	
 	Local difficultyIndex = ReadByte(f)
 	SelectedDifficulty = difficulties[difficultyIndex]
